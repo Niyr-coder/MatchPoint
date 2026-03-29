@@ -3,30 +3,39 @@
 import { motion } from "framer-motion"
 import { Trophy, Users, Plus } from "lucide-react"
 import Link from "next/link"
+import type { Tournament } from "@/lib/tournaments/queries"
 
-interface Torneo {
-  id: string
-  nombre: string
-  deporte: string
-  fecha: string
-  participantes: string
-  estado: "abierto" | "proximo" | "en_curso"
+interface TorneosPanelProps {
+  tournaments: Tournament[]
 }
 
-const PLACEHOLDER_TORNEOS: Torneo[] = [
-  { id: "1", nombre: "Copa Pádel Quito 2025", deporte: "Pádel", fecha: "15 Abr", participantes: "12/16", estado: "abierto" },
-  { id: "2", nombre: "Torneo Fútbol 5 Primavera", deporte: "Fútbol 5", fecha: "22 Abr", participantes: "8/12", estado: "abierto" },
-  { id: "3", nombre: "Open de Tenis Norte", deporte: "Tenis", fecha: "3 May", participantes: "4/32", estado: "proximo" },
-  { id: "4", nombre: "Liga Pickleball Amateur", deporte: "Pickleball", fecha: "10 May", participantes: "16/20", estado: "en_curso" },
-]
+type DisplayEstado = "abierto" | "en_curso" | "completado"
 
-const ESTADO_STYLES: Record<Torneo["estado"], { label: string; classes: string }> = {
+const ESTADO_STYLES: Record<DisplayEstado, { label: string; classes: string }> = {
   abierto: { label: "Abierto", classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
-  proximo: { label: "Próximo", classes: "bg-blue-50 text-blue-700 border-blue-200" },
   en_curso: { label: "En curso", classes: "bg-amber-50 text-amber-700 border-amber-200" },
+  completado: { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
 }
 
-export function TorneosPanel() {
+const STATUS_MAP: Record<string, DisplayEstado> = {
+  open: "abierto",
+  in_progress: "en_curso",
+  completed: "completado",
+}
+
+const SPORT_LABEL: Record<string, string> = {
+  futbol: "Fútbol",
+  padel: "Pádel",
+  tenis: "Tenis",
+  pickleball: "Pickleball",
+}
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr + "T12:00:00")
+  return date.toLocaleDateString("es-EC", { day: "numeric", month: "short" })
+}
+
+export function TorneosPanel({ tournaments }: TorneosPanelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -36,7 +45,6 @@ export function TorneosPanel() {
       className="relative rounded-2xl overflow-hidden"
       style={{ background: "#1a56db" }}
     >
-
       <div className="relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
@@ -57,33 +65,53 @@ export function TorneosPanel() {
           </Link>
         </div>
 
-        {/* Horizontal scroll tournament cards */}
-        <div className="flex gap-4 overflow-x-auto px-6 py-5 scrollbar-hide">
-          {PLACEHOLDER_TORNEOS.map((t) => {
-            const est = ESTADO_STYLES[t.estado]
-            return (
-              <div
-                key={t.id}
-                className="shrink-0 w-52 rounded-xl bg-white/15 border border-white/20 p-4 hover:bg-white/25 transition-colors cursor-pointer"
-              >
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${est.classes}`}>
-                    {est.label}
-                  </span>
-                </div>
-                <h3 className="text-sm font-black text-white leading-tight mb-1">{t.nombre}</h3>
-                <p className="text-[11px] text-white/70 mb-3">{t.deporte}</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <Users className="size-3 text-white/60" />
-                    <span className="text-[11px] font-bold text-white/70">{t.participantes}</span>
+        {/* Tournament cards */}
+        {tournaments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <Trophy className="size-8 text-white/30" />
+            <p className="text-sm font-bold text-white/50">No hay torneos abiertos ahora</p>
+            <Link
+              href="/dashboard/tournaments/create"
+              className="text-[11px] font-black text-white/70 hover:text-white underline"
+            >
+              Crea el primero →
+            </Link>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto px-6 py-5 scrollbar-hide">
+            {tournaments.map((t) => {
+              const displayStatus = STATUS_MAP[t.status] ?? "abierto"
+              const est = ESTADO_STYLES[displayStatus]
+
+              return (
+                <Link
+                  key={t.id}
+                  href={`/dashboard/tournaments/${t.id}`}
+                  className="shrink-0 w-52 rounded-xl bg-white/15 border border-white/20 p-4 hover:bg-white/25 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${est.classes}`}>
+                      {est.label}
+                    </span>
                   </div>
-                  <span className="text-[11px] font-bold text-white/70">{t.fecha}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                  <h3 className="text-sm font-black text-white leading-tight mb-1">{t.name}</h3>
+                  <p className="text-[11px] text-white/70 mb-3">{SPORT_LABEL[t.sport] ?? t.sport}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <Users className="size-3 text-white/60" />
+                      <span className="text-[11px] font-bold text-white/70">
+                        {t.max_participants} cupos
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-white/70">
+                      {formatDate(t.start_date)}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="px-6 pb-4">

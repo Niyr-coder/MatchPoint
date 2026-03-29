@@ -3,21 +3,17 @@
 import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Profile } from "@/types"
+import type { PlayerStats } from "@/lib/stats/queries"
 
 interface WelcomeBannerProps {
   profile: Profile
   date: string
+  stats: PlayerStats
 }
 
 const SPORTS = ["Fútbol", "Pádel", "Tenis", "Pickleball"]
 
-const STATS = [
-  { label: "Torneos jugados", value: "—" },
-  { label: "Reservas este mes", value: "—" },
-  { label: "Ranking", value: "—" },
-]
-
-export function WelcomeBanner({ profile, date }: WelcomeBannerProps) {
+export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
   const firstName = profile.first_name ?? "Jugador"
   const displayName =
     [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
@@ -29,6 +25,12 @@ export function WelcomeBanner({ profile, date }: WelcomeBannerProps) {
     .map((n) => n![0].toUpperCase())
     .join("")
 
+  const statItems = [
+    { label: "Torneos jugados", value: stats.tournamentsPlayed.toString() },
+    { label: "Reservas este mes", value: stats.reservationsThisMonth.toString() },
+    { label: "Puntos ranking", value: stats.rankingScore.toString() },
+  ]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -38,7 +40,6 @@ export function WelcomeBanner({ profile, date }: WelcomeBannerProps) {
       className="relative rounded-2xl overflow-hidden p-6 md:p-8"
       style={{ background: "#1a56db" }}
     >
-
       <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
         {/* Avatar */}
         <Avatar className="size-16 shrink-0 ring-2 ring-white/40">
@@ -76,7 +77,7 @@ export function WelcomeBanner({ profile, date }: WelcomeBannerProps) {
 
         {/* Mini stats */}
         <div className="flex gap-6 shrink-0 sm:border-l sm:border-white/20 sm:pl-6">
-          {STATS.map(({ label, value }) => (
+          {statItems.map(({ label, value }) => (
             <div key={label} className="text-center">
               <p className="text-xl font-black text-white">{value}</p>
               <p className="text-[10px] font-bold text-white/60 uppercase tracking-wide mt-0.5">

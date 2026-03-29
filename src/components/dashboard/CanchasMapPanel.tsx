@@ -1,22 +1,22 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { MapPin, Navigation } from "lucide-react"
+import type { Court } from "@/lib/courts/queries"
 
-interface Cancha {
-  id: string
-  nombre: string
-  deporte: string
-  distancia: string
+interface CanchasMapPanelProps {
+  courts: Court[]
 }
 
-const PLACEHOLDER_CANCHAS: Cancha[] = [
-  { id: "1", nombre: "Club Pichincha", deporte: "Pádel · Tenis", distancia: "0.8 km" },
-  { id: "2", nombre: "SportCenter Norte", deporte: "Fútbol 5", distancia: "2.1 km" },
-  { id: "3", nombre: "Racket Club", deporte: "Tenis · Pickleball", distancia: "3.4 km" },
-]
+const SPORT_LABEL: Record<string, string> = {
+  futbol: "Fútbol",
+  padel: "Pádel",
+  tenis: "Tenis",
+  pickleball: "Pickleball",
+}
 
-export function CanchasMapPanel() {
+export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -32,16 +32,16 @@ export function CanchasMapPanel() {
             <MapPin className="size-4 text-[#16a34a]" />
           </div>
           <h2 className="text-sm font-black uppercase tracking-tight text-[#0a0a0a]">
-            Canchas Cerca
+            Canchas Disponibles
           </h2>
         </div>
         <span className="text-[11px] font-black text-[#16a34a] bg-[#16a34a]/10 px-2.5 py-0.5 rounded-full">
-          &lt; 5 km
+          {courts.length} activas
         </span>
       </div>
 
       {/* Map placeholder */}
-      <div className="mx-4 mt-4 rounded-xl bg-[#e2f3e8] border-2 border-dashed border-[#86efac] flex flex-col items-center justify-center gap-2 py-10">
+      <div className="mx-4 mt-4 rounded-xl bg-[#e2f3e8] border-2 border-dashed border-[#86efac] flex flex-col items-center justify-center gap-2 py-8">
         <Navigation className="size-7 text-[#16a34a]/50" />
         <p className="text-xs font-bold text-[#16a34a]/60 text-center">
           Mapa interactivo próximamente
@@ -51,26 +51,40 @@ export function CanchasMapPanel() {
         </p>
       </div>
 
-      {/* Cancha mini-cards */}
+      {/* Court list */}
       <div className="flex-1 divide-y divide-[#bbf7d0] mt-2">
-        {PLACEHOLDER_CANCHAS.map((c) => (
-          <div key={c.id} className="flex items-center gap-3 px-6 py-3">
-            <div className="size-8 rounded-lg bg-[#16a34a]/10 flex items-center justify-center shrink-0">
-              <MapPin className="size-3.5 text-[#16a34a]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#0a0a0a]">{c.nombre}</p>
-              <p className="text-[11px] text-[#16a34a]/70">{c.deporte}</p>
-            </div>
-            <span className="text-[11px] font-black text-[#16a34a]">{c.distancia}</span>
+        {courts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 gap-1">
+            <p className="text-xs font-bold text-[#16a34a]/50">Sin canchas disponibles</p>
           </div>
-        ))}
+        ) : (
+          courts.slice(0, 3).map((c) => (
+            <div key={c.id} className="flex items-center gap-3 px-6 py-3">
+              <div className="size-8 rounded-lg bg-[#16a34a]/10 flex items-center justify-center shrink-0">
+                <MapPin className="size-3.5 text-[#16a34a]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-[#0a0a0a] truncate">
+                  {c.clubs?.name ?? "Club"} — {c.name}
+                </p>
+                <p className="text-[11px] text-[#16a34a]/70">
+                  {SPORT_LABEL[c.sport] ?? c.sport}
+                  {c.surface_type ? ` · ${c.surface_type}` : ""}
+                  {c.is_indoor ? " · Cubierta" : ""}
+                </p>
+              </div>
+              <span className="text-[11px] font-black text-[#16a34a] whitespace-nowrap">
+                ${c.price_per_hour}/h
+              </span>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="px-6 py-3">
-        <a href="/dashboard/search" className="text-[11px] font-bold text-[#16a34a] hover:underline">
+        <Link href="/dashboard/courts" className="text-[11px] font-bold text-[#16a34a] hover:underline">
           Ver todas las canchas →
-        </a>
+        </Link>
       </div>
     </motion.div>
   )
