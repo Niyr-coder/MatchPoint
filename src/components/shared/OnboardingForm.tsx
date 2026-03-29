@@ -102,7 +102,7 @@ export function OnboardingForm() {
       }
 
       setStatus("success")
-      router.push("/context-selector")
+      router.push("/dashboard")
     } catch {
       setGlobalError("Error de conexión. Intenta de nuevo.")
       setStatus("error")
