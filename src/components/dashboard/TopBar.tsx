@@ -19,7 +19,9 @@ export function TopBar({ sections, profile, currentRole, pageTitle, clubName }: 
         clubName={clubName}
       />
       {pageTitle && (
-        <h1 className="text-sm font-semibold text-white truncate">{pageTitle}</h1>
+        <h1 className="text-xs font-black uppercase tracking-[0.15em] text-white truncate">
+          {pageTitle}
+        </h1>
       )}
     </header>
   )

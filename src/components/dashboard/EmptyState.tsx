@@ -1,33 +1,53 @@
+"use client"
+
+import { motion } from "framer-motion"
+import {
+  Calendar, Search, Trophy, type LucideIcon,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
+
+const ICON_MAP: Record<string, LucideIcon> = { Calendar, Search, Trophy }
 
 interface EmptyStateProps {
-  icon?: LucideIcon
+  /** Icon name string, e.g. "Calendar", "Search", "Trophy" */
+  icon?: string
   title: string
   description?: string
   action?: React.ReactNode
+  ghostLabel?: string
   className?: string
 }
 
-export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action, ghostLabel, className }: EmptyStateProps) {
+  const Icon = icon ? (ICON_MAP[icon] ?? null) : null
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
       className={cn(
-        "flex flex-col items-center justify-center py-12 px-6 text-center",
-        "rounded-xl border border-zinc-800 bg-zinc-900/50",
+        "relative flex flex-col items-center justify-center py-16 px-6 text-center",
+        "rounded-2xl border border-zinc-200 bg-white overflow-hidden",
         className
       )}
     >
+      {ghostLabel && (
+        <span className="absolute top-3 left-4 text-5xl font-black text-zinc-100 select-none pointer-events-none leading-none">
+          {ghostLabel}
+        </span>
+      )}
       {Icon && (
-        <div className="size-12 rounded-2xl bg-zinc-800 flex items-center justify-center mb-4">
-          <Icon className="size-6 text-zinc-500" />
+        <div className="size-11 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center mb-5">
+          <Icon className="size-5 text-zinc-400" />
         </div>
       )}
-      <p className="text-sm font-semibold text-white">{title}</p>
+      <p className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">{title}</p>
       {description && (
-        <p className="mt-1 text-xs text-zinc-500 max-w-xs">{description}</p>
+        <p className="mt-2 text-xs font-medium text-zinc-400 max-w-xs leading-relaxed">{description}</p>
       )}
-      {action && <div className="mt-4">{action}</div>}
-    </div>
+      {action && <div className="mt-5">{action}</div>}
+    </motion.div>
   )
 }

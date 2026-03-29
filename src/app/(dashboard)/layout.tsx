@@ -25,9 +25,7 @@ export default async function DashboardLayout({
 
   return (
     <RoleContextProvider availableRoles={availableRoles}>
-      <div className="dark">
-        {children}
-      </div>
+      {children}
     </RoleContextProvider>
   )
 }

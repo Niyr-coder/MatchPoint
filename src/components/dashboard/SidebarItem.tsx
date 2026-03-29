@@ -27,10 +27,10 @@ export function SidebarItem({ item }: { item: NavItem }) {
     <Link
       href={item.href}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-zinc-800 text-white border-l-2 border-green-600 pl-[10px]"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+          ? "bg-green-600 text-white font-black"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60 font-medium"
       )}
     >
       <Icon className="size-4 shrink-0" />

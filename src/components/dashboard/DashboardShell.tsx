@@ -1,5 +1,4 @@
-import { Sidebar } from "./Sidebar"
-import { TopBar } from "./TopBar"
+import { TopNav } from "./TopNav"
 import type { NavSection, Profile, AppRole } from "@/types"
 
 interface DashboardShellProps {
@@ -7,6 +6,7 @@ interface DashboardShellProps {
   profile: Profile
   currentRole: AppRole
   clubName?: string | null
+  /** @deprecated — page titles are now in-page headings */
   pageTitle?: string
   children: React.ReactNode
 }
@@ -16,29 +16,19 @@ export function DashboardShell({
   profile,
   currentRole,
   clubName,
-  pageTitle,
   children,
 }: DashboardShellProps) {
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-950">
-      <Sidebar
-        sections={navSections}
+    <div className="min-h-screen bg-white">
+      <TopNav
+        navSections={navSections}
         profile={profile}
         currentRole={currentRole}
         clubName={clubName}
       />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <TopBar
-          sections={navSections}
-          profile={profile}
-          currentRole={currentRole}
-          clubName={clubName}
-          pageTitle={pageTitle}
-        />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
+      <main className="max-w-screen-xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        {children}
+      </main>
     </div>
   )
 }
