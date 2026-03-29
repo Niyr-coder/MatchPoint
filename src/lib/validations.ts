@@ -1,0 +1,54 @@
+import { z } from "zod"
+
+export const waitlistSchema = z.object({
+  email: z
+    .string()
+    .min(1, "El email es requerido")
+    .email("Ingresa un email válido")
+    .max(254, "Email demasiado largo"),
+  source: z.string().max(50).optional().default("landing_page"),
+})
+
+export type WaitlistInput = z.infer<typeof waitlistSchema>
+
+export const onboardingSchema = z.object({
+  first_name: z
+    .string()
+    .min(1, "El nombre es requerido")
+    .max(50, "Nombre demasiado largo"),
+  last_name: z
+    .string()
+    .min(1, "El apellido es requerido")
+    .max(50, "Apellido demasiado largo"),
+  province: z
+    .string()
+    .min(1, "La provincia es requerida"),
+  city: z
+    .string()
+    .min(1, "La ciudad es requerida")
+    .max(100, "Ciudad demasiado larga"),
+  phone: z
+    .string()
+    .min(1, "El teléfono es requerido")
+    .min(9, "Teléfono inválido, mínimo 9 dígitos")
+    .max(15, "Teléfono demasiado largo")
+    .regex(/^[0-9]+$/, "Solo se permiten números"),
+  date_of_birth: z
+    .string()
+    .min(1, "La fecha de nacimiento es requerida")
+    .refine((val) => {
+      const date = new Date(val)
+      return !isNaN(date.getTime())
+    }, "Fecha inválida")
+    .refine((val) => {
+      const dob = new Date(val)
+      const today = new Date()
+      const age = today.getFullYear() - dob.getFullYear()
+      const monthDiff = today.getMonth() - dob.getMonth()
+      const dayDiff = today.getDate() - dob.getDate()
+      const exactAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age
+      return exactAge >= 14
+    }, "Debes tener al menos 14 años"),
+})
+
+export type OnboardingFormInput = z.infer<typeof onboardingSchema>
