@@ -1,14 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle, XCircle } from "lucide-react"
 import { onboardingSchema } from "@/lib/validations"
 import { ECUADOR_CITIES_BY_PROVINCE, ECUADOR_PROVINCES } from "@/lib/constants"
 
 type Status = "idle" | "loading" | "success" | "error"
+type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid"
 
 interface FieldErrors {
+  username?: string
   first_name?: string
   last_name?: string
   province?: string
@@ -28,6 +30,8 @@ const YEARS = Array.from({ length: currentYear - 1919 }, (_, i) => currentYear -
 export function OnboardingForm() {
   const router = useRouter()
 
+  const [username, setUsername] = useState("")
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [province, setProvince] = useState("")
@@ -40,6 +44,37 @@ export function OnboardingForm() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<Status>("idle")
   const [globalError, setGlobalError] = useState("")
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    if (username.length < 3) {
+      setUsernameStatus("idle")
+      return
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      setUsernameStatus("invalid")
+      return
+    }
+
+    setUsernameStatus("checking")
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/profile/check-username?username=${encodeURIComponent(username)}`)
+        const data = await res.json()
+        setUsernameStatus(data.data?.available ? "available" : "taken")
+      } catch {
+        setUsernameStatus("idle")
+      }
+    }, 500)
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [username])
 
   const availableCities = province ? (ECUADOR_CITIES_BY_PROVINCE[province] ?? []) : []
 
@@ -67,6 +102,7 @@ export function OnboardingForm() {
     setGlobalError("")
 
     const payload = {
+      username,
       first_name: firstName,
       last_name: lastName,
       province,
@@ -127,6 +163,46 @@ export function OnboardingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Username */}
+      <div>
+        <label htmlFor="username" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+          Nombre de usuario
+        </label>
+        <div className="relative">
+          <input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
+              setFieldErrors((prev) => ({ ...prev, username: undefined }))
+            }}
+            placeholder="juanperez_99"
+            maxLength={30}
+            autoComplete="username"
+            className={inputClass(fieldErrors.username) + " pr-10"}
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2">
+            {usernameStatus === "checking" && <Loader2 className="size-4 text-zinc-400 animate-spin" />}
+            {usernameStatus === "available" && <CheckCircle className="size-4 text-[#16a34a]" />}
+            {usernameStatus === "taken" && <XCircle className="size-4 text-red-500" />}
+          </span>
+        </div>
+        {usernameStatus === "available" && (
+          <p className="text-xs text-[#16a34a] mt-1.5">@{username} está disponible</p>
+        )}
+        {usernameStatus === "taken" && (
+          <p className="text-xs text-red-500 mt-1.5">@{username} ya está en uso</p>
+        )}
+        {usernameStatus === "invalid" && (
+          <p className="text-xs text-red-500 mt-1.5">Solo letras, números y guión bajo</p>
+        )}
+        {fieldErrors.username && (
+          <p className="text-xs text-red-500 mt-1.5">{fieldErrors.username}</p>
+        )}
+        <p className="text-[11px] text-zinc-400 mt-1">Mínimo 3 caracteres · Solo letras, números y _</p>
+      </div>
 
       {/* Nombre + Apellido */}
       <div className="grid grid-cols-2 gap-3">

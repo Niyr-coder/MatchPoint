@@ -12,6 +12,11 @@ export const waitlistSchema = z.object({
 export type WaitlistInput = z.infer<typeof waitlistSchema>
 
 export const onboardingSchema = z.object({
+  username: z
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .max(30, "Máximo 30 caracteres")
+    .regex(/^[a-zA-Z0-9_]+$/, "Solo letras, números y guión bajo"),
   first_name: z
     .string()
     .min(1, "El nombre es requerido")

@@ -37,6 +37,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse<ApiRespo
   const { error: updateError } = await supabase
     .from("profiles")
     .update({
+      username: parsed.data.username,
       first_name: parsed.data.first_name,
       last_name: parsed.data.last_name,
       full_name: `${parsed.data.first_name} ${parsed.data.last_name}`,
