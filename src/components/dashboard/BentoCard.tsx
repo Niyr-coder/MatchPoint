@@ -4,14 +4,14 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import {
   Calendar, Search, Trophy, Building2, Users, DollarSign,
-  BarChart3, MapPin, BookOpen, Star, Wallet, Activity,
+  BarChart3, MapPin, BookOpen, Star, Wallet, Activity, Plus,
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Calendar, Search, Trophy, Building2, Users, DollarSign,
-  BarChart3, MapPin, BookOpen, Star, Wallet, Activity,
+  BarChart3, MapPin, BookOpen, Star, Wallet, Activity, Plus,
 }
 
 const VARIANT_CLASSES: Record<string, string> = {
@@ -54,7 +54,8 @@ export function BentoCard({
       viewport={{ once: true }}
       transition={{ duration: 0.35, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "relative rounded-2xl overflow-hidden flex flex-col min-h-[160px] p-6",
+        "relative rounded-2xl overflow-hidden flex flex-col p-6",
+        "min-h-[160px]",
         VARIANT_CLASSES[variant],
         !href && className,
       )}

@@ -107,14 +107,9 @@ export function getUserNav(): NavSection[] {
     {
       items: [
         { label: "Inicio", href: "/dashboard", icon: "Home" },
-        { label: "Buscar Cancha", href: "/dashboard/search", icon: "Search" },
-        { label: "Mis Reservas", href: "/dashboard/reservations", icon: "Calendar" },
-        { label: "Mi Perfil", href: "/dashboard/profile", icon: "User" },
-        { label: "Leaderboard", href: "/dashboard/leaderboard", icon: "Trophy" },
-        { label: "Torneos", href: "/dashboard/tournaments", icon: "Award" },
-        { label: "Shop", href: "/dashboard/shop", icon: "ShoppingBag" },
-        { label: "Chat", href: "/dashboard/chat", icon: "MessageSquare" },
-        { label: "Cuenta", href: "/dashboard/account", icon: "Settings" },
+        { label: "Clubes", href: "/dashboard/clubs", icon: "Building2" },
+        { label: "Ranking", href: "/dashboard/ranking", icon: "Trophy" },
+        { label: "Eventos", href: "/dashboard/events", icon: "CalendarDays" },
       ],
     },
   ]

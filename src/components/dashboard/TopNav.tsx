@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown, MessageSquare, ShoppingBag, User, Settings, LogOut, CreditCard } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import type { NavSection, Profile, AppRole } from "@/types"
@@ -28,6 +28,8 @@ interface TopNavProps {
 export function TopNav({ navSections, profile, currentRole, clubName }: TopNavProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   const allItems = navSections.flatMap((s) => s.items)
   const visibleItems = allItems.slice(0, 6)
@@ -42,10 +44,23 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
     profile.full_name ||
     "Usuario"
 
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    if (profileOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [profileOpen])
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e5e5e5]">
       <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
-        {/* Logo — matches landing Navbar */}
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a] shrink-0">
           <div className="size-2.5 rounded-full bg-[#16a34a] shrink-0" />
           MATCHPOINT
@@ -61,7 +76,7 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
           </div>
         )}
 
-        {/* Desktop nav — landing pill style */}
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1 flex-1 min-w-0">
           {visibleItems.map((item) => {
             const isActive =
@@ -82,7 +97,6 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
             )
           })}
 
-          {/* Overflow dropdown */}
           {overflowItems.length > 0 && (
             <div className="relative group">
               <button className="flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors">
@@ -111,22 +125,96 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
           )}
         </nav>
 
-        {/* Right: role badge + name + avatar + mobile toggle */}
-        <div className="flex items-center gap-3 ml-auto shrink-0">
-          <span className="hidden sm:block text-[11px] font-bold text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-0.5 rounded-full">
+        {/* Right side */}
+        <div className="flex items-center gap-1 ml-auto shrink-0">
+          {/* Role badge (desktop) */}
+          <span className="hidden sm:block text-[11px] font-bold text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-0.5 rounded-full mr-2">
             {ROLE_LABELS[currentRole]}
           </span>
 
-          <span className="hidden sm:block text-sm font-semibold text-[#0a0a0a]">
-            {displayName}
-          </span>
+          {/* Chat icon */}
+          <Link
+            href="/dashboard/chat"
+            className="hidden sm:flex p-2 rounded-full text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+            aria-label="Chat"
+          >
+            <MessageSquare className="size-5" />
+          </Link>
 
-          <Avatar className="size-8 shrink-0">
-            <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-            <AvatarFallback className="bg-[#0a0a0a] text-white text-xs font-black">
-              {initials || "U"}
-            </AvatarFallback>
-          </Avatar>
+          {/* Store icon */}
+          <Link
+            href="/dashboard/shop"
+            className="hidden sm:flex p-2 rounded-full text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+            aria-label="Tienda"
+          >
+            <ShoppingBag className="size-5" />
+          </Link>
+
+          {/* Profile dropdown */}
+          <div ref={profileRef} className="relative hidden sm:block">
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-[#f5f5f5] transition-colors"
+              aria-expanded={profileOpen}
+              aria-haspopup="true"
+            >
+              <Avatar className="size-7 shrink-0">
+                <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
+                <AvatarFallback className="bg-[#0a0a0a] text-white text-xs font-black">
+                  {initials || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-semibold text-[#0a0a0a] max-w-[100px] truncate">
+                {displayName}
+              </span>
+              <ChevronDown className={cn("size-3.5 text-[#737373] transition-transform", profileOpen && "rotate-180")} />
+            </button>
+
+            {/* Dropdown menu */}
+            {profileOpen && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#e5e5e5] rounded-2xl shadow-lg py-1.5 z-50">
+                <div className="px-4 py-2 border-b border-[#f0f0f0] mb-1">
+                  <p className="text-xs font-black text-[#0a0a0a] truncate">{displayName}</p>
+                  <p className="text-[11px] text-[#737373]">{ROLE_LABELS[currentRole]}</p>
+                </div>
+                <Link
+                  href="/dashboard/profile"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+                >
+                  <User className="size-4" />
+                  Mi Perfil
+                </Link>
+                <Link
+                  href="/dashboard/account"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+                >
+                  <CreditCard className="size-4" />
+                  Cuenta
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+                >
+                  <Settings className="size-4" />
+                  Configuración
+                </Link>
+                <div className="border-t border-[#f0f0f0] mt-1 pt-1">
+                  <form action="/auth/signout" method="POST">
+                    <button
+                      type="submit"
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="size-4" />
+                      Cerrar Sesión
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Mobile hamburger */}
           <button
@@ -142,10 +230,11 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
       {/* Mobile dropdown */}
       <div
         className={`md:hidden bg-white overflow-hidden transition-all duration-300 ${
-          mobileOpen ? "max-h-96" : "max-h-0"
+          mobileOpen ? "max-h-[500px]" : "max-h-0"
         }`}
       >
         <div className="px-4 pb-4 pt-2 space-y-1 border-t border-[#e5e5e5]">
+          {/* Nav items */}
           {allItems.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -166,19 +255,44 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
             )
           })}
 
-          <div className="pt-3 mt-2 border-t border-[#e5e5e5] flex items-center gap-3">
-            <Avatar className="size-8">
-              <AvatarImage src={profile.avatar_url ?? undefined} />
-              <AvatarFallback className="bg-[#0a0a0a] text-white text-xs font-black">
-                {initials || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-semibold text-[#0a0a0a]">{displayName}</p>
-              <p className="text-[11px] font-bold text-[#16a34a]">
-                {ROLE_LABELS[currentRole]}
-              </p>
+          {/* Chat & Tienda */}
+          <Link href="/dashboard/chat" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+            <MessageSquare className="size-4" /> Chat
+          </Link>
+          <Link href="/dashboard/shop" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+            <ShoppingBag className="size-4" /> Tienda
+          </Link>
+
+          {/* Profile section */}
+          <div className="pt-3 mt-2 border-t border-[#e5e5e5] space-y-1">
+            <div className="flex items-center gap-3 px-4 py-2">
+              <Avatar className="size-8">
+                <AvatarImage src={profile.avatar_url ?? undefined} />
+                <AvatarFallback className="bg-[#0a0a0a] text-white text-xs font-black">
+                  {initials || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-semibold text-[#0a0a0a]">{displayName}</p>
+                <p className="text-[11px] font-bold text-[#16a34a]">
+                  {ROLE_LABELS[currentRole]}
+                </p>
+              </div>
             </div>
+            <Link href="/dashboard/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+              <User className="size-4" /> Mi Perfil
+            </Link>
+            <Link href="/dashboard/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+              <CreditCard className="size-4" /> Cuenta
+            </Link>
+            <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+              <Settings className="size-4" /> Configuración
+            </Link>
+            <form action="/auth/signout" method="POST">
+              <button type="submit" className="flex items-center gap-2.5 w-full px-4 py-2 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+                <LogOut className="size-4" /> Cerrar Sesión
+              </button>
+            </form>
           </div>
         </div>
       </div>
