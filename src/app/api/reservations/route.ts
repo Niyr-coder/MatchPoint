@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getUserReservations, createReservation } from "@/lib/reservations/queries"
+import { getUserReservations, createReservation, cancelReservation } from "@/lib/reservations/queries"
 import { z } from "zod"
+
+const cancelReservationSchema = z.object({
+  id: z.string().uuid(),
+})
 
 const createReservationSchema = z.object({
   court_id: z.string().uuid(),
@@ -57,6 +61,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data: reservation }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear reserva"
+    return NextResponse.json({ success: false, error: message }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: Request) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  }
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 })
+  }
+
+  const parsed = cancelReservationSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { success: false, error: parsed.error.issues[0].message },
+      { status: 422 }
+    )
+  }
+
+  // Verify ownership before cancelling
+  const { data: reservation, error: fetchError } = await supabase
+    .from("reservations")
+    .select("id, user_id, status")
+    .eq("id", parsed.data.id)
+    .single()
+
+  if (fetchError || !reservation) {
+    return NextResponse.json({ success: false, error: "Reserva no encontrada" }, { status: 404 })
+  }
+
+  if (reservation.user_id !== user.id) {
+    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+  }
+
+  if (reservation.status === "cancelled") {
+    return NextResponse.json({ success: false, error: "La reserva ya está cancelada" }, { status: 409 })
+  }
+
+  try {
+    await cancelReservation(parsed.data.id)
+    return NextResponse.json({ success: true, data: null })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Error al cancelar reserva"
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

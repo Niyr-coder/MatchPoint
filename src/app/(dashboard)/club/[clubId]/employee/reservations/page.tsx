@@ -1,0 +1,49 @@
+import { Calendar, Clock, CheckCircle } from "lucide-react"
+import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { getClubReservationsToday } from "@/lib/reservations/queries"
+import { PageHeader } from "@/components/shared/PageHeader"
+import { StatCard } from "@/components/shared/StatCard"
+import { TodayTimeline } from "@/components/reservations/TodayTimeline"
+
+export default async function EmployeeReservationsPage({
+  params,
+}: {
+  params: Promise<{ clubId: string }>
+}) {
+  const { clubId } = await params
+  await authorizeOrRedirect({ clubId, requiredRoles: ["employee"] })
+
+  const todayReservations = await getClubReservationsToday(clubId).catch(() => [])
+
+  const pending = todayReservations.filter((r) => r.status === "pending").length
+  const confirmed = todayReservations.filter((r) => r.status === "confirmed").length
+
+  return (
+    <div className="flex flex-col gap-8">
+      <PageHeader label="Operaciones" title="Reservas de Hoy" />
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Total"
+          value={todayReservations.length}
+          icon={Calendar}
+          variant="default"
+        />
+        <StatCard
+          label="Pendientes Check-in"
+          value={pending}
+          icon={Clock}
+          variant="warning"
+        />
+        <StatCard
+          label="Confirmadas"
+          value={confirmed}
+          icon={CheckCircle}
+          variant="success"
+        />
+      </div>
+
+      <TodayTimeline initialReservations={todayReservations} clubId={clubId} />
+    </div>
+  )
+}

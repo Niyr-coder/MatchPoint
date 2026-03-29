@@ -303,7 +303,7 @@ export function OnboardingForm() {
           value={phone}
           onChange={handlePhoneChange}
           placeholder="0991234567"
-          maxLength={15}
+          maxLength={10}
           className={inputClass(fieldErrors.phone)}
         />
         {fieldErrors.phone && (

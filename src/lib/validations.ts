@@ -36,7 +36,7 @@ export const onboardingSchema = z.object({
     .string()
     .min(1, "El teléfono es requerido")
     .min(9, "Teléfono inválido, mínimo 9 dígitos")
-    .max(15, "Teléfono demasiado largo")
+    .max(10, "Máximo 10 dígitos")
     .regex(/^[0-9]+$/, "Solo se permiten números"),
   date_of_birth: z
     .string()

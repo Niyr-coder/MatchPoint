@@ -1,9 +1,64 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { onboardingSchema } from "@/lib/validations"
-import type { ApiResponse } from "@/types"
+import type { ApiResponse, Profile } from "@/types"
 
-export async function PATCH(request: NextRequest): Promise<NextResponse<ApiResponse<null>>> {
+const profileUpdateSchema = z.object({
+  first_name: z.string().min(1, "El nombre es requerido").max(50).optional(),
+  last_name: z.string().min(1, "El apellido es requerido").max(50).optional(),
+  phone: z
+    .string()
+    .min(9, "Mínimo 9 dígitos")
+    .max(10, "Máximo 10 dígitos")
+    .regex(/^[0-9]+$/, "Solo números")
+    .optional(),
+  city: z.string().min(1).max(100).optional(),
+  province: z.string().min(1).optional(),
+  date_of_birth: z.string().optional(),
+})
+
+async function getAuthUser() {
+  const authClient = await createClient()
+  const {
+    data: { user },
+    error,
+  } = await authClient.auth.getUser()
+  if (error || !user) return null
+  return user
+}
+
+export async function GET(
+  _req: NextRequest
+): Promise<NextResponse<ApiResponse<Profile>>> {
+  const user = await getAuthUser()
+  if (!user) {
+    return NextResponse.json(
+      { success: false, data: null, error: "No autenticado" },
+      { status: 401 }
+    )
+  }
+
+  const supabase = await createServiceClient()
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single()
+
+  if (error || !data) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Perfil no encontrado" },
+      { status: 404 }
+    )
+  }
+
+  return NextResponse.json({ success: true, data: data as Profile, error: null })
+}
+
+export async function PATCH(
+  request: NextRequest
+): Promise<NextResponse<ApiResponse<null>>> {
   let body: unknown
   try {
     body = await request.json()
@@ -14,52 +69,102 @@ export async function PATCH(request: NextRequest): Promise<NextResponse<ApiRespo
     )
   }
 
-  const parsed = onboardingSchema.safeParse(body)
-  if (!parsed.success) {
+  // Try onboarding schema first (full onboarding flow)
+  const onboardingParsed = onboardingSchema.safeParse(body)
+  if (onboardingParsed.success) {
+    const user = await getAuthUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, data: null, error: "No autenticado" },
+        { status: 401 }
+      )
+    }
+
+    const supabase = await createServiceClient()
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        username: onboardingParsed.data.username,
+        first_name: onboardingParsed.data.first_name,
+        last_name: onboardingParsed.data.last_name,
+        full_name: `${onboardingParsed.data.first_name} ${onboardingParsed.data.last_name}`,
+        city: onboardingParsed.data.city,
+        province: onboardingParsed.data.province,
+        phone: onboardingParsed.data.phone,
+        date_of_birth: onboardingParsed.data.date_of_birth,
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id)
+
+    if (updateError) {
+      if (updateError.code === "23505") {
+        return NextResponse.json(
+          { success: false, data: null, error: "Este nombre de usuario ya está en uso." },
+          { status: 409 }
+        )
+      }
+      return NextResponse.json(
+        { success: false, data: null, error: "Error al guardar el perfil. Intenta de nuevo." },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true, data: null, error: null })
+  }
+
+  // Partial profile update (from profile edit form)
+  const profileParsed = profileUpdateSchema.safeParse(body)
+  if (!profileParsed.success) {
     return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
+      { success: false, data: null, error: profileParsed.error.issues[0].message },
       { status: 422 }
     )
   }
 
-  // Get authenticated user via cookie-based client
-  const authClient = await createClient()
-  const { data: { user }, error: authError } = await authClient.auth.getUser()
-
-  if (authError || !user) {
+  const user = await getAuthUser()
+  if (!user) {
     return NextResponse.json(
       { success: false, data: null, error: "No autenticado" },
       { status: 401 }
     )
   }
 
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  const d = profileParsed.data
+
+  if (d.first_name !== undefined) updates.first_name = d.first_name
+  if (d.last_name !== undefined) updates.last_name = d.last_name
+  if (d.phone !== undefined) updates.phone = d.phone
+  if (d.city !== undefined) updates.city = d.city
+  if (d.province !== undefined) updates.province = d.province
+  if (d.date_of_birth !== undefined) updates.date_of_birth = d.date_of_birth
+
+  // Rebuild full_name if first or last changed
+  if (d.first_name !== undefined || d.last_name !== undefined) {
+    const supabase = await createServiceClient()
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("id", user.id)
+      .single()
+
+    if (existing) {
+      const firstName = d.first_name ?? (existing.first_name as string) ?? ""
+      const lastName = d.last_name ?? (existing.last_name as string) ?? ""
+      updates.full_name = `${firstName} ${lastName}`.trim()
+    }
+  }
+
   const supabase = await createServiceClient()
   const { error: updateError } = await supabase
     .from("profiles")
-    .update({
-      username: parsed.data.username,
-      first_name: parsed.data.first_name,
-      last_name: parsed.data.last_name,
-      full_name: `${parsed.data.first_name} ${parsed.data.last_name}`,
-      city: parsed.data.city,
-      province: parsed.data.province,
-      phone: parsed.data.phone,
-      date_of_birth: parsed.data.date_of_birth,
-      onboarding_completed: true,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq("id", user.id)
 
   if (updateError) {
-    // Unique constraint violation on username
-    if (updateError.code === "23505") {
-      return NextResponse.json(
-        { success: false, data: null, error: "Este nombre de usuario ya está en uso." },
-        { status: 409 }
-      )
-    }
     return NextResponse.json(
-      { success: false, data: null, error: "Error al guardar el perfil. Intenta de nuevo." },
+      { success: false, data: null, error: "Error al actualizar el perfil." },
       { status: 500 }
     )
   }
