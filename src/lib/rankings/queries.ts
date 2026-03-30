@@ -17,75 +17,54 @@ export async function getRankingBySport(
   try {
     const supabase = await createServiceClient()
 
-    let query = supabase
+    // All registered users
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .limit(500)
+
+    if (profilesError || !profiles) return []
+
+    // Tournament participation stats (left-join done in JS)
+    let participantsQuery = supabase
       .from("tournament_participants")
-      .select(`
-        user_id,
-        status,
-        tournaments!inner(sport),
-        profiles!inner(full_name, avatar_url)
-      `)
+      .select("user_id, status, tournaments!inner(sport)")
       .in("status", ["winner", "confirmed", "eliminated", "registered"])
 
     if (sport) {
-      query = query.eq("tournaments.sport", sport)
+      participantsQuery = participantsQuery.eq("tournaments.sport", sport)
     }
 
-    const { data, error } = await query
+    const { data: participants } = await participantsQuery
 
-    if (error || !data) return []
-
-    const statsMap = new Map<string, {
-      userId: string
-      fullName: string
-      avatarUrl: string | null
-      wins: number
-      participations: number
-    }>()
-
-    for (const row of data) {
+    // Build stats map from participation data
+    const statsMap = new Map<string, { wins: number; participations: number }>()
+    for (const row of participants ?? []) {
       const userId = row.user_id as string
-      const profileRaw = row.profiles as unknown
-      const profile = profileRaw as { full_name: string | null; avatar_url: string | null } | null
       const isWinner = row.status === "winner"
-
-      const existing = statsMap.get(userId)
-      if (existing) {
-        statsMap.set(userId, {
-          ...existing,
-          wins: existing.wins + (isWinner ? 1 : 0),
-          participations: existing.participations + 1,
-        })
-      } else {
-        statsMap.set(userId, {
-          userId,
-          fullName: profile?.full_name ?? "Jugador",
-          avatarUrl: profile?.avatar_url ?? null,
-          wins: isWinner ? 1 : 0,
-          participations: 1,
-        })
-      }
+      const prev = statsMap.get(userId) ?? { wins: 0, participations: 0 }
+      statsMap.set(userId, {
+        wins: prev.wins + (isWinner ? 1 : 0),
+        participations: prev.participations + 1,
+      })
     }
 
-    const ranked = [...statsMap.values()]
-      .map((entry) => ({
-        ...entry,
-        score: entry.wins * 10 + entry.participations * 2,
-        losses: entry.participations - entry.wins,
-      }))
-      .sort((a, b) => b.score - a.score)
+    // Merge profiles with stats, rank all users
+    return profiles
+      .map((p) => {
+        const stats = statsMap.get(p.id) ?? { wins: 0, participations: 0 }
+        return {
+          userId: p.id,
+          fullName: p.full_name ?? "Jugador",
+          avatarUrl: p.avatar_url ?? null,
+          wins: stats.wins,
+          losses: stats.participations - stats.wins,
+          score: stats.wins * 10 + stats.participations * 2,
+        }
+      })
+      .sort((a, b) => b.score - a.score || b.wins - a.wins)
       .slice(0, limit)
-      .map((entry, index) => ({
-        position: index + 1,
-        userId: entry.userId,
-        fullName: entry.fullName,
-        avatarUrl: entry.avatarUrl,
-        score: entry.score,
-        wins: entry.wins,
-        losses: entry.losses,
-      }))
-
-    return ranked
+      .map((entry, index) => ({ ...entry, position: index + 1 }))
   } catch {
     return []
   }

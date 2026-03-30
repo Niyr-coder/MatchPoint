@@ -85,12 +85,14 @@ export function ParticipantsManager({
   tournamentStatus,
   isCreator,
   entryFee,
+  refreshTrigger = 0,
   onRefresh,
 }: {
   tournamentId: string
   tournamentStatus: TournamentStatus
   isCreator: boolean
   entryFee: number
+  refreshTrigger?: number
   onRefresh?: () => void
 }) {
   const [participants, setParticipants] = useState<Participant[]>([])
@@ -128,6 +130,7 @@ export function ParticipantsManager({
   }, [tournamentId])
 
   useEffect(() => { void load() }, [load])
+  useEffect(() => { if (refreshTrigger > 0) void load() }, [refreshTrigger]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced search
   useEffect(() => {

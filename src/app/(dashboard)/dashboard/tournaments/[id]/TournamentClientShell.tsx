@@ -111,11 +111,11 @@ export function TournamentClientShell({
       {/* Tab: Participantes */}
       {(tabs.length === 1 || activeTab === "participants") && showParticipants && (
         <ParticipantsManager
-          key={`pm-${refreshKey}`}
           tournamentId={tournamentId}
           tournamentStatus={currentStatus}
           isCreator={isCreator}
           entryFee={entryFee}
+          refreshTrigger={refreshKey}
           onRefresh={refresh}
         />
       )}
