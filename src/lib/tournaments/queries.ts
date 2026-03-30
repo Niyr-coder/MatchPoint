@@ -20,6 +20,10 @@ export interface Tournament {
   updated_at: string
   clubs?: { name: string } | null
   participant_count?: number
+  modality?: string | null
+  start_time?: string | null
+  is_official?: boolean
+  extras?: Record<string, { enabled?: boolean; detail?: string; name?: string }>
 }
 
 export interface TournamentParticipant {

@@ -1,9 +1,10 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getTournamentById, isUserInTournament } from "@/lib/tournaments/queries"
 import { notFound } from "next/navigation"
-import { Trophy, Users, Calendar, ArrowLeft } from "lucide-react"
+import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { JoinTournamentButton } from "./JoinTournamentButton"
+import { TournamentManagePanel } from "./TournamentManagePanel"
 
 const SPORT_LABEL: Record<string, string> = {
   futbol: "Fútbol",
@@ -12,12 +13,21 @@ const SPORT_LABEL: Record<string, string> = {
   pickleball: "Pickleball",
 }
 
-const STATUS_STYLES: Record<string, { label: string; classes: string }> = {
-  open: { label: "Abierto", classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
-  in_progress: { label: "En curso", classes: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed: { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
-  draft: { label: "Borrador", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
-  cancelled: { label: "Cancelado", classes: "bg-red-50 text-red-600 border-red-200" },
+const STATUS_DOT: Record<string, { label: string; dot: string; badge: string }> = {
+  open:        { label: "Abierto",    dot: "bg-green-500",  badge: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
+  in_progress: { label: "En curso",   dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-200" },
+  completed:   { label: "Completado", dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  draft:       { label: "Borrador",   dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  cancelled:   { label: "Cancelado",  dot: "bg-red-500",    badge: "bg-red-50 text-red-600 border-red-200" },
+}
+
+const EXTRAS_META: Record<string, { emoji: string; label: string }> = {
+  sorteos:     { emoji: "🎰", label: "Sorteos" },
+  premios:     { emoji: "🏆", label: "Premios" },
+  streaming:   { emoji: "📺", label: "Streaming" },
+  fotografia:  { emoji: "📸", label: "Fotografía" },
+  arbitro:     { emoji: "🦺", label: "Árbitro" },
+  patrocinador:{ emoji: "🤝", label: "Patrocinador" },
 }
 
 export default async function TournamentDetailPage({
@@ -35,7 +45,20 @@ export default async function TournamentDetailPage({
 
   if (!tournament) notFound()
 
-  const st = STATUS_STYLES[tournament.status] ?? STATUS_STYLES.open
+  const t = tournament as typeof tournament & {
+    modality?: string | null
+    start_time?: string | null
+    is_official?: boolean
+    extras?: Record<string, { enabled?: boolean; detail?: string; name?: string }>
+  }
+
+  const st = STATUS_DOT[t.status] ?? STATUS_DOT.open
+  const isCreator = t.created_by === ctx.userId
+  const canJoin = t.status === "open" && !isCreator
+
+  const enabledExtras = t.extras
+    ? Object.entries(t.extras).filter(([, v]) => v?.enabled)
+    : []
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-6">
@@ -55,68 +78,123 @@ export default async function TournamentDetailPage({
             <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center">
               <Trophy className="size-6 text-white" />
             </div>
-            <span className={`text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border ${st.classes}`}>
-              {st.label}
-            </span>
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              {t.is_official && (
+                <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full bg-amber-400 text-amber-900 border border-amber-300">
+                  OFICIAL
+                </span>
+              )}
+              <span className={`text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border flex items-center gap-1.5 ${st.badge}`}>
+                <span className={`size-1.5 rounded-full inline-block ${st.dot}`} />
+                {st.label}
+              </span>
+            </div>
           </div>
-          <h1 className="text-2xl font-black text-white uppercase leading-tight tracking-[-0.02em] mb-2">
-            {tournament.name}
+          <h1 className="text-2xl font-black text-white uppercase leading-tight tracking-[-0.02em] mb-3">
+            {t.name}
           </h1>
-          {tournament.description && (
-            <p className="text-sm text-white/70 leading-relaxed">{tournament.description}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
+              {SPORT_LABEL[t.sport] ?? t.sport}
+            </span>
+            {t.modality && (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
+                {t.modality}
+              </span>
+            )}
+          </div>
+          {t.description && (
+            <p className="text-sm text-white/70 leading-relaxed mt-3">{t.description}</p>
           )}
         </div>
       </div>
 
-      {/* Details */}
+      {/* Info grid */}
       <div className="rounded-2xl bg-white border border-[#e5e5e5] divide-y divide-[#f0f0f0]">
         <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
-          <div className="p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-1">Deporte</p>
-            <p className="text-sm font-black text-[#0a0a0a]">
-              {SPORT_LABEL[tournament.sport] ?? tournament.sport}
-            </p>
-          </div>
-          <div className="p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-1">Inscripción</p>
-            <p className="text-sm font-black text-[#0a0a0a]">
-              {tournament.entry_fee > 0 ? `$${tournament.entry_fee}` : "Gratis"}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
           <div className="p-5 flex items-center gap-2">
-            <Calendar className="size-4 text-zinc-400" />
+            <Calendar className="size-4 text-zinc-400 shrink-0" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Inicio</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Fecha</p>
               <p className="text-sm font-bold text-[#0a0a0a]">
-                {new Date(tournament.start_date + "T12:00:00").toLocaleDateString("es-EC", {
-                  day: "numeric", month: "long", year: "numeric"
+                {new Date(t.start_date + "T12:00:00").toLocaleDateString("es-EC", {
+                  day: "numeric", month: "long", year: "numeric",
                 })}
               </p>
             </div>
           </div>
           <div className="p-5 flex items-center gap-2">
-            <Users className="size-4 text-zinc-400" />
+            <Clock className="size-4 text-zinc-400 shrink-0" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Cupos</p>
-              <p className="text-sm font-bold text-[#0a0a0a]">{tournament.max_participants}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Hora</p>
+              <p className="text-sm font-bold text-[#0a0a0a]">{t.start_time ?? "Por confirmar"}</p>
             </div>
           </div>
         </div>
 
-        {tournament.clubs && (
-          <div className="p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-1">Club organizador</p>
-            <p className="text-sm font-black text-[#0a0a0a]">{tournament.clubs.name}</p>
+        <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
+          <div className="p-5 flex items-center gap-2">
+            <DollarSign className="size-4 text-zinc-400 shrink-0" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Inscripción</p>
+              <p className="text-sm font-bold text-[#0a0a0a]">
+                {t.entry_fee > 0 ? `$${t.entry_fee}` : "Gratis"}
+              </p>
+            </div>
           </div>
-        )}
+          <div className="p-5 flex items-center gap-2">
+            <MapPin className="size-4 text-zinc-400 shrink-0" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Club sede</p>
+              <p className="text-sm font-bold text-[#0a0a0a]">
+                {t.clubs?.name ?? "Por confirmar"}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* CTA */}
-      {tournament.status === "open" && (
+      {/* Extras */}
+      {enabledExtras.length > 0 && (
+        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">Incluye</p>
+          <div className="flex flex-wrap gap-2">
+            {enabledExtras.map(([key, val]) => {
+              const meta = EXTRAS_META[key]
+              const label = val.name ?? meta?.label ?? key
+              const emoji = meta?.emoji ?? "✅"
+              return (
+                <span key={key} className="text-xs font-bold px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-700 flex items-center gap-1.5">
+                  <span>{emoji}</span>
+                  {label}
+                  {val.detail && <span className="text-zinc-400 font-normal">· {val.detail}</span>}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Creator panel */}
+      {isCreator && (
+        <TournamentManagePanel tournamentId={id} currentStatus={t.status} />
+      )}
+
+      {/* Join CTA */}
+      {canJoin && (
         <JoinTournamentButton tournamentId={id} alreadyJoined={alreadyJoined} />
+      )}
+
+      {/* Closed message for non-creators */}
+      {!isCreator && t.status !== "open" && (
+        <div className="rounded-2xl bg-zinc-50 border border-zinc-200 p-5 text-center">
+          <p className="text-sm font-bold text-zinc-500">
+            {t.status === "in_progress" ? "Este torneo ya está en curso." :
+             t.status === "completed" ? "Este torneo ha finalizado." :
+             t.status === "cancelled" ? "Este torneo fue cancelado." :
+             "Las inscripciones aún no están abiertas."}
+          </p>
+        </div>
       )}
     </div>
   )
