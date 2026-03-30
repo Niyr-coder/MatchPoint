@@ -1,20 +1,11 @@
 import { StatCard } from "@/components/dashboard/StatCard"
 import { BentoCard } from "@/components/dashboard/BentoCard"
+import { DashboardHeading } from "@/components/dashboard/DashboardHeading"
 
 export default function OwnerDashboardPage() {
   return (
     <div className="space-y-3">
-
-      {/* Page heading */}
-      <div className="pb-6 mb-2 border-b border-[#e5e5e5]">
-        <p className="label-green mb-1">Dueño del Club</p>
-        <h1
-          className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em]"
-          style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
-        >
-          Dashboard del Club
-        </h1>
-      </div>
+      <DashboardHeading label="Dueño del Club" title="Dashboard del Club" />
 
       {/* Bento grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 grid-flow-dense">

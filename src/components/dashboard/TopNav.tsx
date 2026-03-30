@@ -6,26 +6,19 @@ import { usePathname } from "next/navigation"
 import { Menu, X, ChevronDown, MessageSquare, ShoppingBag, User, Settings, LogOut, CreditCard } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
+import { ROLE_LABELS } from "@/lib/roles"
+import { RoleBadge } from "@/components/shared/RoleBadge"
 import type { NavSection, Profile, AppRole } from "@/types"
-
-const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Admin",
-  owner: "Owner",
-  partner: "Socio",
-  manager: "Gerente",
-  employee: "Empleado",
-  coach: "Entrenador",
-  user: "Jugador",
-}
 
 interface TopNavProps {
   navSections: NavSection[]
-  profile: Profile
+  profile: Profile & { username?: string | null }
   currentRole: AppRole
   clubName?: string | null
+  dashboardHref: string
 }
 
-export function TopNav({ navSections, profile, currentRole, clubName }: TopNavProps) {
+export function TopNav({ navSections, profile, currentRole, clubName, dashboardHref }: TopNavProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -44,6 +37,8 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
     profile.full_name ||
     "Usuario"
 
+  const profileHref = profile.username ? `/profile/${profile.username}` : "/dashboard/profile"
+
   // Close profile dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -61,7 +56,7 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e5e5e5]">
       <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a] shrink-0">
+        <Link href={dashboardHref} className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a] shrink-0">
           <div className="size-2.5 rounded-full bg-[#16a34a] shrink-0" />
           MATCHPOINT
         </Link>
@@ -128,8 +123,8 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
         {/* Right side */}
         <div className="flex items-center gap-1 ml-auto shrink-0">
           {/* Role badge (desktop) */}
-          <span className="hidden sm:block text-[11px] font-bold text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-0.5 rounded-full mr-2">
-            {ROLE_LABELS[currentRole]}
+          <span className="hidden sm:block mr-2">
+            <RoleBadge role={currentRole} size="sm" />
           </span>
 
           {/* Chat icon */}
@@ -175,10 +170,12 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
               <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#e5e5e5] rounded-2xl shadow-lg py-1.5 z-50">
                 <div className="px-4 py-2 border-b border-[#f0f0f0] mb-1">
                   <p className="text-xs font-black text-[#0a0a0a] truncate">{displayName}</p>
-                  <p className="text-[11px] text-[#737373]">{ROLE_LABELS[currentRole]}</p>
+                  <p className="mt-0.5">
+                    <RoleBadge role={currentRole} size="sm" />
+                  </p>
                 </div>
                 <Link
-                  href="/dashboard/profile"
+                  href={profileHref}
                   onClick={() => setProfileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
                 >
@@ -274,12 +271,10 @@ export function TopNav({ navSections, profile, currentRole, clubName }: TopNavPr
               </Avatar>
               <div>
                 <p className="text-sm font-semibold text-[#0a0a0a]">{displayName}</p>
-                <p className="text-[11px] font-bold text-[#16a34a]">
-                  {ROLE_LABELS[currentRole]}
-                </p>
+                <RoleBadge role={currentRole} size="sm" className="mt-0.5" />
               </div>
             </div>
-            <Link href="/dashboard/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+            <Link href={profileHref} onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
               <User className="size-4" /> Mi Perfil
             </Link>
             <Link href="/dashboard/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">

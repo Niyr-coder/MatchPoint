@@ -4,31 +4,20 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
-import { StatusBadge } from "@/components/shared/StatusBadge"
+import { RoleBadge } from "@/components/shared/RoleBadge"
+import { ROLE_LABELS } from "@/lib/roles"
 import type { Column } from "@/components/shared/DataTable"
 import type { UserAdmin } from "@/lib/admin/queries"
 import type { AppRole } from "@/types"
 
-type RoleBadgeVariant = "accent" | "info" | "success" | "neutral" | "warning"
-
-const ROLE_BADGE: Record<string, { label: string; variant: RoleBadgeVariant }> = {
-  admin:    { label: "Admin",     variant: "accent" },
-  owner:    { label: "Dueño",     variant: "info" },
-  manager:  { label: "Manager",   variant: "success" },
-  employee: { label: "Empleado",  variant: "neutral" },
-  coach:    { label: "Coach",     variant: "warning" },
-  user:     { label: "Usuario",   variant: "neutral" },
-  partner:  { label: "Socio",     variant: "info" },
-}
-
 const ROLE_OPTIONS: { value: string; label: string }[] = [
-  { value: "admin",    label: "Admin" },
-  { value: "owner",    label: "Dueño" },
-  { value: "manager",  label: "Manager" },
-  { value: "employee", label: "Empleado" },
-  { value: "coach",    label: "Coach" },
-  { value: "user",     label: "Usuario" },
-  { value: "partner",  label: "Socio" },
+  { value: "admin",    label: ROLE_LABELS.admin },
+  { value: "owner",    label: ROLE_LABELS.owner },
+  { value: "manager",  label: ROLE_LABELS.manager },
+  { value: "employee", label: ROLE_LABELS.employee },
+  { value: "coach",    label: ROLE_LABELS.coach },
+  { value: "user",     label: ROLE_LABELS.user },
+  { value: "partner",  label: ROLE_LABELS.partner },
 ]
 
 const VALID_ROLES: AppRole[] = [
@@ -117,8 +106,8 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
       key: "global_role",
       header: "Rol",
       render: (user) => {
-        const badge = ROLE_BADGE[user.global_role] ?? { label: user.global_role, variant: "neutral" as RoleBadgeVariant }
-        return <StatusBadge label={badge.label} variant={badge.variant} />
+        const role = (user.global_role as AppRole) ?? "user"
+        return <RoleBadge role={role} size="sm" />
       },
     },
     {

@@ -11,6 +11,7 @@ export default async function UserDashboardLayout({ children }: { children: Reac
       navSections={navSections}
       profile={ctx.profile}
       currentRole="user"
+      dashboardHref="/dashboard"
       pageTitle="Mi espacio"
     >
       {children}

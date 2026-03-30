@@ -4,25 +4,11 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Users, UserPlus, ChevronDown } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { StatusBadge } from "@/components/shared/StatusBadge"
+import { RoleBadge } from "@/components/shared/RoleBadge"
+import { ROLE_LABELS } from "@/lib/roles"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import type { TeamMember } from "@/lib/team/queries"
-
-const ROLE_LABELS: Record<string, string> = {
-  owner: "Dueño",
-  manager: "Manager",
-  employee: "Empleado",
-  coach: "Coach",
-  partner: "Socio",
-}
-
-const ROLE_BADGE: Record<string, "accent" | "info" | "neutral" | "warning"> = {
-  owner: "accent",
-  manager: "info",
-  employee: "neutral",
-  coach: "warning",
-  partner: "info",
-}
+import type { AppRole } from "@/types"
 
 const VALID_ROLES = ["manager", "employee", "coach"] as const
 type ValidRole = (typeof VALID_ROLES)[number]
@@ -173,10 +159,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
               </div>
 
               {/* Role badge */}
-              <StatusBadge
-                label={ROLE_LABELS[member.role] ?? member.role}
-                variant={ROLE_BADGE[member.role] ?? "neutral"}
-              />
+              <RoleBadge role={(member.role as AppRole) ?? "user"} size="sm" />
 
               {/* Role select */}
               {member.role !== "owner" && (

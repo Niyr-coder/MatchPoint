@@ -1,10 +1,12 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { getUserRoles } from "@/lib/auth/get-user-roles"
 import { getPlayerStats } from "@/lib/stats/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { StatCard } from "@/components/shared/StatCard"
+import { RoleBadge } from "@/components/shared/RoleBadge"
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm"
 import { Calendar, Trophy, Target, Star } from "lucide-react"
-import type { Profile } from "@/types"
+import type { Profile, AppRole } from "@/types"
 
 function getInitials(profile: Profile): string {
   const first = profile.first_name?.charAt(0) ?? ""
@@ -24,13 +26,11 @@ export default async function ProfilePage() {
   const ctx = await authorizeOrRedirect()
 
   const supabase = await createServiceClient()
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", ctx.userId)
-    .single()
-
-  const [stats] = await Promise.all([getPlayerStats(ctx.userId)])
+  const [{ data: profileData }, stats, clubRoles] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", ctx.userId).single(),
+    getPlayerStats(ctx.userId),
+    getUserRoles(ctx.userId),
+  ])
 
   const profile = profileData as Profile & { username?: string }
 
@@ -38,6 +38,8 @@ export default async function ProfilePage() {
     profile.full_name ||
     [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
     "Jugador"
+
+  const globalRole = ctx.globalRole as AppRole
 
   return (
     <div className="flex flex-col gap-8">
@@ -56,6 +58,14 @@ export default async function ProfilePage() {
           {profile.username && (
             <p className="text-sm text-zinc-500 mt-0.5">@{profile.username}</p>
           )}
+        </div>
+
+        {/* Role badges */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <RoleBadge role={globalRole} size="md" />
+          {clubRoles.map((entry) => (
+            <RoleBadge key={`${entry.clubId}-${entry.role}`} role={entry.role as AppRole} size="md" />
+          ))}
         </div>
 
         {/* City + join date */}

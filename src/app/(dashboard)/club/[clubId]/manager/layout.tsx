@@ -18,6 +18,7 @@ export default async function ManagerLayout({
       navSections={navSections}
       profile={ctx.profile}
       currentRole="manager"
+      dashboardHref={`/club/${clubId}/manager`}
       pageTitle="Operaciones"
     >
       {children}

@@ -1,5 +1,6 @@
 import { StatCard } from "@/components/dashboard/StatCard"
 import { BentoCard } from "@/components/dashboard/BentoCard"
+import { DashboardHeading } from "@/components/dashboard/DashboardHeading"
 
 export default function ManagerTodayPage() {
   const date = new Date().toLocaleDateString("es-EC", {
@@ -10,20 +11,7 @@ export default function ManagerTodayPage() {
 
   return (
     <div className="space-y-3">
-
-      {/* Page heading */}
-      <div className="pb-6 mb-2 border-b border-[#e5e5e5]">
-        <p className="label-green mb-1">Vista Operativa</p>
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-1">
-          <h1
-            className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em]"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
-          >
-            Hoy
-          </h1>
-          <p className="text-sm font-medium text-zinc-400 capitalize sm:pb-1">{date}</p>
-        </div>
-      </div>
+      <DashboardHeading label="Vista Operativa" title="Hoy" subtitle={date} />
 
       {/* Bento grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

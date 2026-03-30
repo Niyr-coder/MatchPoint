@@ -1,16 +1,7 @@
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import type { UserRoleEntry, AppRole } from "@/types"
-
-const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Admin",
-  owner: "Dueño",
-  partner: "Socio",
-  manager: "Gerente",
-  employee: "Empleado",
-  coach: "Entrenador",
-  user: "Jugador",
-}
+import { RoleBadge } from "@/components/shared/RoleBadge"
+import type { UserRoleEntry } from "@/types"
 
 export function ContextSelectorCard({ entry }: { entry: UserRoleEntry }) {
   const href = `/club/${entry.clubId}/${entry.role}`
@@ -32,9 +23,9 @@ export function ContextSelectorCard({ entry }: { entry: UserRoleEntry }) {
         <p className="font-black text-[#0a0a0a] truncate text-sm uppercase tracking-tight">
           {entry.clubName}
         </p>
-        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-green-600 mt-0.5">
-          {ROLE_LABELS[entry.role]}
-        </p>
+        <div className="mt-1">
+          <RoleBadge role={entry.role} size="sm" />
+        </div>
       </div>
 
       <span className="text-zinc-300 group-hover:text-[#0a0a0a] transition-colors text-lg">→</span>

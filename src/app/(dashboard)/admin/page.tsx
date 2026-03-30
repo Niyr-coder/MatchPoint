@@ -1,20 +1,11 @@
 import { StatCard } from "@/components/dashboard/StatCard"
 import { BentoCard } from "@/components/dashboard/BentoCard"
+import { DashboardHeading } from "@/components/dashboard/DashboardHeading"
 
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-3">
-
-      {/* Page heading */}
-      <div className="pb-6 mb-2 border-b border-[#e5e5e5]">
-        <p className="label-green mb-1">Plataforma Global</p>
-        <h1
-          className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em]"
-          style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
-        >
-          Dashboard Global
-        </h1>
-      </div>
+      <DashboardHeading label="Plataforma Global" title="Dashboard Global" />
 
       {/* Bento grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
