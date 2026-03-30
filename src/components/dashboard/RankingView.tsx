@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Trophy } from "lucide-react"
+import Image from "next/image"
 import type { RankingEntry } from "@/lib/rankings/queries"
 
 const SPORTS = [
@@ -37,9 +38,11 @@ function getInitials(name: string): string {
 function Avatar({ entry }: { entry: RankingEntry }) {
   if (entry.avatarUrl) {
     return (
-      <img
+      <Image
         src={entry.avatarUrl}
         alt={entry.fullName}
+        width={36}
+        height={36}
         className="size-9 rounded-full object-cover border border-[#e5e5e5]"
       />
     )
@@ -69,9 +72,11 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
     >
       <span className="text-2xl">{MEDALS[entry.position - 1]}</span>
       {entry.avatarUrl ? (
-        <img
+        <Image
           src={entry.avatarUrl}
           alt={entry.fullName}
+          width={isFirst ? 64 : 48}
+          height={isFirst ? 64 : 48}
           className={`rounded-full object-cover border-2 ${
             isFirst ? "size-16 border-[#1a56db]" : "size-12 border-[#e5e5e5]"
           }`}

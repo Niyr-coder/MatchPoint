@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import {
   ShoppingBag,
@@ -243,12 +244,15 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
               >
                 {/* Product image / placeholder */}
                 {product.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-40 object-cover"
-                  />
+                  <div className="relative w-full h-40">
+                    <Image
+                      src={product.image_url}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
                 ) : (
                   <div className="h-40 bg-zinc-50 flex items-center justify-center">
                     <CategoryIcon className="size-10 text-zinc-200" />

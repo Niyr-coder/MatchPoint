@@ -280,14 +280,6 @@ export function ParticipantsManager({
             </button>
           </div>
         )}
-        {isCreator && !isReadOnly && (
-          <button
-            onClick={() => exportCSV(participants)}
-            title="Exportar CSV"
-            className="text-zinc-400 hover:text-zinc-700 transition-colors sm:hidden"
-          >
-          </button>
-        )}
       </div>
 
       {/* Bulk action */}

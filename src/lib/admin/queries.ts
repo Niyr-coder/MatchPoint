@@ -138,7 +138,7 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
     ] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("clubs").select("id", { count: "exact", head: true }).eq("is_active", true),
-      supabase.from("reservations").select("id", { count: "exact", head: true }),
+      supabase.from("reservations").select("id", { count: "exact", head: true }).neq("status", "cancelled"),
       supabase.from("tournaments").select("id", { count: "exact", head: true }),
       supabase
         .from("profiles")

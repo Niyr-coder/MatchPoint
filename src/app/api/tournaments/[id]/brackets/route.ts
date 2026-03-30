@@ -172,18 +172,35 @@ function generateElimination(tournamentId: string, players: string[]): BracketIn
 
 function generateRoundRobin(tournamentId: string, players: string[]): BracketInsert[] {
   const brackets: BracketInsert[] = []
-  let matchNum = 1
-  for (let i = 0; i < players.length; i++) {
-    for (let j = i + 1; j < players.length; j++) {
-      brackets.push({
-        tournament_id: tournamentId,
-        round: 1,
-        match_number: matchNum++,
-        player1_id: players[i],
-        player2_id: players[j],
-        status: "pending",
-      })
+  // Circle method: assign correct round numbers so no player plays twice per round
+  const list: (string | null)[] = players.length % 2 === 0 ? [...players] : [...players, null]
+  const size = list.length
+  const numRounds = size - 1
+  const half = size / 2
+
+  const fixed = list[0]
+  const rotating = list.slice(1)
+
+  for (let round = 1; round <= numRounds; round++) {
+    const schedule = [fixed, ...rotating]
+    let matchNum = 1
+    for (let i = 0; i < half; i++) {
+      const p1 = schedule[i]
+      const p2 = schedule[size - 1 - i]
+      if (p1 !== null && p2 !== null) {
+        brackets.push({
+          tournament_id: tournamentId,
+          round,
+          match_number: matchNum++,
+          player1_id: p1,
+          player2_id: p2,
+          status: "pending",
+        })
+      }
     }
+    // Rotate: move last element to front
+    rotating.unshift(rotating.pop()!)
   }
+
   return brackets
 }
