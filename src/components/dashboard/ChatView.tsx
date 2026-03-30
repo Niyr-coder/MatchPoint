@@ -99,9 +99,14 @@ export function ChatView({ userId }: ChatViewProps) {
         body: JSON.stringify({ conversationId: activeConv, content: tempContent }),
       })
 
-      const r = await fetch(`/api/messages?conversationId=${activeConv}`)
-      const d = (await r.json()) as { messages?: Message[] }
-      setMessages(d.messages ?? [])
+      const [msgRes, convRes] = await Promise.all([
+        fetch(`/api/messages?conversationId=${activeConv}`),
+        fetch("/api/messages"),
+      ])
+      const msgData = (await msgRes.json()) as { messages?: Message[] }
+      const convData = (await convRes.json()) as { conversations?: Conversation[] }
+      setMessages(msgData.messages ?? [])
+      setConversations(convData.conversations ?? [])
     } catch {
       // Restore input on failure
       setInput(tempContent)

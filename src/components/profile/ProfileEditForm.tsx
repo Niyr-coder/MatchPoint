@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { Loader2, Pencil, Check } from "lucide-react"
 import { ECUADOR_PROVINCES, ECUADOR_CITIES_BY_PROVINCE } from "@/lib/constants"
@@ -25,6 +26,7 @@ interface ProfileEditFormProps {
 }
 
 export function ProfileEditForm({ profile }: ProfileEditFormProps) {
+  const router = useRouter()
   const [editing, setEditing] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
@@ -97,6 +99,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       }
       setSuccessMsg("Perfil actualizado")
       setEditing(false)
+      router.refresh()
     } catch {
       setServerError("Error de conexión. Intenta de nuevo.")
     } finally {

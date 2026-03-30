@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { Loader2, Check } from "lucide-react"
 import type { Profile } from "@/types"
@@ -27,6 +28,7 @@ interface AccountFormProps {
 }
 
 export function AccountForm({ profile, email }: AccountFormProps) {
+  const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -86,6 +88,7 @@ export function AccountForm({ profile, email }: AccountFormProps) {
         return
       }
       setSuccessMsg("Cambios guardados correctamente")
+      router.refresh()
     } catch {
       setServerError("Error de conexión. Intenta de nuevo.")
     } finally {
