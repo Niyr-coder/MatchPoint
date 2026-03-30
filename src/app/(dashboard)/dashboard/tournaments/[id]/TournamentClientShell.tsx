@@ -7,15 +7,24 @@ import { JoinTournamentButton } from "./JoinTournamentButton"
 import { ParticipantsManager } from "@/components/dashboard/ParticipantsManager"
 import { BracketView } from "@/components/dashboard/BracketView"
 import { CheckCircle } from "lucide-react"
+import type { TournamentStatus } from "@/lib/tournaments/queries"
+
+type Tab = "participants" | "bracket" | "manage"
+
+interface TabDef {
+  key: Tab
+  label: string
+}
 
 interface Props {
   tournamentId: string
-  currentStatus: string
+  currentStatus: TournamentStatus
   isCreator: boolean
   canJoin: boolean
   alreadyJoined: boolean
   entryFee: number
   modality?: string | null
+  bracketLocked: boolean
 }
 
 export function TournamentClientShell({
@@ -26,9 +35,20 @@ export function TournamentClientShell({
   alreadyJoined,
   entryFee,
   modality,
+  bracketLocked,
 }: Props) {
   const router = useRouter()
   const [refreshKey, setRefreshKey] = useState(0)
+
+  const showBracket = currentStatus !== "draft"
+
+  const tabs: TabDef[] = [
+    { key: "participants", label: "Participantes" },
+    ...(showBracket ? [{ key: "bracket" as Tab, label: "Bracket" }] : []),
+    ...(isCreator ? [{ key: "manage" as Tab, label: "Gestión" }] : []),
+  ]
+
+  const [activeTab, setActiveTab] = useState<Tab>("participants")
 
   const refresh = useCallback(() => {
     setRefreshKey(k => k + 1)
@@ -38,20 +58,8 @@ export function TournamentClientShell({
   const showParticipants =
     isCreator || currentStatus === "open" || currentStatus === "in_progress" || currentStatus === "completed"
 
-  const showBracket = currentStatus !== "draft"
-
   return (
-    <>
-      {/* Creator management panel */}
-      {isCreator && (
-        <TournamentManagePanel
-          tournamentId={tournamentId}
-          currentStatus={currentStatus}
-          modality={modality}
-          onRefresh={refresh}
-        />
-      )}
-
+    <div className="flex flex-col gap-4">
       {/* Join CTA */}
       {canJoin && (
         <JoinTournamentButton
@@ -81,28 +89,59 @@ export function TournamentClientShell({
         </div>
       )}
 
-      {/* Participants — key remounts on refresh to re-fetch */}
-      {showParticipants && (
+      {/* Tabs */}
+      {tabs.length > 1 && (
+        <div className="flex gap-1 p-1 bg-zinc-100 rounded-xl w-fit">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2 rounded-lg text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
+                activeTab === tab.key
+                  ? "bg-white text-[#0a0a0a] shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-600"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Tab: Participantes */}
+      {(tabs.length === 1 || activeTab === "participants") && showParticipants && (
         <ParticipantsManager
           key={`pm-${refreshKey}`}
           tournamentId={tournamentId}
+          tournamentStatus={currentStatus}
           isCreator={isCreator}
           entryFee={entryFee}
           onRefresh={refresh}
         />
       )}
 
-      {/* Bracket */}
-      {showBracket && (
+      {/* Tab: Bracket */}
+      {(tabs.length === 1 || activeTab === "bracket") && showBracket && (
         <BracketView
           key={`bv-${refreshKey}`}
           tournamentId={tournamentId}
           isCreator={isCreator}
           modality={modality}
           tournamentStatus={currentStatus}
+          bracketLocked={bracketLocked}
           onRefresh={refresh}
         />
       )}
-    </>
+
+      {/* Tab: Gestión (creator only) */}
+      {isCreator && (tabs.length === 1 || activeTab === "manage") && (
+        <TournamentManagePanel
+          tournamentId={tournamentId}
+          currentStatus={currentStatus}
+          modality={modality}
+          onRefresh={refresh}
+        />
+      )}
+    </div>
   )
 }

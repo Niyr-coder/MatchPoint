@@ -180,6 +180,7 @@ export default async function TournamentDetailPage({
         alreadyJoined={alreadyJoined}
         entryFee={t.entry_fee}
         modality={t.modality}
+        bracketLocked={t.bracket_locked ?? false}
       />
     </div>
   )

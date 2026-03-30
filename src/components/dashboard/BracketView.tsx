@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { Shuffle, RefreshCw, Trophy } from "lucide-react"
+import { Shuffle, RefreshCw, Trophy, Lock, Pencil } from "lucide-react"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
 interface BracketPlayer {
   id: string
@@ -22,23 +23,36 @@ interface BracketMatch {
 
 const ROUND_ROBIN_MODALITIES = ["Round Robin", "King of the Court", "Popcorn", "Americano"]
 
+function playerName(p: BracketPlayer | null): string {
+  return p ? (p.full_name ?? p.username ?? "Jugador") : "BYE"
+}
+
 export function BracketView({
   tournamentId,
   isCreator,
   modality,
   tournamentStatus,
+  bracketLocked,
   onRefresh,
 }: {
   tournamentId: string
   isCreator: boolean
   modality: string | null | undefined
   tournamentStatus: string
+  bracketLocked: boolean
   onRefresh?: () => void
 }) {
   const [matches, setMatches] = useState<BracketMatch[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Score entry sheet
+  const [scoreMatch, setScoreMatch] = useState<BracketMatch | null>(null)
+  const [scoreInput, setScoreInput] = useState("")
+  const [winnerId, setWinnerId] = useState<string>("")
+  const [scoreLoading, setScoreLoading] = useState(false)
+  const [scoreError, setScoreError] = useState<string | null>(null)
 
   const isRoundRobin = ROUND_ROBIN_MODALITIES.some(m => modality?.includes(m))
   const bracketType = isRoundRobin ? "round_robin" : "elimination"
@@ -69,21 +83,44 @@ export function BracketView({
     onRefresh?.()
   }
 
+  function openScoreSheet(m: BracketMatch) {
+    setScoreMatch(m)
+    setScoreInput(m.score ?? "")
+    setWinnerId(m.winner?.id ?? "")
+    setScoreError(null)
+  }
+
+  async function submitScore() {
+    if (!scoreMatch || !winnerId) { setScoreError("Selecciona el ganador"); return }
+    setScoreLoading(true)
+    setScoreError(null)
+    const res = await fetch(`/api/tournaments/${tournamentId}/brackets/${scoreMatch.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ winner_id: winnerId, score: scoreInput || null }),
+    })
+    const json = await res.json() as { success: boolean; error?: string }
+    setScoreLoading(false)
+    if (!json.success) { setScoreError(json.error ?? "Error al guardar"); return }
+    setScoreMatch(null)
+    await load()
+    onRefresh?.()
+  }
+
   const rounds = matches.reduce<Record<number, BracketMatch[]>>((acc, m) => {
     if (!acc[m.round]) acc[m.round] = []
     acc[m.round].push(m)
     return acc
   }, {})
 
-  const playerName = (p: BracketPlayer | null) =>
-    p ? (p.full_name ?? p.username ?? "Jugador") : "BYE"
+  const canEditMatch = isCreator && tournamentStatus === "in_progress"
 
   if (tournamentStatus === "draft") return null
 
   return (
     <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
       {/* Header */}
-      <div className="p-5 border-b border-[#f0f0f0] flex items-center gap-2">
+      <div className="p-5 border-b border-[#f0f0f0] flex items-center gap-2 flex-wrap">
         <Shuffle className="size-4 text-zinc-400" />
         <p className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">
           {isRoundRobin ? "Fixture" : "Cuadro de juego"}
@@ -93,7 +130,13 @@ export function BracketView({
             {modality}
           </span>
         )}
-        {isCreator && (
+        {bracketLocked && (
+          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
+            <Lock className="size-2.5" />
+            Bloqueado
+          </span>
+        )}
+        {isCreator && !bracketLocked && (
           <button
             onClick={() => void generate()}
             disabled={generating}
@@ -124,10 +167,14 @@ export function BracketView({
           </p>
         </div>
       ) : isRoundRobin ? (
-        /* Round Robin / Popcorn / King — flat match list */
+        /* Round Robin — flat match list */
         <div className="divide-y divide-[#f5f5f5]">
           {matches.map((m) => (
-            <div key={m.id} className="flex items-center gap-3 px-5 py-3">
+            <div
+              key={m.id}
+              className={`flex items-center gap-3 px-5 py-3 ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:bg-zinc-50" : ""}`}
+              onClick={() => { if (canEditMatch && m.status !== "bye") openScoreSheet(m) }}
+            >
               <span className="text-[10px] font-black text-zinc-300 w-4 shrink-0">
                 {m.match_number}
               </span>
@@ -143,6 +190,9 @@ export function BracketView({
               )}
               {m.winner && (
                 <Trophy className="size-3.5 text-amber-400 shrink-0" aria-label={`Ganador: ${playerName(m.winner)}`} />
+              )}
+              {canEditMatch && m.status !== "bye" && (
+                <Pencil className="size-3 text-zinc-300 shrink-0" />
               )}
             </div>
           ))}
@@ -168,33 +218,30 @@ export function BracketView({
                   {rMatches.map((m) => (
                     <div
                       key={m.id}
-                      className={`w-44 rounded-xl border overflow-hidden ${
-                        m.status === "bye" ? "opacity-40" : ""
-                      }`}
+                      className={`w-44 rounded-xl border overflow-hidden ${m.status === "bye" ? "opacity-40" : ""} ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:border-[#1a56db]/40" : ""}`}
+                      onClick={() => { if (canEditMatch && m.status !== "bye" && m.status !== "completed") openScoreSheet(m) }}
                     >
-                      <div className={`flex items-center gap-2 px-3 py-2 border-b ${
-                        m.winner?.id === m.player1?.id ? "bg-green-50" : "bg-white"
-                      }`}>
+                      <div className={`flex items-center gap-2 px-3 py-2 border-b ${m.winner?.id === m.player1?.id ? "bg-green-50" : "bg-white"}`}>
                         {m.winner?.id === m.player1?.id && <Trophy className="size-3 text-amber-400 shrink-0" />}
-                        <span className={`text-xs font-bold truncate flex-1 ${
-                          m.player1 ? "text-[#0a0a0a]" : "text-zinc-300"
-                        }`}>
+                        <span className={`text-xs font-bold truncate flex-1 ${m.player1 ? "text-[#0a0a0a]" : "text-zinc-300"}`}>
                           {playerName(m.player1)}
                         </span>
                       </div>
-                      <div className={`flex items-center gap-2 px-3 py-2 ${
-                        m.winner?.id === m.player2?.id ? "bg-green-50" : "bg-white"
-                      }`}>
+                      <div className={`flex items-center gap-2 px-3 py-2 ${m.winner?.id === m.player2?.id ? "bg-green-50" : "bg-white"}`}>
                         {m.winner?.id === m.player2?.id && <Trophy className="size-3 text-amber-400 shrink-0" />}
-                        <span className={`text-xs font-bold truncate flex-1 ${
-                          m.player2 ? "text-[#0a0a0a]" : "text-zinc-300"
-                        }`}>
+                        <span className={`text-xs font-bold truncate flex-1 ${m.player2 ? "text-[#0a0a0a]" : "text-zinc-300"}`}>
                           {m.status === "bye" ? "BYE" : playerName(m.player2)}
                         </span>
                       </div>
                       {m.score && (
                         <div className="px-3 py-1 bg-zinc-50 border-t">
                           <span className="text-[10px] font-mono text-zinc-400">{m.score}</span>
+                        </div>
+                      )}
+                      {canEditMatch && m.status !== "bye" && m.status !== "completed" && (
+                        <div className="px-3 py-1.5 bg-zinc-50 border-t flex items-center gap-1 text-[10px] text-zinc-400">
+                          <Pencil className="size-2.5" />
+                          Registrar resultado
                         </div>
                       )}
                     </div>
@@ -205,6 +252,82 @@ export function BracketView({
           </div>
         </div>
       )}
+
+      {/* Score entry sheet */}
+      <Sheet open={scoreMatch !== null} onOpenChange={open => { if (!open) setScoreMatch(null) }}>
+        <SheetContent side="bottom" className="rounded-t-2xl max-w-md mx-auto">
+          <SheetHeader className="text-left pb-4">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+              Registrar resultado
+            </SheetTitle>
+          </SheetHeader>
+          {scoreMatch && (
+            <div className="flex flex-col gap-4">
+              {/* Score input */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+                  Marcador (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={scoreInput}
+                  onChange={e => setScoreInput(e.target.value)}
+                  placeholder="Ej: 6-3 6-4"
+                  className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                />
+              </div>
+
+              {/* Winner selection */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+                  Ganador
+                </label>
+                <div className="flex gap-2">
+                  {[scoreMatch.player1, scoreMatch.player2].map(player => {
+                    if (!player) return null
+                    const selected = winnerId === player.id
+                    return (
+                      <button
+                        key={player.id}
+                        onClick={() => setWinnerId(player.id)}
+                        className={`flex-1 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${
+                          selected
+                            ? "bg-green-50 border-green-400 text-green-700"
+                            : "bg-white border-[#e5e5e5] text-zinc-600 hover:border-zinc-400"
+                        }`}
+                      >
+                        {playerName(player)}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {scoreError && (
+                <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{scoreError}</p>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setScoreMatch(null)}
+                  disabled={scoreLoading}
+                  className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => void submitScore()}
+                  disabled={scoreLoading || !winnerId}
+                  className="flex-1 bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                >
+                  {scoreLoading && <RefreshCw className="size-3.5 animate-spin" />}
+                  Guardar
+                </button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

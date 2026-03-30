@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import type { SportType } from "@/lib/courts/queries"
 
 export type TournamentStatus = "draft" | "open" | "in_progress" | "completed" | "cancelled"
-export type ParticipantStatus = "registered" | "confirmed" | "eliminated" | "winner"
+export type ParticipantStatus = "registered" | "confirmed" | "eliminated" | "winner" | "withdrawn"
+export type PaymentStatus = "pending" | "paid" | "waived" | "refunded"
 
 export interface Tournament {
   id: string
@@ -16,6 +17,7 @@ export interface Tournament {
   end_date: string | null
   status: TournamentStatus
   entry_fee: number
+  bracket_locked: boolean
   created_at: string
   updated_at: string
   clubs?: { name: string } | null

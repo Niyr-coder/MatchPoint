@@ -38,7 +38,7 @@ export async function POST(
 
   const { data: tournament } = await supabase
     .from("tournaments")
-    .select("created_by, modality")
+    .select("created_by, modality, bracket_locked")
     .eq("id", id)
     .single()
 
