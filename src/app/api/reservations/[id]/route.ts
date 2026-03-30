@@ -28,6 +28,21 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "Acción no válida" }, { status: 422 })
   }
 
+  // Ownership check: verify the reservation belongs to this user
+  const { data: reservation, error: fetchError } = await supabase
+    .from("reservations")
+    .select("id, user_id")
+    .eq("id", id)
+    .single()
+
+  if (fetchError || !reservation) {
+    return NextResponse.json({ success: false, error: "Reserva no encontrada" }, { status: 404 })
+  }
+
+  if (reservation.user_id !== user.id) {
+    return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
+  }
+
   try {
     await cancelReservation(id)
     return NextResponse.json({ success: true })

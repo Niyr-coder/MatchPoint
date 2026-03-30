@@ -47,6 +47,22 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
   }
 
+  // State machine: enforce valid transitions
+  const validTransitions: Record<string, string[]> = {
+    draft: ["open", "cancelled"],
+    open: ["in_progress", "cancelled"],
+    in_progress: ["completed", "cancelled"],
+    completed: [],
+    cancelled: [],
+  }
+  const current = tournament.status as string
+  if (!(validTransitions[current] ?? []).includes(status)) {
+    return NextResponse.json({
+      success: false,
+      error: `No se puede cambiar de "${current}" a "${status}"`,
+    }, { status: 409 })
+  }
+
   const service = await createServiceClient()
 
   // Guard: open → in_progress requires ≥ 4 participants and bracket generated

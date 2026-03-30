@@ -10,11 +10,14 @@ export async function GET(request: Request) {
   const q = searchParams.get("q")?.trim() ?? ""
   if (q.length < 2) return NextResponse.json({ success: true, data: [] })
 
+  // Escape PostgREST filter metacharacters to prevent filter injection
+  const safe = q.replace(/[%_\\,().]/g, "\\$&")
+
   const service = await createServiceClient()
   const { data, error } = await service
     .from("profiles")
     .select("id, username, full_name, avatar_url")
-    .or(`full_name.ilike.%${q}%,username.ilike.%${q}%`)
+    .or(`full_name.ilike.%${safe}%,username.ilike.%${safe}%`)
     .neq("id", user.id)
     .limit(10)
 
