@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Profile, AppRole } from "@/types"
 
 const BANNER_BG: Record<AppRole, string> = {
-  admin:    "#18181b",
+  admin:    "#b91c1c",
   owner:    "#1e40af",
   partner:  "#0f766e",
   manager:  "#15803d",
