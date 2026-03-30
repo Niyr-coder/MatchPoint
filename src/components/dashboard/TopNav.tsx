@@ -74,8 +74,12 @@ export function TopNav({ navSections, profile, currentRole, clubName, dashboardH
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1 flex-1 min-w-0">
           {visibleItems.map((item) => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`)
+            const isParentOfOtherItem = allItems.some(
+              (other) => other.href !== item.href && other.href.startsWith(`${item.href}/`)
+            )
+            const isActive = isParentOfOtherItem
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.href}
@@ -233,8 +237,12 @@ export function TopNav({ navSections, profile, currentRole, clubName, dashboardH
         <div className="px-4 pb-4 pt-2 space-y-1 border-t border-[#e5e5e5]">
           {/* Nav items */}
           {allItems.map((item) => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`)
+            const isParentOfOtherItem = allItems.some(
+              (other) => other.href !== item.href && other.href.startsWith(`${item.href}/`)
+            )
+            const isActive = isParentOfOtherItem
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.href}
