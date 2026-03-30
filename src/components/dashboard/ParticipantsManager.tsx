@@ -120,9 +120,10 @@ export function ParticipantsManager({
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${tournamentId}/participants`)
-    if (!res.ok) return
-    const json = await res.json() as { success: boolean; data: Participant[] }
-    if (json.success) setParticipants(json.data)
+    if (res.ok) {
+      const json = await res.json() as { success: boolean; data: Participant[] }
+      if (json.success) setParticipants(json.data)
+    }
     setLoading(false)
   }, [tournamentId])
 
@@ -158,7 +159,7 @@ export function ParticipantsManager({
     const res = await fetch(`/api/tournaments/${tournamentId}/participants`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId }),
+      body: JSON.stringify({ userId }),
     })
     const json = await res.json() as { success: boolean; error?: string }
     setActionId(null)
