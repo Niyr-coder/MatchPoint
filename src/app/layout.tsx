@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   keywords: ["fútbol", "pádel", "tenis", "pickleball", "deportes", "canchas", "torneos"],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
-  metadataBase: new URL("https://matchpoint.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://matchpoint.vercel.app"),
   openGraph: {
     title: `${SITE_NAME} — Domina Tu Juego`,
     description: SITE_DESCRIPTION,
