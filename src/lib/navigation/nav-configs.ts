@@ -44,7 +44,6 @@ export function getPartnerNav(clubId: string): NavSection[] {
       items: [
         { label: "Dashboard", href: base, icon: "LayoutDashboard" },
         { label: "Mi Financiero", href: `${base}/financials`, icon: "DollarSign" },
-        { label: "Equipo", href: `${base}/team`, icon: "Users" },
         { label: "Mis Torneos", href: `${base}/tournaments`, icon: "Trophy" },
         { label: "Reportes", href: `${base}/reports`, icon: "FileBarChart" },
       ],

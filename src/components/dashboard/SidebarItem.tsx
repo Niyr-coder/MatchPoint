@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, DollarSign, Building2, Users, Trophy, Shield,
-  BarChart3, Settings, MapPin, UserCheck, Calendar, CreditCard,
+  BarChart3, Settings, MapPin, UserCheck, Calendar, CalendarDays, CreditCard,
   FileBarChart, Sun, Wallet, MessageSquare, FileText, BookOpen,
   User, Award, ShoppingBag, Home, Search,
 } from "lucide-react"
@@ -13,7 +13,7 @@ import type { NavItem } from "@/types"
 
 const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, DollarSign, Building2, Users, Trophy, Shield,
-  BarChart3, Settings, MapPin, UserCheck, Calendar, CreditCard,
+  BarChart3, Settings, MapPin, UserCheck, Calendar, CalendarDays, CreditCard,
   FileBarChart, Sun, Wallet, MessageSquare, FileText, BookOpen,
   User, Award, ShoppingBag, Home, Search,
 }
