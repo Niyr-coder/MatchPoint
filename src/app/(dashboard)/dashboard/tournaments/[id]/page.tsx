@@ -5,6 +5,8 @@ import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft } from "lucide-r
 import Link from "next/link"
 import { JoinTournamentButton } from "./JoinTournamentButton"
 import { TournamentManagePanel } from "./TournamentManagePanel"
+import { ParticipantsManager } from "@/components/dashboard/ParticipantsManager"
+import { BracketView } from "@/components/dashboard/BracketView"
 
 const SPORT_LABEL: Record<string, string> = {
   futbol: "Fútbol",
@@ -22,12 +24,12 @@ const STATUS_DOT: Record<string, { label: string; dot: string; badge: string }> 
 }
 
 const EXTRAS_META: Record<string, { emoji: string; label: string }> = {
-  sorteos:     { emoji: "🎰", label: "Sorteos" },
-  premios:     { emoji: "🏆", label: "Premios" },
-  streaming:   { emoji: "📺", label: "Streaming" },
-  fotografia:  { emoji: "📸", label: "Fotografía" },
-  arbitro:     { emoji: "🦺", label: "Árbitro" },
-  patrocinador:{ emoji: "🤝", label: "Patrocinador" },
+  sorteos:      { emoji: "🎰", label: "Sorteos" },
+  premios:      { emoji: "🏆", label: "Premios" },
+  streaming:    { emoji: "📺", label: "Streaming" },
+  fotografia:   { emoji: "📸", label: "Fotografía" },
+  arbitro:      { emoji: "🦺", label: "Árbitro oficial" },
+  patrocinador: { emoji: "🤝", label: "Patrocinador" },
 }
 
 export default async function TournamentDetailPage({
@@ -54,14 +56,14 @@ export default async function TournamentDetailPage({
 
   const st = STATUS_DOT[t.status] ?? STATUS_DOT.open
   const isCreator = t.created_by === ctx.userId
-  const canJoin = t.status === "open" && !isCreator
+  const canJoin = t.status === "open" && !isCreator && !alreadyJoined
 
   const enabledExtras = t.extras
     ? Object.entries(t.extras).filter(([, v]) => v?.enabled)
     : []
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col gap-6">
+    <div className="max-w-4xl mx-auto flex flex-col gap-6">
       {/* Back */}
       <Link
         href="/dashboard/tournaments"
@@ -131,7 +133,6 @@ export default async function TournamentDetailPage({
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
           <div className="p-5 flex items-center gap-2">
             <DollarSign className="size-4 text-zinc-400 shrink-0" />
@@ -175,17 +176,28 @@ export default async function TournamentDetailPage({
         </div>
       )}
 
-      {/* Creator panel */}
+      {/* Creator management panel */}
       {isCreator && (
-        <TournamentManagePanel tournamentId={id} currentStatus={t.status} />
+        <TournamentManagePanel
+          tournamentId={id}
+          currentStatus={t.status}
+          modality={t.modality}
+        />
       )}
 
-      {/* Join CTA */}
+      {/* Join CTA for eligible non-creators */}
       {canJoin && (
         <JoinTournamentButton tournamentId={id} alreadyJoined={alreadyJoined} />
       )}
 
-      {/* Closed message for non-creators */}
+      {/* Already joined notice */}
+      {!isCreator && alreadyJoined && t.status === "open" && (
+        <div className="rounded-2xl bg-green-50 border border-green-200 p-4 text-center">
+          <p className="text-sm font-bold text-green-700">Ya estás inscrito en este torneo.</p>
+        </div>
+      )}
+
+      {/* Closed notice for non-creators */}
       {!isCreator && t.status !== "open" && (
         <div className="rounded-2xl bg-zinc-50 border border-zinc-200 p-5 text-center">
           <p className="text-sm font-bold text-zinc-500">
@@ -195,6 +207,25 @@ export default async function TournamentDetailPage({
              "Las inscripciones aún no están abiertas."}
           </p>
         </div>
+      )}
+
+      {/* Participants table — always visible (creator sees all, others see only when open+) */}
+      {(isCreator || t.status === "open" || t.status === "in_progress" || t.status === "completed") && (
+        <ParticipantsManager
+          tournamentId={id}
+          isCreator={isCreator}
+          entryFee={t.entry_fee}
+        />
+      )}
+
+      {/* Bracket / Fixture — hidden while draft */}
+      {t.status !== "draft" && (
+        <BracketView
+          tournamentId={id}
+          isCreator={isCreator}
+          modality={t.modality}
+          tournamentStatus={t.status}
+        />
       )}
     </div>
   )

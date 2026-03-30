@@ -24,9 +24,11 @@ const CANCEL_ALLOWED = ["draft", "open", "in_progress"]
 export function TournamentManagePanel({
   tournamentId,
   currentStatus,
+  modality,
 }: {
   tournamentId: string
   currentStatus: string
+  modality?: string | null
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -71,6 +73,9 @@ export function TournamentManagePanel({
            currentStatus === "in_progress" ? "En curso" :
            currentStatus === "completed" ? "Finalizado" : currentStatus}
         </p>
+        {modality && (
+          <p className="text-[10px] text-zinc-400 mt-1">Modalidad: <span className="font-bold text-zinc-600">{modality}</span></p>
+        )}
       </div>
 
       {nextAction && (() => { const Icon = nextAction.icon; return (
