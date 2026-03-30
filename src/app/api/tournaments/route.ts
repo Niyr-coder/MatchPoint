@@ -7,11 +7,22 @@ const createTournamentSchema = z.object({
   name: z.string().min(3).max(100),
   sport: z.enum(["futbol", "padel", "tenis", "pickleball"]),
   description: z.string().max(1000).optional(),
-  max_participants: z.number().int().min(2).max(256),
+  max_participants: z.number().int().min(2).max(256).optional(),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   entry_fee: z.number().min(0),
   club_id: z.string().uuid().optional(),
+  start_time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  modality: z.string().max(50).optional(),
+  is_official: z.boolean().optional(),
+  extras: z.object({
+    sorteos: z.object({ enabled: z.boolean(), detail: z.string().optional() }).optional(),
+    premios: z.object({ enabled: z.boolean(), detail: z.string().optional() }).optional(),
+    streaming: z.object({ enabled: z.boolean() }).optional(),
+    fotografia: z.object({ enabled: z.boolean() }).optional(),
+    arbitro: z.object({ enabled: z.boolean() }).optional(),
+    patrocinador: z.object({ enabled: z.boolean(), name: z.string().optional() }).optional(),
+  }).optional(),
 })
 
 export async function GET() {
@@ -55,7 +66,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const tournament = await createTournament(user.id, parsed.data)
+    const tournament = await createTournament(user.id, {
+      name: parsed.data.name,
+      sport: parsed.data.sport,
+      description: parsed.data.description,
+      max_participants: parsed.data.max_participants,
+      start_date: parsed.data.start_date,
+      end_date: parsed.data.end_date,
+      entry_fee: parsed.data.entry_fee,
+      club_id: parsed.data.club_id,
+      start_time: parsed.data.start_time,
+      modality: parsed.data.modality,
+      is_official: parsed.data.is_official,
+      extras: parsed.data.extras,
+    })
     return NextResponse.json({ success: true, data: tournament }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear torneo"

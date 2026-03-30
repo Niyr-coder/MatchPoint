@@ -30,15 +30,28 @@ export interface TournamentParticipant {
   registered_at: string
 }
 
+export interface TournamentExtras {
+  sorteos?: { enabled: boolean; detail?: string }
+  premios?: { enabled: boolean; detail?: string }
+  streaming?: { enabled: boolean }
+  fotografia?: { enabled: boolean }
+  arbitro?: { enabled: boolean }
+  patrocinador?: { enabled: boolean; name?: string }
+}
+
 export interface CreateTournamentInput {
   name: string
   sport: SportType
   description?: string
-  max_participants: number
+  max_participants?: number
   start_date: string
   end_date?: string
   entry_fee: number
   club_id?: string
+  start_time?: string
+  modality?: string
+  is_official?: boolean
+  extras?: TournamentExtras
 }
 
 export async function getOpenTournaments(): Promise<Tournament[]> {
