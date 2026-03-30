@@ -1,44 +1,61 @@
-import { StatCard } from "@/components/dashboard/StatCard"
+import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { RoleWelcomeBanner } from "@/components/dashboard/RoleWelcomeBanner"
 import { BentoCard } from "@/components/dashboard/BentoCard"
-import { DashboardHeading } from "@/components/dashboard/DashboardHeading"
 
-export default function ManagerTodayPage() {
+export default async function ManagerTodayPage({
+  params,
+}: {
+  params: Promise<{ clubId: string }>
+}) {
+  const { clubId } = await params
+  const ctx = await authorizeOrRedirect({ clubId, requiredRoles: ["manager"] })
+
   const date = new Date().toLocaleDateString("es-EC", {
     weekday: "long",
     day: "numeric",
     month: "long",
   })
 
+  const stats = [
+    { label: "Ocupación", value: "—" },
+    { label: "Reservas", value: "—" },
+    { label: "Caja del día", value: "—" },
+  ]
+
   return (
-    <div className="space-y-3">
-      <DashboardHeading label="Vista Operativa" title="Hoy" subtitle={date} />
+    <div className="flex flex-col gap-6">
+      <RoleWelcomeBanner profile={ctx.profile} role="manager" date={date} stats={stats} />
 
-      {/* Bento grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-        {/* Row 1: Stat cards */}
-        <StatCard label="Ocupación" value="—" suffix="%" icon="BarChart3" accent index={0} />
-        <StatCard label="Reservas" value="—" icon="Calendar" index={1} />
-        <StatCard label="Check-ins" value="—" icon="Users" index={2} />
-        <StatCard label="Caja del Día" value="—" suffix="USD" icon="Wallet" index={3} />
-
-        {/* Row 2: Full-width actions card */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <BentoCard
           variant="default"
           icon="Calendar"
-          label="02"
-          title="Próximas Acciones"
-          subtitle="Clases, mantenimientos y torneos de hoy"
-          className="col-span-2 lg:col-span-4"
-          index={4}
+          label="Reservas de hoy"
+          title="Actividad del día"
+          subtitle="Check-in de jugadores y canchas activas"
+          index={0}
         >
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
             <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
-              Sin acciones pendientes
+              Sin reservas para hoy
             </p>
           </div>
         </BentoCard>
 
+        <BentoCard
+          variant="default"
+          icon="Wallet"
+          label="Caja"
+          title="Movimientos del día"
+          subtitle="Ingresos y egresos registrados"
+          index={1}
+        >
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
+              Sin movimientos hoy
+            </p>
+          </div>
+        </BentoCard>
       </div>
     </div>
   )
