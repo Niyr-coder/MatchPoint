@@ -201,6 +201,7 @@ export async function isUserInTournament(
     .select("id")
     .eq("tournament_id", tournamentId)
     .eq("user_id", userId)
+    .neq("status", "withdrawn")
     .maybeSingle()
 
   if (error) throw new Error(error.message)

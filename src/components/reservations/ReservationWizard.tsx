@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, Building2, Layers, Clock, CheckCircle } from "lucide-react"
@@ -97,7 +97,7 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useState(() => {
+  useEffect(() => {
     setLoading(true)
     fetch("/api/clubs")
       .then((r) => r.json())
@@ -107,7 +107,7 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
       })
       .catch(() => setError("Error de conexión"))
       .finally(() => setLoading(false))
-  })
+  }, [])
 
   if (loading) {
     return (
@@ -167,7 +167,7 @@ function StepCourt({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useState(() => {
+  useEffect(() => {
     setLoading(true)
     fetch(`/api/courts?club_id=${clubId}`)
       .then((r) => r.json())
@@ -177,7 +177,7 @@ function StepCourt({
       })
       .catch(() => setError("Error de conexión"))
       .finally(() => setLoading(false))
-  })
+  }, [clubId])
 
   if (loading) {
     return (

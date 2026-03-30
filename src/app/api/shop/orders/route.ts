@@ -88,7 +88,11 @@ export async function POST(request: Request) {
   })
 
   const { error: itemsError } = await supabase.from("order_items").insert(orderItems)
-  if (itemsError) return NextResponse.json({ error: itemsError.message }, { status: 500 })
+  if (itemsError) {
+    // Clean up orphaned order — best-effort, not awaited to not delay response
+    void supabase.from("orders").delete().eq("id", order.id)
+    return NextResponse.json({ error: itemsError.message }, { status: 500 })
+  }
 
   return NextResponse.json({ order })
 }

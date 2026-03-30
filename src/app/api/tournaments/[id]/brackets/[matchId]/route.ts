@@ -51,12 +51,11 @@ export async function PATCH(
 
   if (matchError) return NextResponse.json({ success: false, error: matchError.message }, { status: 500 })
 
-  // Lock the bracket on first recorded result
-  await supabase
+  // Lock the bracket on first recorded result (service client bypasses RLS reliably)
+  await service
     .from("tournaments")
     .update({ bracket_locked: true })
     .eq("id", id)
-    .eq("created_by", user.id)
 
   // Auto-advance winner to next elimination round
   // Next round match: Math.ceil(match_number / 2), slot: odd → player1, even → player2
