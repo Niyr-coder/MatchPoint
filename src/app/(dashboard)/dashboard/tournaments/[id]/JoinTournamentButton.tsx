@@ -7,9 +7,10 @@ import { CheckCircle } from "lucide-react"
 interface JoinTournamentButtonProps {
   tournamentId: string
   alreadyJoined: boolean
+  onRefresh?: () => void
 }
 
-export function JoinTournamentButton({ tournamentId, alreadyJoined }: JoinTournamentButtonProps) {
+export function JoinTournamentButton({ tournamentId, alreadyJoined, onRefresh }: JoinTournamentButtonProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +22,7 @@ export function JoinTournamentButton({ tournamentId, alreadyJoined }: JoinTourna
 
     try {
       const res = await fetch(`/api/tournaments/${tournamentId}/join`, { method: "POST" })
-      const data = await res.json()
+      const data = await res.json() as { success: boolean; error?: string }
 
       if (!data.success) {
         setError(data.error ?? "Error al inscribirse")
@@ -29,7 +30,7 @@ export function JoinTournamentButton({ tournamentId, alreadyJoined }: JoinTourna
       }
 
       setJoined(true)
-      router.refresh()
+      onRefresh ? onRefresh() : router.refresh()
     } catch {
       setError("Error de conexión. Intenta de nuevo.")
     } finally {

@@ -25,10 +25,12 @@ export function TournamentManagePanel({
   tournamentId,
   currentStatus,
   modality,
+  onRefresh,
 }: {
   tournamentId: string
   currentStatus: string
   modality?: string | null
+  onRefresh?: () => void
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -48,7 +50,7 @@ export function TournamentManagePanel({
       })
       const data = await res.json() as { success: boolean; error?: string }
       if (!data.success) { setError(data.error ?? "Error al actualizar"); return }
-      router.refresh()
+      onRefresh ? onRefresh() : router.refresh()
     } catch {
       setError("Error de conexión")
     } finally {

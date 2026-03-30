@@ -31,10 +31,12 @@ export function ParticipantsManager({
   tournamentId,
   isCreator,
   entryFee,
+  onRefresh,
 }: {
   tournamentId: string
   isCreator: boolean
   entryFee: number
+  onRefresh?: () => void
 }) {
   const [participants, setParticipants] = useState<Participant[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,6 +62,7 @@ export function ParticipantsManager({
     })
     await load()
     setActionId(null)
+    onRefresh?.()
   }
 
   async function removeParticipant(userId: string) {
@@ -68,6 +71,7 @@ export function ParticipantsManager({
     setConfirmDelete(null)
     await load()
     setActionId(null)
+    onRefresh?.()
   }
 
   const paidCount = participants.filter(p => p.payment_status === "paid").length

@@ -27,11 +27,13 @@ export function BracketView({
   isCreator,
   modality,
   tournamentStatus,
+  onRefresh,
 }: {
   tournamentId: string
   isCreator: boolean
   modality: string | null | undefined
   tournamentStatus: string
+  onRefresh?: () => void
 }) {
   const [matches, setMatches] = useState<BracketMatch[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,6 +66,7 @@ export function BracketView({
     if (!json.success) { setError(json.error ?? "Error al generar sorteo"); setGenerating(false); return }
     await load()
     setGenerating(false)
+    onRefresh?.()
   }
 
   const rounds = matches.reduce<Record<number, BracketMatch[]>>((acc, m) => {

@@ -3,10 +3,7 @@ import { getTournamentById, isUserInTournament } from "@/lib/tournaments/queries
 import { notFound } from "next/navigation"
 import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { JoinTournamentButton } from "./JoinTournamentButton"
-import { TournamentManagePanel } from "./TournamentManagePanel"
-import { ParticipantsManager } from "@/components/dashboard/ParticipantsManager"
-import { BracketView } from "@/components/dashboard/BracketView"
+import { TournamentClientShell } from "./TournamentClientShell"
 
 const SPORT_LABEL: Record<string, string> = {
   futbol: "Fútbol",
@@ -73,42 +70,40 @@ export default async function TournamentDetailPage({
         Volver a torneos
       </Link>
 
-      {/* Hero */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: "#1a56db" }}>
-        <div className="p-6 md:p-8">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center">
-              <Trophy className="size-6 text-white" />
-            </div>
-            <div className="flex items-center gap-2 flex-wrap justify-end">
-              {t.is_official && (
-                <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full bg-amber-400 text-amber-900 border border-amber-300">
-                  OFICIAL
-                </span>
-              )}
-              <span className={`text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border flex items-center gap-1.5 ${st.badge}`}>
-                <span className={`size-1.5 rounded-full inline-block ${st.dot}`} />
-                {st.label}
-              </span>
-            </div>
+      {/* Hero — default card style, no color */}
+      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 md:p-8">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="size-12 rounded-xl bg-zinc-100 flex items-center justify-center">
+            <Trophy className="size-6 text-zinc-400" />
           </div>
-          <h1 className="text-2xl font-black text-white uppercase leading-tight tracking-[-0.02em] mb-3">
-            {t.name}
-          </h1>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
-              {SPORT_LABEL[t.sport] ?? t.sport}
-            </span>
-            {t.modality && (
-              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
-                {t.modality}
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {t.is_official && (
+              <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                OFICIAL
               </span>
             )}
+            <span className={`text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border flex items-center gap-1.5 ${st.badge}`}>
+              <span className={`size-1.5 rounded-full inline-block ${st.dot}`} />
+              {st.label}
+            </span>
           </div>
-          {t.description && (
-            <p className="text-sm text-white/70 leading-relaxed mt-3">{t.description}</p>
+        </div>
+        <h1 className="text-2xl font-black text-[#0a0a0a] uppercase leading-tight tracking-[-0.02em] mb-3">
+          {t.name}
+        </h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600">
+            {SPORT_LABEL[t.sport] ?? t.sport}
+          </span>
+          {t.modality && (
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600">
+              {t.modality}
+            </span>
           )}
         </div>
+        {t.description && (
+          <p className="text-sm text-zinc-500 leading-relaxed mt-3">{t.description}</p>
+        )}
       </div>
 
       {/* Info grid */}
@@ -176,57 +171,16 @@ export default async function TournamentDetailPage({
         </div>
       )}
 
-      {/* Creator management panel */}
-      {isCreator && (
-        <TournamentManagePanel
-          tournamentId={id}
-          currentStatus={t.status}
-          modality={t.modality}
-        />
-      )}
-
-      {/* Join CTA for eligible non-creators */}
-      {canJoin && (
-        <JoinTournamentButton tournamentId={id} alreadyJoined={alreadyJoined} />
-      )}
-
-      {/* Already joined notice */}
-      {!isCreator && alreadyJoined && t.status === "open" && (
-        <div className="rounded-2xl bg-green-50 border border-green-200 p-4 text-center">
-          <p className="text-sm font-bold text-green-700">Ya estás inscrito en este torneo.</p>
-        </div>
-      )}
-
-      {/* Closed notice for non-creators */}
-      {!isCreator && t.status !== "open" && (
-        <div className="rounded-2xl bg-zinc-50 border border-zinc-200 p-5 text-center">
-          <p className="text-sm font-bold text-zinc-500">
-            {t.status === "in_progress" ? "Este torneo ya está en curso." :
-             t.status === "completed" ? "Este torneo ha finalizado." :
-             t.status === "cancelled" ? "Este torneo fue cancelado." :
-             "Las inscripciones aún no están abiertas."}
-          </p>
-        </div>
-      )}
-
-      {/* Participants table — always visible (creator sees all, others see only when open+) */}
-      {(isCreator || t.status === "open" || t.status === "in_progress" || t.status === "completed") && (
-        <ParticipantsManager
-          tournamentId={id}
-          isCreator={isCreator}
-          entryFee={t.entry_fee}
-        />
-      )}
-
-      {/* Bracket / Fixture — hidden while draft */}
-      {t.status !== "draft" && (
-        <BracketView
-          tournamentId={id}
-          isCreator={isCreator}
-          modality={t.modality}
-          tournamentStatus={t.status}
-        />
-      )}
+      {/* All interactive/mutable parts — synced via shared refreshKey */}
+      <TournamentClientShell
+        tournamentId={id}
+        currentStatus={t.status}
+        isCreator={isCreator}
+        canJoin={canJoin}
+        alreadyJoined={alreadyJoined}
+        entryFee={t.entry_fee}
+        modality={t.modality}
+      />
     </div>
   )
 }

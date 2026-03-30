@@ -15,7 +15,7 @@ const SPORTS = [
 type SportValue = (typeof SPORTS)[number]["value"]
 
 const MODALITIES: Record<SportValue, string[]> = {
-  pickleball: ["Singles", "Dobles", "Mixtos", "Round Robin", "Eliminación Directa", "King of the Court"],
+  pickleball: ["Singles", "Dobles", "Mixtos", "Round Robin", "Eliminación Directa", "King of the Court", "Popcorn"],
   padel: ["Singles", "Dobles", "Americano", "Cuadrangular"],
   tenis: ["Singles", "Dobles", "Mixtos"],
   futbol: ["5 vs 5", "7 vs 7", "11 vs 11"],
