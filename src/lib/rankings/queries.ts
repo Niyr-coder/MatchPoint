@@ -47,37 +47,35 @@ export async function getRankingBySport(
       })
     }
 
-    // No sport filter: show all profiles, joined with their ranking score (or 0)
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url, rankings(score, wins, losses)")
-      .order("id")
-      .limit(limit)
+    // No sport filter: two queries then merge (rankings.user_id → auth.users, not profiles)
+    const [profilesRes, rankingsRes] = await Promise.all([
+      supabase.from("profiles").select("id, full_name, avatar_url").limit(limit),
+      supabase.from("rankings").select("user_id, score, wins, losses"),
+    ])
 
-    if (error || !data) return []
+    if (profilesRes.error || !profilesRes.data) return []
 
-    type ProfileRow = {
-      id: string
-      full_name: string | null
-      avatar_url: string | null
-      rankings: { score: number; wins: number; losses: number }[] | null
+    type RankMap = Record<string, { score: number; wins: number; losses: number }>
+    const rankMap: RankMap = {}
+    for (const r of rankingsRes.data ?? []) {
+      const uid = r.user_id as string
+      rankMap[uid] = {
+        score: (rankMap[uid]?.score ?? 0) + (r.score as number),
+        wins:  (rankMap[uid]?.wins  ?? 0) + (r.wins  as number),
+        losses:(rankMap[uid]?.losses ?? 0) + (r.losses as number),
+      }
     }
 
-    const rows = (data as ProfileRow[]).map(p => {
-      const r = Array.isArray(p.rankings) ? p.rankings[0] : null
-      return {
-        userId: p.id,
-        fullName: p.full_name ?? "Jugador",
-        avatarUrl: p.avatar_url ?? null,
-        score: r?.score ?? 0,
-        wins: r?.wins ?? 0,
-        losses: r?.losses ?? 0,
-      }
-    })
+    const rows = profilesRes.data.map(p => ({
+      userId: p.id as string,
+      fullName: (p.full_name as string | null) ?? "Jugador",
+      avatarUrl: (p.avatar_url as string | null) ?? null,
+      score:  rankMap[p.id]?.score  ?? 0,
+      wins:   rankMap[p.id]?.wins   ?? 0,
+      losses: rankMap[p.id]?.losses ?? 0,
+    }))
 
-    // Sort by score desc, then wins desc
     rows.sort((a, b) => b.score - a.score || b.wins - a.wins)
-
     return rows.map((r, index) => ({ ...r, position: index + 1 }))
   } catch {
     return []
