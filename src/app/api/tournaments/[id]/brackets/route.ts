@@ -46,6 +46,13 @@ export async function POST(
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
+  if (tournament.bracket_locked) {
+    return NextResponse.json({
+      success: false,
+      error: "El bracket está bloqueado porque ya hay partidos con resultado registrado.",
+    }, { status: 409 })
+  }
+
   const body = await request.json() as { type?: string }
   const type = body.type ?? "elimination"
 

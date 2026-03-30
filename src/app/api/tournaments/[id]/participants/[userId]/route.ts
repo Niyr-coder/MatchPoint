@@ -10,7 +10,6 @@ export async function PATCH(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
 
-  // Only creator can update participants
   const { data: tournament } = await supabase
     .from("tournaments")
     .select("created_by")
@@ -27,6 +26,7 @@ export async function PATCH(
   if (body.status !== undefined) allowed.status = body.status
   if (body.notes !== undefined) allowed.notes = body.notes
   if (body.seed !== undefined) allowed.seed = body.seed
+  if (body.withdrawal_reason !== undefined) allowed.withdrawal_reason = body.withdrawal_reason
 
   const service = await createServiceClient()
   const { data, error } = await service
@@ -42,7 +42,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   const { id, userId } = await params
@@ -52,7 +52,7 @@ export async function DELETE(
 
   const { data: tournament } = await supabase
     .from("tournaments")
-    .select("created_by")
+    .select("created_by, status")
     .eq("id", id)
     .single()
 
@@ -60,7 +60,39 @@ export async function DELETE(
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
+  const body = await request.json().catch(() => ({})) as { mode?: string; reason?: string }
+  const mode = body.mode ?? (tournament.status === "in_progress" ? "withdraw" : "remove")
   const service = await createServiceClient()
+
+  if (mode === "withdraw") {
+    // Mark as withdrawn — keep record and bracket history
+    const { error } = await service
+      .from("tournament_participants")
+      .update({ status: "withdrawn", withdrawal_reason: body.reason ?? null })
+      .eq("tournament_id", id)
+      .eq("user_id", userId)
+
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+
+    // Replace pending bracket slots with bye (preserve completed match history)
+    const { data: matches } = await service
+      .from("tournament_brackets")
+      .select("id, player1_id, player2_id, status")
+      .eq("tournament_id", id)
+      .or(`player1_id.eq.${userId},player2_id.eq.${userId}`)
+
+    for (const match of matches ?? []) {
+      if (match.status === "completed") continue
+      const update: Record<string, unknown> = { status: "bye" }
+      if (match.player1_id === userId) update.player1_id = null
+      if (match.player2_id === userId) update.player2_id = null
+      await service.from("tournament_brackets").update(update).eq("id", match.id)
+    }
+
+    return NextResponse.json({ success: true, mode: "withdrawn" })
+  }
+
+  // Hard remove — pre-tournament only
   const { error } = await service
     .from("tournament_participants")
     .delete()
@@ -68,5 +100,5 @@ export async function DELETE(
     .eq("user_id", userId)
 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, mode: "removed" })
 }
