@@ -54,6 +54,14 @@ export interface Profile {
   onboarding_completed: boolean
   created_at: string
   updated_at: string
+  // Extended fields added by migrations 005 and 009
+  username?: string | null
+  global_role?: AppRole
+  rating?: number | string | null
+  ranking_position?: number | null
+  matches_played?: number | null
+  matches_won?: number | null
+  current_streak?: number | null
 }
 
 // ============================================================

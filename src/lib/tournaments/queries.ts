@@ -34,6 +34,12 @@ export interface TournamentParticipant {
   user_id: string
   status: ParticipantStatus
   registered_at: string
+  // Extended fields added by migration 012
+  payment_status?: PaymentStatus
+  seed?: number | null
+  notes?: string | null
+  club_id?: string | null
+  confirmed_at?: string | null
 }
 
 export interface TournamentExtras {

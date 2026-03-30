@@ -3,15 +3,6 @@ import { RoleWelcomeBanner } from "@/components/dashboard/RoleWelcomeBanner"
 import { BentoCard } from "@/components/dashboard/BentoCard"
 import { getPlatformAnalytics } from "@/lib/admin/queries"
 
-const ACTIVITY_BARS = [
-  { day: "L", value: 55 },
-  { day: "M", value: 70 },
-  { day: "X", value: 45 },
-  { day: "J", value: 80 },
-  { day: "V", value: 95 },
-  { day: "S", value: 85 },
-  { day: "D", value: 60 },
-]
 
 export default async function AdminDashboardPage() {
   const ctx = await authorizeOrRedirect()
@@ -125,26 +116,34 @@ export default async function AdminDashboardPage() {
           index={3}
         >
           <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
-            <div className="flex items-end justify-between gap-1.5 h-[60px]">
-              {ACTIVITY_BARS.map((bar, i) => (
-                <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                  <div
-                    className="w-full rounded-t-sm bg-[#dc2626]"
-                    style={{
-                      height: `${bar.value * 0.58}px`,
-                      opacity: i === ACTIVITY_BARS.length - 2 ? 1 : 0.3 + i * 0.1,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex items-end justify-between gap-1.5">
-              {ACTIVITY_BARS.map((bar, i) => (
-                <div key={i} className="flex flex-col items-center flex-1">
-                  <span className="text-[9px] font-bold text-zinc-400 uppercase">{bar.day}</span>
-                </div>
-              ))}
-            </div>
+            {(() => {
+              const bars = analytics.activityLast7Days
+              const maxVal = Math.max(...bars.map((b) => b.value), 1)
+              return (
+                <>
+                  <div className="flex items-end justify-between gap-1.5 h-[60px]">
+                    {bars.map((bar, i) => (
+                      <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                        <div
+                          className="w-full rounded-t-sm bg-[#dc2626]"
+                          style={{
+                            height: `${(bar.value / maxVal) * 55}px`,
+                            opacity: bar.value === 0 ? 0.1 : 0.4 + (bar.value / maxVal) * 0.6,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-end justify-between gap-1.5">
+                    {bars.map((bar, i) => (
+                      <div key={i} className="flex flex-col items-center flex-1">
+                        <span className="text-[9px] font-bold text-zinc-400 uppercase">{bar.day}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         </BentoCard>
       </div>

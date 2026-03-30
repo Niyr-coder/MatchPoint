@@ -17,54 +17,36 @@ export async function getRankingBySport(
   try {
     const supabase = await createServiceClient()
 
-    // All registered users
-    const { data: profiles, error: profilesError } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url")
-      .limit(500)
-
-    if (profilesError || !profiles) return []
-
-    // Tournament participation stats (left-join done in JS)
-    let participantsQuery = supabase
-      .from("tournament_participants")
-      .select("user_id, status, tournaments!inner(sport)")
-      .in("status", ["winner", "confirmed", "eliminated", "registered"])
+    // Use the rankings table (populated when match results are recorded)
+    // Eliminates the 500-profile full-scan and incorrect losses calculation
+    let query = supabase
+      .from("rankings")
+      .select("user_id, score, wins, losses, profiles!inner(full_name, avatar_url)")
+      .order("score", { ascending: false })
+      .order("wins", { ascending: false })
+      .limit(limit)
 
     if (sport) {
-      participantsQuery = participantsQuery.eq("tournaments.sport", sport)
+      query = query.eq("sport", sport)
     }
 
-    const { data: participants } = await participantsQuery
+    const { data, error } = await query
+    if (error || !data) return []
 
-    // Build stats map from participation data
-    const statsMap = new Map<string, { wins: number; participations: number }>()
-    for (const row of participants ?? []) {
-      const userId = row.user_id as string
-      const isWinner = row.status === "winner"
-      const prev = statsMap.get(userId) ?? { wins: 0, participations: 0 }
-      statsMap.set(userId, {
-        wins: prev.wins + (isWinner ? 1 : 0),
-        participations: prev.participations + 1,
-      })
-    }
-
-    // Merge profiles with stats, rank all users
-    return profiles
-      .map((p) => {
-        const stats = statsMap.get(p.id) ?? { wins: 0, participations: 0 }
-        return {
-          userId: p.id,
-          fullName: p.full_name ?? "Jugador",
-          avatarUrl: p.avatar_url ?? null,
-          wins: stats.wins,
-          losses: stats.participations - stats.wins,
-          score: stats.wins * 10 + stats.participations * 2,
-        }
-      })
-      .sort((a, b) => b.score - a.score || b.wins - a.wins)
-      .slice(0, limit)
-      .map((entry, index) => ({ ...entry, position: index + 1 }))
+    return data.map((row, index) => {
+      const profile = (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles) as
+        | { full_name: string | null; avatar_url: string | null }
+        | null
+      return {
+        position: index + 1,
+        userId: row.user_id as string,
+        fullName: profile?.full_name ?? "Jugador",
+        avatarUrl: profile?.avatar_url ?? null,
+        score: row.score,
+        wins: row.wins,
+        losses: row.losses,
+      }
+    })
   } catch {
     return []
   }

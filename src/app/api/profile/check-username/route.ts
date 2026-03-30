@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { createServiceClient } from "@/lib/supabase/server"
+import { createClient, createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
 
 const querySchema = z.object({
@@ -12,6 +12,13 @@ const querySchema = z.object({
 })
 
 export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<{ available: boolean }>>> {
+  // Require auth to prevent username enumeration by unauthenticated users
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  }
+
   const { searchParams } = new URL(request.url)
   const username = searchParams.get("username") ?? ""
 

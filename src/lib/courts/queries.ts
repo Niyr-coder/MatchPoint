@@ -138,7 +138,7 @@ export async function updateCourt(
   const supabase = await createServiceClient()
   const { data, error } = await supabase
     .from("courts")
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({ ...input })
     .eq("id", id)
     .select()
     .single()

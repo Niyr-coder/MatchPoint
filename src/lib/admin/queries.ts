@@ -24,6 +24,7 @@ export interface PlatformAnalytics {
   totalTournaments: number
   newUsersThisMonth: number
   reservationsThisMonth: number
+  activityLast7Days: Array<{ day: string; value: number }>
 }
 
 export async function getAllClubsAdmin(
@@ -123,6 +124,9 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
       .toISOString()
       .split("T")[0]
 
+    // Last 7 days for activity chart
+    const day0 = new Date(now); day0.setDate(now.getDate() - 6); day0.setHours(0, 0, 0, 0)
+
     const [
       usersRes,
       clubsRes,
@@ -130,6 +134,7 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
       tournamentsRes,
       newUsersRes,
       reservationsMonthRes,
+      activityRes,
     ] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("clubs").select("id", { count: "exact", head: true }).eq("is_active", true),
@@ -144,7 +149,23 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
         .select("id", { count: "exact", head: true })
         .gte("created_at", firstOfMonth)
         .neq("status", "cancelled"),
+      supabase
+        .from("reservations")
+        .select("created_at")
+        .gte("created_at", day0.toISOString())
+        .neq("status", "cancelled"),
     ])
+
+    // Build 7-day activity bars from raw reservation timestamps
+    const DAY_LABELS = ["D", "L", "M", "X", "J", "V", "S"]
+    const activityLast7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(day0); d.setDate(day0.getDate() + i)
+      const dateStr = d.toISOString().split("T")[0]
+      const count = (activityRes.data ?? []).filter(
+        (r) => r.created_at.startsWith(dateStr)
+      ).length
+      return { day: DAY_LABELS[d.getDay()], value: count }
+    })
 
     return {
       totalUsers: usersRes.count ?? 0,
@@ -153,6 +174,7 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
       totalTournaments: tournamentsRes.count ?? 0,
       newUsersThisMonth: newUsersRes.count ?? 0,
       reservationsThisMonth: reservationsMonthRes.count ?? 0,
+      activityLast7Days,
     }
   } catch {
     return {
@@ -162,6 +184,7 @@ export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
       totalTournaments: 0,
       newUsersThisMonth: 0,
       reservationsThisMonth: 0,
+      activityLast7Days: [],
     }
   }
 }
