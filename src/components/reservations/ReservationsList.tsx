@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Calendar, Clock, MapPin, AlertCircle } from "lucide-react"
 import { StatusBadge } from "@/components/shared/StatusBadge"
@@ -141,6 +142,7 @@ interface ReservationsListProps {
 }
 
 export function ReservationsList({ reservations, invites }: ReservationsListProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>("upcoming")
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [localReservations, setLocalReservations] = useState<Reservation[]>(reservations)
@@ -169,6 +171,7 @@ export function ReservationsList({ reservations, invites }: ReservationsListProp
         setLocalReservations((prev) =>
           prev.map((r) => (r.id === id ? { ...r, status: "cancelled" as const } : r))
         )
+        router.refresh()
       })
     } catch {
       // silently revert — user can retry

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import {
   ShoppingBag,
   ShoppingCart,
@@ -60,6 +61,7 @@ function formatPrice(price: number): string {
 }
 
 export function ShopView({ userId: _userId }: ShopViewProps) {
+  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [activeCategory, setActiveCategory] = useState("")
   const [loading, setLoading] = useState(true)
@@ -139,6 +141,8 @@ export function ShopView({ userId: _userId }: ShopViewProps) {
         setCart([])
         setCartOpen(false)
         setOrderSuccess(true)
+        router.refresh()
+        loadProducts()
         setTimeout(() => setOrderSuccess(false), 5000)
       }
     } catch {

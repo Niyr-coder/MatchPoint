@@ -458,6 +458,7 @@ export function ReservationWizard() {
         return
       }
 
+      router.refresh()
       router.push("/dashboard/reservations")
     } catch {
       setSubmitError("Error de conexión. Inténtalo de nuevo.")

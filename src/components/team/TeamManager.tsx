@@ -85,14 +85,15 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
 
   async function handleRoleChange(memberId: string, role: string) {
     try {
-      await fetch(`/api/club/${clubId}/team`, {
+      const res = await fetch(`/api/club/${clubId}/team`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "role", memberId, role }),
       })
-      setMembers((prev) =>
-        prev.map((m) => (m.id === memberId ? { ...m, role } : m))
-      )
+      if (!res.ok) return
+      const refreshed = await fetch(`/api/club/${clubId}/team`)
+      const refreshedJson = await refreshed.json()
+      if (refreshedJson.success) setMembers(refreshedJson.data)
     } catch {
       // silent — UI stays as-is
     }
@@ -102,12 +103,15 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
     if (!pendingDeactivate) return
     setDeactivateLoading(true)
     try {
-      await fetch(`/api/club/${clubId}/team`, {
+      const res = await fetch(`/api/club/${clubId}/team`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "deactivate", memberId: pendingDeactivate }),
       })
-      setMembers((prev) => prev.filter((m) => m.id !== pendingDeactivate))
+      if (!res.ok) return
+      const refreshed = await fetch(`/api/club/${clubId}/team`)
+      const refreshedJson = await refreshed.json()
+      if (refreshedJson.success) setMembers(refreshedJson.data)
     } finally {
       setDeactivateLoading(false)
       setPendingDeactivate(null)
