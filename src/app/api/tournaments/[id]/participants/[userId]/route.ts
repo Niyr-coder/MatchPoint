@@ -1,5 +1,17 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { z } from "zod"
+
+const VALID_PAYMENT_STATUS = ["pending", "paid", "refunded"] as const
+const VALID_STATUS = ["registered", "confirmed", "withdrawn", "cancelled"] as const
+
+const patchParticipantSchema = z.object({
+  payment_status: z.enum(VALID_PAYMENT_STATUS).optional(),
+  status: z.enum(VALID_STATUS).optional(),
+  notes: z.string().max(500).nullable().optional(),
+  seed: z.number().int().min(1).nullable().optional(),
+  withdrawal_reason: z.string().max(500).nullable().optional(),
+}).strict()
 
 export async function PATCH(
   request: Request,
@@ -20,18 +32,26 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
-  const body = await request.json() as Record<string, unknown>
-  const allowed: Record<string, unknown> = {}
-  if (body.payment_status !== undefined) allowed.payment_status = body.payment_status
-  if (body.status !== undefined) allowed.status = body.status
-  if (body.notes !== undefined) allowed.notes = body.notes
-  if (body.seed !== undefined) allowed.seed = body.seed
-  if (body.withdrawal_reason !== undefined) allowed.withdrawal_reason = body.withdrawal_reason
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
+  }
+
+  const parsed = patchParticipantSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 422 })
+  }
+
+  if (Object.keys(parsed.data).length === 0) {
+    return NextResponse.json({ success: false, error: "No hay campos para actualizar" }, { status: 400 })
+  }
 
   const service = await createServiceClient()
   const { data, error } = await service
     .from("tournament_participants")
-    .update(allowed)
+    .update(parsed.data)
     .eq("tournament_id", id)
     .eq("user_id", userId)
     .select()

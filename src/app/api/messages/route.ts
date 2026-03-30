@@ -10,6 +10,18 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   if (conversationId) {
+    // Verify user is a member of this conversation before reading messages
+    const { data: membership } = await supabase
+      .from("conversation_participants")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("user_id", user.id)
+      .maybeSingle()
+
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const { data, error } = await supabase
       .from("messages")
       .select("*, sender:profiles(id, full_name, username, avatar_url)")
@@ -49,6 +61,22 @@ export async function POST(request: Request) {
 
   if (!conversationId || !content?.trim()) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 })
+  }
+
+  if (content.trim().length > 2000) {
+    return NextResponse.json({ error: "El mensaje no puede superar 2000 caracteres" }, { status: 400 })
+  }
+
+  // Verify user is a participant in this conversation before sending
+  const { data: membership } = await supabase
+    .from("conversation_participants")
+    .select("id")
+    .eq("conversation_id", conversationId)
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (!membership) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   const { data, error } = await supabase

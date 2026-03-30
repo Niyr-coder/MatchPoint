@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
+import { createServiceClient } from "@/lib/supabase/server"
 import {
   getClubTeam,
   addTeamMemberByUserId,
@@ -127,6 +128,22 @@ export async function PATCH(
     return NextResponse.json(
       { success: false, data: null, error: parsed.error.issues[0].message },
       { status: 422 }
+    )
+  }
+
+  // Verify the member belongs to this club before modifying
+  const service = await createServiceClient()
+  const { data: member } = await service
+    .from("club_members")
+    .select("id")
+    .eq("id", parsed.data.memberId)
+    .eq("club_id", clubId)
+    .maybeSingle()
+
+  if (!member) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Miembro no encontrado en este club" },
+      { status: 404 }
     )
   }
 

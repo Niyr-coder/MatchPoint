@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authorize } from "@/lib/auth/authorization"
 import { getClubReservations, updateReservationStatus } from "@/lib/reservations/queries"
+import { createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
 
 const updateStatusSchema = z.object({
@@ -57,6 +58,19 @@ export async function PATCH(
       { success: false, error: parsed.error.issues[0].message },
       { status: 422 }
     )
+  }
+
+  // Verify the reservation belongs to this club (via court → club relationship)
+  const service = await createServiceClient()
+  const { data: authResult2 } = await service
+    .from("reservations")
+    .select("id, courts!inner(club_id)")
+    .eq("id", parsed.data.id)
+    .eq("courts.club_id", clubId)
+    .maybeSingle()
+
+  if (!authResult2) {
+    return NextResponse.json({ success: false, error: "Reserva no encontrada en este club" }, { status: 404 })
   }
 
   try {

@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { getCourts, getCourtsBySport } from "@/lib/courts/queries"
 import type { SportType } from "@/lib/courts/queries"
 
+const VALID_SPORTS: SportType[] = ["futbol", "padel", "tenis", "pickleball"]
+
 export async function GET(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +14,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const sport = searchParams.get("sport") as SportType | null
+  const rawSport = searchParams.get("sport")
+  const sport: SportType | null =
+    rawSport && (VALID_SPORTS as string[]).includes(rawSport) ? (rawSport as SportType) : null
   const city = searchParams.get("city") ?? undefined
 
   try {

@@ -64,8 +64,9 @@ export async function POST(
   }
 
   const body = await request.json() as { userId?: string }
-  if (!body.userId) {
-    return NextResponse.json({ success: false, error: "userId requerido" }, { status: 400 })
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!body.userId || !UUID_RE.test(body.userId)) {
+    return NextResponse.json({ success: false, error: "userId inválido" }, { status: 400 })
   }
 
   const service = await createServiceClient()

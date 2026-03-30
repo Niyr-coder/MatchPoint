@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const all = searchParams.get("all") === "true"
-  const page = parseInt(searchParams.get("page") ?? "0", 10)
+  const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10) || 0)
 
   try {
     if (all) {
