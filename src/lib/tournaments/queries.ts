@@ -108,13 +108,49 @@ export async function createTournament(
 ): Promise<Tournament> {
   const supabase = await createClient()
 
+  // Base fields — always present in the original schema
+  const baseInsert = {
+    created_by: userId,
+    status: "draft" as const,
+    name: input.name,
+    sport: input.sport,
+    description: input.description,
+    max_participants: input.max_participants,
+    start_date: input.start_date,
+    end_date: input.end_date,
+    entry_fee: input.entry_fee,
+    club_id: input.club_id,
+  }
+
+  // Extended fields added by migration 010 — may not exist until migration runs
+  const fullInsert = {
+    ...baseInsert,
+    start_time: input.start_time,
+    modality: input.modality,
+    is_official: input.is_official ?? false,
+    extras: input.extras ?? {},
+  }
+
   const { data, error } = await supabase
     .from("tournaments")
-    .insert({ ...input, created_by: userId, status: "draft" })
+    .insert(fullInsert)
     .select("*, clubs(name)")
     .single()
 
-  if (error) throw new Error(error.message)
+  // If new columns don't exist yet (migration 010 pending), retry with base fields only
+  if (error) {
+    if (error.message.includes("column") || error.message.includes("schema cache")) {
+      const { data: baseData, error: baseError } = await supabase
+        .from("tournaments")
+        .insert(baseInsert)
+        .select("*, clubs(name)")
+        .single()
+      if (baseError) throw new Error(baseError.message)
+      return baseData as Tournament
+    }
+    throw new Error(error.message)
+  }
+
   return data as Tournament
 }
 
