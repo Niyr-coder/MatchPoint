@@ -49,29 +49,27 @@ export async function PATCH(
 
   const service = await createServiceClient()
 
-  // Guard: draft → open requires ≥ 4 participants
-  if (status === "open" && tournament.status === "draft") {
-    const { count } = await service
+  // Guard: open → in_progress requires ≥ 4 participants and bracket generated
+  if (status === "in_progress" && tournament.status === "open") {
+    const { count: participantCount } = await service
       .from("tournament_participants")
       .select("id", { count: "exact", head: true })
       .eq("tournament_id", id)
+      .neq("status", "withdrawn")
 
-    if ((count ?? 0) < 4) {
+    if ((participantCount ?? 0) < 4) {
       return NextResponse.json({
         success: false,
-        error: `Se necesitan al menos 4 participantes para publicar. Actualmente hay ${count ?? 0}.`,
+        error: `Se necesitan al menos 4 participantes para iniciar. Actualmente hay ${participantCount ?? 0}.`,
       }, { status: 409 })
     }
-  }
 
-  // Guard: open → in_progress requires bracket generated
-  if (status === "in_progress" && tournament.status === "open") {
-    const { count } = await service
+    const { count: bracketCount } = await service
       .from("tournament_brackets")
       .select("id", { count: "exact", head: true })
       .eq("tournament_id", id)
 
-    if ((count ?? 0) === 0) {
+    if ((bracketCount ?? 0) === 0) {
       return NextResponse.json({
         success: false,
         error: "Genera el bracket antes de iniciar el torneo.",
