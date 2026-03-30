@@ -19,7 +19,7 @@ export default function EmployeeTodayPage() {
         <StatCard label="Canchas en Uso" value="—" icon="MapPin" index={2} />
 
         <BentoCard
-          variant="dark"
+          variant="default"
           icon="Calendar"
           label="02"
           title="Reservas del Día"
@@ -27,8 +27,8 @@ export default function EmployeeTodayPage() {
           className="col-span-2 lg:col-span-4"
           index={3}
         >
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
               Sin reservas para hoy
             </p>
           </div>

@@ -18,7 +18,7 @@ export default function AdminDashboardPage() {
 
         {/* Row 2: Wide info cards */}
         <BentoCard
-          variant="dark"
+          variant="default"
           label="02"
           title="Actividad Reciente"
           subtitle="Historial de acciones en la plataforma"
@@ -26,14 +26,14 @@ export default function AdminDashboardPage() {
           index={4}
         >
           <div className="flex items-end justify-between mt-auto pt-4">
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
               Próximamente
             </p>
             <div className="flex items-end gap-1">
               {[3, 5, 2, 7, 4, 6, 8].map((h, i) => (
                 <div
                   key={i}
-                  className="w-1.5 rounded-full bg-white/20"
+                  className="w-1.5 rounded-full bg-zinc-200"
                   style={{ height: `${h * 4}px` }}
                 />
               ))}

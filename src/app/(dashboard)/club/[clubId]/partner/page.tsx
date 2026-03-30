@@ -38,15 +38,15 @@ export default function PartnerDashboardPage() {
 
         {/* Info card */}
         <BentoCard
-          variant="dark"
+          variant="default"
           label="02"
           title="Actividad del Mes"
           subtitle="Resumen de tu participación en el club"
           className="col-span-2 lg:col-span-4"
           index={3}
         >
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
               Próximamente
             </p>
           </div>

@@ -24,7 +24,7 @@ export default function ManagerTodayPage() {
 
         {/* Row 2: Full-width actions card */}
         <BentoCard
-          variant="dark"
+          variant="default"
           icon="Calendar"
           label="02"
           title="Próximas Acciones"
@@ -32,13 +32,10 @@ export default function ManagerTodayPage() {
           className="col-span-2 lg:col-span-4"
           index={4}
         >
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
               Sin acciones pendientes
             </p>
-            <a href="#" className="btn-pill-sm bg-white/10 text-white hover:bg-white/20 border-0">
-              Agregar acción
-            </a>
           </div>
         </BentoCard>
 

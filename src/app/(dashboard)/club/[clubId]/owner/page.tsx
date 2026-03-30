@@ -44,7 +44,7 @@ export default function OwnerDashboardPage() {
 
         {/* Wide rendimiento card (cols 2-4, row 2) */}
         <BentoCard
-          variant="dark"
+          variant="default"
           label="02"
           title="Rendimiento Semanal"
           subtitle="Evolución de reservas e ingresos"
@@ -52,14 +52,14 @@ export default function OwnerDashboardPage() {
           index={4}
         >
           <div className="flex items-end justify-between mt-auto pt-4">
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+            <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">
               Próximamente
             </p>
             <div className="flex items-end gap-1.5">
               {[4, 6, 3, 8, 5, 7, 9].map((h, i) => (
                 <div
                   key={i}
-                  className="w-2 rounded-sm bg-[#16a34a]/30"
+                  className="w-2 rounded-sm bg-[#16a34a]/40"
                   style={{ height: `${h * 5}px` }}
                 />
               ))}
