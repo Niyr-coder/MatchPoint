@@ -71,9 +71,11 @@ export async function POST(
     return NextResponse.json({ success: false, error: "Se necesitan al menos 2 participantes" }, { status: 400 })
   }
 
-  // Shuffle for fairness if no seeds assigned
+  // Shuffle for fairness if no seeds assigned; keep seeded order if seeds exist
   const unseeded = participants.every(p => !p.seed)
-  const players = unseeded ? shuffleArray(participants.map(p => p.user_id)) : participants.map(p => p.user_id)
+  const players = unseeded
+    ? shuffleArray(participants.map(p => p.user_id))
+    : participants.map(p => p.user_id)
 
   let brackets: BracketInsert[]
 
@@ -120,15 +122,23 @@ function generateElimination(tournamentId: string, players: string[]): BracketIn
   while (size < n) size *= 2
   const byes = size - n
 
-  // First round: pair players, add byes
-  const firstRound: (string | null)[] = [...players]
-  for (let i = 0; i < byes; i++) firstRound.push(null)
+  // A6: Distribute byes to top seeds so seeds 1..byes auto-advance
+  // instead of stacking byes at the end where all top seeds play each other R1.
+  // Layout: [seed1, BYE, seed2, BYE, ..., seedN-1, seedN, ...]
+  const slots: (string | null)[] = []
+  for (let i = 0; i < byes; i++) {
+    slots.push(players[i]) // top seed gets the bye
+    slots.push(null)
+  }
+  for (let i = byes; i < n; i++) {
+    slots.push(players[i])
+  }
 
   const brackets: BracketInsert[] = []
   let matchNum = 1
-  for (let i = 0; i < firstRound.length; i += 2) {
-    const p1 = firstRound[i] ?? null
-    const p2 = firstRound[i + 1] ?? null
+  for (let i = 0; i < slots.length; i += 2) {
+    const p1 = slots[i] ?? null
+    const p2 = slots[i + 1] ?? null
     brackets.push({
       tournament_id: tournamentId,
       round: 1,

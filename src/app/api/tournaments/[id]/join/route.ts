@@ -36,6 +36,26 @@ export async function POST(
       )
     }
 
+    // A2: Validate max_participants before allowing join
+    if (tournament.max_participants) {
+      const { count, error: countErr } = await supabase
+        .from("tournament_participants")
+        .select("id", { count: "exact", head: true })
+        .eq("tournament_id", id)
+        .neq("status", "withdrawn")
+
+      if (countErr) {
+        return NextResponse.json({ success: false, error: "Error al verificar participantes" }, { status: 500 })
+      }
+
+      if (count !== null && count >= tournament.max_participants) {
+        return NextResponse.json(
+          { success: false, error: `El torneo está lleno (máx. ${tournament.max_participants} participantes)` },
+          { status: 409 }
+        )
+      }
+    }
+
     const participant = await joinTournament(id, user.id)
     return NextResponse.json({ success: true, data: participant }, { status: 201 })
   } catch (error: unknown) {

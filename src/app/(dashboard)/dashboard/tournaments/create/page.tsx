@@ -136,6 +136,7 @@ export default function CreateTournamentPage() {
     start_time: "",
     end_date: "",
     entry_fee: 0,
+    max_participants: 32,
     description: "",
     is_official: false,
     extras: {
@@ -179,6 +180,7 @@ export default function CreateTournamentPage() {
         start_time: form.start_time || undefined,
         end_date: form.end_date || undefined,
         entry_fee: form.entry_fee,
+        max_participants: form.max_participants,
         description: form.description || undefined,
         is_official: form.extras.arbitro.enabled,
         extras: form.extras,
@@ -366,6 +368,24 @@ export default function CreateTournamentPage() {
               <p className="text-[10px] text-zinc-400">
                 Para torneos de varios días
               </p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelCls}>Máx. participantes</label>
+              <input
+                type="number"
+                min={2}
+                max={256}
+                step={1}
+                className={inputCls}
+                value={form.max_participants}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    max_participants: Math.max(2, Math.min(256, parseInt(e.target.value) || 32)),
+                  }))
+                }
+              />
             </div>
 
             <div className="flex flex-col gap-1.5">
