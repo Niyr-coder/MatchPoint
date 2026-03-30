@@ -49,34 +49,52 @@ export function ChatView({ userId }: ChatViewProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
   const [loadingConvs, setLoadingConvs] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const fetchConversations = () => {
+    fetch("/api/messages")
+      .then((r) => r.json())
+      .then((d: { conversations?: Conversation[] }) => setConversations(d.conversations ?? []))
+      .catch(() => {})
+  }
 
   useEffect(() => {
     setLoadingConvs(true)
     fetch("/api/messages")
       .then((r) => r.json())
-      .then((d: { conversations?: Conversation[] }) => {
-        setConversations(d.conversations ?? [])
-      })
+      .then((d: { conversations?: Conversation[] }) => setConversations(d.conversations ?? []))
       .catch(() => setConversations([]))
       .finally(() => setLoadingConvs(false))
+
+    // Auto-refresh conversations list every 10s
+    const convPollId = setInterval(fetchConversations, 10000)
+    return () => clearInterval(convPollId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (!activeConv) return
 
+    // Clear stale messages when switching conversations
+    setMessages([])
+    let cancelled = false
+
     const load = () => {
       fetch(`/api/messages?conversationId=${activeConv}`)
         .then((r) => r.json())
-        .then((d: { messages?: Message[] }) => setMessages(d.messages ?? []))
+        .then((d: { messages?: Message[] }) => {
+          if (!cancelled) setMessages(d.messages ?? [])
+        })
         .catch(() => {})
     }
 
     load()
     pollRef.current = setInterval(load, 3000)
     return () => {
+      cancelled = true
       if (pollRef.current) clearInterval(pollRef.current)
     }
   }, [activeConv])
@@ -89,15 +107,21 @@ export function ChatView({ userId }: ChatViewProps) {
     if (!input.trim() || !activeConv || sending) return
 
     setSending(true)
+    setSendError(null)
     const tempContent = input
     setInput("")
 
     try {
-      await fetch("/api/messages", {
+      const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ conversationId: activeConv, content: tempContent }),
       })
+
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        throw new Error(data.error ?? "Error al enviar el mensaje")
+      }
 
       const [msgRes, convRes] = await Promise.all([
         fetch(`/api/messages?conversationId=${activeConv}`),
@@ -107,9 +131,10 @@ export function ChatView({ userId }: ChatViewProps) {
       const convData = (await convRes.json()) as { conversations?: Conversation[] }
       setMessages(msgData.messages ?? [])
       setConversations(convData.conversations ?? [])
-    } catch {
-      // Restore input on failure
+    } catch (err) {
       setInput(tempContent)
+      setSendError(err instanceof Error ? err.message : "Error al enviar el mensaje")
+      setTimeout(() => setSendError(null), 4000)
     } finally {
       setSending(false)
     }
@@ -276,6 +301,13 @@ export function ChatView({ userId }: ChatViewProps) {
                 )}
                 <div ref={messagesEndRef} />
               </div>
+
+              {/* Send error */}
+              {sendError && (
+                <div className="px-4 py-2 bg-red-50 border-t border-red-200">
+                  <p className="text-xs text-red-600">{sendError}</p>
+                </div>
+              )}
 
               {/* Input */}
               <div className="p-4 border-t border-[#e5e5e5] flex gap-2">

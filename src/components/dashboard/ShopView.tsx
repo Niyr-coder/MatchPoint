@@ -39,6 +39,7 @@ interface CartItem {
 
 interface ShopViewProps {
   userId: string
+  clubId: string | null
 }
 
 const CATEGORIES: { value: string; label: string }[] = [
@@ -60,7 +61,7 @@ function formatPrice(price: number): string {
   return new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" }).format(price)
 }
 
-export function ShopView({ userId: _userId }: ShopViewProps) {
+export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [activeCategory, setActiveCategory] = useState("")
@@ -69,18 +70,20 @@ export function ShopView({ userId: _userId }: ShopViewProps) {
   const [cartOpen, setCartOpen] = useState(false)
   const [ordering, setOrdering] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
+  const [orderError, setOrderError] = useState<string | null>(null)
 
   const loadProducts = useCallback(() => {
     setLoading(true)
     const params = new URLSearchParams()
     if (activeCategory) params.set("category", activeCategory)
+    if (clubId) params.set("clubId", clubId)
 
     fetch(`/api/shop/products?${params.toString()}`)
       .then((r) => r.json())
       .then((d: { products?: Product[] }) => setProducts(d.products ?? []))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false))
-  }, [activeCategory])
+  }, [activeCategory, clubId])
 
   useEffect(() => {
     loadProducts()
@@ -122,21 +125,21 @@ export function ShopView({ userId: _userId }: ShopViewProps) {
   const confirmOrder = async () => {
     if (!cart.length || ordering) return
     setOrdering(true)
+    setOrderError(null)
 
     try {
       const items = cart.map((item) => ({
         product_id: item.product.id,
         quantity: item.quantity,
-        unit_price: item.product.price,
-        product_name: item.product.name,
       }))
 
       const r = await fetch("/api/shop/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, clubId: clubId ?? undefined }),
       })
 
+      const data = await r.json() as { order?: unknown; error?: string }
       if (r.ok) {
         setCart([])
         setCartOpen(false)
@@ -144,9 +147,11 @@ export function ShopView({ userId: _userId }: ShopViewProps) {
         router.refresh()
         loadProducts()
         setTimeout(() => setOrderSuccess(false), 5000)
+      } else {
+        setOrderError(data.error ?? "Error al procesar el pedido")
       }
     } catch {
-      // silent — user can retry
+      setOrderError("Error de conexión. Intenta de nuevo.")
     } finally {
       setOrdering(false)
     }
@@ -406,6 +411,11 @@ export function ShopView({ userId: _userId }: ShopViewProps) {
                   <p className="text-sm font-semibold text-zinc-500">Total</p>
                   <p className="text-xl font-black text-zinc-900">{formatPrice(cartTotal)}</p>
                 </div>
+                {orderError && (
+                  <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                    {orderError}
+                  </p>
+                )}
                 <button
                   onClick={() => void confirmOrder()}
                   disabled={ordering}

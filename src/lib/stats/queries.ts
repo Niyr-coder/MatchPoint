@@ -154,7 +154,7 @@ export async function getPublicPlayerProfile(userId: string): Promise<PublicPlay
     .filter((c) => c.id)
 
   return {
-    rating: profile?.rating ?? 0,
+    rating: Number(profile?.rating ?? 0),
     ranking_position: profile?.ranking_position ?? null,
     matches_played: matchesPlayed,
     matches_won: matchesWon,

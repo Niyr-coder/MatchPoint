@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
@@ -47,11 +47,11 @@ export async function POST(request: Request) {
 
   const { items, clubId } = parsed.data
 
-  // Fetch actual product prices from DB to prevent client-side price manipulation
+  // Fetch actual product prices + stock from DB to prevent manipulation
   const productIds = items.map((i) => i.product_id)
   const { data: products, error: productsError } = await supabase
     .from("products")
-    .select("id, name, price, is_active")
+    .select("id, name, price, stock, is_active")
     .in("id", productIds)
     .eq("is_active", true)
 
@@ -62,6 +62,17 @@ export async function POST(request: Request) {
   }
 
   const priceMap = new Map(products.map((p) => [p.id, p]))
+
+  // Validate stock for each item (-1 means unlimited)
+  for (const item of items) {
+    const product = priceMap.get(item.product_id)!
+    if (product.stock !== -1 && item.quantity > product.stock) {
+      return NextResponse.json(
+        { error: `Stock insuficiente para "${product.name}": disponible ${product.stock}, solicitado ${item.quantity}` },
+        { status: 409 }
+      )
+    }
+  }
 
   const total = items.reduce((sum, item) => {
     const product = priceMap.get(item.product_id)!
@@ -89,10 +100,25 @@ export async function POST(request: Request) {
 
   const { error: itemsError } = await supabase.from("order_items").insert(orderItems)
   if (itemsError) {
-    // Clean up orphaned order — best-effort, not awaited to not delay response
     void supabase.from("orders").delete().eq("id", order.id)
     return NextResponse.json({ error: itemsError.message }, { status: 500 })
   }
+
+  // Decrement stock for limited-stock items using service client
+  const service = await createServiceClient()
+  const stockDecrements = items
+    .filter((item) => {
+      const product = priceMap.get(item.product_id)!
+      return product.stock !== -1
+    })
+    .map((item) => {
+      const product = priceMap.get(item.product_id)!
+      return service.from("products")
+        .update({ stock: Math.max(0, product.stock - item.quantity) })
+        .eq("id", item.product_id)
+    })
+
+  await Promise.all(stockDecrements)
 
   return NextResponse.json({ order })
 }
