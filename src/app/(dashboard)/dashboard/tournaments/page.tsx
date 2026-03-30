@@ -1,5 +1,5 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getOpenTournaments, getUserTournaments } from "@/lib/tournaments/queries"
+import { getOpenTournaments, getCreatedTournaments } from "@/lib/tournaments/queries"
 import { Trophy, Users, Plus } from "lucide-react"
 import Link from "next/link"
 
@@ -11,9 +11,11 @@ const SPORT_LABEL: Record<string, string> = {
 }
 
 const STATUS_STYLES: Record<string, { label: string; classes: string }> = {
-  open: { label: "Abierto", classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
-  in_progress: { label: "En curso", classes: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed: { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  draft:       { label: "Borrador",   classes: "bg-zinc-100 text-zinc-400 border-zinc-200" },
+  open:        { label: "Abierto",    classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
+  in_progress: { label: "En curso",   classes: "bg-amber-50 text-amber-700 border-amber-200" },
+  completed:   { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  cancelled:   { label: "Cancelado",  classes: "bg-red-50 text-red-600 border-red-200" },
 }
 
 function formatDate(dateStr: string): string {
@@ -29,7 +31,7 @@ export default async function TournamentsPage() {
 
   const [openTournaments, myTournaments] = await Promise.all([
     getOpenTournaments(),
-    getUserTournaments(ctx.userId),
+    getCreatedTournaments(ctx.userId),
   ])
 
   return (
@@ -80,7 +82,7 @@ export default async function TournamentsPage() {
                     <span>·</span>
                     <div className="flex items-center gap-1">
                       <Users className="size-3" />
-                      <span>{t.max_participants} cupos</span>
+                      <span>{t.max_participants ? `${t.max_participants} cupos` : "Sin límite"}</span>
                     </div>
                   </div>
                 </Link>

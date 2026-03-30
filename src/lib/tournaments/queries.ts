@@ -72,6 +72,20 @@ export async function getOpenTournaments(): Promise<Tournament[]> {
   return (data ?? []) as Tournament[]
 }
 
+export async function getCreatedTournaments(userId: string): Promise<Tournament[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from("tournaments")
+    .select("*, clubs(name)")
+    .eq("created_by", userId)
+    .order("created_at", { ascending: false })
+    .limit(20)
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Tournament[]
+}
+
 export async function getUserTournaments(userId: string): Promise<Tournament[]> {
   const supabase = await createClient()
 
