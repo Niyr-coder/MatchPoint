@@ -23,7 +23,7 @@ export async function getRankingBySport(
     if (sport) {
       const { data, error } = await supabase
         .from("rankings")
-        .select("user_id, score, wins, losses, profiles!inner(full_name, avatar_url)")
+        .select("user_id, score, wins, losses, profiles!rankings_user_profile_fk(full_name, avatar_url)")
         .eq("sport", sport)
         .order("score", { ascending: false })
         .order("wins", { ascending: false })

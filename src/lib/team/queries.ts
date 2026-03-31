@@ -30,7 +30,7 @@ export async function getClubTeam(clubId: string): Promise<TeamMember[]> {
         role,
         is_active,
         joined_at,
-        profiles!inner (
+        profiles!club_members_user_profile_fk (
           full_name,
           avatar_url,
           phone
@@ -118,7 +118,7 @@ export async function getClubClients(clubId: string): Promise<ClientEntry[]> {
         user_id,
         date,
         courts!inner ( club_id ),
-        profiles!inner ( full_name, phone )
+        profiles!reservations_user_profile_fk ( full_name, phone )
       `)
       .eq("courts.club_id", clubId)
 

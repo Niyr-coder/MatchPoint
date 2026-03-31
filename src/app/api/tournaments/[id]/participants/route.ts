@@ -22,7 +22,7 @@ export async function GET(
       notes,
       withdrawal_reason,
       registered_at,
-      profiles:user_id (
+      profiles!tp_user_profile_fk (
         id,
         username,
         full_name,
