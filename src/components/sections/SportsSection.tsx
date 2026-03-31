@@ -1,26 +1,22 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { SPORTS } from "@/lib/constants"
 import type { SportCategory } from "@/types"
 
 function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.07 }}
-      className="group relative h-64 overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer"
+    <div
+      className="animate-fade-in-up group relative h-64 overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer"
+      style={{ animationDelay: `${index * 0.07}s` }}
     >
       {/* Background Image */}
-      <img 
-        src={sport.image} 
-        alt={sport.name} 
+      <img
+        src={sport.image}
+        alt={sport.name}
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-80"
       />
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
 
@@ -34,7 +30,7 @@ function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
         </p>
         <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -42,12 +38,7 @@ export function SportsSection() {
   return (
     <section id="deportes" className="bg-white py-24 border-t border-[#e5e5e5]">
       <div className="container mx-auto px-6 sm:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-        >
+        <div className="animate-fade-in-up-16">
           <p className="label-green">Deportes</p>
           <h2
             className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em] mb-12"
@@ -55,7 +46,7 @@ export function SportsSection() {
           >
             Un deporte.<br />Mil partidos.
           </h2>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {SPORTS.map((sport, i) => (
@@ -64,18 +55,15 @@ export function SportsSection() {
         </div>
 
         {/* Coming soon */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="mt-8 flex items-center gap-3"
+        <div
+          className="animate-fade-in mt-8 flex items-center gap-3"
+          style={{ animationDelay: "0.3s" }}
         >
           <span className="text-xs text-[#737373]">Próximamente:</span>
           <span className="text-xs font-medium text-[#737373]">
             Natación · Baloncesto · Béisbol · Crossfit
           </span>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

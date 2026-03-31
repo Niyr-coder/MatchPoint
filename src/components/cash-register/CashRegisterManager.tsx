@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Wallet, ChevronDown } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { StatusBadge } from "@/components/shared/StatusBadge"
@@ -126,12 +125,10 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
           {/* Rows */}
           <div className="divide-y divide-[#f0f0f0]">
             {entries.map((entry, i) => (
-              <motion.div
+              <div
                 key={entry.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: i * 0.03 }}
-                className="grid grid-cols-4 px-5 py-3.5 items-center"
+                className="animate-fade-in-up grid grid-cols-4 px-5 py-3.5 items-center"
+                style={{ animationDelay: `${i * 0.03}s` }}
               >
                 <span className="text-sm text-zinc-500">{formatTime(entry.created_at)}</span>
                 <div>
@@ -154,7 +151,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                   {entry.type === "expense" ? "-" : "+"}
                   {formatAmount(entry.amount)}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

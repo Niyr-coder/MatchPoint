@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Users, UserPlus, ChevronDown } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { RoleBadge } from "@/components/shared/RoleBadge"
@@ -140,12 +139,10 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
       ) : (
         <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden divide-y divide-[#f0f0f0]">
           {members.map((member, i) => (
-            <motion.div
+            <div
               key={member.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: i * 0.04 }}
-              className="flex items-center gap-4 px-5 py-4"
+              className="animate-fade-in-up flex items-center gap-4 px-5 py-4"
+              style={{ animationDelay: `${i * 0.04}s` }}
             >
               {/* Avatar */}
               <div className="size-10 rounded-full bg-zinc-100 text-zinc-500 font-black flex items-center justify-center text-sm shrink-0">
@@ -195,7 +192,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
                   Desactivar
                 </button>
               )}
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Trophy, Users, Plus } from "lucide-react"
 import Link from "next/link"
 import type { Tournament } from "@/lib/tournaments/queries"
@@ -37,12 +36,8 @@ function formatDate(dateStr: string): string {
 
 export function TorneosPanel({ tournaments }: TorneosPanelProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: 0.21, ease: [0.16, 1, 0.3, 1] }}
-      className="relative rounded-2xl overflow-hidden"
+    <div
+      className="animate-fade-in-up relative rounded-2xl overflow-hidden"
       style={{ background: "#1a56db" }}
     >
       <div className="relative z-10">
@@ -120,6 +115,6 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

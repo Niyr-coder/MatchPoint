@@ -109,29 +109,33 @@ export function TournamentClientShell({
       )}
 
       {/* Tab: Participantes */}
-      {(tabs.length === 1 || activeTab === "participants") && showParticipants && (
-        <ParticipantsManager
-          tournamentId={tournamentId}
-          tournamentStatus={currentStatus}
-          isCreator={isCreator}
-          entryFee={entryFee}
-          refreshTrigger={refreshKey}
-          onRefresh={refresh}
-        />
-      )}
+      <div className={activeTab === "participants" || tabs.length === 1 ? undefined : "hidden"}>
+        {showParticipants && (
+          <ParticipantsManager
+            tournamentId={tournamentId}
+            tournamentStatus={currentStatus}
+            isCreator={isCreator}
+            entryFee={entryFee}
+            refreshTrigger={refreshKey}
+            onRefresh={refresh}
+          />
+        )}
+      </div>
 
       {/* Tab: Bracket */}
-      {(tabs.length === 1 || activeTab === "bracket") && showBracket && (
-        <BracketView
-          key={`bv-${refreshKey}`}
-          tournamentId={tournamentId}
-          isCreator={isCreator}
-          modality={modality}
-          tournamentStatus={currentStatus}
-          bracketLocked={bracketLocked}
-          onRefresh={refresh}
-        />
-      )}
+      <div className={activeTab === "bracket" || tabs.length === 1 ? undefined : "hidden"}>
+        {showBracket && (
+          <BracketView
+            key={`bv-${refreshKey}`}
+            tournamentId={tournamentId}
+            isCreator={isCreator}
+            modality={modality}
+            tournamentStatus={currentStatus}
+            bracketLocked={bracketLocked}
+            onRefresh={refresh}
+          />
+        )}
+      </div>
 
       {/* Tab: Gestión (creator only) */}
       {isCreator && (tabs.length === 1 || activeTab === "manage") && (

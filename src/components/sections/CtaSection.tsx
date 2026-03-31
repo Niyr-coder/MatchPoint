@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 
 export function CtaSection() {
@@ -10,12 +9,7 @@ export function CtaSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(22,163,74,0.15),transparent_60%)] pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-6 sm:px-8 text-center max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="animate-fade-in-up">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[#16a34a] block mb-6 text-center">
             Únete — Acceso Anticipado
           </p>
@@ -32,14 +26,11 @@ export function CtaSection() {
             <span className="text-white font-semibold">Acceso anticipado gratuito</span>{" "}
             para los primeros 500 registrados.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="flex justify-center"
+        <div
+          className="animate-fade-in-up-16 flex justify-center"
+          style={{ animationDelay: "0.2s" }}
         >
           <a
             href="/login"
@@ -47,15 +38,12 @@ export function CtaSection() {
           >
             Únete Gratis <ArrowRight className="w-5 h-5" />
           </a>
-        </motion.div>
+        </div>
 
         {/* Social proof */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-          className="flex items-center justify-center gap-3 mt-10"
+        <div
+          className="animate-fade-in flex items-center justify-center gap-3 mt-10"
+          style={{ animationDelay: "0.4s" }}
         >
           <div className="flex -space-x-2">
             {["⚽", "🎾", "🏓", "🏸"].map((emoji, i) => (
@@ -70,7 +58,7 @@ export function CtaSection() {
           <p className="text-xs text-white/40">
             <span className="text-white font-semibold">+500</span> deportistas ya registrados
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

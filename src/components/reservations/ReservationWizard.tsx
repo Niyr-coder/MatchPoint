@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, Building2, Layers, Clock, CheckCircle } from "lucide-react"
 import type { ClubWithSports } from "@/lib/clubs/queries"
 import type { Court } from "@/lib/courts/queries"
@@ -124,13 +123,11 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {(clubs ?? []).map((club, i) => (
-        <motion.button
+        <button
           key={club.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.04 }}
           onClick={() => onSelect(club)}
-          className="rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          style={{ animationDelay: `${i * 0.04}s` }}
         >
           <p className="text-sm font-black text-[#0a0a0a]">{club.name}</p>
           {club.city && (
@@ -148,7 +145,7 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
               ))}
             </div>
           )}
-        </motion.button>
+        </button>
       ))}
     </div>
   )
@@ -194,13 +191,11 @@ function StepCourt({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {(courts ?? []).map((court, i) => (
-        <motion.button
+        <button
           key={court.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.04 }}
           onClick={() => onSelect(court)}
-          className="rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          style={{ animationDelay: `${i * 0.04}s` }}
         >
           <div className="flex items-start justify-between">
             <p className="text-sm font-black text-[#0a0a0a]">{court.name}</p>
@@ -215,7 +210,7 @@ function StepCourt({
             ${court.price_per_hour.toFixed(2)}
             <span className="text-[11px] font-normal text-zinc-400">/hora</span>
           </p>
-        </motion.button>
+        </button>
       ))}
     </div>
   )
@@ -475,44 +470,36 @@ export function ReservationWizard() {
       <ProgressIndicator currentStep={step} />
 
       {/* Step content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -16 }}
-          transition={{ duration: 0.2 }}
-        >
-          {step === 0 && <StepClub onSelect={handleSelectClub} />}
+      <div key={step} className="animate-fade-in">
+        {step === 0 && <StepClub onSelect={handleSelectClub} />}
 
-          {step === 1 && wizardState.club && (
-            <StepCourt
-              clubId={wizardState.club.id}
-              onSelect={handleSelectCourt}
-            />
-          )}
+        {step === 1 && wizardState.club && (
+          <StepCourt
+            clubId={wizardState.club.id}
+            onSelect={handleSelectCourt}
+          />
+        )}
 
-          {step === 2 && wizardState.court && (
-            <StepDateTime
-              courtId={wizardState.court.id}
-              date={wizardState.date}
-              selectedSlot={wizardState.slot}
-              onDateChange={handleDateChange}
-              onSlotSelect={handleSlotSelect}
-            />
-          )}
+        {step === 2 && wizardState.court && (
+          <StepDateTime
+            courtId={wizardState.court.id}
+            date={wizardState.date}
+            selectedSlot={wizardState.slot}
+            onDateChange={handleDateChange}
+            onSlotSelect={handleSlotSelect}
+          />
+        )}
 
-          {step === 3 && (
-            <StepConfirm
-              state={wizardState}
-              onNotesChange={handleNotesChange}
-              onSubmit={handleSubmit}
-              submitting={submitting}
-              error={submitError}
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
+        {step === 3 && (
+          <StepConfirm
+            state={wizardState}
+            onNotesChange={handleNotesChange}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            error={submitError}
+          />
+        )}
+      </div>
 
       {/* Back nav */}
       {canGoBack && (

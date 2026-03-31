@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { MapPin, Navigation } from "lucide-react"
 import type { Court } from "@/lib/courts/queries"
@@ -18,13 +17,7 @@ const SPORT_LABEL: Record<string, string> = {
 
 export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl bg-[#f0fdf4] border border-[#bbf7d0] overflow-hidden flex flex-col"
-    >
+    <div className="animate-fade-in-up rounded-2xl bg-[#f0fdf4] border border-[#bbf7d0] overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-[#bbf7d0]">
         <div className="flex items-center gap-2">
@@ -86,6 +79,6 @@ export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
           Ver todas las canchas →
         </Link>
       </div>
-    </motion.div>
+    </div>
   )
 }

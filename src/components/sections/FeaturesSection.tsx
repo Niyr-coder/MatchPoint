@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Search, Calendar, TrendingUp, type LucideIcon } from "lucide-react"
 
 interface StepProps {
@@ -13,12 +12,9 @@ interface StepProps {
 
 function Step({ number, icon: Icon, title, desc, index }: StepProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="text-left"
+    <div
+      className="animate-fade-in-up text-left"
+      style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="flex items-center gap-4 mb-6">
         <span className="text-6xl font-black text-white/10 leading-none select-none">
@@ -30,7 +26,7 @@ function Step({ number, icon: Icon, title, desc, index }: StepProps) {
       </div>
       <h3 className="text-xl font-black text-white uppercase tracking-tight mb-3">{title}</h3>
       <p className="text-white/50 font-medium leading-relaxed">{desc}</p>
-    </motion.div>
+    </div>
   )
 }
 
@@ -59,12 +55,7 @@ export function FeaturesSection() {
   return (
     <section id="features" className="section-dark py-24 border-t border-white/5">
       <div className="container mx-auto px-6 sm:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-        >
+        <div className="animate-fade-in-up-16">
           <p className="label-green">Cómo funciona</p>
           <h2
             className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-16"
@@ -72,7 +63,7 @@ export function FeaturesSection() {
           >
             Tres pasos.<br />Cero complicaciones.
           </h2>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {STEPS.map((step, i) => (

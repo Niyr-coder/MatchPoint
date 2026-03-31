@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { Calendar, Clock } from "lucide-react"
 import type { Reservation } from "@/lib/reservations/queries"
@@ -38,13 +37,7 @@ function formatDate(dateStr: string): string {
 
 export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: 0.07, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col"
-    >
+    <div className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5]">
         <div className="flex items-center gap-2">
@@ -111,6 +104,6 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
           </Link>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

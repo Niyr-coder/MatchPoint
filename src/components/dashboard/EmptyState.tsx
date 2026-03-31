@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import {
   Calendar, Search, Trophy, type LucideIcon,
 } from "lucide-react"
@@ -22,13 +21,9 @@ export function EmptyState({ icon, title, description, action, ghostLabel, class
   const Icon = icon ? (ICON_MAP[icon] ?? null) : null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
+    <div
       className={cn(
-        "relative flex flex-col items-center justify-center py-16 px-6 text-center",
+        "animate-fade-in-up-16 relative flex flex-col items-center justify-center py-16 px-6 text-center",
         "rounded-2xl border border-zinc-200 bg-white overflow-hidden",
         className
       )}
@@ -48,6 +43,6 @@ export function EmptyState({ icon, title, description, action, ghostLabel, class
         <p className="mt-2 text-xs font-medium text-zinc-400 max-w-xs leading-relaxed">{description}</p>
       )}
       {action && <div className="mt-5">{action}</div>}
-    </motion.div>
+    </div>
   )
 }

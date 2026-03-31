@@ -11,6 +11,8 @@ export function getAdminNav(): NavSection[] {
         { label: "Torneos", href: "/admin/tournaments", icon: "Trophy" },
         { label: "Moderación", href: "/admin/moderation", icon: "Shield" },
         { label: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
+        { label: "Chat", href: "/admin/chat", icon: "MessageSquare" },
+        { label: "Shop", href: "/admin/shop", icon: "ShoppingBag" },
         { label: "Configuración", href: "/admin/settings", icon: "Settings" },
       ],
     },

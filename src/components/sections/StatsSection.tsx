@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Users, Trophy, MapPin, Star, type LucideIcon } from "lucide-react"
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter"
 
@@ -14,12 +13,9 @@ interface StatItemProps {
 
 function StatItem({ icon: Icon, value, suffix, label, index }: StatItemProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.08 }}
-      className="text-center"
+    <div
+      className="animate-fade-in-up-16 text-center"
+      style={{ animationDelay: `${index * 0.08}s` }}
     >
       <div className="w-12 h-12 rounded-full bg-[#f5f5f5] flex items-center justify-center mx-auto mb-4">
         <Icon className="w-6 h-6 text-[#0a0a0a]" />
@@ -30,7 +26,7 @@ function StatItem({ icon: Icon, value, suffix, label, index }: StatItemProps) {
       <p className="text-sm font-semibold text-[#737373] uppercase tracking-widest mt-2">
         {label}
       </p>
-    </motion.div>
+    </div>
   )
 }
 
@@ -45,13 +41,7 @@ export function StatsSection() {
   return (
     <section id="stats" className="bg-white py-24 border-t-2 border-[#16a34a]">
       <div className="container mx-auto px-6 sm:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="mb-16"
-        >
+        <div className="animate-fade-in-up-16 mb-16">
           <p className="label-green">Comunidad</p>
           <h2
             className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em]"
@@ -59,7 +49,7 @@ export function StatsSection() {
           >
             Donde el juego<br />se vive.
           </h2>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
           {STATS_WITH_ICONS.map((stat, i) => (

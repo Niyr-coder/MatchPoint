@@ -1,7 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
-
 export interface Column<T> {
   key: string
   header: string
@@ -47,13 +45,10 @@ export function DataTable<T extends { id?: string }>({
           </div>
         ) : (
           data.map((item, i) => (
-            <motion.div
+            <div
               key={getKey(item)}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: i * 0.03 }}
-              className={`grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-zinc-50 transition-colors" : ""}`}
-              style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-zinc-50 transition-colors" : ""}`}
+              style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, animationDelay: `${i * 0.03}s` }}
               onClick={() => onRowClick?.(item)}
             >
               {columns.map((col) => (
@@ -63,7 +58,7 @@ export function DataTable<T extends { id?: string }>({
                     : String((item as Record<string, unknown>)[col.key] ?? "—")}
                 </div>
               ))}
-            </motion.div>
+            </div>
           ))
         )}
       </div>

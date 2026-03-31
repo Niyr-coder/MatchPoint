@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { motion } from "framer-motion"
 import { FilterBar, type FilterConfig } from "@/components/shared/FilterBar"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
@@ -237,18 +236,14 @@ export function ClubReservationsTable({
         values={filters}
         onFilterChange={handleFilterChange}
       />
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-      >
+      <div className="animate-fade-in-up-8">
         <DataTable
           columns={columns}
           data={filtered}
           emptyMessage="No se encontraron reservas"
           keyExtractor={(r) => r.id}
         />
-      </motion.div>
+      </div>
     </div>
   )
 }

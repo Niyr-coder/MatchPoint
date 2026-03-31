@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import {
   LayoutDashboard, DollarSign, Building2, Users, Trophy, Shield,
   BarChart3, Settings, MapPin, UserCheck, Calendar, CreditCard,
@@ -43,17 +42,13 @@ export function StatCard({
   const Icon = icon ? (ICON_MAP[icon] ?? null) : null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+    <div
       className={cn(
-        "relative bg-white border rounded-2xl p-5 overflow-hidden cursor-default",
+        "animate-fade-in-up relative bg-white border rounded-2xl p-5 overflow-hidden cursor-default",
         accent ? "border-[#0a0a0a]" : "border-zinc-200",
         className
       )}
+      style={{ animationDelay: `${index * 0.08}s` }}
     >
       {accent && (
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-green-500" />
@@ -99,6 +94,6 @@ export function StatCard({
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { motion } from "framer-motion"
 import { CheckCircle } from "lucide-react"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import type { ReservationWithProfile } from "@/lib/reservations/queries"
@@ -64,12 +63,10 @@ export function TodayTimeline({ initialReservations, clubId }: TodayTimelineProp
   return (
     <div className="flex flex-col gap-2">
       {sorted.map((r, i) => (
-        <motion.div
+        <div
           key={r.id}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.04 }}
-          className="rounded-2xl bg-white border border-[#e5e5e5] px-5 py-4 flex items-center gap-4"
+          className="animate-fade-in-up-8 rounded-2xl bg-white border border-[#e5e5e5] px-5 py-4 flex items-center gap-4"
+          style={{ animationDelay: `${i * 0.04}s` }}
         >
           {/* Time */}
           <div className="w-20 shrink-0 text-center">
@@ -107,7 +104,7 @@ export function TodayTimeline({ initialReservations, clubId }: TodayTimelineProp
               Check-in
             </button>
           )}
-        </motion.div>
+        </div>
       ))}
     </div>
   )

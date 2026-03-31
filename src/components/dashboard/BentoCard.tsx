@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import Link from "next/link"
 import {
   Calendar, Search, Trophy, Building2, Users, DollarSign,
@@ -48,17 +47,14 @@ export function BentoCard({
   const isAccent = variant === "accent"
 
   const inner = (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+    <div
       className={cn(
-        "relative rounded-2xl overflow-hidden flex flex-col p-6",
+        "animate-fade-in-up relative rounded-2xl overflow-hidden flex flex-col p-6",
         "min-h-[160px]",
         VARIANT_CLASSES[variant],
         !href && className,
       )}
+      style={{ animationDelay: `${index * 0.07}s` }}
     >
       {/* Subtle radial glow for dark cards */}
       {isDark && (
@@ -119,7 +115,7 @@ export function BentoCard({
           →
         </span>
       )}
-    </motion.div>
+    </div>
   )
 
   if (href) {

@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Building2, MapPin, Phone } from "lucide-react"
 import type { ClubWithSports } from "@/lib/clubs/queries"
 
@@ -18,12 +17,9 @@ interface ClubCardProps {
 
 export function ClubCard({ club, index = 0 }: ClubCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.04 }}
-      className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#1a56db]/40 transition-colors"
+    <div
+      className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#1a56db]/40 transition-colors"
+      style={{ animationDelay: `${index * 0.04}s` }}
     >
       {/* Cover */}
       {club.cover_url ? (
@@ -76,6 +72,6 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

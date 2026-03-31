@@ -50,7 +50,7 @@ export async function getRankingBySport(
     // No sport filter: two queries then merge (rankings.user_id → auth.users, not profiles)
     const [profilesRes, rankingsRes] = await Promise.all([
       supabase.from("profiles").select("id, full_name, avatar_url").limit(limit),
-      supabase.from("rankings").select("user_id, score, wins, losses"),
+      supabase.from("rankings").select("user_id, score, wins, losses").limit(200),
     ])
 
     if (profilesRes.error || !profilesRes.data) return []

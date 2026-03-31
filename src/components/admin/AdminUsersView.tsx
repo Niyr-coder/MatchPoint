@@ -53,9 +53,11 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
 
   const filtered = users.filter((user) => {
     const name = user.full_name ?? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
+    const searchLower = filters.search.toLowerCase()
     const matchSearch =
       !filters.search ||
-      name.toLowerCase().includes(filters.search.toLowerCase())
+      name.toLowerCase().includes(searchLower) ||
+      (user.username ?? "").toLowerCase().includes(searchLower)
     const matchRole = !filters.role || user.global_role === filters.role
     return matchSearch && matchRole
   })
@@ -92,7 +94,33 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
           user.full_name ||
           [user.first_name, user.last_name].filter(Boolean).join(" ") ||
           "—"
-        return <span className="font-bold text-[#0a0a0a]">{name}</span>
+        const initials = name
+          .split(" ")
+          .slice(0, 2)
+          .map((w) => w[0] ?? "")
+          .join("")
+          .toUpperCase()
+        return (
+          <div className="flex items-center gap-3">
+            {user.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={name}
+                className="w-8 h-8 rounded-full object-cover shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center shrink-0">
+                <span className="text-[10px] font-semibold text-zinc-600">{initials}</span>
+              </div>
+            )}
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-[#0a0a0a] truncate">{name}</span>
+              {user.username && (
+                <span className="text-[11px] text-zinc-400 truncate">@{user.username}</span>
+              )}
+            </div>
+          </div>
+        )
       },
     },
     {
@@ -109,6 +137,20 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
         const role = (user.global_role as AppRole) ?? "user"
         return <RoleBadge role={role} size="sm" />
       },
+    },
+    {
+      key: "rating",
+      header: "Stats",
+      render: (user) => (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[11px] text-zinc-700">
+            {user.rating != null ? `★ ${user.rating.toFixed(1)}` : "—"}
+          </span>
+          <span className="text-[10px] text-zinc-400">
+            {user.matches_played != null ? `${user.matches_played} partidos` : ""}
+          </span>
+        </div>
+      ),
     },
     {
       key: "created_at",

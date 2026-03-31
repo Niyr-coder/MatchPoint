@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Profile, AppRole } from "@/types"
 
@@ -54,39 +53,45 @@ export function RoleWelcomeBanner({
     .map((n) => n![0].toUpperCase())
     .join("")
 
+  const accentColor = BANNER_BG[role]
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="relative rounded-2xl overflow-hidden p-6 md:p-8"
-      style={{ background: BANNER_BG[role] }}
-    >
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-zinc-100 shadow-sm">
+      {/* Top accent stripe */}
+      <div
+        className="h-1.5 w-full absolute top-0 left-0 right-0"
+        style={{ background: accentColor }}
+      />
+
       <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
         {/* Avatar */}
-        <Avatar className="size-16 shrink-0 ring-2 ring-white/40">
-          <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-          <AvatarFallback className="bg-white/20 text-white text-xl font-black">
-            {initials || "U"}
-          </AvatarFallback>
-        </Avatar>
+        <div style={{ outline: `2px solid ${accentColor}40`, borderRadius: "9999px" }}>
+          <Avatar className="size-16 shrink-0 ring-2 ring-zinc-200">
+            <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
+            <AvatarFallback className="bg-zinc-100 text-zinc-700 text-xl font-black">
+              {initials || "U"}
+            </AvatarFallback>
+          </Avatar>
+        </div>
 
         {/* Name + date + club chip */}
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">
+          <p
+            className="text-[10px] font-black uppercase tracking-[0.2em] mb-1"
+            style={{ color: accentColor }}
+          >
             {ROLE_LABEL[role]}
           </p>
           <h1
-            className="font-black text-white uppercase leading-[0.9] tracking-[-0.03em] truncate"
+            className="font-black text-zinc-900 uppercase leading-[0.9] tracking-[-0.03em] truncate"
             style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}
           >
             Hola, {firstName}.
           </h1>
-          <p className="mt-1.5 text-white/60 text-sm capitalize">{date}</p>
+          <p className="mt-1.5 text-zinc-400 text-sm capitalize">{date}</p>
           {clubName && (
             <div className="mt-3">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 text-white border border-white/30">
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-zinc-700 border border-zinc-200">
                 {clubName}
               </span>
             </div>
@@ -95,11 +100,11 @@ export function RoleWelcomeBanner({
 
         {/* Mini stats */}
         {stats.length > 0 && (
-          <div className="flex gap-6 shrink-0 sm:border-l sm:border-white/20 sm:pl-6">
+          <div className="flex gap-6 shrink-0 sm:border-l sm:border-zinc-200 sm:pl-6">
             {stats.map(({ label, value }) => (
               <div key={label} className="text-center">
-                <p className="text-xl font-black text-white">{value}</p>
-                <p className="text-[10px] font-bold text-white/60 uppercase tracking-wide mt-0.5">
+                <p className="text-xl font-black text-zinc-900">{value}</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mt-0.5">
                   {label}
                 </p>
               </div>
@@ -107,6 +112,6 @@ export function RoleWelcomeBanner({
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

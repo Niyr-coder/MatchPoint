@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import type { RankingEntry } from "@/lib/rankings/queries"
@@ -59,16 +58,13 @@ function Avatar({ entry }: { entry: RankingEntry }) {
 function TopThreeCard({ entry }: { entry: RankingEntry }) {
   const isFirst = entry.position === 1
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: (entry.position - 1) * 0.06 }}
-      className={`rounded-2xl p-5 flex flex-col items-center gap-3 border ${
+    <div
+      className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border ${
         isFirst
           ? "bg-[#eff6ff] border-[#bfdbfe]"
           : "bg-white border-[#e5e5e5]"
       }`}
+      style={{ animationDelay: `${(entry.position - 1) * 0.06}s` }}
     >
       <span className="text-2xl">{MEDALS[entry.position - 1]}</span>
       {entry.avatarUrl ? (
@@ -115,18 +111,15 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
         <span>·</span>
         <span>{entry.losses}D</span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
 function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.03 }}
-      className="flex items-center gap-4 py-3 border-b border-[#f0f0f0] last:border-0"
+    <div
+      className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-[#f0f0f0] last:border-0"
+      style={{ animationDelay: `${index * 0.02}s` }}
     >
       <span className="text-[11px] font-black text-zinc-400 w-6 text-right shrink-0">
         {entry.position}
@@ -143,7 +136,7 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
       <span className="text-[11px] font-black text-[#1a56db] shrink-0">
         {entry.score} pts
       </span>
-    </motion.div>
+    </div>
   )
 }
 

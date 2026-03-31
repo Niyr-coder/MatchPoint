@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
 import { Calendar, Clock, MapPin, AlertCircle } from "lucide-react"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
@@ -66,12 +65,7 @@ function ReservationCard({ reservation, showCancel, onCancel, cancellingId }: Re
   const isCancelling = cancellingId === reservation.id
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3"
-    >
+    <div className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
           <p className="text-sm font-black text-[#0a0a0a]">
@@ -132,7 +126,7 @@ function ReservationCard({ reservation, showCancel, onCancel, cancellingId }: Re
           />
         </>
       )}
-    </motion.div>
+    </div>
   )
 }
 
