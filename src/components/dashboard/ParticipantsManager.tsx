@@ -348,10 +348,12 @@ export function ParticipantsManager({
                 {/* Name */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[#0a0a0a] truncate">{displayName(p)}</p>
-                  <p className="text-[10px] text-zinc-400">
+                  <p className="text-[10px] text-zinc-400 truncate">
                     {isWithdrawn
                       ? "Retirado"
-                      : new Date(p.registered_at).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
+                      : p.profiles?.username
+                        ? `@${p.profiles.username}`
+                        : new Date(p.registered_at).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
                   </p>
                 </div>
 

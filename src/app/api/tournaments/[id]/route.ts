@@ -20,6 +20,60 @@ export async function GET(
   return NextResponse.json({ success: true, data })
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+
+  const body = await request.json() as {
+    name?: string; description?: string; start_date?: string; start_time?: string
+    end_date?: string; entry_fee?: number; max_participants?: number; modality?: string
+  }
+
+  const { data: tournament } = await supabase
+    .from("tournaments")
+    .select("created_by, status")
+    .eq("id", id)
+    .single()
+
+  if (!tournament || tournament.created_by !== user.id) {
+    return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
+  }
+
+  if (["completed", "cancelled"].includes(tournament.status as string)) {
+    return NextResponse.json({ success: false, error: "No se puede editar un torneo finalizado" }, { status: 400 })
+  }
+
+  if (!body.name?.trim() || body.name.trim().length < 3) {
+    return NextResponse.json({ success: false, error: "El nombre debe tener al menos 3 caracteres" }, { status: 400 })
+  }
+
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if (body.name)             updates.name = body.name.trim()
+  if (body.description !== undefined) updates.description = body.description
+  if (body.start_date)       updates.start_date = body.start_date
+  if (body.start_time !== undefined) updates.start_time = body.start_time || null
+  if (body.end_date !== undefined)   updates.end_date = body.end_date || null
+  if (body.entry_fee !== undefined)  updates.entry_fee = body.entry_fee
+  if (body.max_participants !== undefined) updates.max_participants = body.max_participants
+  if (body.modality !== undefined)   updates.modality = body.modality || null
+
+  const { data, error } = await supabase
+    .from("tournaments")
+    .update(updates)
+    .eq("id", id)
+    .eq("created_by", user.id)
+    .select()
+    .single()
+
+  if (error || !data) return NextResponse.json({ success: false, error: "Error al actualizar" }, { status: 500 })
+  return NextResponse.json({ success: true, data })
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
