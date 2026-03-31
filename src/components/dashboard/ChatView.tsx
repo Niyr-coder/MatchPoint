@@ -80,21 +80,26 @@ export function ChatView({ userId }: ChatViewProps) {
 
     // Clear stale messages when switching conversations
     setMessages([])
-    let cancelled = false
+
+    let currentController: AbortController | null = null
 
     const load = () => {
-      fetch(`/api/messages?conversationId=${activeConv}`)
+      currentController?.abort()
+      currentController = new AbortController()
+      fetch(`/api/messages?conversationId=${activeConv}`, { signal: currentController.signal })
         .then((r) => r.json())
-        .then((d: { messages?: Message[] }) => {
-          if (!cancelled) setMessages(d.messages ?? [])
+        .then((d: { messages?: Message[] }) => setMessages(d.messages ?? []))
+        .catch((err: unknown) => {
+          if (!(err instanceof Error && err.name === "AbortError")) {
+            // ignore fetch errors silently
+          }
         })
-        .catch(() => {})
     }
 
     load()
-    pollRef.current = setInterval(load, 3000)
+    pollRef.current = setInterval(load, 5000)
     return () => {
-      cancelled = true
+      currentController?.abort()
       if (pollRef.current) clearInterval(pollRef.current)
     }
   }, [activeConv])

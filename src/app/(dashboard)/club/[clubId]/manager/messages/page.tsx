@@ -1,7 +1,6 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { EmptyState } from "@/components/shared/EmptyState"
-import { MessageSquare } from "lucide-react"
+import { ChatView } from "@/components/dashboard/ChatView"
 
 export default async function ManagerMessagesPage({
   params,
@@ -9,20 +8,12 @@ export default async function ManagerMessagesPage({
   params: Promise<{ clubId: string }>
 }) {
   const { clubId } = await params
-  await authorizeOrRedirect({ clubId, requiredRoles: ["manager", "owner"] })
+  const ctx = await authorizeOrRedirect({ clubId, requiredRoles: ["manager"] })
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        label="MANAGER · MENSAJES"
-        title="Mensajes del Club"
-        description="Comunicaciones internas del club"
-      />
-      <EmptyState
-        icon={MessageSquare}
-        title="Mensajes disponible próximamente"
-        description="Aquí podrás gestionar las comunicaciones con el equipo, socios y entrenadores del club."
-      />
+      <PageHeader label="Manager · Mensajes" title="Mensajes del Club" />
+      <ChatView userId={ctx.userId} />
     </div>
   )
 }

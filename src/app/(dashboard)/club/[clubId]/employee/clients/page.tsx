@@ -1,7 +1,67 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { getClubClients } from "@/lib/team/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
+import { StatCard } from "@/components/shared/StatCard"
+import { DataTable } from "@/components/shared/DataTable"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Users } from "lucide-react"
+import type { ClientEntry } from "@/lib/team/queries"
+import type { Column } from "@/components/shared/DataTable"
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "—"
+  return new Date(dateStr).toLocaleDateString("es-EC", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })
+}
+
+function getInitials(name: string | null): string {
+  if (!name) return "?"
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+}
+
+const columns: Column<ClientEntry & { id: string }>[] = [
+  {
+    key: "fullName",
+    header: "Nombre",
+    render: (item) => (
+      <div className="flex items-center gap-3">
+        <div className="size-8 rounded-full bg-zinc-100 text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
+          {getInitials(item.fullName)}
+        </div>
+        <span className="font-medium text-[#0a0a0a]">{item.fullName ?? "Sin nombre"}</span>
+      </div>
+    ),
+  },
+  {
+    key: "phone",
+    header: "Teléfono",
+    render: (item) => (
+      <span className="text-zinc-500">{item.phone ?? "—"}</span>
+    ),
+  },
+  {
+    key: "totalReservations",
+    header: "Reservas Totales",
+    render: (item) => (
+      <span className="font-black text-[#0a0a0a]">{item.totalReservations}</span>
+    ),
+  },
+  {
+    key: "lastVisit",
+    header: "Última Visita",
+    render: (item) => (
+      <span className="text-zinc-500">{formatDate(item.lastVisit)}</span>
+    ),
+  },
+]
 
 export default async function EmployeeClientsPage({
   params,
@@ -9,20 +69,35 @@ export default async function EmployeeClientsPage({
   params: Promise<{ clubId: string }>
 }) {
   const { clubId } = await params
-  await authorizeOrRedirect({ clubId, requiredRoles: ["employee", "manager", "owner"] })
+  await authorizeOrRedirect({ clubId, requiredRoles: ["employee"] })
+
+  const clients = await getClubClients(clubId)
+  const tableData = clients.map((c) => ({ ...c, id: c.userId }))
+
+  const withReservations = clients.filter((c) => c.totalReservations > 0).length
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        label="EMPLEADO · CLIENTES"
-        title="Clientes del Club"
-        description="Listado y atención a los clientes del club"
-      />
-      <EmptyState
-        icon={Users}
-        title="Clientes disponible próximamente"
-        description="Aquí podrás buscar, registrar y atender a los clientes que visitan el club."
-      />
+      <PageHeader label="Empleado · Clientes" title="Clientes del Club" />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <StatCard label="Total Clientes" value={clients.length} icon={Users} variant="default" />
+        <StatCard label="Con Reservas" value={withReservations} icon={Users} variant="success" />
+      </div>
+
+      {clients.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="Aún no hay clientes registrados"
+          description="Las visitas aparecerán aquí una vez que se realicen reservas en el club."
+        />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={tableData}
+          keyExtractor={(item) => item.userId}
+        />
+      )}
     </div>
   )
 }

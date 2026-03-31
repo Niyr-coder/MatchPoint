@@ -111,6 +111,8 @@ export function getUserNav(): NavSection[] {
         { label: "Clubes", href: "/dashboard/clubs", icon: "Building2" },
         { label: "Ranking", href: "/dashboard/ranking", icon: "Trophy" },
         { label: "Eventos", href: "/dashboard/events", icon: "CalendarDays" },
+        { label: "Chat", href: "/dashboard/chat", icon: "MessageSquare" },
+        { label: "Shop", href: "/dashboard/shop", icon: "ShoppingBag" },
       ],
     },
   ]

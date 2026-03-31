@@ -1,8 +1,9 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubCourts } from "@/lib/courts/queries"
-import { StatusBadge } from "@/components/shared/StatusBadge"
-import { EmptyState } from "@/components/shared/EmptyState"
+import { getCourtsByClub } from "@/lib/courts/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
+import { StatCard } from "@/components/shared/StatCard"
+import { EmptyState } from "@/components/shared/EmptyState"
+import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Home } from "lucide-react"
 import type { Court } from "@/lib/courts/queries"
 
@@ -30,11 +31,18 @@ export default async function ManagerCourtsPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["manager"] })
 
-  const courts = await getClubCourts(clubId)
+  const courts = await getCourtsByClub(clubId).catch(() => [] as Court[])
+
+  const activeCourts = courts.filter((c) => c.is_active)
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader label="Canchas" title="Canchas y Horarios" />
+    <div className="flex flex-col gap-8">
+      <PageHeader label="MANAGER · CANCHAS" title="Canchas del Club" />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <StatCard label="Total Canchas" value={courts.length} icon={Home} variant="default" />
+        <StatCard label="Activas" value={activeCourts.length} icon={Home} variant="success" />
+      </div>
 
       {courts.length === 0 ? (
         <EmptyState
