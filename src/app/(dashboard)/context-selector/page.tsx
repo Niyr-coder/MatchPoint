@@ -2,6 +2,15 @@ import Link from "next/link"
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getUserRoles } from "@/lib/auth/get-user-roles"
 import { ContextSelectorCard } from "@/components/context-selector/ContextSelectorCard"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+
+async function enterPlayerMode() {
+  "use server"
+  const cookieStore = await cookies()
+  cookieStore.set("player_mode", "1", { path: "/", httpOnly: true, sameSite: "lax" })
+  redirect("/dashboard")
+}
 
 export default async function ContextSelectorPage() {
   const ctx = await authorizeOrRedirect()
@@ -65,14 +74,16 @@ export default async function ContextSelectorPage() {
           ))}
         </div>
 
-        {/* Player mode link */}
+        {/* Player mode — sets cookie to skip redirect loop */}
         <div className="mt-6 text-center">
-          <Link
-            href="/dashboard"
-            className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-[#0a0a0a] transition-colors"
-          >
-            Continuar como Jugador →
-          </Link>
+          <form action={enterPlayerMode}>
+            <button
+              type="submit"
+              className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-[#0a0a0a] transition-colors"
+            >
+              Continuar como Jugador →
+            </button>
+          </form>
         </div>
       </div>
     </div>
