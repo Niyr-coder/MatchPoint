@@ -24,7 +24,7 @@ const createClubSchema = z.object({
   province: z.enum(ECUADOR_PROVINCES as readonly [EcuadorProvince, ...EcuadorProvince[]], {
     message: "Provincia inválida",
   }),
-  description: z.string().optional(),
+  description: z.string().nullish(),
 })
 
 const toggleClubSchema = z.object({

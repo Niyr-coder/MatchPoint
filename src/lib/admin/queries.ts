@@ -497,6 +497,78 @@ export async function getAllTournamentsAdmin(): Promise<TournamentAdmin[]> {
   }
 }
 
+// ============================================================
+// Club Requests (admin view)
+// ============================================================
+
+export interface ClubRequestAdmin {
+  id: string
+  user_id: string
+  requester_name: string | null
+  requester_username: string | null
+  name: string
+  city: string
+  province: string
+  description: string | null
+  sports: string[]
+  contact_phone: string | null
+  contact_email: string | null
+  status: "pending" | "approved" | "rejected"
+  admin_notes: string | null
+  reviewed_by: string | null
+  reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function getClubRequestsAdmin(
+  status?: "pending" | "approved" | "rejected"
+): Promise<ClubRequestAdmin[]> {
+  try {
+    const supabase = await createServiceClient()
+
+    let query = supabase
+      .from("club_requests")
+      .select(
+        "id, user_id, name, city, province, description, sports, contact_phone, contact_email, status, admin_notes, reviewed_by, reviewed_at, created_at, updated_at, profiles!club_requests_user_id_fkey(full_name, username)"
+      )
+      .order("created_at", { ascending: false })
+      .limit(200)
+
+    if (status) {
+      query = query.eq("status", status)
+    }
+
+    const { data, error } = await query
+    if (error) throw new Error(error.message)
+
+    return (data ?? []).map((row) => {
+      const profile = row.profiles as { full_name?: string | null; username?: string | null } | null
+      return {
+        id: row.id,
+        user_id: row.user_id,
+        requester_name: profile?.full_name ?? null,
+        requester_username: profile?.username ?? null,
+        name: row.name,
+        city: row.city,
+        province: row.province,
+        description: row.description ?? null,
+        sports: row.sports ?? [],
+        contact_phone: row.contact_phone ?? null,
+        contact_email: row.contact_email ?? null,
+        status: row.status as ClubRequestAdmin["status"],
+        admin_notes: row.admin_notes ?? null,
+        reviewed_by: row.reviewed_by ?? null,
+        reviewed_at: row.reviewed_at ?? null,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      }
+    })
+  } catch {
+    return []
+  }
+}
+
 // ---- getAdminModerationData ----------------------------------------
 
 export async function getAdminModerationData(): Promise<AdminModerationData> {

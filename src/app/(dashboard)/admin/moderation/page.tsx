@@ -1,8 +1,9 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getAdminModerationData } from "@/lib/admin/queries"
+import { getAdminModerationData, getClubRequestsAdmin } from "@/lib/admin/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { AdminPendingClubsPanel } from "@/components/admin/AdminPendingClubsPanel"
-import { Users, Building2, ExternalLink } from "lucide-react"
+import { AdminClubRequestsView } from "@/components/admin/AdminClubRequestsView"
+import { Users, Building2, ExternalLink, FileText } from "lucide-react"
 import Link from "next/link"
 
 const ROLE_LABELS: Record<string, string> = {
@@ -54,7 +55,10 @@ function SectionHeader({ icon: Icon, title, count }: { icon: React.ElementType; 
 export default async function AdminModerationPage() {
   await authorizeOrRedirect({ requiredRoles: ["admin"] })
 
-  const data = await getAdminModerationData()
+  const [data, clubRequests] = await Promise.all([
+    getAdminModerationData(),
+    getClubRequestsAdmin(),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -126,12 +130,29 @@ export default async function AdminModerationPage() {
         <AdminPendingClubsPanel clubs={data.pendingClubs} />
       </div>
 
-      {/* Section 3: Summary */}
+      {/* Section 3: Club requests */}
+      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+        <div className="flex items-center gap-2 mb-5">
+          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
+            <FileText className="size-4 text-zinc-500" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+            Solicitudes de creación de club
+          </p>
+          <span className="ml-auto text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">
+            {clubRequests.filter((r) => r.status === "pending").length} pendientes
+          </span>
+        </div>
+
+        <AdminClubRequestsView requests={clubRequests} />
+      </div>
+
+      {/* Section 4: Summary */}
       <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3">
           Resumen de moderación
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="rounded-xl bg-zinc-50 p-4">
             <p className="text-2xl font-black text-[#0a0a0a]">{data.recentUsers.length}</p>
             <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">
@@ -142,6 +163,14 @@ export default async function AdminModerationPage() {
             <p className="text-2xl font-black text-amber-700">{data.pendingClubs.length}</p>
             <p className="text-[11px] font-bold text-amber-500 uppercase tracking-wide mt-0.5">
               Clubs inactivos
+            </p>
+          </div>
+          <div className="rounded-xl bg-blue-50 p-4">
+            <p className="text-2xl font-black text-blue-700">
+              {clubRequests.filter((r) => r.status === "pending").length}
+            </p>
+            <p className="text-[11px] font-bold text-blue-400 uppercase tracking-wide mt-0.5">
+              Solicitudes pendientes
             </p>
           </div>
           <div className="rounded-xl bg-zinc-50 p-4">

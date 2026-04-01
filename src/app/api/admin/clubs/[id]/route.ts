@@ -23,7 +23,7 @@ const updateClubSchema = z
       ECUADOR_PROVINCES as readonly [EcuadorProvince, ...EcuadorProvince[]],
       { message: "Provincia inválida" }
     ),
-    description: z.string().optional(),
+    description: z.string().nullish(),
     is_active: z.boolean().optional(),
   })
   .partial()

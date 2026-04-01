@@ -6,7 +6,7 @@ import {
   LayoutDashboard, DollarSign, Building2, Users, Trophy, Shield,
   BarChart3, Settings, MapPin, UserCheck, Calendar, CalendarDays, CreditCard,
   FileBarChart, Sun, Wallet, MessageSquare, FileText, BookOpen,
-  User, Award, ShoppingBag, Home, Search,
+  User, Award, ShoppingBag, Home, Search, PlusCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types"
@@ -15,7 +15,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, DollarSign, Building2, Users, Trophy, Shield,
   BarChart3, Settings, MapPin, UserCheck, Calendar, CalendarDays, CreditCard,
   FileBarChart, Sun, Wallet, MessageSquare, FileText, BookOpen,
-  User, Award, ShoppingBag, Home, Search,
+  User, Award, ShoppingBag, Home, Search, PlusCircle,
 }
 
 export function SidebarItem({ item }: { item: NavItem }) {
