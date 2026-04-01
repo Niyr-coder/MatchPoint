@@ -1,5 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+
+const putSchema = z.object({
+  name:             z.string().min(3, "El nombre debe tener al menos 3 caracteres").max(100).optional(),
+  description:      z.string().max(1000).optional(),
+  start_date:       z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida").optional(),
+  start_time:       z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+  end_date:         z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  entry_fee:        z.number().min(0).optional(),
+  max_participants: z.number().int().min(2).max(256).optional(),
+  modality:         z.string().max(50).nullable().optional(),
+})
+
+const patchSchema = z.object({
+  status: z.enum(["open", "in_progress", "completed", "cancelled"]),
+  force:  z.boolean().optional(),
+})
 
 export async function GET(
   _request: Request,
@@ -29,10 +46,15 @@ export async function PUT(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
 
-  const body = await request.json() as {
-    name?: string; description?: string; start_date?: string; start_time?: string
-    end_date?: string; entry_fee?: number; max_participants?: number; modality?: string
+  let rawBody: unknown
+  try { rawBody = await request.json() } catch {
+    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
   }
+  const parsed = putSchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 422 })
+  }
+  const body = parsed.data
 
   const { data: tournament } = await supabase
     .from("tournaments")
@@ -48,19 +70,15 @@ export async function PUT(
     return NextResponse.json({ success: false, error: "No se puede editar un torneo finalizado" }, { status: 400 })
   }
 
-  if (!body.name?.trim() || body.name.trim().length < 3) {
-    return NextResponse.json({ success: false, error: "El nombre debe tener al menos 3 caracteres" }, { status: 400 })
-  }
-
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (body.name)             updates.name = body.name.trim()
-  if (body.description !== undefined) updates.description = body.description
-  if (body.start_date)       updates.start_date = body.start_date
-  if (body.start_time !== undefined) updates.start_time = body.start_time || null
-  if (body.end_date !== undefined)   updates.end_date = body.end_date || null
-  if (body.entry_fee !== undefined)  updates.entry_fee = body.entry_fee
+  if (body.name)                       updates.name             = body.name.trim()
+  if (body.description !== undefined)  updates.description      = body.description
+  if (body.start_date)                 updates.start_date       = body.start_date
+  if (body.start_time !== undefined)   updates.start_time       = body.start_time ?? null
+  if (body.end_date !== undefined)     updates.end_date         = body.end_date ?? null
+  if (body.entry_fee !== undefined)    updates.entry_fee        = body.entry_fee
   if (body.max_participants !== undefined) updates.max_participants = body.max_participants
-  if (body.modality !== undefined)   updates.modality = body.modality || null
+  if (body.modality !== undefined)     updates.modality         = body.modality ?? null
 
   const { data, error } = await supabase
     .from("tournaments")
@@ -83,13 +101,15 @@ export async function PATCH(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
 
-  const body = await request.json() as { status: string; force?: boolean }
-  const { status, force = false } = body
-
-  const allowed = ["open", "in_progress", "completed", "cancelled"]
-  if (!allowed.includes(status)) {
-    return NextResponse.json({ success: false, error: "Estado inválido" }, { status: 400 })
+  let rawBody: unknown
+  try { rawBody = await request.json() } catch {
+    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
   }
+  const parsedPatch = patchSchema.safeParse(rawBody)
+  if (!parsedPatch.success) {
+    return NextResponse.json({ success: false, error: parsedPatch.error.issues[0].message }, { status: 422 })
+  }
+  const { status, force = false } = parsedPatch.data
 
   const { data: tournament } = await supabase
     .from("tournaments")
