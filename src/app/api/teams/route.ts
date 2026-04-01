@@ -124,7 +124,7 @@ export async function GET(
       user_id: m.user_id,
       role: m.role as "captain" | "member",
       joined_at: m.joined_at,
-      profiles: (m.profiles as TeamMemberProfile["profiles"]) ?? null,
+      profiles: ((Array.isArray(m.profiles) ? m.profiles[0] : m.profiles) as TeamMemberProfile["profiles"]) ?? null,
     }))
 
     const result: TeamWithMembers = {

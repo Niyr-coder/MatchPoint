@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getAdminNav } from "@/lib/navigation/nav-configs"
 import { DashboardShell } from "@/components/dashboard/DashboardShell"

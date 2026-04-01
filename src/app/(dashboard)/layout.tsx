@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { redirect } from "next/navigation"
 import { authorize } from "@/lib/auth/authorization"
 import { getUserRoles } from "@/lib/auth/get-user-roles"
