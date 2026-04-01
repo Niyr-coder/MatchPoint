@@ -22,7 +22,7 @@ export async function PATCH(
     body = patchBodySchema.parse(await request.json())
   } catch (err) {
     const message = err instanceof z.ZodError
-      ? err.errors.map((e) => e.message).join(", ")
+      ? err.issues.map((e) => e.message).join(", ")
       : "Invalid request body"
     return NextResponse.json({ data: null, error: message }, { status: 400 })
   }
@@ -75,12 +75,12 @@ export async function PATCH(
     const msg = rpcError.message ?? ""
 
     // SQLSTATE P0002 (no_data_found) — match not found in tournament
-    if (error.code === "P0002" || msg.includes("not found in tournament")) {
+    if (rpcError.code === "P0002" || msg.includes("not found in tournament")) {
       return NextResponse.json({ data: null, error: "Partido no encontrado" }, { status: 404 })
     }
 
     // SQLSTATE 23505 (unique_violation) re-used for already-scored match
-    if (error.code === "23505" || msg.includes("ya tiene resultado")) {
+    if (rpcError.code === "23505" || msg.includes("ya tiene resultado")) {
       return NextResponse.json(
         { data: null, error: "Este partido ya tiene resultado registrado" },
         { status: 409 }

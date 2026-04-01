@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getOpenTournaments, createTournament } from "@/lib/tournaments/queries"
+import { authorize } from "@/lib/auth/authorization"
 import { z } from "zod"
 
 const createTournamentSchema = z.object({
@@ -43,13 +44,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
-  }
-
   let body: unknown
   try {
     body = await request.json()
@@ -65,8 +59,28 @@ export async function POST(request: Request) {
     )
   }
 
+  // Authorization:
+  //   - No club_id → any authenticated user with a profile can create a personal tournament
+  //   - club_id present → user must have tournaments.manage permission in that club
+  //   - is_official → additionally restricted to owner/manager roles (club_id required for official)
+  const authResult = await authorize(
+    parsed.data.club_id
+      ? {
+          clubId: parsed.data.club_id,
+          requiredPermission: "tournaments.manage",
+          ...(parsed.data.is_official ? { requiredRoles: ["owner", "manager"] as const } : {}),
+        }
+      : {}
+  )
+
+  if (!authResult.ok) {
+    const status = authResult.reason === "not_authenticated" ? 401 : 403
+    const message = authResult.reason === "not_authenticated" ? "Unauthorized" : "Forbidden"
+    return NextResponse.json({ success: false, error: message }, { status })
+  }
+
   try {
-    const tournament = await createTournament(user.id, {
+    const tournament = await createTournament(authResult.context.userId, {
       name: parsed.data.name,
       sport: parsed.data.sport,
       description: parsed.data.description,
