@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 import { waitlistSchema } from "@/lib/validations"
 import { createServiceClient } from "@/lib/supabase/server"
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
+  const ip = getClientIp(request)
+  const rl = checkRateLimit("waitlist", ip, RATE_LIMITS.waitlist)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rl.retryAfterSeconds),
+          "X-RateLimit-Limit": String(RATE_LIMITS.waitlist.limit),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
+        },
+      }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()

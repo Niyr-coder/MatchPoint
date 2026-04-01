@@ -1,7 +1,25 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const rl = checkRateLimit("messages", ip, RATE_LIMITS.messages)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rl.retryAfterSeconds),
+          "X-RateLimit-Limit": String(RATE_LIMITS.messages.limit),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
+        },
+      }
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const conversationId = searchParams.get("conversationId")
 
@@ -52,6 +70,23 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const rl = checkRateLimit("messages", ip, RATE_LIMITS.messages)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rl.retryAfterSeconds),
+          "X-RateLimit-Limit": String(RATE_LIMITS.messages.limit),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
+        },
+      }
+    )
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

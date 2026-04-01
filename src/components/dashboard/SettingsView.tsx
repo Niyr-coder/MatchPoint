@@ -1,22 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import type { UserSettings } from "@/app/api/profile/settings/route"
 
-// ─── Storage helpers ───────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────────
+
+type SettingsState = Required<UserSettings>
+
+// ─── Constants ─────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = "matchpoint_settings"
-
-interface SettingsState {
-  notif_reservas: boolean
-  notif_recordatorios: boolean
-  notif_torneos: boolean
-  notif_mensajes: boolean
-  tema: "auto" | "claro" | "oscuro"
-  perfil_publico: boolean
-  mostrar_estadisticas: boolean
-  mostrar_ranking: boolean
-  idioma: "es" | "en"
-}
 
 const DEFAULT_SETTINGS: SettingsState = {
   notif_reservas: true,
@@ -30,22 +23,24 @@ const DEFAULT_SETTINGS: SettingsState = {
   idioma: "es",
 }
 
-function loadSettings(): SettingsState {
-  if (typeof window === "undefined") return DEFAULT_SETTINGS
+// ─── localStorage helpers ──────────────────────────────────────────────────────
+
+function readCache(): SettingsState | null {
+  if (typeof window === "undefined") return null
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_SETTINGS
+    if (!raw) return null
     return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<SettingsState>) }
   } catch {
-    return DEFAULT_SETTINGS
+    return null
   }
 }
 
-function saveSettings(s: SettingsState): void {
+function writeCache(s: SettingsState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s))
   } catch {
-    // localStorage not available — silently ignore
+    // localStorage unavailable — ignore
   }
 }
 
@@ -56,9 +51,10 @@ interface ToggleProps {
   onChange: (value: boolean) => void
   label: string
   description?: string
+  disabled?: boolean
 }
 
-function Toggle({ checked, onChange, label, description }: ToggleProps) {
+function Toggle({ checked, onChange, label, description, disabled }: ToggleProps) {
   return (
     <div className="flex items-center justify-between py-3">
       <div>
@@ -71,8 +67,9 @@ function Toggle({ checked, onChange, label, description }: ToggleProps) {
         type="button"
         role="switch"
         aria-checked={checked}
+        disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
+        className={`relative w-11 h-6 rounded-full transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed ${
           checked ? "bg-[#1d4ed8]" : "bg-zinc-200"
         }`}
       >
@@ -107,25 +104,123 @@ function SectionCard({ label, title, children }: SectionCardProps) {
   )
 }
 
+// ─── Error banner ──────────────────────────────────────────────────────────────
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      {message}
+    </div>
+  )
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
+
+type LoadState = "idle" | "loading" | "ready" | "error"
+type SaveState = "idle" | "saving" | "error"
 
 export function SettingsView() {
   const [settings, setSettings] = useState<SettingsState>(DEFAULT_SETTINGS)
-  const [mounted, setMounted] = useState(false)
+  const [loadState, setLoadState] = useState<LoadState>("idle")
+  const [saveState, setSaveState] = useState<SaveState>("idle")
+  const [saveError, setSaveError] = useState<string | null>(null)
 
+  // ── Load settings on mount ────────────────────────────────────────────────
   useEffect(() => {
-    setSettings(loadSettings())
-    setMounted(true)
+    let cancelled = false
+
+    async function fetchSettings() {
+      // Show cached data immediately to avoid empty skeleton flash
+      const cached = readCache()
+      if (cached) {
+        setSettings(cached)
+        setLoadState("ready")
+      } else {
+        setLoadState("loading")
+      }
+
+      try {
+        const res = await fetch("/api/profile/settings")
+        if (cancelled) return
+
+        if (!res.ok) {
+          // Fallback to cache (already applied above) or defaults
+          if (!cached) setLoadState("error")
+          return
+        }
+
+        const json = (await res.json()) as { success: boolean; data: Partial<SettingsState> | null; error: string | null }
+        if (cancelled) return
+
+        if (json.success && json.data) {
+          const merged: SettingsState = { ...DEFAULT_SETTINGS, ...json.data }
+          setSettings(merged)
+          writeCache(merged)
+        }
+
+        setLoadState("ready")
+      } catch {
+        if (cancelled) return
+        // Network error — keep cached/default values, surface error only if nothing was cached
+        if (!cached) setLoadState("error")
+      }
+    }
+
+    void fetchSettings()
+    return () => { cancelled = true }
   }, [])
 
-  function update<K extends keyof SettingsState>(key: K, value: SettingsState[K]) {
-    const next = { ...settings, [key]: value }
-    setSettings(next)
-    saveSettings(next)
-  }
+  // ── Persist a single setting change ───────────────────────────────────────
+  const update = useCallback(
+    async <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => {
+      // Optimistic local update
+      const next: SettingsState = { ...settings, [key]: value }
+      setSettings(next)
+      writeCache(next)
+      setSaveState("saving")
+      setSaveError(null)
 
-  // Avoid hydration mismatch — render skeleton until client-side state is loaded
-  if (!mounted) {
+      try {
+        const res = await fetch("/api/profile/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [key]: value }),
+        })
+
+        const json = (await res.json()) as { success: boolean; data: Partial<SettingsState> | null; error: string | null }
+
+        if (!res.ok || !json.success) {
+          // Rollback optimistic update
+          setSettings(settings)
+          writeCache(settings)
+          setSaveError(json.error ?? "Error al guardar los ajustes")
+          setSaveState("error")
+          return
+        }
+
+        if (json.data) {
+          const synced: SettingsState = { ...DEFAULT_SETTINGS, ...json.data }
+          setSettings(synced)
+          writeCache(synced)
+        }
+
+        setSaveState("idle")
+      } catch {
+        // Rollback on network error
+        setSettings(settings)
+        writeCache(settings)
+        setSaveError("Sin conexión. Intenta de nuevo.")
+        setSaveState("error")
+      }
+    },
+    [settings]
+  )
+
+  // ── Skeleton while first load with no cache ───────────────────────────────
+  if (loadState === "loading") {
     return (
       <div className="flex flex-col gap-6 animate-pulse">
         {[1, 2, 3, 4].map((i) => (
@@ -134,6 +229,14 @@ export function SettingsView() {
       </div>
     )
   }
+
+  if (loadState === "error") {
+    return (
+      <ErrorBanner message="No se pudieron cargar tus ajustes. Recarga la página." />
+    )
+  }
+
+  const isBusy = saveState === "saving"
 
   const temaOptions: { value: SettingsState["tema"]; label: string }[] = [
     { value: "auto", label: "Auto" },
@@ -148,32 +251,40 @@ export function SettingsView() {
 
   return (
     <div className="flex flex-col gap-6">
+      {saveState === "error" && saveError && (
+        <ErrorBanner message={saveError} />
+      )}
+
       {/* Notificaciones */}
       <SectionCard label="Preferencias" title="Notificaciones">
         <div className="divide-y divide-[#f4f4f5]">
           <Toggle
             checked={settings.notif_reservas}
-            onChange={(v) => update("notif_reservas", v)}
+            onChange={(v) => void update("notif_reservas", v)}
             label="Reservas confirmadas"
             description="Recibe un aviso cuando tu reserva sea confirmada"
+            disabled={isBusy}
           />
           <Toggle
             checked={settings.notif_recordatorios}
-            onChange={(v) => update("notif_recordatorios", v)}
+            onChange={(v) => void update("notif_recordatorios", v)}
             label="Recordatorios de clase"
             description="Recuerda tus próximas clases con anticipación"
+            disabled={isBusy}
           />
           <Toggle
             checked={settings.notif_torneos}
-            onChange={(v) => update("notif_torneos", v)}
+            onChange={(v) => void update("notif_torneos", v)}
             label="Nuevos torneos"
             description="Entérate cuando se abra la inscripción a un torneo"
+            disabled={isBusy}
           />
           <Toggle
             checked={settings.notif_mensajes}
-            onChange={(v) => update("notif_mensajes", v)}
+            onChange={(v) => void update("notif_mensajes", v)}
             label="Mensajes del club"
             description="Comunicados y novedades de tu club"
+            disabled={isBusy}
           />
         </div>
       </SectionCard>
@@ -187,8 +298,9 @@ export function SettingsView() {
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => update("tema", opt.value)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
+                disabled={isBusy}
+                onClick={() => void update("tema", opt.value)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   active
                     ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
                     : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
@@ -212,21 +324,24 @@ export function SettingsView() {
         <div className="divide-y divide-[#f4f4f5]">
           <Toggle
             checked={settings.perfil_publico}
-            onChange={(v) => update("perfil_publico", v)}
+            onChange={(v) => void update("perfil_publico", v)}
             label="Perfil público"
             description="Tu perfil es visible para otros usuarios"
+            disabled={isBusy}
           />
           <Toggle
             checked={settings.mostrar_estadisticas}
-            onChange={(v) => update("mostrar_estadisticas", v)}
+            onChange={(v) => void update("mostrar_estadisticas", v)}
             label="Mostrar estadísticas"
             description="Otros jugadores pueden ver tus estadísticas"
+            disabled={isBusy}
           />
           <Toggle
             checked={settings.mostrar_ranking}
-            onChange={(v) => update("mostrar_ranking", v)}
+            onChange={(v) => void update("mostrar_ranking", v)}
             label="Mostrar ranking"
             description="Tu posición en el ranking es pública"
+            disabled={isBusy}
           />
         </div>
       </SectionCard>
@@ -240,8 +355,9 @@ export function SettingsView() {
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => update("idioma", opt.value)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
+                disabled={isBusy}
+                onClick={() => void update("idioma", opt.value)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   active
                     ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
                     : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"

@@ -62,6 +62,8 @@ export interface Profile {
   matches_played?: number | null
   matches_won?: number | null
   current_streak?: number | null
+  // Added by migration 023_profile_settings
+  settings?: Record<string, unknown> | null
 }
 
 // ============================================================
