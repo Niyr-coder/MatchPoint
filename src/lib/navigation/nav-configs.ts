@@ -113,6 +113,7 @@ export function getUserNav(): NavSection[] {
         { label: "Eventos", href: "/dashboard/events", icon: "CalendarDays" },
         { label: "Chat", href: "/dashboard/chat", icon: "MessageSquare" },
         { label: "Shop", href: "/dashboard/shop", icon: "ShoppingBag" },
+        { label: "Mi Team ❤️", href: "/dashboard/team", icon: "Users" },
         { label: "Solicitar club", href: "/dashboard/request-club", icon: "PlusCircle" },
       ],
     },

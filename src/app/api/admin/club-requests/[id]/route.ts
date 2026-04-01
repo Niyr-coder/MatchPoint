@@ -144,6 +144,21 @@ export async function PATCH(
 
       if (updateError) throw new Error(updateError.message)
 
+      // Fire-and-forget notification — must not fail the main operation
+      try {
+        await supabase.from("notifications").insert({
+          user_id: req.user_id,
+          type: "club_request_rejected",
+          title: "Solicitud de club no aprobada",
+          body: adminNotes
+            ? `Tu solicitud para "${req.name}" no fue aprobada. Motivo: ${adminNotes}`
+            : `Tu solicitud para "${req.name}" no fue aprobada en esta ocasión. Puedes enviar una nueva solicitud.`,
+          metadata: { club_name: req.name },
+        })
+      } catch (notifErr) {
+        console.error(`[PATCH /api/admin/club-requests/${id}] notification insert failed (reject)`, notifErr)
+      }
+
       return NextResponse.json({ success: true, data: null, error: null })
     }
 
@@ -194,6 +209,19 @@ export async function PATCH(
       .eq("id", id)
 
     if (updateError) throw new Error(updateError.message)
+
+    // Fire-and-forget notification — must not fail the main operation
+    try {
+      await supabase.from("notifications").insert({
+        user_id: req.user_id,
+        type: "club_request_approved",
+        title: "¡Tu solicitud de club fue aprobada! 🎉",
+        body: `Tu solicitud para crear "${req.name}" ha sido aprobada. Ya puedes administrar tu club desde el panel de Owner.`,
+        metadata: { club_id: newClub.id, club_name: req.name },
+      })
+    } catch (notifErr) {
+      console.error(`[PATCH /api/admin/club-requests/${id}] notification insert failed (approve)`, notifErr)
+    }
 
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {

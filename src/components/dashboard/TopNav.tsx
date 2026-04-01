@@ -3,11 +3,12 @@
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, ChevronDown, MessageSquare, ShoppingBag, User, Settings, LogOut, CreditCard } from "lucide-react"
+import { Menu, X, ChevronDown, MessageSquare, ShoppingBag, User, Settings, LogOut, CreditCard, Bell } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { ROLE_LABELS } from "@/lib/roles"
 import { RoleBadge } from "@/components/shared/RoleBadge"
+import { NotificationsBell } from "@/components/dashboard/NotificationsBell"
 import type { NavSection, Profile, AppRole } from "@/types"
 
 interface TopNavProps {
@@ -149,6 +150,11 @@ export function TopNav({ navSections, profile, currentRole, clubName, dashboardH
             <ShoppingBag className="size-5" />
           </Link>
 
+          {/* Notifications bell */}
+          <span className="hidden sm:block">
+            <NotificationsBell />
+          </span>
+
           {/* Profile dropdown */}
           <div ref={profileRef} className="relative hidden sm:block">
             <button
@@ -260,12 +266,15 @@ export function TopNav({ navSections, profile, currentRole, clubName, dashboardH
             )
           })}
 
-          {/* Chat & Tienda */}
+          {/* Chat, Tienda & Notificaciones */}
           <Link href="/dashboard/chat" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
             <MessageSquare className="size-4" /> Chat
           </Link>
           <Link href="/dashboard/shop" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
             <ShoppingBag className="size-4" /> Tienda
+          </Link>
+          <Link href="/dashboard/notifications" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]">
+            <Bell className="size-4" /> Notificaciones
           </Link>
 
           {/* Profile section */}
