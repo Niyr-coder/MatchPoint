@@ -117,13 +117,19 @@ interface SuspendTarget {
   userName: string
 }
 
+interface DeleteTarget {
+  userId: string
+  userName: string
+}
+
 interface UserDetailPanelProps {
   user: UserAdmin
   onClose: () => void
   onSuspendRequest: (target: SuspendTarget) => void
+  onDeleteRequest: (target: DeleteTarget) => void
 }
 
-function UserDetailPanel({ user, onClose, onSuspendRequest }: UserDetailPanelProps) {
+function UserDetailPanel({ user, onClose, onSuspendRequest, onDeleteRequest }: UserDetailPanelProps) {
   const name        = displayName(user)
   const suspended   = isSuspended(user)
   const userInitials = initials(name)
@@ -199,8 +205,8 @@ function UserDetailPanel({ user, onClose, onSuspendRequest }: UserDetailPanelPro
           </div>
         </div>
 
-        {/* Footer — suspend / reactivate */}
-        <div className="px-5 py-4 border-t border-[#f0f0f0]">
+        {/* Footer — suspend / reactivate / delete */}
+        <div className="px-5 py-4 border-t border-[#f0f0f0] flex flex-col gap-2">
           {suspended ? (
             <button
               onClick={() =>
@@ -222,6 +228,13 @@ function UserDetailPanel({ user, onClose, onSuspendRequest }: UserDetailPanelPro
               Suspender cuenta
             </button>
           )}
+          <button
+            onClick={() => onDeleteRequest({ userId: user.id, userName: name })}
+            className="w-full flex items-center justify-center gap-2 bg-red-600 text-white rounded-full py-2.5 text-sm font-bold hover:bg-red-700 transition-colors"
+          >
+            <X className="size-4" />
+            Eliminar cuenta permanentemente
+          </button>
         </div>
       </div>
     </>
@@ -267,6 +280,11 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
   const [suspendTarget, setSuspendTarget] = useState<SuspendTarget | null>(null)
   const [suspendLoading, setSuspendLoading] = useState(false)
   const [suspendError, setSuspendError] = useState<string | null>(null)
+
+  // Delete confirm
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -334,6 +352,32 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
       setSuspendError("Error de conexión. Intenta de nuevo.")
     } finally {
       setSuspendLoading(false)
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    setDeleteError(null)
+
+    try {
+      const res = await fetch(`/api/admin/users/${deleteTarget.userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete" }),
+      })
+      const json = (await res.json()) as { success: boolean; error?: string | null }
+      if (!json.success) {
+        setDeleteError(json.error ?? "Error desconocido")
+        return
+      }
+      setDeleteTarget(null)
+      setSelectedUser(null)
+      startTransition(() => router.refresh())
+    } catch {
+      setDeleteError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -465,6 +509,7 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
           user={selectedUser}
           onClose={() => setSelectedUser(null)}
           onSuspendRequest={handleSuspendRequest}
+          onDeleteRequest={(target) => { setDeleteError(null); setDeleteTarget(target) }}
         />
       )}
 
@@ -488,6 +533,21 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
           }}
           loading={suspendLoading}
           error={suspendError}
+        />
+      )}
+
+      {/* Delete confirm dialog */}
+      {deleteTarget && (
+        <ConfirmDialog
+          message={`¿Eliminar permanentemente la cuenta de "${deleteTarget.userName}"? Esta acción no se puede deshacer y borrará todos sus datos.`}
+          confirmLabel="Eliminar permanentemente"
+          confirmClass="bg-red-600 hover:bg-red-700"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            if (!deleteLoading) setDeleteTarget(null)
+          }}
+          loading={deleteLoading}
+          error={deleteError}
         />
       )}
     </div>

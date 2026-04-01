@@ -4,6 +4,7 @@ import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getUserNav } from "@/lib/navigation/nav-configs"
 import { DashboardShell } from "@/components/dashboard/DashboardShell"
 import { redirect } from "next/navigation"
+import type { AppRole } from "@/types"
 
 export default async function UserDashboardLayout({ children }: { children: React.ReactNode }) {
   const ctx = await authorizeOrRedirect()
@@ -18,7 +19,7 @@ export default async function UserDashboardLayout({ children }: { children: Reac
     <DashboardShell
       navSections={navSections}
       profile={ctx.profile}
-      currentRole="user"
+      currentRole={ctx.globalRole as AppRole}
       dashboardHref="/dashboard"
       pageTitle="Mi espacio"
     >
