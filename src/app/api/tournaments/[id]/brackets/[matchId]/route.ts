@@ -1,174 +1,106 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
+import { authorize } from "@/lib/auth/authorization"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 
-const RATING_WIN_DELTA = 0.25
-const RATING_LOSS_DELTA = -0.15
+const patchBodySchema = z.object({
+  winner_id: z.string().uuid(),
+  loser_id: z.string().uuid(),
+  winner_score: z.number().int().min(0),
+  loser_score: z.number().int().min(0),
+})
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; matchId: string }> }
 ) {
-  const { id, matchId } = await params
+  const { id: tournamentId, matchId } = await params
+
+  // Parse and validate body first — fail fast before any DB round-trips
+  let body: z.infer<typeof patchBodySchema>
+  try {
+    body = patchBodySchema.parse(await request.json())
+  } catch (err) {
+    const message = err instanceof z.ZodError
+      ? err.errors.map((e) => e.message).join(", ")
+      : "Invalid request body"
+    return NextResponse.json({ data: null, error: message }, { status: 400 })
+  }
+
+  // Fetch tournament to get club_id, sport, is_official for auth + RPC
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
-
-  const { data: tournament } = await supabase
+  const { data: tournament, error: tournamentError } = await supabase
     .from("tournaments")
-    .select("created_by, is_official, sport, name, club_id")
-    .eq("id", id)
+    .select("club_id, sport, is_official, created_by")
+    .eq("id", tournamentId)
     .single()
 
-  if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+  if (tournamentError || !tournament) {
+    return NextResponse.json({ data: null, error: "Tournament not found" }, { status: 404 })
   }
 
-  const body = await request.json() as { score?: string; winner_id: string }
-  if (!body.winner_id) {
-    return NextResponse.json({ success: false, error: "winner_id requerido" }, { status: 400 })
+  // Authorization: full 6-layer check via authorize()
+  // club_id may be null for tournaments not scoped to a club — fall back to
+  // creator check in that case (layer 3 admin bypass still applies).
+  const authResult = await authorize({
+    clubId: tournament.club_id ?? null,
+    requiredPermission: "tournaments.manage",
+  })
+
+  if (!authResult.ok) {
+    // If the user failed club-level permission, allow the tournament creator as fallback
+    const supabaseClient = await createClient()
+    const { data: { user } } = await supabaseClient.auth.getUser()
+    const isCreator = user && tournament.created_by === user.id
+
+    if (!isCreator) {
+      return NextResponse.json({ data: null, error: "Forbidden" }, { status: 403 })
+    }
   }
 
+  // Call the atomic RPC — all writes happen inside a single DB transaction
   const service = await createServiceClient()
+  const { data: rpcData, error: rpcError } = await service.rpc("score_bracket_match", {
+    p_match_id: matchId,
+    p_tournament_id: tournamentId,
+    p_winner_id: body.winner_id,
+    p_loser_id: body.loser_id,
+    p_winner_score: body.winner_score,
+    p_loser_score: body.loser_score,
+    p_sport: tournament.sport,
+    p_is_official: tournament.is_official ?? false,
+  })
 
-  const { data: match } = await service
-    .from("tournament_brackets")
-    .select("id, round, match_number, player1_id, player2_id, status")
-    .eq("id", matchId)
-    .eq("tournament_id", id)
-    .single()
+  if (rpcError) {
+    const msg = rpcError.message ?? ""
 
-  if (!match) return NextResponse.json({ success: false, error: "Partido no encontrado" }, { status: 404 })
+    // SQLSTATE P0002 (no_data_found) — match not found in tournament
+    if (error.code === "P0002" || msg.includes("not found in tournament")) {
+      return NextResponse.json({ data: null, error: "Partido no encontrado" }, { status: 404 })
+    }
 
-  // A7: Prevent overwriting a completed match
-  if (match.status === "completed") {
-    return NextResponse.json(
-      { success: false, error: "Este partido ya tiene resultado registrado" },
-      { status: 409 }
-    )
+    // SQLSTATE 23505 (unique_violation) re-used for already-scored match
+    if (error.code === "23505" || msg.includes("ya tiene resultado")) {
+      return NextResponse.json(
+        { data: null, error: "Este partido ya tiene resultado registrado" },
+        { status: 409 }
+      )
+    }
+
+    console.error("[PATCH /api/tournaments/[id]/brackets/[matchId]] RPC error", {
+      matchId,
+      tournamentId,
+      error: msg,
+    })
+    return NextResponse.json({ data: null, error: "Internal server error" }, { status: 500 })
   }
 
-  if (body.winner_id !== match.player1_id && body.winner_id !== match.player2_id) {
-    return NextResponse.json(
-      { success: false, error: "El ganador debe ser uno de los participantes del partido" },
-      { status: 400 }
-    )
-  }
-
-  // Record result
-  const { error: matchError } = await service
-    .from("tournament_brackets")
-    .update({ score: body.score ?? null, winner_id: body.winner_id, status: "completed" })
-    .eq("id", matchId)
-
-  if (matchError) return NextResponse.json({ success: false, error: matchError.message }, { status: 500 })
-
-  // Lock the bracket on first recorded result
-  await service.from("tournaments").update({ bracket_locked: true }).eq("id", id)
-
-  // A3: Write match_results + update profiles.rating
-  // A4: Upsert rankings
-  const loserId = body.winner_id === match.player1_id ? match.player2_id : match.player1_id
-  if (loserId) {
-    const isOfficial = tournament.is_official ?? false
-
-    // Insert match_results for both players
-    await service.from("match_results").insert([
-      {
-        player_id: body.winner_id,
-        opponent_id: loserId,
-        event_id: id,
-        event_type: "tournament",
-        event_name: tournament.name,
-        club_id: tournament.club_id ?? null,
-        sport: tournament.sport,
-        result: "win",
-        score: body.score ?? null,
-        is_official: isOfficial,
-        rating_delta: isOfficial ? RATING_WIN_DELTA : 0,
-      },
-      {
-        player_id: loserId,
-        opponent_id: body.winner_id,
-        event_id: id,
-        event_type: "tournament",
-        event_name: tournament.name,
-        club_id: tournament.club_id ?? null,
-        sport: tournament.sport,
-        result: "loss",
-        score: body.score ?? null,
-        is_official: isOfficial,
-        rating_delta: isOfficial ? RATING_LOSS_DELTA : 0,
-      },
-    ])
-
-    // Fetch profiles to compute new values
-    const [{ data: winnerProfile }, { data: loserProfile }] = await Promise.all([
-      service.from("profiles").select("rating, matches_played, matches_won").eq("id", body.winner_id).single(),
-      service.from("profiles").select("rating, matches_played, matches_won").eq("id", loserId).single(),
-    ])
-
-    // Update profiles stats (and rating if official)
-    await Promise.all([
-      winnerProfile && service.from("profiles").update({
-        matches_played: (winnerProfile.matches_played ?? 0) + 1,
-        matches_won: (winnerProfile.matches_won ?? 0) + 1,
-        ...(isOfficial && {
-          rating: Math.min(9.99, Math.max(0, Number(winnerProfile.rating ?? 0) + RATING_WIN_DELTA)),
-        }),
-      }).eq("id", body.winner_id),
-      loserProfile && service.from("profiles").update({
-        matches_played: (loserProfile.matches_played ?? 0) + 1,
-        ...(isOfficial && {
-          rating: Math.min(9.99, Math.max(0, Number(loserProfile.rating ?? 0) + RATING_LOSS_DELTA)),
-        }),
-      }).eq("id", loserId),
-    ])
-
-    // Upsert rankings for both players (A4)
-    const [{ data: winnerRanking }, { data: loserRanking }] = await Promise.all([
-      service.from("rankings").select("wins, losses, score").eq("user_id", body.winner_id).eq("sport", tournament.sport).maybeSingle(),
-      service.from("rankings").select("wins, losses, score").eq("user_id", loserId).eq("sport", tournament.sport).maybeSingle(),
-    ])
-
-    await Promise.all([
-      service.from("rankings").upsert({
-        user_id: body.winner_id,
-        sport: tournament.sport,
-        wins: (winnerRanking?.wins ?? 0) + 1,
-        losses: winnerRanking?.losses ?? 0,
-        score: (winnerRanking?.score ?? 0) + 3,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id,sport" }),
-      service.from("rankings").upsert({
-        user_id: loserId,
-        sport: tournament.sport,
-        wins: loserRanking?.wins ?? 0,
-        losses: (loserRanking?.losses ?? 0) + 1,
-        score: Math.max(0, (loserRanking?.score ?? 0) - 1),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id,sport" }),
-    ])
-  }
-
-  // Auto-advance winner to next elimination round
-  const nextRound = match.round + 1
-  const nextMatchNumber = Math.ceil(match.match_number / 2)
-  const slot = match.match_number % 2 === 1 ? "player1_id" : "player2_id"
-
-  const { data: nextMatch } = await service
-    .from("tournament_brackets")
-    .select("id")
-    .eq("tournament_id", id)
-    .eq("round", nextRound)
-    .eq("match_number", nextMatchNumber)
-    .maybeSingle()
-
-  if (nextMatch) {
-    await service
-      .from("tournament_brackets")
-      .update({ [slot]: body.winner_id })
-      .eq("id", nextMatch.id)
-  }
-
-  return NextResponse.json({ success: true, advanced: nextMatch !== null })
+  return NextResponse.json({
+    data: {
+      nextMatchId: rpcData?.next_match_id ?? null,
+      winnerNewRating: rpcData?.winner_new_rating ?? null,
+      loserNewRating: rpcData?.loser_new_rating ?? null,
+    },
+    error: null,
+  })
 }

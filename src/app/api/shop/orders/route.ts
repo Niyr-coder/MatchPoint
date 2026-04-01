@@ -45,80 +45,45 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 422 })
   }
 
-  const { items, clubId } = parsed.data
+  const { items } = parsed.data
 
-  // Fetch actual product prices + stock from DB to prevent manipulation
+  // Fetch authoritative product prices from DB — never trust client-supplied prices
   const productIds = items.map((i) => i.product_id)
   const { data: products, error: productsError } = await supabase
     .from("products")
-    .select("id, name, price, stock, is_active")
+    .select("id, price, is_active")
     .in("id", productIds)
     .eq("is_active", true)
 
-  if (productsError) return NextResponse.json({ error: productsError.message }, { status: 500 })
+  if (productsError) {
+    return NextResponse.json({ error: "Error al verificar productos" }, { status: 500 })
+  }
 
   if (!products || products.length !== productIds.length) {
     return NextResponse.json({ error: "Uno o más productos no están disponibles" }, { status: 400 })
   }
 
-  const priceMap = new Map(products.map((p) => [p.id, p]))
+  const serverPrices = Object.fromEntries(products.map((p) => [p.id, p.price as number]))
 
-  // Validate stock for each item (-1 means unlimited)
-  for (const item of items) {
-    const product = priceMap.get(item.product_id)!
-    if (product.stock !== -1 && item.quantity > product.stock) {
-      return NextResponse.json(
-        { error: `Stock insuficiente para "${product.name}": disponible ${product.stock}, solicitado ${item.quantity}` },
-        { status: 409 }
-      )
-    }
-  }
+  const rpcItems = items.map((item) => ({
+    product_id: item.product_id,
+    quantity: item.quantity,
+    unit_price: serverPrices[item.product_id],
+  }))
 
-  const total = items.reduce((sum, item) => {
-    const product = priceMap.get(item.product_id)!
-    return sum + product.price * item.quantity
-  }, 0)
-
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .insert({ user_id: user.id, club_id: clubId ?? null, total, status: "pending" })
-    .select()
-    .single()
-
-  if (orderError) return NextResponse.json({ error: orderError.message }, { status: 500 })
-
-  const orderItems = items.map((item) => {
-    const product = priceMap.get(item.product_id)!
-    return {
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      unit_price: product.price,
-      product_name: product.name,
-    }
+  const serviceClient = await createServiceClient()
+  const { data, error } = await serviceClient.rpc("create_order_atomic", {
+    p_user_id: user.id,
+    p_items: rpcItems,
   })
 
-  const { error: itemsError } = await supabase.from("order_items").insert(orderItems)
-  if (itemsError) {
-    void supabase.from("orders").delete().eq("id", order.id)
-    return NextResponse.json({ error: itemsError.message }, { status: 500 })
+  if (error) {
+    // SQLSTATE 53000 (insufficient_resources) or message from create_order_atomic
+    if (error.code === "53000" || error.message.includes("Stock insuficiente")) {
+      return NextResponse.json({ data: null, error: "Stock insuficiente para uno o más productos" }, { status: 409 })
+    }
+    return NextResponse.json({ data: null, error: "No se pudo crear la orden" }, { status: 500 })
   }
 
-  // Decrement stock for limited-stock items using service client
-  const service = await createServiceClient()
-  const stockDecrements = items
-    .filter((item) => {
-      const product = priceMap.get(item.product_id)!
-      return product.stock !== -1
-    })
-    .map((item) => {
-      const product = priceMap.get(item.product_id)!
-      return service.from("products")
-        .update({ stock: Math.max(0, product.stock - item.quantity) })
-        .eq("id", item.product_id)
-    })
-
-  await Promise.all(stockDecrements)
-
-  return NextResponse.json({ order })
+  return NextResponse.json({ data: { orderId: (data as { order_id: string }).order_id }, error: null })
 }
