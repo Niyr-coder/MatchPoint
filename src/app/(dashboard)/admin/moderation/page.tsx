@@ -1,6 +1,7 @@
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getAdminModerationData } from "@/lib/admin/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
+import { AdminPendingClubsPanel } from "@/components/admin/AdminPendingClubsPanel"
 import { Users, Building2, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
@@ -122,33 +123,7 @@ export default async function AdminModerationPage() {
           </Link>
         </div>
 
-        {data.pendingClubs.length === 0 ? (
-          <p className="text-sm text-zinc-400 text-center py-6">No hay clubs inactivos</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 pb-2 border-b border-[#f0f0f0] mb-1">
-              <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Club</p>
-              <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Ciudad</p>
-              <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Owner</p>
-              <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 text-right">Creado</p>
-            </div>
-            <div className="flex flex-col divide-y divide-[#f0f0f0]">
-              {data.pendingClubs.map((club) => (
-                <div key={club.id} className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 py-3 items-center">
-                  <div>
-                    <p className="text-sm font-bold text-[#0a0a0a]">{club.name}</p>
-                    {club.province && (
-                      <p className="text-[10px] text-zinc-400">{club.province}</p>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-500">{club.city ?? "—"}</p>
-                  <p className="text-xs text-zinc-500">{club.owner_name ?? "—"}</p>
-                  <p className="text-xs text-zinc-400 text-right">{formatDate(club.created_at)}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        <AdminPendingClubsPanel clubs={data.pendingClubs} />
       </div>
 
       {/* Section 3: Summary */}

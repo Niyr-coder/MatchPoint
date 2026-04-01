@@ -90,6 +90,8 @@ export interface UserAdmin {
   avatar_url: string | null
   rating: number | null
   matches_played: number | null
+  /** JSONB settings; contains `suspended_from_role` key when account is suspended */
+  settings: Record<string, unknown> | null
 }
 
 export interface PlatformAnalytics {
@@ -171,7 +173,7 @@ export async function getAllUsersAdmin(
 
     let query = supabase
       .from("profiles")
-      .select("id, full_name, first_name, last_name, global_role, created_at, city, province, username, avatar_url, rating, matches_played")
+      .select("id, full_name, first_name, last_name, global_role, created_at, city, province, username, avatar_url, rating, matches_played, settings")
       .order("created_at", { ascending: false })
 
     if (filters?.role) {
