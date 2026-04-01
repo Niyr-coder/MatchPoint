@@ -1,19 +1,35 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { X, ShieldOff, ShieldCheck } from "lucide-react"
+import { X, ShieldOff, ShieldCheck, UserPlus, Trash2, Building2 } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { RoleBadge } from "@/components/shared/RoleBadge"
 import { ROLE_LABELS } from "@/lib/roles"
 import type { Column } from "@/components/shared/DataTable"
-import type { UserAdmin } from "@/lib/admin/queries"
-import type { AppRole } from "@/types"
+import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
+import type { AppRole, ApiResponse } from "@/types"
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-const ROLE_OPTIONS: { value: string; label: string }[] = [
+const GLOBAL_ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: "admin", label: ROLE_LABELS.admin },
+  { value: "user",  label: ROLE_LABELS.user },
+]
+
+const VALID_GLOBAL_ROLES: AppRole[] = ["admin", "user"]
+
+const CLUB_ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: "owner",    label: ROLE_LABELS.owner },
+  { value: "manager",  label: ROLE_LABELS.manager },
+  { value: "partner",  label: ROLE_LABELS.partner },
+  { value: "coach",    label: ROLE_LABELS.coach },
+  { value: "employee", label: ROLE_LABELS.employee },
+]
+
+// Filter options include all roles so the table filter still works for existing data
+const FILTER_ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "admin",    label: ROLE_LABELS.admin },
   { value: "owner",    label: ROLE_LABELS.owner },
   { value: "manager",  label: ROLE_LABELS.manager },
@@ -23,9 +39,15 @@ const ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "partner",  label: ROLE_LABELS.partner },
 ]
 
-const VALID_ROLES: AppRole[] = [
-  "admin", "owner", "partner", "manager", "employee", "coach", "user",
-]
+// ── types ─────────────────────────────────────────────────────────────────────
+
+interface ClubMembership {
+  club_id: string
+  club_name: string | null
+  role: string
+  is_active: boolean
+  joined_at: string
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -109,6 +131,227 @@ function ConfirmDialog({
   )
 }
 
+// ── memberships section ───────────────────────────────────────────────────────
+
+interface MembershipsSectionProps {
+  userId: string
+  clubs: ClubAdmin[]
+  onMembershipChange: () => void
+}
+
+function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSectionProps) {
+  const [memberships, setMemberships] = useState<ClubMembership[]>([])
+  const [loadingFetch, setLoadingFetch] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  const [addClubId, setAddClubId] = useState("")
+  const [addRole, setAddRole] = useState("owner")
+  const [addLoading, setAddLoading] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
+
+  const [removingClubId, setRemovingClubId] = useState<string | null>(null)
+  const [removeError, setRemoveError] = useState<string | null>(null)
+
+  const fetchMemberships = useCallback(async () => {
+    setLoadingFetch(true)
+    setFetchError(null)
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`)
+      const json = (await res.json()) as ApiResponse<{
+        profile: unknown
+        memberships: ClubMembership[]
+      }>
+      if (!json.success || !json.data) {
+        setFetchError(json.error ?? "Error al cargar membresías")
+        return
+      }
+      setMemberships(json.data.memberships.filter((m) => m.is_active))
+    } catch {
+      setFetchError("Error de conexión al cargar membresías")
+    } finally {
+      setLoadingFetch(false)
+    }
+  }, [userId])
+
+  useEffect(() => {
+    void fetchMemberships()
+  }, [fetchMemberships])
+
+  async function handleAdd() {
+    if (!addClubId) {
+      setAddError("Selecciona un club")
+      return
+    }
+    setAddLoading(true)
+    setAddError(null)
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/memberships`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clubId: addClubId, role: addRole }),
+      })
+      const json = (await res.json()) as ApiResponse<null>
+      if (!json.success) {
+        setAddError(json.error ?? "Error al agregar membresía")
+        return
+      }
+      setAddClubId("")
+      setAddRole("owner")
+      await fetchMemberships()
+      onMembershipChange()
+    } catch {
+      setAddError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setAddLoading(false)
+    }
+  }
+
+  async function handleRemove(clubId: string) {
+    setRemovingClubId(clubId)
+    setRemoveError(null)
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/memberships`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clubId }),
+      })
+      const json = (await res.json()) as ApiResponse<null>
+      if (!json.success) {
+        setRemoveError(json.error ?? "Error al eliminar membresía")
+        return
+      }
+      await fetchMemberships()
+      onMembershipChange()
+    } catch {
+      setRemoveError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setRemovingClubId(null)
+    }
+  }
+
+  // Clubs not yet assigned (active memberships excluded)
+  const assignedClubIds = new Set(memberships.map((m) => m.club_id))
+  const availableClubs = clubs.filter((c) => !assignedClubIds.has(c.id))
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <Building2 className="size-3.5 text-zinc-400 shrink-0" />
+        <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
+          Membresías de Club
+        </p>
+      </div>
+
+      {loadingFetch ? (
+        <div className="flex flex-col gap-2">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-9 rounded-xl bg-zinc-100 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : fetchError ? (
+        <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 border border-red-100">
+          {fetchError}
+        </p>
+      ) : memberships.length === 0 ? (
+        <p className="text-sm text-zinc-400 italic">Sin membresías activas</p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          {memberships.map((m) => (
+            <div
+              key={m.club_id}
+              className="flex items-center justify-between gap-2 rounded-xl border border-[#e5e5e5] px-3 py-2"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-sm font-medium text-[#0a0a0a] truncate">
+                  {m.club_name ?? m.club_id}
+                </span>
+                <RoleBadge role={m.role as AppRole} size="sm" />
+              </div>
+              <button
+                onClick={() => void handleRemove(m.club_id)}
+                disabled={removingClubId === m.club_id}
+                title="Eliminar membresía"
+                className="size-6 flex items-center justify-center rounded-full hover:bg-red-50 text-zinc-400 hover:text-red-500 transition-colors disabled:opacity-50 shrink-0"
+              >
+                {removingClubId === m.club_id ? (
+                  <span className="size-3 rounded-full border-2 border-zinc-300 border-t-zinc-500 animate-spin block" />
+                ) : (
+                  <Trash2 className="size-3.5" />
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {removeError && (
+        <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 border border-red-100">
+          {removeError}
+        </p>
+      )}
+
+      {/* Add membership form */}
+      {availableClubs.length > 0 && (
+        <div className="flex flex-col gap-2 pt-1">
+          <div className="flex gap-2">
+            <select
+              value={addClubId}
+              onChange={(e) => { setAddClubId(e.target.value); setAddError(null) }}
+              className="flex-1 min-w-0 border border-[#e5e5e5] rounded-xl px-2.5 py-1.5 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer"
+            >
+              <option value="">Seleccionar club…</option>
+              {availableClubs.map((club) => (
+                <option key={club.id} value={club.id}>
+                  {club.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={addRole}
+              onChange={(e) => setAddRole(e.target.value)}
+              className="border border-[#e5e5e5] rounded-xl px-2.5 py-1.5 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer"
+            >
+              {CLUB_ROLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {addError && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 border border-red-100">
+              {addError}
+            </p>
+          )}
+          <button
+            onClick={() => void handleAdd()}
+            disabled={addLoading || !addClubId}
+            className="flex items-center justify-center gap-1.5 w-full border border-[#e5e5e5] rounded-full py-2 text-[11px] font-bold text-[#0a0a0a] hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          >
+            {addLoading ? (
+              "Agregando…"
+            ) : (
+              <>
+                <UserPlus className="size-3.5" />
+                Agregar membresía
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
+      {availableClubs.length === 0 && !loadingFetch && memberships.length > 0 && (
+        <p className="text-[11px] text-zinc-400 italic">
+          Usuario asignado a todos los clubes disponibles
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ── user detail slide-over ────────────────────────────────────────────────────
 
 interface SuspendTarget {
@@ -124,16 +367,25 @@ interface DeleteTarget {
 
 interface UserDetailPanelProps {
   user: UserAdmin
+  clubs: ClubAdmin[]
   onClose: () => void
   onSuspendRequest: (target: SuspendTarget) => void
   onDeleteRequest: (target: DeleteTarget) => void
+  onMembershipChange: () => void
 }
 
-function UserDetailPanel({ user, onClose, onSuspendRequest, onDeleteRequest }: UserDetailPanelProps) {
-  const name        = displayName(user)
-  const suspended   = isSuspended(user)
+function UserDetailPanel({
+  user,
+  clubs,
+  onClose,
+  onSuspendRequest,
+  onDeleteRequest,
+  onMembershipChange,
+}: UserDetailPanelProps) {
+  const name         = displayName(user)
+  const suspended    = isSuspended(user)
   const userInitials = initials(name)
-  const role = (user.global_role as AppRole) ?? "user"
+  const role         = (user.global_role as AppRole) ?? "user"
 
   return (
     <>
@@ -190,9 +442,9 @@ function UserDetailPanel({ user, onClose, onSuspendRequest, onDeleteRequest }: U
             </div>
           )}
 
-          {/* Fields */}
+          {/* Profile fields */}
           <div className="flex flex-col gap-3">
-            <FieldRow label="Rol" value={<RoleBadge role={role} size="sm" />} />
+            <FieldRow label="Rol global" value={<RoleBadge role={role} size="sm" />} />
             <FieldRow label="Ciudad" value={user.city ?? "—"} />
             <FieldRow label="Provincia" value={user.province ?? "—"} />
             <FieldRow label="Miembro desde" value={formatDate(user.created_at)} />
@@ -203,6 +455,16 @@ function UserDetailPanel({ user, onClose, onSuspendRequest, onDeleteRequest }: U
               <FieldRow label="Partidos jugados" value={String(user.matches_played)} />
             )}
           </div>
+
+          {/* Divider */}
+          <div className="border-t border-[#f0f0f0]" />
+
+          {/* Club memberships */}
+          <MembershipsSection
+            userId={user.id}
+            clubs={clubs}
+            onMembershipChange={onMembershipChange}
+          />
         </div>
 
         {/* Footer — suspend / reactivate / delete */}
@@ -260,9 +522,10 @@ function FieldRow({
 
 interface AdminUsersViewProps {
   users: UserAdmin[]
+  clubs: ClubAdmin[]
 }
 
-export function AdminUsersView({ users }: AdminUsersViewProps) {
+export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
@@ -302,7 +565,7 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
   })
 
   async function handleRoleChange(userId: string, newRole: string) {
-    if (!(VALID_ROLES as string[]).includes(newRole)) return
+    if (!(VALID_GLOBAL_ROLES as string[]).includes(newRole)) return
     setChangingRole((prev) => ({ ...prev, [userId]: true }))
     setRoleError(null)
     try {
@@ -456,16 +719,16 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
     },
     {
       key: "actions",
-      header: "Acciones",
+      header: "Rol global",
       render: (user) => (
         <select
           value={user.global_role}
           disabled={changingRole[user.id]}
-          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+          onChange={(e) => void handleRoleChange(user.id, e.target.value)}
           className="border border-[#e5e5e5] rounded-lg px-2 py-1 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer disabled:opacity-50"
           onClick={(e) => e.stopPropagation()}
         >
-          {ROLE_OPTIONS.map((opt) => (
+          {GLOBAL_ROLE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -483,7 +746,7 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
           {
             key: "role",
             label: "Todos los roles",
-            options: ROLE_OPTIONS,
+            options: FILTER_ROLE_OPTIONS,
           },
         ]}
         values={filters}
@@ -507,9 +770,11 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
       {selectedUser && (
         <UserDetailPanel
           user={selectedUser}
+          clubs={clubs}
           onClose={() => setSelectedUser(null)}
           onSuspendRequest={handleSuspendRequest}
           onDeleteRequest={(target) => { setDeleteError(null); setDeleteTarget(target) }}
+          onMembershipChange={() => startTransition(() => router.refresh())}
         />
       )}
 
@@ -527,7 +792,7 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
               ? "bg-red-600 hover:bg-red-700"
               : "bg-[#0a0a0a] hover:bg-zinc-800"
           }
-          onConfirm={confirmSuspendAction}
+          onConfirm={() => void confirmSuspendAction()}
           onCancel={() => {
             if (!suspendLoading) setSuspendTarget(null)
           }}
@@ -542,7 +807,7 @@ export function AdminUsersView({ users }: AdminUsersViewProps) {
           message={`¿Eliminar permanentemente la cuenta de "${deleteTarget.userName}"? Esta acción no se puede deshacer y borrará todos sus datos.`}
           confirmLabel="Eliminar permanentemente"
           confirmClass="bg-red-600 hover:bg-red-700"
-          onConfirm={confirmDelete}
+          onConfirm={() => void confirmDelete()}
           onCancel={() => {
             if (!deleteLoading) setDeleteTarget(null)
           }}
