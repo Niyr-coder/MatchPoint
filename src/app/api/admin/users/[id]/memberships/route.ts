@@ -93,20 +93,25 @@ export async function POST(
       )
     }
 
-    const { error: upsertError } = await supabase
+    // Deactivate any existing membership for this user+club (role may differ)
+    await supabase
       .from("club_members")
-      .upsert(
-        {
-          user_id: id,
-          club_id: clubId,
-          role,
-          is_active: true,
-          joined_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,club_id" }
-      )
+      .update({ is_active: false })
+      .eq("user_id", id)
+      .eq("club_id", clubId)
 
-    if (upsertError) throw new Error(upsertError.message)
+    // Insert new active membership
+    const { error: insertError } = await supabase
+      .from("club_members")
+      .insert({
+        user_id: id,
+        club_id: clubId,
+        role,
+        is_active: true,
+        joined_at: new Date().toISOString(),
+      })
+
+    if (insertError) throw new Error(insertError.message)
 
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {
