@@ -15,7 +15,7 @@ interface Notification {
   type: NotificationType
   title: string
   body: string
-  is_read: boolean
+  read: boolean
   created_at: string
 }
 
@@ -49,7 +49,7 @@ export function NotificationsBell() {
   const [isLoading, setIsLoading] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -89,7 +89,7 @@ export function NotificationsBell() {
         body: JSON.stringify({ all: true }),
       })
       if (res.ok) {
-        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
       }
     } catch {
       // Silently ignore
@@ -157,13 +157,13 @@ export function NotificationsBell() {
                     key={n.id}
                     className={cn(
                       "flex items-start gap-3 px-4 py-3 border-b border-[#f7f7f7] last:border-0 transition-colors",
-                      !n.is_read ? "bg-blue-50/50" : "hover:bg-[#f9f9f9]"
+                      !n.read ? "bg-blue-50/50" : "hover:bg-[#f9f9f9]"
                     )}
                   >
                     <div
                       className={cn(
                         "size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-                        !n.is_read ? "bg-white border border-[#e5e5e5]" : "bg-zinc-100"
+                        !n.read ? "bg-white border border-[#e5e5e5]" : "bg-zinc-100"
                       )}
                     >
                       <Icon className={cn("size-4", colorClass)} />
@@ -171,7 +171,7 @@ export function NotificationsBell() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-xs font-bold text-[#0a0a0a] leading-snug">{n.title}</p>
-                        {!n.is_read && (
+                        {!n.read && (
                           <span className="size-2 rounded-full bg-blue-500 shrink-0 mt-1" />
                         )}
                       </div>
