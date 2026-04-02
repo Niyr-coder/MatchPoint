@@ -22,7 +22,7 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className={`flex h-screen overflow-hidden relative ${darkMode ? "bg-zinc-950" : "bg-[#f4f4f5]"}`}>
+    <div className={`flex h-screen overflow-hidden relative ${darkMode ? "bg-zinc-950" : "bg-slate-100"}`}>
       {/* Subtle brand gradient (light mode only) */}
       {!darkMode && (
         <div

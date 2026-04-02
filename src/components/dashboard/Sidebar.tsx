@@ -12,17 +12,18 @@ interface SidebarProps {
 
 export function Sidebar({ sections, profile, currentRole, clubName }: SidebarProps) {
   return (
-    <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-zinc-950 border-r border-zinc-800 h-screen sticky top-0">
+    <aside className="hidden lg:flex flex-col w-64 shrink-0 m-3 rounded-2xl bg-white overflow-hidden"
+      style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
       {/* Logo */}
-      <div className="px-4 py-4 border-b border-zinc-800">
-        <div className="flex items-center gap-2.5">
-          <div className="size-7 rounded bg-green-600 flex items-center justify-center shrink-0">
+      <div className="px-4 py-4 border-b border-slate-100">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="size-7 rounded-lg bg-green-600 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-black tracking-tighter">M</span>
           </div>
-          <p className="text-white font-black text-sm tracking-[-0.03em] uppercase">
+          <p className="text-[#1e293b] font-black text-sm tracking-[-0.03em] uppercase">
             MATCHPOINT
           </p>
-        </div>
+        </Link>
         {clubName && (
           <p className="mt-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-green-600 truncate pl-[1.875rem]">
             {clubName}
@@ -35,7 +36,7 @@ export function Sidebar({ sections, profile, currentRole, clubName }: SidebarPro
         {sections.map((section, i) => (
           <div key={i}>
             {section.title && (
-              <p className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-green-600">
+              <p className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
                 {section.title}
               </p>
             )}

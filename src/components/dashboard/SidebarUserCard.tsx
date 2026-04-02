@@ -19,23 +19,23 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
     || "Usuario"
 
   return (
-    <div className="border-t border-zinc-800 p-3 space-y-2">
+    <div className="border-t border-slate-100 p-3 space-y-2">
       <div className="flex items-center gap-3">
         <Avatar className="size-8 shrink-0">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-          <AvatarFallback className="bg-green-900 text-green-100 text-xs font-bold">
+          <AvatarFallback className="bg-green-100 text-green-700 text-xs font-bold">
             {initials || "U"}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate">{displayName}</p>
+          <p className="text-sm font-semibold text-[#1e293b] truncate">{displayName}</p>
           <RoleBadge role={currentRole} size="sm" className="mt-0.5" />
         </div>
       </div>
       <form action="/auth/signout" method="POST">
         <button
           type="submit"
-          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
         >
           <LogOut className="size-3.5" />
           Cerrar sesión
