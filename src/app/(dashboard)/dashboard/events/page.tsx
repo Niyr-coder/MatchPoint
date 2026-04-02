@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { getAllEvents } from "@/lib/events/queries"
 import { Calendar, MapPin } from "lucide-react"
@@ -53,11 +54,15 @@ export default async function EventsPage() {
             >
               {/* Image or placeholder */}
               {event.image_url ? (
-                <img
-                  src={event.image_url}
-                  alt={event.title}
-                  className="w-full h-40 object-cover"
-                />
+                <div className="relative w-full h-40">
+                  <Image
+                    src={event.image_url}
+                    alt={event.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
               ) : (
                 <div
                   className="w-full h-40 flex items-center justify-center"

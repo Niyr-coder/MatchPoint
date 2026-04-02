@@ -58,7 +58,7 @@ export function ChatView({ userId }: ChatViewProps) {
     fetch("/api/messages")
       .then((r) => r.json())
       .then((d: { conversations?: Conversation[] }) => setConversations(d.conversations ?? []))
-      .catch(() => {})
+      .catch(() => setConversations([]))
   }
 
   useEffect(() => {
@@ -91,7 +91,8 @@ export function ChatView({ userId }: ChatViewProps) {
         .then((d: { messages?: Message[] }) => setMessages(d.messages ?? []))
         .catch((err: unknown) => {
           if (!(err instanceof Error && err.name === "AbortError")) {
-            // ignore fetch errors silently
+            setSendError("Error al cargar mensajes. Intenta de nuevo.")
+            setTimeout(() => setSendError(null), 4000)
           }
         })
     }

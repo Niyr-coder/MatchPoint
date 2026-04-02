@@ -161,7 +161,7 @@ export default function CreateTournamentPage() {
           setClubs(d.clubs)
         }
       })
-      .catch(() => {})
+      .catch(() => setError("No se pudieron cargar los clubes. Recarga la página."))
   }, [])
 
   const canProceedStep1 = form.name.trim().length >= 3
