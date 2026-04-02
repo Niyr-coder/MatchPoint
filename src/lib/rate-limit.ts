@@ -92,7 +92,9 @@ export function getClientIp(request: Request): string {
 // ---------------------------------------------------------------------------
 
 export const RATE_LIMITS = {
-  waitlist:   { limit: 5,  windowMs: 60_000 } satisfies RateLimitConfig,
-  shopOrders: { limit: 10, windowMs: 60_000 } satisfies RateLimitConfig,
-  messages:   { limit: 30, windowMs: 60_000 } satisfies RateLimitConfig,
+  waitlist:       { limit: 5,  windowMs:    60_000 } satisfies RateLimitConfig,
+  shopOrders:     { limit: 10, windowMs:    60_000 } satisfies RateLimitConfig,
+  messages:       { limit: 30, windowMs:    60_000 } satisfies RateLimitConfig,
+  invitesCreate:  { limit: 20, windowMs: 3_600_000 } satisfies RateLimitConfig,
+  invitesRedeem:  { limit: 10, windowMs: 3_600_000 } satisfies RateLimitConfig,
 } as const

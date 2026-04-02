@@ -16,7 +16,13 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                maxAge: 60 * 60 * 24 * 365,
+                ...(process.env.COOKIE_DOMAIN
+                  ? { domain: process.env.COOKIE_DOMAIN }
+                  : {}),
+              })
             )
           } catch {
             // Server Component — cookies are read-only

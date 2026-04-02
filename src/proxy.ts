@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
 // Routes that never require auth
-const PUBLIC_PATHS = ["/", "/login", "/onboarding"]
+const PUBLIC_PATHS = ["/", "/login", "/onboarding", "/invite"]
 const PUBLIC_PREFIXES = [
   "/api/waitlist",
   "/api/auth",
@@ -38,7 +38,13 @@ export async function proxy(request: NextRequest) {
           // Step 2: recreate response with updated request, then forward cookies
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              maxAge: 60 * 60 * 24 * 365,
+              ...(process.env.COOKIE_DOMAIN
+                ? { domain: process.env.COOKIE_DOMAIN }
+                : {}),
+            })
           )
         },
       },
