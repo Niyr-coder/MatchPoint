@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Trophy } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import type { RankingEntry } from "@/lib/rankings/queries"
 
 const SPORTS = [
@@ -58,8 +59,9 @@ function Avatar({ entry }: { entry: RankingEntry }) {
 function TopThreeCard({ entry }: { entry: RankingEntry }) {
   const isFirst = entry.position === 1
   return (
-    <div
-      className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border ${
+    <Link
+      href={`/dashboard/players/${entry.userId}`}
+      className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border transition-shadow hover:shadow-md ${
         isFirst
           ? "bg-[#eff6ff] border-[#bfdbfe]"
           : "bg-white border-[#e5e5e5]"
@@ -111,14 +113,15 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
         <span>·</span>
         <span>{entry.losses}D</span>
       </div>
-    </div>
+    </Link>
   )
 }
 
 function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
   return (
-    <div
-      className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-[#f0f0f0] last:border-0"
+    <Link
+      href={`/dashboard/players/${entry.userId}`}
+      className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-[#f0f0f0] last:border-0 hover:bg-[#fafafa] transition-colors -mx-5 px-5"
       style={{ animationDelay: `${index * 0.02}s` }}
     >
       <span className="text-[11px] font-black text-zinc-400 w-6 text-right shrink-0">
@@ -136,7 +139,7 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
       <span className="text-[11px] font-black text-[#1a56db] shrink-0">
         {entry.score} pts
       </span>
-    </div>
+    </Link>
   )
 }
 
