@@ -3,15 +3,7 @@ import { RoleWelcomeBanner } from "@/components/dashboard/RoleWelcomeBanner"
 import { BentoCard } from "@/components/dashboard/BentoCard"
 import { createClient } from "@/lib/supabase/server"
 
-const WEEK_BARS = [
-  { day: "L", height: 40, reservations: 8 },
-  { day: "M", height: 65, reservations: 13 },
-  { day: "X", height: 50, reservations: 10 },
-  { day: "J", height: 80, reservations: 16 },
-  { day: "V", height: 90, reservations: 18 },
-  { day: "S", height: 100, reservations: 20 },
-  { day: "D", height: 55, reservations: 11 },
-]
+const DAY_LABELS = ["D", "L", "M", "X", "J", "V", "S"] as const
 
 export default async function OwnerDashboardPage({
   params,
@@ -22,9 +14,15 @@ export default async function OwnerDashboardPage({
   const ctx = await authorizeOrRedirect({ clubId, requiredRoles: ["owner"] })
 
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const now = new Date()
+  const today = now.toISOString().split("T")[0]
 
-  const [membersRes, courtsRes, reservationsTodayRes] = await Promise.all([
+  // Start of 7-day window (6 days back from today)
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() - 6)
+  weekStart.setHours(0, 0, 0, 0)
+
+  const [membersRes, courtsRes, reservationsTodayRes, weeklyRes] = await Promise.all([
     supabase
       .from("club_members")
       .select("id", { count: "exact", head: true })
@@ -42,7 +40,28 @@ export default async function OwnerDashboardPage({
       .gte("start_time", `${today}T00:00:00`)
       .lte("start_time", `${today}T23:59:59`)
       .neq("status", "cancelled"),
+    supabase
+      .from("reservations")
+      .select("start_time")
+      .eq("club_id", clubId)
+      .gte("start_time", weekStart.toISOString())
+      .neq("status", "cancelled"),
   ])
+
+  // Build week bars from real data
+  const countByDate = new Map<string, number>()
+  for (const r of weeklyRes.data ?? []) {
+    const d = r.start_time.split("T")[0]
+    countByDate.set(d, (countByDate.get(d) ?? 0) + 1)
+  }
+  const rawBars = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    const dateStr = d.toISOString().split("T")[0]
+    return { day: DAY_LABELS[d.getDay()], count: countByDate.get(dateStr) ?? 0 }
+  })
+  const maxCount = Math.max(...rawBars.map((b) => b.count), 1)
+  const weekBars = rawBars.map((b) => ({ ...b, height: Math.round((b.count / maxCount) * 100) }))
 
   const memberCount = membersRes.error ? "—" : String(membersRes.count ?? 0)
   const courtCount = courtsRes.error ? "—" : String(courtsRes.count ?? 0)
@@ -78,17 +97,17 @@ export default async function OwnerDashboardPage({
         >
           <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
             <div className="flex items-end justify-between gap-1.5 h-[80px]">
-              {WEEK_BARS.map((bar, i) => (
+              {weekBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
                     className="w-full rounded-t-sm bg-[#1e40af]"
-                    style={{ height: `${bar.height * 0.7}px`, opacity: i === 5 ? 1 : 0.45 + i * 0.08 }}
+                    style={{ height: `${bar.height * 0.7}px`, opacity: i === weekBars.length - 1 ? 1 : 0.3 + i * 0.1 }}
                   />
                 </div>
               ))}
             </div>
             <div className="flex items-end justify-between gap-1.5">
-              {WEEK_BARS.map((bar, i) => (
+              {weekBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center flex-1">
                   <span className="text-[9px] font-bold text-zinc-400 uppercase">{bar.day}</span>
                 </div>

@@ -3,14 +3,7 @@ import { RoleWelcomeBanner } from "@/components/dashboard/RoleWelcomeBanner"
 import { BentoCard } from "@/components/dashboard/BentoCard"
 import { createClient } from "@/lib/supabase/server"
 
-const ROI_BARS = [
-  { month: "Oct", value: 60 },
-  { month: "Nov", value: 75 },
-  { month: "Dic", value: 85 },
-  { month: "Ene", value: 70 },
-  { month: "Feb", value: 90 },
-  { month: "Mar", value: 100 },
-]
+const MONTH_LABELS_ES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"] as const
 
 export default async function PartnerDashboardPage({
   params,
@@ -21,8 +14,10 @@ export default async function PartnerDashboardPage({
   const ctx = await authorizeOrRedirect({ clubId, requiredRoles: ["partner"] })
 
   const supabase = await createClient()
+  const now = new Date()
+  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
 
-  const [tournamentsRes, membersRes] = await Promise.all([
+  const [tournamentsRes, membersRes, monthlyRes] = await Promise.all([
     supabase
       .from("tournaments")
       .select("id", { count: "exact", head: true })
@@ -32,7 +27,28 @@ export default async function PartnerDashboardPage({
       .select("id", { count: "exact", head: true })
       .eq("club_id", clubId)
       .eq("is_active", true),
+    supabase
+      .from("reservations")
+      .select("start_time")
+      .eq("club_id", clubId)
+      .gte("start_time", sixMonthsAgo.toISOString())
+      .neq("status", "cancelled"),
   ])
+
+  // Build 6-month activity bars
+  const countByMonth = new Map<string, number>()
+  for (const r of monthlyRes.data ?? []) {
+    const d = new Date(r.start_time)
+    const key = `${d.getFullYear()}-${d.getMonth()}`
+    countByMonth.set(key, (countByMonth.get(key) ?? 0) + 1)
+  }
+  const rawMonthBars = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1)
+    const key = `${d.getFullYear()}-${d.getMonth()}`
+    return { month: MONTH_LABELS_ES[d.getMonth()], count: countByMonth.get(key) ?? 0 }
+  })
+  const maxMonth = Math.max(...rawMonthBars.map((b) => b.count), 1)
+  const activityBars = rawMonthBars.map((b) => ({ ...b, value: Math.round((b.count / maxMonth) * 100) }))
 
   const tournamentCount = tournamentsRes.error ? "—" : String(tournamentsRes.count ?? 0)
   const teamCount = membersRes.error ? "—" : String(membersRes.count ?? 0)
@@ -103,40 +119,36 @@ export default async function PartnerDashboardPage({
           </div>
         </BentoCard>
 
-        {/* ROI placeholder chart */}
+        {/* Monthly activity chart — real reservation data */}
         <BentoCard
           variant="default"
           icon="BarChart3"
-          label="ROI de inversión"
-          title="Retorno histórico"
-          subtitle="Últimos 6 meses (referencia)"
+          label="Actividad mensual"
+          title="Reservas por mes"
+          subtitle="Últimos 6 meses del club"
           index={2}
         >
           <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
             <div className="flex items-end justify-between gap-1.5 h-[60px]">
-              {ROI_BARS.map((bar, i) => (
+              {activityBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className="w-full rounded-t-sm"
+                    className="w-full rounded-t-sm bg-[#0d9488]"
                     style={{
                       height: `${bar.value * 0.55}px`,
-                      backgroundColor: i === ROI_BARS.length - 1 ? "#0d9488" : "#0d9488",
-                      opacity: i === ROI_BARS.length - 1 ? 1 : 0.3 + i * 0.12,
+                      opacity: i === activityBars.length - 1 ? 1 : 0.3 + i * 0.12,
                     }}
                   />
                 </div>
               ))}
             </div>
             <div className="flex items-end justify-between gap-1.5">
-              {ROI_BARS.map((bar, i) => (
+              {activityBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center flex-1">
                   <span className="text-[8px] font-bold text-zinc-400 uppercase">{bar.month}</span>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-zinc-300 font-bold uppercase tracking-widest">
-              Datos reales próximamente
-            </p>
           </div>
         </BentoCard>
 
