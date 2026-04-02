@@ -151,7 +151,7 @@ export default async function OwnerReportsPage({
                 return (
                   <div key={i} className="flex flex-col items-center gap-1 flex-1">
                     <div
-                      className="w-full rounded-t-sm bg-[#1e40af]"
+                      className="w-full rounded-t-sm bg-[#16a34a]"
                       style={{
                         height: `${Math.max(heightPct * 0.8, 4)}px`,
                         opacity: count > 0 ? 0.5 + (count / maxDayCount) * 0.5 : 0.15,
@@ -204,7 +204,7 @@ export default async function OwnerReportsPage({
                     </div>
                     <div className="h-1.5 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#1e40af]"
+                        className="h-full rounded-full bg-[#16a34a]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { SPORTS } from "@/lib/constants"
 import type { SportCategory } from "@/types"
@@ -11,10 +12,11 @@ function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
       style={{ animationDelay: `${index * 0.07}s` }}
     >
       {/* Background Image */}
-      <img
+      <Image
         src={sport.image}
         alt={sport.name}
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-80"
+        fill
+        className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-80"
       />
 
       {/* Gradient Overlay */}

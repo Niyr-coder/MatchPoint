@@ -107,7 +107,7 @@ export default async function CoachClassesPage({
             </div>
             <div className="flex flex-col items-end gap-1">
               <span className="text-xs font-black text-[#d97706] bg-amber-50 px-2 py-0.5 rounded-full">
-                Coach
+                Entrenador
               </span>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default async function CoachClassesPage({
                 estudiantes activos
               </p>
             </div>
-            <span className="text-xs font-black text-[#d97706] bg-amber-50 px-2 py-0.5 rounded-full">Coach</span>
+            <span className="text-xs font-black text-[#d97706] bg-amber-50 px-2 py-0.5 rounded-full">Entrenador</span>
           </div>
         </BentoCard>
       </div>

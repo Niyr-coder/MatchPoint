@@ -58,13 +58,13 @@ export default async function OwnerCoachesPage({
       .order("joined_at", { ascending: false }),
     supabase
       .from("coach_students")
-      .select("coach_id")
+      .select("coach_user_id")
       .eq("club_id", clubId),
   ])
 
   const studentCountMap = new Map<string, number>()
   for (const row of (studentsResult.data ?? [])) {
-    const key = (row as { coach_id: string }).coach_id
+    const key = (row as { coach_user_id: string }).coach_user_id
     studentCountMap.set(key, (studentCountMap.get(key) ?? 0) + 1)
   }
 

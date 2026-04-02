@@ -20,17 +20,21 @@ export default async function EmployeeReservationsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader label="Operaciones" title="Reservas de Hoy" />
+      <PageHeader
+        label="Empleado · Operaciones"
+        title="Reservas de Hoy"
+        description="Gestiona los check-ins y el estado de las reservas del día"
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          label="Total"
+          label="Total Hoy"
           value={todayReservations.length}
           icon={Calendar}
           variant="default"
         />
         <StatCard
-          label="Pendientes Check-in"
+          label="Pendientes"
           value={pending}
           icon={Clock}
           variant="warning"
