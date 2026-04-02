@@ -19,25 +19,36 @@ function isPublic(pathname: string): boolean {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (isPublic(pathname)) return NextResponse.next()
+  // Always run through Supabase cookie management so the PKCE code verifier
+  // and session tokens are forwarded correctly on every request — including
+  // public paths like /api/auth/callback.
+  let supabaseResponse = NextResponse.next({ request })
 
-  // Fast session check at edge — full 6-layer auth happens inside route handlers
-  const response = NextResponse.next()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (toSet) =>
-          toSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          ),
+        setAll(cookiesToSet) {
+          // Step 1: update request cookies so subsequent reads are consistent
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          // Step 2: recreate response with updated request, then forward cookies
+          supabaseResponse = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
       },
     }
   )
 
+  // Refresh session — mandatory for PKCE flow; do not remove.
   const { data: { user } } = await supabase.auth.getUser()
+
+  if (isPublic(pathname)) return supabaseResponse
 
   if (!user) {
     const loginUrl = new URL("/login", request.url)
@@ -45,10 +56,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  return response
+  return supabaseResponse
 }
 
-export const config = {
+export const proxyConfig = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|images/).*)",
   ],
