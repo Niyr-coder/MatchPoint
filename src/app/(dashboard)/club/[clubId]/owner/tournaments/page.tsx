@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
+import { InviteTogglePanel } from "@/components/invites/InviteTogglePanel"
 import { Trophy, Users, CheckCircle } from "lucide-react"
 
 interface Tournament {
@@ -103,32 +104,45 @@ export default async function OwnerTournamentsPage({
         />
       ) : (
         <div className="flex flex-col gap-3">
-          {tournaments.map((t) => (
-            <div
-              key={t.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-            >
-              <div className="flex flex-col gap-1">
-                <p className="text-sm font-black text-[#0a0a0a]">{t.name}</p>
-                <p className="text-[11px] text-zinc-500">
-                  {SPORT_LABELS[t.sport] ?? t.sport}
-                  {t.start_date && (
-                    <> · {new Date(t.start_date).toLocaleDateString("es-EC", { dateStyle: "medium" })}</>
-                  )}
-                </p>
+          {tournaments.map((t) => {
+            const isTerminal = t.status === "cancelled" || t.status === "completed"
+            return (
+              <div
+                key={t.id}
+                className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-black text-[#0a0a0a]">{t.name}</p>
+                    <p className="text-[11px] text-zinc-500">
+                      {SPORT_LABELS[t.sport] ?? t.sport}
+                      {t.start_date && (
+                        <> · {new Date(t.start_date).toLocaleDateString("es-EC", { dateStyle: "medium" })}</>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1 text-[11px] text-zinc-500">
+                      <Users className="size-3" />
+                      {t.participant_count} participantes
+                    </span>
+                    <StatusBadge
+                      label={STATUS_LABEL[t.status] ?? t.status}
+                      variant={STATUS_VARIANT[t.status] ?? "neutral"}
+                    />
+                  </div>
+                </div>
+
+                {!isTerminal && (
+                  <InviteTogglePanel
+                    entityType="tournament"
+                    entityId={t.id}
+                    label="Generar link de invitación al torneo"
+                  />
+                )}
               </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1 text-[11px] text-zinc-500">
-                  <Users className="size-3" />
-                  {t.participant_count} participantes
-                </span>
-                <StatusBadge
-                  label={STATUS_LABEL[t.status] ?? t.status}
-                  variant={STATUS_VARIANT[t.status] ?? "neutral"}
-                />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

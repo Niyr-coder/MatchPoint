@@ -3,6 +3,7 @@ import { getClubTeam } from "@/lib/team/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { TeamManager } from "@/components/team/TeamManager"
+import { InviteTogglePanel } from "@/components/invites/InviteTogglePanel"
 import { Users } from "lucide-react"
 
 export default async function TeamPage({
@@ -53,6 +54,22 @@ export default async function TeamPage({
 
       {/* Interactive team manager */}
       <TeamManager clubId={clubId} initialMembers={members} />
+
+      {/* Invite to club */}
+      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">
+            Invitaciones
+          </p>
+          <h3 className="text-sm font-black text-[#0a0a0a] mt-0.5">
+            Invitar nuevos miembros al equipo
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1">
+            Comparte este link para que managers, coaches o empleados se unan al club.
+          </p>
+        </div>
+        <InviteTogglePanel entityType="club" entityId={clubId} label="Generar link de invitación al equipo" />
+      </div>
     </div>
   )
 }
