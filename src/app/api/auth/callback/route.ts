@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
-    return NextResponse.redirect(`${origin}/login?error=exchange_failed`)
+    const reason = encodeURIComponent(error.message ?? error.code ?? "unknown")
+    return NextResponse.redirect(`${origin}/login?error=exchange_failed&reason=${reason}`)
   }
 
   const {
