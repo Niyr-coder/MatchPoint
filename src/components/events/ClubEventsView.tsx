@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Pencil, Eye, EyeOff, XCircle, Users } from "lucide-react"
+import { Plus, Pencil, Eye, EyeOff, XCircle, Users, Link2 } from "lucide-react"
 import { StatCard } from "@/components/shared/StatCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { EventFormModal, EMPTY_EVENT_FORM } from "@/components/events/EventForm"
+import { InviteLinkGenerator } from "@/components/invites/InviteLinkGenerator"
 import { EVENT_TYPE_CONFIG, EVENT_STATUS_CONFIG } from "@/lib/events/constants"
 import { CalendarDays, CheckCircle } from "lucide-react"
 import type { EventWithClub, EventType, EventStatus } from "@/lib/events/types"
@@ -143,6 +144,8 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
 
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  const [inviteOpenId, setInviteOpenId] = useState<string | null>(null)
 
   // Stats
   const total     = events.length
@@ -346,8 +349,8 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
               const isActioning = actionLoading === event.id
 
               return (
+                <div key={event.id} className="flex flex-col">
                 <div
-                  key={event.id}
                   className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-zinc-50 transition-colors"
                 >
                   {/* Title */}
@@ -399,6 +402,20 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                       <Users className="size-3.5" />
                     </button>
 
+                    {event.status === "published" && (
+                      <button
+                        onClick={() => setInviteOpenId(inviteOpenId === event.id ? null : event.id)}
+                        title="Generar link de invitación"
+                        className={`size-7 flex items-center justify-center rounded-lg transition-colors ${
+                          inviteOpenId === event.id
+                            ? "bg-[#16a34a] text-white"
+                            : "hover:bg-zinc-100 text-zinc-400 hover:text-[#16a34a]"
+                        }`}
+                      >
+                        <Link2 className="size-3.5" />
+                      </button>
+                    )}
+
                     {!isTerminal && (
                       <button
                         onClick={() => openEdit(event)}
@@ -438,6 +455,23 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                       <span className="text-[10px] text-zinc-300 font-bold uppercase px-1">—</span>
                     )}
                   </div>
+                </div>
+
+                {/* Inline invite panel */}
+                {inviteOpenId === event.id && (
+                  <div className="px-5 pb-4 border-t border-[#f0f0f0]">
+                    <div className="rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4 mt-3">
+                      <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 mb-3">
+                        Link de invitación — {event.title}
+                      </p>
+                      <InviteLinkGenerator
+                        entityType="event"
+                        entityId={event.id}
+                        label="Generar link de invitación al evento"
+                      />
+                    </div>
+                  </div>
+                )}
                 </div>
               )
             })}

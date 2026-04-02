@@ -2,6 +2,7 @@ import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { ClubSettingsForm } from "@/components/club/ClubSettingsForm"
+import { InviteLinkGenerator } from "@/components/invites/InviteLinkGenerator"
 import type { Club } from "@/types"
 
 export default async function SettingsPage({
@@ -32,6 +33,22 @@ export default async function SettingsPage({
     <div className="flex flex-col gap-6">
       <PageHeader label="Configuración" title="Ajustes del Club" />
       <ClubSettingsForm club={club as Club} clubId={clubId} />
+
+      {/* Invite link section */}
+      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">
+            Invitaciones
+          </p>
+          <h3 className="text-sm font-black text-[#0a0a0a] mt-0.5">
+            Link de invitación al club
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1">
+            Comparte este link para que usuarios se unan directamente a tu club.
+          </p>
+        </div>
+        <InviteLinkGenerator entityType="club" entityId={clubId} />
+      </div>
     </div>
   )
 }
