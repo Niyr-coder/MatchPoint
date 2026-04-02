@@ -2,11 +2,14 @@
 
 import { useState, useTransition, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { X, ShieldOff, ShieldCheck, UserPlus, Trash2, Building2, BadgeCheck, Plus } from "lucide-react"
+import { X, ShieldOff, ShieldCheck, UserPlus, Trash2, Building2, BadgeCheck, Plus, Loader2 } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { RoleBadge } from "@/components/shared/RoleBadge"
+import { ConfirmDialog as SharedConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { CreateUserModal } from "@/components/admin/CreateUserModal"
+import { useBulkSelection } from "@/hooks/useBulkSelection"
+import { UserBulkBar } from "@/components/admin/UserBulkBar"
 import { ROLE_LABELS } from "@/lib/roles"
 import type { Column } from "@/components/shared/DataTable"
 import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
@@ -690,6 +693,11 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  // Bulk actions
+  const [bulkLoading, setBulkLoading] = useState(false)
+  const [bulkError, setBulkError] = useState<string | null>(null)
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
+
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
@@ -704,6 +712,41 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
     const matchRole = !filters.role || user.global_role === filters.role
     return matchSearch && matchRole
   })
+
+  const filteredIds = filtered.map((u) => u.id)
+  const bulk = useBulkSelection(filteredIds)
+
+  async function executeBulkAction(action: "suspend" | "unsuspend" | "delete") {
+    if (bulk.selectedCount === 0) return
+    setBulkLoading(true)
+    setBulkError(null)
+    try {
+      const res = await fetch("/api/admin/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          entity_type: "user",
+          ids: Array.from(bulk.selectedIds),
+        }),
+      })
+      const json = (await res.json()) as {
+        success: boolean
+        data: { success_count: number; failed_ids: string[] } | null
+        error: string | null
+      }
+      if (!json.success) {
+        setBulkError(json.error ?? "Error al ejecutar la operación masiva")
+        return
+      }
+      bulk.clearSelection()
+      startTransition(() => router.refresh())
+    } catch {
+      setBulkError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setBulkLoading(false)
+    }
+  }
 
   async function handleRoleChange(userId: string, newRole: string) {
     if (!(VALID_GLOBAL_ROLES as string[]).includes(newRole)) return
@@ -786,6 +829,21 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
   }
 
   const columns: Column<UserAdmin>[] = [
+    {
+      key: "checkbox",
+      header: "",
+      render: (user) => (
+        <input
+          type="checkbox"
+          checked={bulk.selectedIds.has(user.id)}
+          onChange={() => bulk.toggleOne(user.id)}
+          onClick={(e) => e.stopPropagation()}
+          className="size-4 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+          aria-label={`Seleccionar ${displayName(user)}`}
+        />
+      ),
+      className: "w-8 shrink-0",
+    },
     {
       key: "full_name",
       header: "Nombre",
@@ -912,6 +970,43 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
         </button>
       </div>
 
+      {/* Select-all row */}
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1">
+          <input
+            type="checkbox"
+            checked={bulk.isAllSelected}
+            ref={(el) => {
+              if (el) el.indeterminate = bulk.isIndeterminate
+            }}
+            onChange={() => bulk.toggleAll(filteredIds)}
+            className="size-4 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+            aria-label="Seleccionar todos"
+          />
+          <span className="text-[11px] text-zinc-400 font-semibold">
+            Seleccionar todos ({filtered.length})
+          </span>
+        </div>
+      )}
+
+      {/* Bulk action bar */}
+      {bulk.selectedCount > 0 && (
+        <UserBulkBar
+          count={bulk.selectedCount}
+          loading={bulkLoading}
+          onSuspend={() => void executeBulkAction("suspend")}
+          onUnsuspend={() => void executeBulkAction("unsuspend")}
+          onDelete={() => setShowBulkDeleteConfirm(true)}
+          onClear={bulk.clearSelection}
+        />
+      )}
+
+      {bulkError && (
+        <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          {bulkError}
+        </div>
+      )}
+
       <DataTable
         columns={columns}
         data={filtered}
@@ -983,6 +1078,23 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
           error={deleteError}
         />
       )}
+
+      {/* Bulk delete confirm dialog */}
+      <SharedConfirmDialog
+        open={showBulkDeleteConfirm}
+        onOpenChange={(open) => {
+          if (!open && !bulkLoading) setShowBulkDeleteConfirm(false)
+        }}
+        title="¿Eliminar usuarios seleccionados?"
+        description={`Esta acción eliminará permanentemente ${bulk.selectedCount} ${bulk.selectedCount === 1 ? "usuario" : "usuarios"}. No se puede deshacer.`}
+        confirmLabel="Eliminar todos"
+        variant="danger"
+        loading={bulkLoading}
+        onConfirm={async () => {
+          await executeBulkAction("delete")
+          setShowBulkDeleteConfirm(false)
+        }}
+      />
     </div>
   )
 }

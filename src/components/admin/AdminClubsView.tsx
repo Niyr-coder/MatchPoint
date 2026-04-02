@@ -7,6 +7,8 @@ import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { useBulkSelection } from "@/hooks/useBulkSelection"
+import { ClubBulkBar } from "@/components/admin/ClubBulkBar"
 import { ECUADOR_PROVINCES } from "@/lib/constants"
 import type { Column } from "@/components/shared/DataTable"
 import type { ClubAdmin } from "@/lib/admin/queries"
@@ -295,6 +297,10 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
+  // Bulk actions
+  const [bulkLoading, setBulkLoading] = useState(false)
+  const [bulkError, setBulkError] = useState<string | null>(null)
+
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
@@ -313,6 +319,41 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
     const matchProvince = !filters.province || club.province === filters.province
     return matchSearch && matchProvince
   })
+
+  const filteredIds = filtered.map((c) => c.id)
+  const bulk = useBulkSelection(filteredIds)
+
+  async function executeBulkAction(action: "activate" | "deactivate") {
+    if (bulk.selectedCount === 0) return
+    setBulkLoading(true)
+    setBulkError(null)
+    try {
+      const res = await fetch("/api/admin/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          entity_type: "club",
+          ids: Array.from(bulk.selectedIds),
+        }),
+      })
+      const json = (await res.json()) as {
+        success: boolean
+        data: { success_count: number; failed_ids: string[] } | null
+        error: string | null
+      }
+      if (!json.success) {
+        setBulkError(json.error ?? "Error al ejecutar la operación masiva")
+        return
+      }
+      bulk.clearSelection()
+      startTransition(() => router.refresh())
+    } catch {
+      setBulkError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setBulkLoading(false)
+    }
+  }
 
   // ── Toggle active/inactive ─────────────────────────────────────────────────
 
@@ -429,6 +470,21 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
   // ── Columns ───────────────────────────────────────────────────────────────
 
   const columns: Column<ClubAdmin>[] = [
+    {
+      key: "checkbox",
+      header: "",
+      render: (club) => (
+        <input
+          type="checkbox"
+          checked={bulk.selectedIds.has(club.id)}
+          onChange={() => bulk.toggleOne(club.id)}
+          onClick={(e) => e.stopPropagation()}
+          className="size-4 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+          aria-label={`Seleccionar ${club.name}`}
+        />
+      ),
+      className: "w-8 shrink-0",
+    },
     {
       key: "name",
       header: "Nombre",
@@ -550,6 +606,42 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
           Crear club
         </button>
       </div>
+
+      {/* Select-all row */}
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1">
+          <input
+            type="checkbox"
+            checked={bulk.isAllSelected}
+            ref={(el) => {
+              if (el) el.indeterminate = bulk.isIndeterminate
+            }}
+            onChange={() => bulk.toggleAll(filteredIds)}
+            className="size-4 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+            aria-label="Seleccionar todos los clubs"
+          />
+          <span className="text-[11px] text-zinc-400 font-semibold">
+            Seleccionar todos ({filtered.length})
+          </span>
+        </div>
+      )}
+
+      {/* Bulk action bar */}
+      {bulk.selectedCount > 0 && (
+        <ClubBulkBar
+          count={bulk.selectedCount}
+          loading={bulkLoading}
+          onActivate={() => void executeBulkAction("activate")}
+          onDeactivate={() => void executeBulkAction("deactivate")}
+          onClear={bulk.clearSelection}
+        />
+      )}
+
+      {bulkError && (
+        <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          {bulkError}
+        </div>
+      )}
 
       <DataTable
         columns={columns}

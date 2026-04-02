@@ -17,6 +17,7 @@ export function getAdminNav(): NavSection[] {
         { label: "Chat", href: "/admin/chat", icon: "MessageSquare" },
         { label: "Shop", href: "/admin/shop", icon: "ShoppingBag" },
         { label: "Configuración", href: "/admin/settings", icon: "Settings" },
+        { label: "Auditoría", href: "/admin/audit", icon: "Shield" },
       ],
     },
   ]
