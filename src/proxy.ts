@@ -41,9 +41,6 @@ export async function proxy(request: NextRequest) {
             supabaseResponse.cookies.set(name, value, {
               ...options,
               maxAge: 60 * 60 * 24 * 365,
-              secure: true,
-              httpOnly: true,
-              sameSite: "lax",
               ...(process.env.COOKIE_DOMAIN
                 ? { domain: process.env.COOKIE_DOMAIN }
                 : {}),
