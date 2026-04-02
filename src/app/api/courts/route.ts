@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getCourts, getCourtsBySport } from "@/lib/courts/queries"
-import type { SportType } from "@/lib/courts/queries"
+import { z } from "zod"
 
-const VALID_SPORTS: SportType[] = ["futbol", "padel", "tenis", "pickleball"]
+const getCourtsSchema = z.object({
+  sport: z.enum(["futbol", "padel", "tenis", "pickleball"]).optional(),
+  city: z.string().max(100).trim().optional(),
+})
 
 export async function GET(request: Request) {
   const supabase = await createClient()
@@ -14,10 +17,14 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const rawSport = searchParams.get("sport")
-  const sport: SportType | null =
-    rawSport && (VALID_SPORTS as string[]).includes(rawSport) ? (rawSport as SportType) : null
-  const city = searchParams.get("city") ?? undefined
+  const parsed = getCourtsSchema.safeParse({
+    sport: searchParams.get("sport") ?? undefined,
+    city: searchParams.get("city") ?? undefined,
+  })
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
+  }
+  const { sport, city } = parsed.data
 
   try {
     const courts = sport

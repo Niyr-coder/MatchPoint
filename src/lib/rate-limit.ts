@@ -1,16 +1,15 @@
 /**
- * In-memory sliding-window rate limiter.
+ * Persistent sliding-window rate limiter backed by Supabase.
  *
- * Trade-offs vs. Upstash/Redis:
- *  - State is per-process: resets on cold starts and is not shared across
- *    multiple Vercel instances (each worker has its own Map).
- *  - Suitable for MVP / single-worker deployments. Replace with
- *    @upstash/ratelimit + @upstash/redis when horizontal scaling is needed.
+ * Uses the `check_rate_limit` RPC (migration 027) which atomically counts
+ * requests in a rolling window and inserts the current request when allowed.
+ * State is shared across all Vercel instances and survives cold starts.
  *
- * The sliding window algorithm records each request timestamp and evicts
- * entries outside the current window on every check — no background timer
- * or memory leak.
+ * Fails open: if the DB call errors, the request is allowed through so that
+ * a database hiccup never takes down the entire API.
  */
+
+import { createServiceClient } from "@/lib/supabase/server"
 
 export interface RateLimitConfig {
   /** Maximum number of allowed requests within the window. */
@@ -31,57 +30,45 @@ export interface RateLimitResult {
 }
 
 /**
- * One limiter instance per named bucket.
- * Key: "<bucket>:<identifier>", Value: sorted list of request timestamps.
- */
-const store = new Map<string, number[]>()
-
-/**
  * Checks whether the given identifier is within its rate limit for a bucket.
- * Mutates the store entry for that key (adds current timestamp, evicts old ones).
+ * Delegates to the `check_rate_limit` Postgres function for atomic, shared state.
  *
- * @param bucket     - A namespaced string identifying the limit rule (e.g. "waitlist").
- * @param identifier - The per-client key (typically an IP address).
+ * @param bucket     - Namespaced string identifying the limit rule (e.g. "waitlist").
+ * @param identifier - Per-client key (typically an IP address).
  * @param config     - Limit and window configuration.
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   bucket: string,
   identifier: string,
   config: RateLimitConfig
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const { limit, windowMs } = config
-  const now = Date.now()
-  const windowStart = now - windowMs
-  const storeKey = `${bucket}:${identifier}`
 
-  const timestamps = store.get(storeKey) ?? []
+  try {
+    const service = await createServiceClient()
+    const { data, error } = await service.rpc("check_rate_limit", {
+      p_bucket:     bucket,
+      p_identifier: identifier,
+      p_limit:      limit,
+      p_window_ms:  windowMs,
+    })
 
-  // Evict timestamps outside the current sliding window
-  const active = timestamps.filter((ts) => ts > windowStart)
-
-  const resetAt = active.length > 0 ? active[0] + windowMs : now + windowMs
-  const retryAfterSeconds = Math.ceil((resetAt - now) / 1000)
-
-  if (active.length >= limit) {
-    // Do not record this request — it is being rejected
-    store.set(storeKey, active)
-    return {
-      allowed: false,
-      remaining: 0,
-      resetAt,
-      retryAfterSeconds,
+    if (error || !data) {
+      // Fail open — never block traffic due to a rate-limit DB error
+      console.error("[rate-limit] RPC error, failing open:", error?.message)
+      return { allowed: true, remaining: limit, resetAt: Date.now() + windowMs, retryAfterSeconds: 0 }
     }
-  }
 
-  // Record the new request and persist
-  const updated = [...active, now]
-  store.set(storeKey, updated)
-
-  return {
-    allowed: true,
-    remaining: limit - updated.length,
-    resetAt,
-    retryAfterSeconds: 0,
+    const result = data as { allowed: boolean; remaining: number; reset_at: number; retry_after_seconds: number }
+    return {
+      allowed:           result.allowed,
+      remaining:         result.remaining,
+      resetAt:           result.reset_at,
+      retryAfterSeconds: result.retry_after_seconds,
+    }
+  } catch (err) {
+    console.error("[rate-limit] Unexpected error, failing open:", err)
+    return { allowed: true, remaining: limit, resetAt: Date.now() + windowMs, retryAfterSeconds: 0 }
   }
 }
 
@@ -97,8 +84,6 @@ export function getClientIp(request: Request): string {
     const first = forwarded.split(",")[0].trim()
     if (first) return first
   }
-  // Fallback: treat unknown origin as a single shared key rather than skipping
-  // rate limiting entirely. This is conservative but safe.
   return "unknown"
 }
 
@@ -107,7 +92,7 @@ export function getClientIp(request: Request): string {
 // ---------------------------------------------------------------------------
 
 export const RATE_LIMITS = {
-  waitlist: { limit: 5, windowMs: 60_000 } satisfies RateLimitConfig,
+  waitlist:   { limit: 5,  windowMs: 60_000 } satisfies RateLimitConfig,
   shopOrders: { limit: 10, windowMs: 60_000 } satisfies RateLimitConfig,
-  messages: { limit: 30, windowMs: 60_000 } satisfies RateLimitConfig,
+  messages:   { limit: 30, windowMs: 60_000 } satisfies RateLimitConfig,
 } as const

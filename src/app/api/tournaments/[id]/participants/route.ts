@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { z } from "zod"
+
+const addParticipantSchema = z.object({
+  userId: z.string().uuid("userId debe ser un UUID válido"),
+})
 
 export async function GET(
   _request: Request,
@@ -63,11 +68,11 @@ export async function POST(
     )
   }
 
-  const body = await request.json() as { userId?: string }
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  if (!body.userId || !UUID_RE.test(body.userId)) {
-    return NextResponse.json({ success: false, error: "userId inválido" }, { status: 400 })
+  const parsed = addParticipantSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
   }
+  const body = parsed.data
 
   const service = await createServiceClient()
 

@@ -6,7 +6,7 @@ import type { ApiResponse } from "@/types"
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   const ip = getClientIp(request)
-  const rl = checkRateLimit("waitlist", ip, RATE_LIMITS.waitlist)
+  const rl = await checkRateLimit("waitlist", ip, RATE_LIMITS.waitlist)
   if (!rl.allowed) {
     return NextResponse.json(
       { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },

@@ -1,10 +1,22 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { z } from "zod"
+
+const getProductsSchema = z.object({
+  category: z.enum(["equipment", "membership", "class", "other"]).optional(),
+  clubId: z.string().uuid("clubId debe ser un UUID válido").optional(),
+})
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const category = searchParams.get("category")
-  const clubId = searchParams.get("clubId")
+  const parsed = getProductsSchema.safeParse({
+    category: searchParams.get("category") ?? undefined,
+    clubId: searchParams.get("clubId") ?? undefined,
+  })
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+  }
+  const { category, clubId } = parsed.data
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

@@ -196,3 +196,75 @@ export interface UserRoleEntry {
   clubLogo: string | null
   role: AppRole
 }
+
+// ============================================================
+// Club Requests (migration 025)
+// ============================================================
+
+export type ClubRequestStatus = 'pending' | 'approved' | 'rejected'
+
+export interface ClubRequest {
+  id: string
+  user_id: string
+  name: string
+  city: string
+  province: string
+  description: string | null
+  sports: string[]
+  contact_phone: string | null
+  contact_email: string | null
+  status: ClubRequestStatus
+  admin_notes: string | null
+  reviewed_by: string | null
+  reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ============================================================
+// Notifications (migration 026)
+// ============================================================
+
+export type NotificationType =
+  | 'club_request_approved'
+  | 'club_request_rejected'
+  | 'team_invite'
+  | 'system'
+
+export interface Notification {
+  id: string
+  user_id: string
+  type: NotificationType
+  title: string
+  body: string
+  read: boolean
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
+// ============================================================
+// Teams (migration 026)
+// ============================================================
+
+export type TeamRole = 'captain' | 'member'
+
+export interface Team {
+  id: string
+  name: string
+  description: string | null
+  sport: 'futbol' | 'padel' | 'tenis' | 'pickleball' | null
+  club_id: string | null
+  created_by: string
+  invite_code: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface TeamMember {
+  id: string
+  team_id: string
+  user_id: string
+  role: TeamRole
+  joined_at: string
+}

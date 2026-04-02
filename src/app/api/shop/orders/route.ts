@@ -31,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
-  const rl = checkRateLimit("shopOrders", ip, RATE_LIMITS.shopOrders)
+  const rl = await checkRateLimit("shopOrders", ip, RATE_LIMITS.shopOrders)
   if (!rl.allowed) {
     return NextResponse.json(
       { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },

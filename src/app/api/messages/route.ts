@@ -1,10 +1,20 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
+import { z } from "zod"
+
+const getMessagesSchema = z.object({
+  conversationId: z.string().uuid("conversationId debe ser un UUID válido").optional(),
+})
+
+const postMessageSchema = z.object({
+  conversationId: z.string().uuid("conversationId inválido"),
+  content: z.string().min(1, "El mensaje no puede estar vacío").max(2000, "El mensaje no puede superar 2000 caracteres").trim(),
+})
 
 export async function GET(request: Request) {
   const ip = getClientIp(request)
-  const rl = checkRateLimit("messages", ip, RATE_LIMITS.messages)
+  const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
     return NextResponse.json(
       { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
@@ -21,7 +31,11 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const conversationId = searchParams.get("conversationId")
+  const parsed = getMessagesSchema.safeParse({ conversationId: searchParams.get("conversationId") ?? undefined })
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+  }
+  const { conversationId } = parsed.data
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -71,7 +85,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
-  const rl = checkRateLimit("messages", ip, RATE_LIMITS.messages)
+  const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
     return NextResponse.json(
       { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
@@ -91,16 +105,11 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const body = await request.json() as { conversationId?: string; content?: string }
-  const { conversationId, content } = body
-
-  if (!conversationId || !content?.trim()) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 })
+  const parsed = postMessageSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
-
-  if (content.trim().length > 2000) {
-    return NextResponse.json({ error: "El mensaje no puede superar 2000 caracteres" }, { status: 400 })
-  }
+  const { conversationId, content } = parsed.data
 
   // Verify user is a participant in this conversation before sending
   const { data: membership } = await supabase
