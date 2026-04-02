@@ -111,19 +111,13 @@ export async function GET(
       const { data, error, count } = await query
       if (error) throw new Error(error.message)
 
-      const products: AdminProduct[] = (data ?? []).map(
-        (row: {
-          id: string
-          name: string
-          description: string | null
-          price: number
-          stock: number
-          category: string
-          is_active: boolean
-          club_id: string | null
-          clubs: { name: string } | null
-          created_at: string
-        }) => ({
+      type ProductRow = {
+        id: string; name: string; description: string | null; price: number
+        stock: number; category: string; is_active: boolean; club_id: string | null
+        clubs: { name: string } | null; created_at: string
+      }
+      const products: AdminProduct[] = ((data ?? []) as unknown as ProductRow[]).map(
+        (row) => ({
           id: row.id,
           name: row.name,
           description: row.description,
@@ -163,17 +157,14 @@ export async function GET(
     const { data, error, count } = await query
     if (error) throw new Error(error.message)
 
-    const orders: AdminOrder[] = (data ?? []).map(
-      (row: {
-        id: string
-        total: number
-        status: "pending" | "confirmed" | "delivered" | "cancelled"
-        club_id: string | null
-        created_at: string
-        profiles: { full_name: string | null; email: string } | null
-        clubs: { name: string } | null
-        order_items: { quantity: number; unit_price: number; product_name: string }[]
-      }) => {
+    type OrderRow = {
+      id: string; total: number; status: "pending" | "confirmed" | "delivered" | "cancelled"
+      club_id: string | null; created_at: string
+      profiles: { full_name: string | null; email: string } | null
+      clubs: { name: string } | null
+      order_items: { quantity: number; unit_price: number; product_name: string }[]
+    }
+    const orders: AdminOrder[] = ((data ?? []) as unknown as OrderRow[]).map((row) => {
         const firstItem = row.order_items?.[0]
         return {
           id: row.id,
