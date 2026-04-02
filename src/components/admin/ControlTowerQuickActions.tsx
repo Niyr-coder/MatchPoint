@@ -17,44 +17,44 @@ const ACTIONS: ActionBtn[] = [
     href: "/admin/events?action=create",
     icon: <CalendarPlus className="size-4" />,
     label: "Crear Evento",
-    accent: "bg-emerald-500/10 border-emerald-500/40 hover:bg-emerald-500/20",
-    textAccent: "text-emerald-400",
+    accent: "bg-emerald-50 border-emerald-200 hover:bg-emerald-100",
+    textAccent: "text-emerald-700",
   },
   {
     href: "/admin/clubs?action=add",
     icon: <Building2 className="size-4" />,
     label: "Añadir Club",
-    accent: "bg-sky-500/10 border-sky-500/40 hover:bg-sky-500/30",
-    textAccent: "text-sky-400",
+    accent: "bg-sky-50 border-sky-200 hover:bg-sky-100",
+    textAccent: "text-sky-700",
   },
   {
     href: "/admin/users?action=suspend",
     icon: <UserX className="size-4" />,
     label: "Suspender Usuario",
-    accent: "bg-red-500/10 border-red-500/40 hover:bg-red-500/30",
-    textAccent: "text-red-400",
+    accent: "bg-red-50 border-red-200 hover:bg-red-100",
+    textAccent: "text-red-700",
   },
   {
     href: "/admin/settings?tab=announcements",
     icon: <Bell className="size-4" />,
     label: "Notificación Global",
-    accent: "bg-amber-500/10 border-amber-500/40 hover:bg-amber-500/30",
-    textAccent: "text-amber-400",
+    accent: "bg-amber-50 border-amber-200 hover:bg-amber-100",
+    textAccent: "text-amber-700",
   },
   {
     href: "/admin/events?action=feature",
     icon: <Star className="size-4" />,
     label: "Destacar Evento",
-    accent: "bg-violet-500/10 border-violet-500/40 hover:bg-violet-500/30",
-    textAccent: "text-violet-400",
+    accent: "bg-violet-50 border-violet-200 hover:bg-violet-100",
+    textAccent: "text-violet-700",
   },
 ]
 
 export function ControlTowerQuickActions() {
   return (
-    <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
-      <div className="px-4 py-3 border-b border-zinc-800">
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
+    <div className="rounded-2xl bg-white border border-zinc-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-zinc-200">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
           Acciones rápidas
         </p>
       </div>

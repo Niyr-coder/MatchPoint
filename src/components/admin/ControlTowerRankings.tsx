@@ -7,37 +7,39 @@ interface RankListProps {
   icon: React.ReactNode
   items: ControlTowerRanking[]
   valueLabel: string
-  accent: string
+  barColor: string
+  iconBg: string
+  iconColor: string
 }
 
-function RankList({ title, icon, items, valueLabel, accent }: RankListProps) {
+function RankList({ title, icon, items, valueLabel, barColor, iconBg, iconColor }: RankListProps) {
   const max = Math.max(...items.map((i) => i.value), 1)
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <div className={cn("size-6 rounded-lg flex items-center justify-center text-white", accent)}>
+        <div className={cn("size-6 rounded-lg flex items-center justify-center", iconBg, iconColor)}>
           {icon}
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">{title}</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{title}</p>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {items.length === 0 ? (
           <p className="text-xs text-zinc-400 py-2">Sin datos</p>
         ) : (
           items.map((item, i) => (
             <div key={item.id} className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-zinc-400 w-4 shrink-0">{i + 1}</span>
+              <span className="text-[10px] font-black text-zinc-300 w-4 shrink-0">{i + 1}</span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-xs font-semibold text-zinc-200 truncate pr-2">{item.name}</span>
-                  <span className="text-[10px] font-black text-zinc-400 shrink-0">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-zinc-700 truncate pr-2">{item.name}</span>
+                  <span className="text-[10px] font-black text-zinc-500 shrink-0">
                     {item.value} {valueLabel}
                   </span>
                 </div>
-                <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
                   <div
-                    className={cn("h-full rounded-full transition-all", accent)}
+                    className={cn("h-full rounded-full transition-all", barColor)}
                     style={{ width: `${(item.value / max) * 100}%` }}
                   />
                 </div>
@@ -61,18 +63,20 @@ interface Props {
 
 export function ControlTowerRankings({ topClubs, topPlayers, topTournaments }: Props) {
   return (
-    <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
-      <div className="px-4 py-3 border-b border-zinc-800">
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">Top Rankings</p>
+    <div className="rounded-2xl bg-white border border-zinc-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-zinc-200">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Top Rankings</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100">
         <div className="p-4">
           <RankList
             title="Clubs más activos"
             icon={<Building2 className="size-3" />}
             items={topClubs}
             valueLabel="matches"
-            accent="bg-amber-500"
+            barColor="bg-amber-400"
+            iconBg="bg-amber-50"
+            iconColor="text-amber-600"
           />
         </div>
         <div className="p-4">
@@ -81,7 +85,9 @@ export function ControlTowerRankings({ topClubs, topPlayers, topTournaments }: P
             icon={<User className="size-3" />}
             items={topPlayers}
             valueLabel="partidos"
-            accent="bg-sky-500"
+            barColor="bg-sky-400"
+            iconBg="bg-sky-50"
+            iconColor="text-sky-600"
           />
         </div>
         <div className="p-4">
@@ -90,7 +96,9 @@ export function ControlTowerRankings({ topClubs, topPlayers, topTournaments }: P
             icon={<Trophy className="size-3" />}
             items={topTournaments}
             valueLabel="jugadores"
-            accent="bg-violet-500"
+            barColor="bg-violet-400"
+            iconBg="bg-violet-50"
+            iconColor="text-violet-600"
           />
         </div>
       </div>

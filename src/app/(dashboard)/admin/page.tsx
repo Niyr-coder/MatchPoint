@@ -17,16 +17,16 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-black text-white uppercase tracking-[-0.02em]">
+          <h1 className="text-lg font-black text-zinc-900 uppercase tracking-[-0.02em]">
             Torre de Control
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mt-0.5">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mt-0.5">
             MATCHPOINT · Admin Dashboard
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">
+          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
             Sistema activo
           </span>
         </div>

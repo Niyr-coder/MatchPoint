@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils"
 
 type Accent = "green" | "blue" | "amber" | "red" | "purple" | "cyan"
 
-const ACCENT: Record<Accent, { icon: string; badge: string }> = {
-  green:  { icon: "text-emerald-400", badge: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
-  blue:   { icon: "text-blue-400",    badge: "text-blue-400 bg-blue-500/10 border-blue-500/30" },
-  cyan:   { icon: "text-cyan-400",    badge: "text-cyan-400 bg-cyan-500/10 border-cyan-500/30" },
-  amber:  { icon: "text-amber-400",   badge: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
-  red:    { icon: "text-red-400",     badge: "text-red-400 bg-red-500/10 border-red-500/30" },
-  purple: { icon: "text-violet-400",  badge: "text-violet-400 bg-violet-500/10 border-violet-500/30" },
+const ACCENT: Record<Accent, { icon: string; iconBg: string; badge: string; label: string }> = {
+  green:  { icon: "text-emerald-600", iconBg: "bg-emerald-50",  badge: "text-emerald-700 bg-emerald-50 border-emerald-200",  label: "text-emerald-600" },
+  blue:   { icon: "text-blue-600",    iconBg: "bg-blue-50",     badge: "text-blue-700 bg-blue-50 border-blue-200",            label: "text-blue-600" },
+  cyan:   { icon: "text-cyan-600",    iconBg: "bg-cyan-50",     badge: "text-cyan-700 bg-cyan-50 border-cyan-200",            label: "text-cyan-600" },
+  amber:  { icon: "text-amber-600",   iconBg: "bg-amber-50",    badge: "text-amber-700 bg-amber-50 border-amber-200",         label: "text-amber-600" },
+  red:    { icon: "text-red-600",     iconBg: "bg-red-50",      badge: "text-red-700 bg-red-50 border-red-200",               label: "text-red-600" },
+  purple: { icon: "text-violet-600",  iconBg: "bg-violet-50",   badge: "text-violet-700 bg-violet-50 border-violet-200",      label: "text-violet-600" },
 }
 
 interface KPICardProps {
@@ -25,10 +25,9 @@ interface KPICardProps {
 function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardProps) {
   const a = ACCENT[accent]
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 p-5 flex flex-col gap-4 min-h-[130px]">
-      {/* Top row: icon + badge */}
+    <div className="relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-5 flex flex-col gap-4 min-h-[130px]">
       <div className="flex items-start justify-between">
-        <div className={cn("size-8 rounded-xl flex items-center justify-center bg-zinc-800 shrink-0", a.icon)}>
+        <div className={cn("size-8 rounded-xl flex items-center justify-center shrink-0", a.iconBg, a.icon)}>
           {icon}
         </div>
         {trend && (
@@ -37,12 +36,10 @@ function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardPr
           </span>
         )}
       </div>
-
-      {/* Bottom row: value + label */}
       <div className="mt-auto">
-        <p className="text-3xl font-black text-white tracking-tight leading-none">{value}</p>
-        <p className={cn("text-[10px] font-black uppercase tracking-[0.16em] mt-1.5 truncate", a.icon)}>{label}</p>
-        <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{sub}</p>
+        <p className="text-3xl font-black text-zinc-900 tracking-tight leading-none">{value}</p>
+        <p className={cn("text-[10px] font-black uppercase tracking-[0.16em] mt-1.5 truncate", a.label)}>{label}</p>
+        <p className="text-[10px] text-zinc-400 mt-0.5 truncate">{sub}</p>
       </div>
     </div>
   )

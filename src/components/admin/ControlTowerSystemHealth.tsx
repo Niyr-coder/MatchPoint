@@ -12,23 +12,23 @@ interface HealthRowData {
   hint: string
 }
 
-const STATUS_STYLES: Record<Status, { icon: string; bg: string; dot: string; count: string }> = {
-  ok:       { icon: "text-emerald-400", bg: "bg-emerald-500/10", dot: "bg-emerald-500",                 count: "text-emerald-400" },
-  warn:     { icon: "text-amber-400",   bg: "bg-amber-500/10",   dot: "bg-amber-500",                   count: "text-amber-400" },
-  critical: { icon: "text-red-400",     bg: "bg-red-500/10",     dot: "bg-red-500 animate-pulse",        count: "text-red-400" },
+const STATUS_STYLES: Record<Status, { icon: string; bg: string; count: string }> = {
+  ok:       { icon: "text-emerald-600", bg: "bg-emerald-50",  count: "text-emerald-600" },
+  warn:     { icon: "text-amber-600",   bg: "bg-amber-50",    count: "text-amber-600" },
+  critical: { icon: "text-red-600",     bg: "bg-red-50",      count: "text-red-600" },
 }
 
 function HealthRow({ icon, label, value, status, hint }: HealthRowData) {
   const s = STATUS_STYLES[status]
   const StatusIcon = status === "ok" ? CheckCircle : status === "warn" ? AlertTriangle : XCircle
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-zinc-800 last:border-0">
+    <div className="flex items-center gap-3 py-2.5 border-b border-zinc-100 last:border-0">
       <div className={cn("size-7 rounded-lg flex items-center justify-center shrink-0", s.bg, s.icon)}>
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-zinc-200 leading-snug">{label}</p>
-        <p className="text-[10px] text-zinc-500">{hint}</p>
+        <p className="text-xs font-semibold text-zinc-800 leading-snug">{label}</p>
+        <p className="text-[10px] text-zinc-400">{hint}</p>
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
         <span className={cn("text-sm font-black tabular-nums", s.count)}>{value}</span>
@@ -76,22 +76,17 @@ export function ControlTowerSystemHealth({ health }: Props) {
 
   const criticalCount = rows.filter((r) => r.status === "critical").length
   const warnCount = rows.filter((r) => r.status === "warn").length
-  const overallStatus: Status =
-    criticalCount > 0 ? "critical" : warnCount > 0 ? "warn" : "ok"
-
-  const overallDot = STATUS_STYLES[overallStatus].dot
+  const overallStatus: Status = criticalCount > 0 ? "critical" : warnCount > 0 ? "warn" : "ok"
+  const overallDotColor = { ok: "bg-emerald-500", warn: "bg-amber-500", critical: "bg-red-500 animate-pulse" }[overallStatus]
 
   return (
-    <div className="rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col overflow-hidden h-full">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 shrink-0">
-        <div className={cn("size-2 rounded-full shrink-0", overallDot)} />
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
+    <div className="rounded-2xl bg-white border border-zinc-200 flex flex-col overflow-hidden h-full">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-200 shrink-0">
+        <div className={cn("size-2 rounded-full shrink-0", overallDotColor)} />
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
           Estado del sistema
         </p>
       </div>
-
-      {/* Rows */}
       <div className="px-4 py-1 flex-1">
         {rows.map((row) => (
           <HealthRow key={row.label} {...row} />
