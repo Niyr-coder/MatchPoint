@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { getAllClubsAdmin } from "@/lib/admin/queries"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse, Club } from "@/types"
 import type { ClubAdmin } from "@/lib/admin/queries"
 
@@ -106,6 +107,15 @@ export async function PATCH(
       .eq("id", parsed.data.clubId)
 
     if (error) throw new Error(error.message)
+
+    await logAdminAction({
+      action: "club.toggled_active",
+      entityType: "clubs",
+      entityId: parsed.data.clubId,
+      actorId: authResult.context.userId,
+      details: { isActive: parsed.data.isActive },
+    })
+
     return NextResponse.json({ success: true, data: null, error: null })
   } catch {
     return NextResponse.json(
@@ -166,6 +176,15 @@ export async function POST(
       .single()
 
     if (error) throw new Error(error.message)
+
+    await logAdminAction({
+      action: "club.created",
+      entityType: "clubs",
+      entityId: club.id,
+      actorId: authResult.context.userId,
+      details: { name: parsed.data.name, city: parsed.data.city, province: parsed.data.province },
+    })
+
     return NextResponse.json(
       { success: true, data: club as Club, error: null },
       { status: 201 }

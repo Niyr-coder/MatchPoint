@@ -1,117 +1,221 @@
-import Image from "next/image"
+import { Suspense } from "react"
 import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getAllEvents } from "@/lib/events/queries"
-import { Calendar, MapPin } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/shared/PageHeader"
+import { EmptyState } from "@/components/shared/EmptyState"
+import { EventCard } from "@/components/events/EventCard"
+import { EventsFilters } from "@/components/events/EventsFilters"
+import { CalendarDays } from "lucide-react"
+import type { EventWithClub } from "@/lib/events/types"
 
-const SPORT_LABEL: Record<string, string> = {
-  futbol: "Fútbol",
-  padel: "Pádel",
-  tenis: "Tenis",
-  pickleball: "Pickleball",
+const PAGE_SIZE = 12
+
+interface SearchParams {
+  sport?: string
+  event_type?: string
+  city?: string
+  is_free?: string
+  search?: string
+  page?: string
+  tab?: string
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-EC", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+async function fetchEvents(
+  params: SearchParams,
+  userId: string,
+): Promise<{ events: EventWithClub[]; total: number }> {
+  const supabase = await createClient()
+
+  const page    = Math.max(0, parseInt(params.page ?? "0", 10))
+  const tab     = params.tab ?? "all"
+  const isFree  = params.is_free === "true"
+
+  let query = supabase
+    .from("events")
+    .select(
+      `
+      id, title, description, sport, event_type, status,
+      club_id, city, location, start_date, end_date,
+      image_url, is_free, price, max_capacity, min_participants,
+      visibility, registration_deadline, tags,
+      organizer_name, organizer_contact, created_at,
+      clubs ( name ),
+      event_registrations ( count )
+      `,
+      { count: "exact" },
+    )
+    .eq("status", "published")
+    .eq("visibility", "public")
+    .order("start_date", { ascending: true })
+    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+
+  if (params.sport)      query = query.eq("sport", params.sport)
+  if (params.event_type) query = query.eq("event_type", params.event_type)
+  if (params.city)       query = query.ilike("city", `%${params.city}%`)
+  if (isFree)            query = query.eq("is_free", true)
+  if (params.search)     query = query.ilike("title", `%${params.search}%`)
+
+  if (tab === "mine") {
+    const { data: regs } = await supabase
+      .from("event_registrations")
+      .select("event_id")
+      .eq("user_id", userId)
+    const ids = (regs ?? []).map((r: { event_id: string }) => r.event_id)
+    if (ids.length === 0) return { events: [], total: 0 }
+    query = query.in("id", ids)
+  }
+
+  const { data, error, count } = await query
+
+  if (error) throw new Error(error.message)
+
+  const events: EventWithClub[] = (data ?? []).map((row: Record<string, unknown>) => ({
+    id:                    row.id as string,
+    title:                 row.title as string,
+    description:           row.description as string | null,
+    sport:                 row.sport as string | null,
+    event_type:            row.event_type as EventWithClub["event_type"],
+    status:                row.status as EventWithClub["status"],
+    club_id:               row.club_id as string | null,
+    club_name:             (row.clubs as { name: string } | null)?.name ?? null,
+    city:                  row.city as string | null,
+    location:              row.location as string | null,
+    start_date:            row.start_date as string,
+    end_date:              row.end_date as string | null,
+    image_url:             row.image_url as string | null,
+    is_free:               row.is_free as boolean,
+    price:                 row.price as number | null,
+    max_capacity:          row.max_capacity as number | null,
+    min_participants:      row.min_participants as number | null,
+    visibility:            row.visibility as EventWithClub["visibility"],
+    registration_deadline: row.registration_deadline as string | null,
+    tags:                  row.tags as string[] | null,
+    organizer_name:        row.organizer_name as string | null,
+    organizer_contact:     row.organizer_contact as string | null,
+    is_featured:           false,
+    created_by:            null,
+    created_at:            row.created_at as string,
+    updated_at:            null,
+    registration_count:    (row.event_registrations as { count: number }[])?.[0]?.count ?? 0,
+  }))
+
+  return { events, total: count ?? 0 }
 }
 
-export default async function EventsPage() {
-  await authorizeOrRedirect()
-  const { events } = await getAllEvents(0, 20)
+interface EventsPageProps {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const { userId } = await authorizeOrRedirect()
+  const params = await searchParams
+  const tab    = params.tab ?? "all"
+
+  const { events, total } = await fetchEvents(params, userId)
+  const page = Math.max(0, parseInt(params.page ?? "0", 10))
+
+  const buildHref = (newParams: Record<string, string>) => {
+    const merged = { ...params, ...newParams }
+    const qs = new URLSearchParams(
+      Object.entries(merged).filter(([, v]) => Boolean(v)),
+    ).toString()
+    return `/dashboard/events${qs ? `?${qs}` : ""}`
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
-          Plataforma
-        </p>
-        <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a]">
-          Eventos Oficiales
-        </h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          Torneos, ligas y actividades organizadas por MatchPoint
-        </p>
+      <PageHeader
+        label="Plataforma · Comunidad"
+        title="Eventos"
+        description="Clínicas, quedadas, workshops y más actividades de tu comunidad"
+      />
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-[#e5e5e5]">
+        {[
+          { key: "all",  label: "Todos" },
+          { key: "mine", label: "Mis registraciones" },
+        ].map(({ key, label }) => (
+          <a
+            key={key}
+            href={buildHref({ tab: key, page: "0" })}
+            className={`px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors border-b-2 -mb-px ${
+              tab === key
+                ? "border-[#0a0a0a] text-[#0a0a0a]"
+                : "border-transparent text-zinc-400 hover:text-zinc-700"
+            }`}
+          >
+            {label}
+          </a>
+        ))}
       </div>
 
-      {/* Events grid */}
+      {/* Filters — wrapped in Suspense because it uses useSearchParams internally */}
+      <Suspense>
+        <EventsFilters />
+      </Suspense>
+
+      {/* Results count */}
+      {total > 0 && (
+        <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide">
+          {total} evento{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
+        </p>
+      )}
+
+      {/* Grid */}
       {events.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 border border-dashed border-[#e5e5e5] rounded-2xl">
-          <Calendar className="size-10 text-zinc-300" />
-          <p className="text-sm font-bold text-zinc-400">No hay eventos próximos</p>
-          <p className="text-xs text-zinc-300">Vuelve pronto para ver nuevas actividades</p>
-        </div>
+        <EmptyState
+          icon={CalendarDays}
+          title={tab === "mine" ? "No te has registrado a ningún evento" : "No hay eventos disponibles"}
+          description={
+            tab === "mine"
+              ? "Explora los eventos disponibles y regístrate para verlos aquí."
+              : "Prueba ajustar los filtros o vuelve más tarde."
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {events.map((event) => (
-            <div
+            <EventCard
               key={event.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#1a56db]/40 transition-colors"
-            >
-              {/* Image or placeholder */}
-              {event.image_url ? (
-                <div className="relative w-full h-40">
-                  <Image
-                    src={event.image_url}
-                    alt={event.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                </div>
-              ) : (
-                <div
-                  className="w-full h-40 flex items-center justify-center"
-                  style={{ background: "#1a56db" }}
-                >
-                  <Calendar className="size-10 text-white/40" />
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2 p-5 flex-1">
-                {/* Sport + featured badge */}
-                <div className="flex items-center gap-2">
-                  {event.sport && (
-                    <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[#16a34a] border border-[#bbf7d0]">
-                      {SPORT_LABEL[event.sport] ?? event.sport}
-                    </span>
-                  )}
-                  {event.is_featured && (
-                    <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                      Destacado
-                    </span>
-                  )}
-                </div>
-
-                <h2 className="text-sm font-black text-[#0a0a0a] leading-tight">{event.title}</h2>
-
-                {event.description && (
-                  <p className="text-[11px] text-zinc-500 line-clamp-2">{event.description}</p>
-                )}
-
-                <div className="mt-auto pt-3 border-t border-[#f0f0f0] flex flex-col gap-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="size-3 text-zinc-400 shrink-0" />
-                    <span className="text-[11px] text-zinc-500 capitalize">
-                      {formatDate(event.start_date)}
-                    </span>
-                  </div>
-                  {(event.location || event.city) && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="size-3 text-zinc-400 shrink-0" />
-                      <span className="text-[11px] text-zinc-500">
-                        {[event.location, event.city].filter(Boolean).join(", ")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+              id={event.id}
+              title={event.title}
+              description={event.description}
+              sport={event.sport}
+              event_type={event.event_type}
+              city={event.city}
+              location={event.location}
+              start_date={event.start_date}
+              image_url={event.image_url}
+              is_free={event.is_free}
+              price={event.price}
+              max_capacity={event.max_capacity}
+              registration_count={event.registration_count}
+              club_name={event.club_name}
+            />
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {total > PAGE_SIZE && (
+        <div className="flex justify-center gap-2">
+          {page > 0 && (
+            <a
+              href={buildHref({ page: String(page - 1) })}
+              className="border border-[#e5e5e5] rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              Anterior
+            </a>
+          )}
+          {(page + 1) * PAGE_SIZE < total && (
+            <a
+              href={buildHref({ page: String(page + 1) })}
+              className="bg-[#0a0a0a] text-white rounded-full px-5 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors"
+            >
+              Siguiente
+            </a>
+          )}
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { getAllUsersAdmin } from "@/lib/admin/queries"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse, AppRole } from "@/types"
 import type { UserAdmin } from "@/lib/admin/queries"
 
@@ -88,6 +89,15 @@ export async function PATCH(
       .eq("id", parsed.data.userId)
 
     if (error) throw new Error(error.message)
+
+    await logAdminAction({
+      action: "user.role_changed",
+      entityType: "users",
+      entityId: parsed.data.userId,
+      actorId: authResult.context.userId,
+      details: { globalRole: parsed.data.globalRole },
+    })
+
     return NextResponse.json({ success: true, data: null, error: null })
   } catch {
     return NextResponse.json(

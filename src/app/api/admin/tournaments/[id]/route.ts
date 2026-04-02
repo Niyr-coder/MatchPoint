@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse } from "@/types"
 
 interface TournamentWithClub {
@@ -198,6 +199,15 @@ export async function PUT(
       .eq("id", id)
 
     if (updateError) throw new Error(updateError.message)
+
+    await logAdminAction({
+      action: "tournament.updated",
+      entityType: "tournaments",
+      entityId: id,
+      actorId: authResult.context.userId,
+      details: { fields: Object.keys(d).filter((k) => d[k as keyof typeof d] !== undefined) },
+    })
+
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
@@ -264,6 +274,14 @@ export async function DELETE(
 
       if (cancelError) throw new Error(cancelError.message)
     }
+
+    await logAdminAction({
+      action: existing.status === "draft" ? "tournament.deleted" : "tournament.cancelled",
+      entityType: "tournaments",
+      entityId: id,
+      actorId: authResult.context.userId,
+      details: { previousStatus: existing.status },
+    })
 
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {

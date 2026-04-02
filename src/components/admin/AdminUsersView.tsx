@@ -2,10 +2,11 @@
 
 import { useState, useTransition, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { X, ShieldOff, ShieldCheck, UserPlus, Trash2, Building2 } from "lucide-react"
+import { X, ShieldOff, ShieldCheck, UserPlus, Trash2, Building2, BadgeCheck, Plus } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { RoleBadge } from "@/components/shared/RoleBadge"
+import { CreateUserModal } from "@/components/admin/CreateUserModal"
 import { ROLE_LABELS } from "@/lib/roles"
 import type { Column } from "@/components/shared/DataTable"
 import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
@@ -78,6 +79,38 @@ function initials(name: string): string {
     .map((w) => w[0] ?? "")
     .join("")
     .toUpperCase()
+}
+
+const ORIGIN_LABELS: Record<string, string> = {
+  email:         "Email",
+  google:        "Google",
+  admin_created: "Admin",
+  invite:        "Invitación",
+}
+
+function originLabel(origin: string | null): string {
+  if (!origin) return "Email"
+  return ORIGIN_LABELS[origin] ?? origin
+}
+
+function OriginBadge({ origin }: { origin: string | null }) {
+  const label = originLabel(origin)
+  const colorClass =
+    origin === "google"
+      ? "bg-blue-50 text-blue-700 border-blue-100"
+      : origin === "admin_created"
+      ? "bg-purple-50 text-purple-700 border-purple-100"
+      : origin === "invite"
+      ? "bg-amber-50 text-amber-700 border-amber-100"
+      : "bg-zinc-50 text-zinc-600 border-zinc-200"
+
+  return (
+    <span
+      className={`inline-flex items-center text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border ${colorClass}`}
+    >
+      {label}
+    </span>
+  )
 }
 
 // ── confirm dialog ────────────────────────────────────────────────────────────
@@ -352,6 +385,103 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
   )
 }
 
+// ── verification section ──────────────────────────────────────────────────────
+
+interface VerificationSectionProps {
+  user: UserAdmin
+  onVerified: () => void
+}
+
+function VerificationSection({ user, onVerified }: VerificationSectionProps) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState<string | null>(null)
+
+  async function handleVerify() {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify" }),
+      })
+      const json = (await res.json()) as { success: boolean; error?: string | null }
+      if (!json.success) {
+        setError(json.error ?? "Error al verificar")
+        return
+      }
+      onVerified()
+    } catch {
+      setError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <BadgeCheck className="size-3.5 text-zinc-400 shrink-0" />
+        <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
+          Verificación
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-[#e5e5e5] px-3 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-zinc-500">Estado</span>
+          {user.is_verified ? (
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+              <BadgeCheck className="size-3" />
+              Verificado
+            </span>
+          ) : (
+            <span className="text-[11px] font-bold text-zinc-400 bg-zinc-100 border border-zinc-200 rounded-full px-2 py-0.5">
+              No verificado
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-zinc-500">Origen</span>
+          <OriginBadge origin={user.account_origin} />
+        </div>
+
+        {user.verified_at && (
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] text-zinc-500">Verificado el</span>
+            <span className="text-[11px] text-zinc-700">{formatDate(user.verified_at)}</span>
+          </div>
+        )}
+      </div>
+
+      {!user.is_verified && (
+        <>
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 border border-red-100">
+              {error}
+            </p>
+          )}
+          <button
+            onClick={() => void handleVerify()}
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 w-full border border-green-200 text-green-700 rounded-full py-2 text-[11px] font-bold hover:bg-green-50 transition-colors disabled:opacity-50"
+          >
+            {loading ? (
+              "Verificando…"
+            ) : (
+              <>
+                <BadgeCheck className="size-3.5" />
+                Verificar manualmente
+              </>
+            )}
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
 // ── user detail slide-over ────────────────────────────────────────────────────
 
 interface SuspendTarget {
@@ -372,6 +502,7 @@ interface UserDetailPanelProps {
   onSuspendRequest: (target: SuspendTarget) => void
   onDeleteRequest: (target: DeleteTarget) => void
   onMembershipChange: () => void
+  onVerified: () => void
 }
 
 function UserDetailPanel({
@@ -381,6 +512,7 @@ function UserDetailPanel({
   onSuspendRequest,
   onDeleteRequest,
   onMembershipChange,
+  onVerified,
 }: UserDetailPanelProps) {
   const name         = displayName(user)
   const suspended    = isSuspended(user)
@@ -455,6 +587,12 @@ function UserDetailPanel({
               <FieldRow label="Partidos jugados" value={String(user.matches_played)} />
             )}
           </div>
+
+          {/* Divider */}
+          <div className="border-t border-[#f0f0f0]" />
+
+          {/* Verification */}
+          <VerificationSection user={user} onVerified={onVerified} />
 
           {/* Divider */}
           <div className="border-t border-[#f0f0f0]" />
@@ -535,6 +673,9 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
   })
   const [changingRole, setChangingRole] = useState<Record<string, boolean>>({})
   const [roleError, setRoleError] = useState<string | null>(null)
+
+  // Create user modal
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   // Detail panel
   const [selectedUser, setSelectedUser] = useState<UserAdmin | null>(null)
@@ -665,11 +806,17 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
               </div>
             )}
             <div className="flex flex-col min-w-0 gap-0.5">
-              <span className="font-bold text-[#0a0a0a] truncate">{name}</span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-bold text-[#0a0a0a] truncate">{name}</span>
+                {user.is_verified && (
+                  <BadgeCheck className="size-3.5 text-green-600 shrink-0" aria-label="Verificado" />
+                )}
+              </div>
               <div className="flex items-center gap-1.5">
                 {user.username && (
                   <span className="text-[11px] text-zinc-400 truncate">@{user.username}</span>
                 )}
+                <OriginBadge origin={user.account_origin} />
                 {suspended && (
                   <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100">
                     Suspendido
@@ -740,18 +887,30 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      <FilterBar
-        searchPlaceholder="Buscar usuario..."
-        filters={[
-          {
-            key: "role",
-            label: "Todos los roles",
-            options: FILTER_ROLE_OPTIONS,
-          },
-        ]}
-        values={filters}
-        onFilterChange={handleFilterChange}
-      />
+      {/* Toolbar: filters + create button */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex-1 min-w-0">
+          <FilterBar
+            searchPlaceholder="Buscar usuario..."
+            filters={[
+              {
+                key: "role",
+                label: "Todos los roles",
+                options: FILTER_ROLE_OPTIONS,
+              },
+            ]}
+            values={filters}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-1.5 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors shrink-0"
+        >
+          <Plus className="size-4" />
+          Crear cuenta
+        </button>
+      </div>
 
       <DataTable
         columns={columns}
@@ -775,6 +934,15 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
           onSuspendRequest={handleSuspendRequest}
           onDeleteRequest={(target) => { setDeleteError(null); setDeleteTarget(target) }}
           onMembershipChange={() => startTransition(() => router.refresh())}
+          onVerified={() => { setSelectedUser(null); startTransition(() => router.refresh()) }}
+        />
+      )}
+
+      {/* Create user modal */}
+      {showCreateModal && (
+        <CreateUserModal
+          clubs={clubs}
+          onClose={() => setShowCreateModal(false)}
         />
       )}
 

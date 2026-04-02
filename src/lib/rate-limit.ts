@@ -97,4 +97,5 @@ export const RATE_LIMITS = {
   messages:       { limit: 30, windowMs:    60_000 } satisfies RateLimitConfig,
   invitesCreate:  { limit: 20, windowMs: 3_600_000 } satisfies RateLimitConfig,
   invitesRedeem:  { limit: 10, windowMs: 3_600_000 } satisfies RateLimitConfig,
+  eventsCreate:   { limit: 10, windowMs: 3_600_000 } satisfies RateLimitConfig,
 } as const

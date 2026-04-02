@@ -92,6 +92,14 @@ export interface UserAdmin {
   matches_played: number | null
   /** JSONB settings; contains `suspended_from_role` key when account is suspended */
   settings: Record<string, unknown> | null
+  /** Whether the account has been manually verified by an admin */
+  is_verified: boolean | null
+  /** Origin of the account: 'email', 'google', 'admin_created', 'invite' */
+  account_origin: string | null
+  /** Timestamp when the account was verified */
+  verified_at: string | null
+  /** ID of the admin who verified the account */
+  verified_by: string | null
 }
 
 export interface PlatformAnalytics {
@@ -173,7 +181,7 @@ export async function getAllUsersAdmin(
 
     let query = supabase
       .from("profiles")
-      .select("id, full_name, first_name, last_name, global_role, created_at, city, province, username, avatar_url, rating, matches_played, settings")
+      .select("id, full_name, first_name, last_name, global_role, created_at, city, province, username, avatar_url, rating, matches_played, settings, is_verified, account_origin, verified_at, verified_by")
       .order("created_at", { ascending: false })
 
     if (filters?.role) {

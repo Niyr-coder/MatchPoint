@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse, Club } from "@/types"
 
 const ECUADOR_PROVINCES = [
@@ -103,6 +104,15 @@ export async function PUT(
       .single()
 
     if (updateError) throw new Error(updateError.message)
+
+    await logAdminAction({
+      action: "club.updated",
+      entityType: "clubs",
+      entityId: id,
+      actorId: authResult.context.userId,
+      details: { fields: Object.keys(parsed.data) },
+    })
+
     return NextResponse.json({ success: true, data: updated as Club, error: null })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
@@ -158,6 +168,14 @@ export async function DELETE(
       .eq("id", id)
 
     if (deleteError) throw new Error(deleteError.message)
+
+    await logAdminAction({
+      action: "club.deleted",
+      entityType: "clubs",
+      entityId: id,
+      actorId: authResult.context.userId,
+    })
+
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"

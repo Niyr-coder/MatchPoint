@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse } from "@/types"
 
 // ──────────────────────────────────────────────────────────
@@ -159,6 +160,14 @@ export async function PATCH(
         console.error(`[PATCH /api/admin/club-requests/${id}] notification insert failed (reject)`, notifErr)
       }
 
+      await logAdminAction({
+        action: "club_request.rejected",
+        entityType: "club_requests",
+        entityId: id,
+        actorId: reviewerId,
+        details: { requestedClubName: req.name, userId: req.user_id },
+      })
+
       return NextResponse.json({ success: true, data: null, error: null })
     }
 
@@ -222,6 +231,14 @@ export async function PATCH(
     } catch (notifErr) {
       console.error(`[PATCH /api/admin/club-requests/${id}] notification insert failed (approve)`, notifErr)
     }
+
+    await logAdminAction({
+      action: "club_request.approved",
+      entityType: "club_requests",
+      entityId: id,
+      actorId: reviewerId,
+      details: { requestedClubName: req.name, newClubId: newClub.id, userId: req.user_id },
+    })
 
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (err) {

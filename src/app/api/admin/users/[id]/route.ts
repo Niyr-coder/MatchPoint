@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse } from "@/types"
 
 interface UserProfile {
@@ -37,8 +38,8 @@ interface UserDetail {
 // value and 'user'. The original role is stored in the `settings` JSONB field
 // under the key "suspended_from_role" so it can be restored on unsuspend.
 const patchSchema = z.object({
-  action: z.enum(["suspend", "unsuspend", "delete"], {
-    message: "Acción inválida. Use: suspend, unsuspend, delete",
+  action: z.enum(["suspend", "unsuspend", "delete", "verify"], {
+    message: "Acción inválida. Use: suspend, unsuspend, delete, verify",
   }),
 })
 
@@ -184,18 +185,49 @@ export async function PATCH(
       )
     }
 
-    // Prevent acting on other admins
-    if (existing.global_role === "admin" && action !== "unsuspend") {
+    // Prevent acting on other admins (except verify)
+    if (existing.global_role === "admin" && action !== "unsuspend" && action !== "verify") {
       return NextResponse.json(
         { success: false, data: null, error: "No se puede aplicar esta acción a otro administrador" },
         { status: 400 }
       )
     }
 
+    if (action === "verify") {
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          verified_by: authResult.context.userId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+
+      if (updateError) throw new Error(updateError.message)
+
+      await logAdminAction({
+        action: "user.verified",
+        entityType: "users",
+        entityId: id,
+        actorId: authResult.context.userId,
+      })
+
+      return NextResponse.json({ success: true, data: null, error: null })
+    }
+
     if (action === "delete") {
       // Hard-delete from auth.users — CASCADE will remove the profile row
       const { error: deleteError } = await supabase.auth.admin.deleteUser(id)
       if (deleteError) throw new Error(deleteError.message)
+
+      await logAdminAction({
+        action: "user.deleted",
+        entityType: "users",
+        entityId: id,
+        actorId: authResult.context.userId,
+      })
+
       return NextResponse.json({ success: true, data: null, error: null })
     }
 
@@ -219,6 +251,15 @@ export async function PATCH(
         .eq("id", id)
 
       if (updateError) throw new Error(updateError.message)
+
+      await logAdminAction({
+        action: "user.suspended",
+        entityType: "users",
+        entityId: id,
+        actorId: authResult.context.userId,
+        details: { previousRole: existing.global_role },
+      })
+
       return NextResponse.json({ success: true, data: null, error: null })
     }
 
@@ -238,6 +279,15 @@ export async function PATCH(
         .eq("id", id)
 
       if (updateError) throw new Error(updateError.message)
+
+      await logAdminAction({
+        action: "user.unsuspended",
+        entityType: "users",
+        entityId: id,
+        actorId: authResult.context.userId,
+        details: { restoredRole: previousRole },
+      })
+
       return NextResponse.json({ success: true, data: null, error: null })
     }
 
