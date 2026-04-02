@@ -39,10 +39,10 @@ function FeedItem({ entry, isNew }: { entry: ActivityFeedEntry; isNew: boolean }
       <div className="flex-1 min-w-0">
         <p className="text-xs font-semibold text-zinc-200 leading-snug truncate">{meta.label}</p>
         {entityName && (
-          <p className="text-[10px] text-zinc-500 truncate">{entityName}</p>
+          <p className="text-[10px] text-zinc-400 truncate">{entityName}</p>
         )}
       </div>
-      <span className="text-[10px] text-zinc-600 shrink-0 mt-0.5">
+      <span className="text-[10px] text-zinc-400 shrink-0 mt-0.5">
         {formatTimeAgo(entry.created_at)}
       </span>
     </div>

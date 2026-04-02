@@ -48,7 +48,7 @@ export default function RootLayout({
       className={`${inter.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-white text-[#0a0a0a] antialiased">
+      <body className="min-h-full bg-zinc-950 text-[#0a0a0a] antialiased">
         {children}
       </body>
     </html>

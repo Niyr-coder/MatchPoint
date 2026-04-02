@@ -23,11 +23,11 @@ function RankList({ title, icon, items, valueLabel, accent }: RankListProps) {
       </div>
       <div className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-xs text-zinc-600 py-2">Sin datos</p>
+          <p className="text-xs text-zinc-400 py-2">Sin datos</p>
         ) : (
           items.map((item, i) => (
             <div key={item.id} className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-zinc-600 w-4 shrink-0">{i + 1}</span>
+              <span className="text-[10px] font-black text-zinc-400 w-4 shrink-0">{i + 1}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="text-xs font-semibold text-zinc-200 truncate pr-2">{item.name}</span>
@@ -42,7 +42,7 @@ function RankList({ title, icon, items, valueLabel, accent }: RankListProps) {
                   />
                 </div>
                 {item.secondary && (
-                  <p className="text-[9px] text-zinc-600 mt-0.5">{item.secondary}</p>
+                  <p className="text-[9px] text-zinc-400 mt-0.5">{item.secondary}</p>
                 )}
               </div>
             </div>

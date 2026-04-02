@@ -9,9 +9,10 @@ interface TopBarProps {
   currentRole: AppRole
   pageTitle?: string
   clubName?: string | null
+  darkMode?: boolean
 }
 
-export function TopBar({ sections, profile, currentRole, clubName }: TopBarProps) {
+export function TopBar({ sections, profile, currentRole, clubName, darkMode = false }: TopBarProps) {
   const firstName = profile.first_name ?? profile.full_name?.split(" ")[0] ?? "Bienvenido"
 
   const initials = [profile.first_name, profile.last_name]
@@ -26,7 +27,11 @@ export function TopBar({ sections, profile, currentRole, clubName }: TopBarProps
   })
 
   return (
-    <header className="flex items-center gap-4 h-16 px-4 md:px-6 border-b border-zinc-200 bg-white/80 backdrop-blur-sm shrink-0 relative z-10">
+    <header className={`flex items-center gap-4 h-16 px-4 md:px-6 border-b shrink-0 relative z-10 backdrop-blur-sm ${
+      darkMode
+        ? "border-zinc-800 bg-zinc-950/90"
+        : "border-zinc-200 bg-white/80"
+    }`}>
       {/* Mobile hamburger */}
       <MobileSidebar
         sections={sections}
@@ -37,7 +42,7 @@ export function TopBar({ sections, profile, currentRole, clubName }: TopBarProps
 
       {/* Greeting */}
       <div className="flex-1 min-w-0">
-        <p className="text-base font-black text-[#0a0a0a] leading-tight truncate">
+        <p className={`text-base font-black leading-tight truncate ${darkMode ? "text-white" : "text-[#0a0a0a]"}`}>
           Hola, {firstName}.
         </p>
         <p className="text-[11px] text-zinc-400 capitalize hidden sm:block">{today}</p>

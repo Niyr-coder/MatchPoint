@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
   const data = await getAdminControlTowerData()
 
   return (
-    <div className="flex flex-col gap-4 -mx-4 md:-mx-6 -my-6 px-4 md:px-6 py-6 min-h-full bg-zinc-950">
+    <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -36,19 +36,19 @@ export default async function AdminDashboardPage() {
       <ControlTowerKPIs kpis={data.kpis} />
 
       {/* Row 2: Activity Feed + Growth Charts + System Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
         {/* Activity Feed — tall */}
-        <div className="lg:col-span-3 min-h-[340px] flex flex-col">
+        <div className="lg:col-span-3 flex flex-col" style={{ minHeight: 340 }}>
           <ControlTowerActivityFeed initialFeed={data.activityFeed} />
         </div>
 
         {/* Growth Charts */}
-        <div className="lg:col-span-5 min-h-[340px] flex flex-col">
+        <div className="lg:col-span-5 flex flex-col" style={{ minHeight: 340 }}>
           <ControlTowerGrowthCharts growthData={data.growthData} />
         </div>
 
         {/* System Health */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-4 flex flex-col">
           <ControlTowerSystemHealth health={data.systemHealth} />
         </div>
       </div>

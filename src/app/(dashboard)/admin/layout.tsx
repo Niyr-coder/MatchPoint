@@ -15,6 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       currentRole="admin"
       dashboardHref="/admin"
       pageTitle="Admin"
+      darkMode={true}
     >
       {children}
     </DashboardShell>
