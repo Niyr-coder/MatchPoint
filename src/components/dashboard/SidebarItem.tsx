@@ -29,7 +29,7 @@ export function SidebarItem({ item }: { item: NavItem }) {
       className={cn(
         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-green-600 text-white font-black"
+          ? "bg-green-600/15 text-green-400 font-bold"
           : "text-zinc-400 hover:text-white hover:bg-zinc-800/60 font-medium"
       )}
     >

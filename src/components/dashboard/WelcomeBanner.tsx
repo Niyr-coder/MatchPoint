@@ -33,7 +33,7 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
   return (
     <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-zinc-100 shadow-sm">
       {/* Top accent stripe */}
-      <div className="h-1.5 w-full absolute top-0 left-0 right-0 bg-[#1a56db]" />
+      <div className="h-1.5 w-full absolute top-0 left-0 right-0 bg-[#16a34a]" />
 
       <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
         {/* Avatar */}
@@ -46,7 +46,7 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
 
         {/* Name + date + sports */}
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a56db] mb-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16a34a] mb-1">
             Bienvenido de vuelta
           </p>
           <h1
@@ -62,7 +62,7 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
             {SPORTS.map((sport) => (
               <span
                 key={sport}
-                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"
               >
                 {sport}
               </span>
