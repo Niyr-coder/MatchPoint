@@ -641,3 +641,301 @@ export async function getAdminModerationData(): Promise<AdminModerationData> {
     return EMPTY
   }
 }
+
+// ============================================================
+// Control Tower — consolidated data for admin home dashboard
+// ============================================================
+
+export interface ControlTowerKPIs {
+  totalUsers: number
+  activePlayersThisWeek: number
+  totalClubs: number
+  activeMatchesToday: number
+  totalRevenue: number
+  revenueThisMonth: number
+  revenueLastMonth: number
+  newUsersThisMonth: number
+  totalTournaments: number
+}
+
+export interface ActivityFeedEntry {
+  id: string
+  action: string
+  entity_type: string | null
+  details: Record<string, unknown>
+  created_at: string
+}
+
+export interface SystemHealthData {
+  suspendedUsers: number
+  pendingClubRequests: number
+  cancelledReservationsToday: number
+  inactiveClubs: number
+}
+
+export interface ControlTowerRanking {
+  id: string
+  name: string
+  value: number
+  secondary?: string
+}
+
+export interface ControlTowerData {
+  kpis: ControlTowerKPIs
+  activityFeed: ActivityFeedEntry[]
+  growthData: {
+    usersByMonth: Array<{ month: string; users: number }>
+    matchesByMonth: Array<{ month: string; matches: number }>
+    revenueByMonth: Array<{ month: string; revenue: number }>
+  }
+  systemHealth: SystemHealthData
+  topClubs: ControlTowerRanking[]
+  topPlayers: ControlTowerRanking[]
+  topTournaments: ControlTowerRanking[]
+  revenue: {
+    total: number
+    thisMonth: number
+    lastMonth: number
+    avgPerMatch: number
+    tournamentRevenue: number
+    topClubsByRevenue: Array<{ id: string; name: string; revenue: number; matches: number }>
+  }
+}
+
+export async function getAdminControlTowerData(): Promise<ControlTowerData> {
+  const supabase = await createServiceClient()
+
+  const now = new Date()
+  const todayStr = now.toISOString().split("T")[0]
+  const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const firstLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
+  const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7)
+  const monthStart6 = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+
+  const [
+    usersCountRes,
+    clubsCountRes,
+    tournamentsCountRes,
+    activeMatchesRes,
+    newUsersMonthRes,
+    revenueReservationsRes,
+    tournamentRevenueRes,
+    activityFeedRes,
+    suspendedUsersRes,
+    pendingClubRequestsRes,
+    cancelledTodayRes,
+    inactiveClubsCountRes,
+    topPlayersRes,
+    topTournamentsRes,
+    clubsNamesRes,
+    sixMonthUsersRes,
+    sixMonthReservationsRes,
+  ] = await Promise.all([
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("clubs").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("tournaments").select("id", { count: "exact", head: true }),
+    supabase
+      .from("reservations")
+      .select("id", { count: "exact", head: true })
+      .eq("date", todayStr)
+      .eq("status", "confirmed"),
+    supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", firstThisMonth),
+    supabase
+      .from("reservations")
+      .select("created_at, total_price, club_id")
+      .neq("status", "cancelled"),
+    supabase
+      .from("tournament_participants")
+      .select("tournament_id, tournaments(entry_fee)")
+      .eq("payment_status", "paid"),
+    supabase
+      .from("audit_log")
+      .select("id, action, entity_type, details, created_at")
+      .order("created_at", { ascending: false })
+      .limit(40),
+    supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .not("settings->suspended_from_role", "is", null),
+    supabase
+      .from("club_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
+    supabase
+      .from("reservations")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "cancelled")
+      .gte("updated_at", `${todayStr}T00:00:00`),
+    supabase
+      .from("clubs")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", false),
+    supabase
+      .from("profiles")
+      .select("id, full_name, username, matches_played, rating")
+      .order("matches_played", { ascending: false })
+      .limit(5),
+    supabase
+      .from("tournaments")
+      .select("id, name, sport")
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase.from("clubs").select("id, name"),
+    supabase
+      .from("profiles")
+      .select("created_at")
+      .gte("created_at", monthStart6.toISOString()),
+    supabase
+      .from("reservations")
+      .select("created_at, total_price, club_id")
+      .gte("created_at", monthStart6.toISOString())
+      .neq("status", "cancelled"),
+  ])
+
+  // ---- Revenue calculations
+  const reservationRows = revenueReservationsRes.data ?? []
+  const totalRevenue = reservationRows.reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+  const revenueThisMonth = reservationRows
+    .filter((r) => new Date(r.created_at) >= new Date(firstThisMonth))
+    .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+  const revenueLastMonth = reservationRows
+    .filter((r) => {
+      const d = new Date(r.created_at)
+      return d >= new Date(firstLastMonth) && d < new Date(firstThisMonth)
+    })
+    .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+  const tournamentRevenue = (tournamentRevenueRes.data ?? []).reduce((s, p) => {
+    const fee = Number((p.tournaments as { entry_fee?: number } | null)?.entry_fee ?? 0)
+    return s + fee
+  }, 0)
+
+  const activePlayersThisWeek = (sixMonthUsersRes.data ?? []).filter(
+    (u) => new Date(u.created_at) >= weekAgo
+  ).length
+
+  const kpis: ControlTowerKPIs = {
+    totalUsers: usersCountRes.count ?? 0,
+    activePlayersThisWeek,
+    totalClubs: clubsCountRes.count ?? 0,
+    activeMatchesToday: activeMatchesRes.count ?? 0,
+    totalRevenue,
+    revenueThisMonth,
+    revenueLastMonth,
+    newUsersThisMonth: newUsersMonthRes.count ?? 0,
+    totalTournaments: tournamentsCountRes.count ?? 0,
+  }
+
+  // ---- Activity feed
+  const activityFeed: ActivityFeedEntry[] = (activityFeedRes.data ?? []).map((row) => ({
+    id: row.id as string,
+    action: row.action as string,
+    entity_type: row.entity_type as string | null,
+    details: (row.details ?? {}) as Record<string, unknown>,
+    created_at: row.created_at as string,
+  }))
+
+  // ---- Growth charts (6 months)
+  function ctMonthLabel(d: Date) {
+    return d.toLocaleDateString("es-EC", { month: "short", year: "2-digit" })
+  }
+  const months6 = Array.from({ length: 6 }, (_, i) =>
+    new Date(now.getFullYear(), now.getMonth() - 5 + i, 1)
+  )
+  const userRows6 = sixMonthUsersRes.data ?? []
+  const resRows6 = sixMonthReservationsRes.data ?? []
+
+  const usersByMonth = months6.map((m) => {
+    const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+    const users = userRows6.filter((u) => {
+      const d = new Date(u.created_at); return d >= m && d < next
+    }).length
+    return { month: ctMonthLabel(m), users }
+  })
+  const matchesByMonth = months6.map((m) => {
+    const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+    const matches = resRows6.filter((r) => {
+      const d = new Date(r.created_at); return d >= m && d < next
+    }).length
+    return { month: ctMonthLabel(m), matches }
+  })
+  const revenueByMonth = months6.map((m) => {
+    const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+    const revenue = resRows6
+      .filter((r) => { const d = new Date(r.created_at); return d >= m && d < next })
+      .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+    return { month: ctMonthLabel(m), revenue }
+  })
+
+  // ---- System health
+  const systemHealth: SystemHealthData = {
+    suspendedUsers: suspendedUsersRes.count ?? 0,
+    pendingClubRequests: pendingClubRequestsRes.count ?? 0,
+    cancelledReservationsToday: cancelledTodayRes.count ?? 0,
+    inactiveClubs: inactiveClubsCountRes.count ?? 0,
+  }
+
+  // ---- Top rankings
+  const clubsById: Record<string, string> = {}
+  for (const c of clubsNamesRes.data ?? []) clubsById[c.id] = c.name
+  const clubRevMap: Record<string, { revenue: number; matches: number }> = {}
+  for (const r of reservationRows) {
+    if (!r.club_id) continue
+    const cur = clubRevMap[r.club_id] ?? { revenue: 0, matches: 0 }
+    clubRevMap[r.club_id] = {
+      revenue: cur.revenue + (Number(r.total_price) || 0),
+      matches: cur.matches + 1,
+    }
+  }
+  const topClubs: ControlTowerRanking[] = Object.entries(clubRevMap)
+    .map(([id, v]) => ({ id, name: clubsById[id] ?? id, value: v.matches, secondary: `$${v.revenue.toFixed(0)}` }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5)
+
+  const topPlayers: ControlTowerRanking[] = (topPlayersRes.data ?? []).map((p) => ({
+    id: p.id,
+    name: p.full_name ?? p.username ?? "—",
+    value: p.matches_played ?? 0,
+    secondary: p.rating ? `★ ${Number(p.rating).toFixed(1)}` : undefined,
+  }))
+
+  // Participant counts per tournament
+  const participantCountRes = await supabase
+    .from("tournament_participants")
+    .select("tournament_id")
+  const participantCount: Record<string, number> = {}
+  for (const p of participantCountRes.data ?? []) {
+    participantCount[p.tournament_id] = (participantCount[p.tournament_id] ?? 0) + 1
+  }
+  const topTournaments: ControlTowerRanking[] = (topTournamentsRes.data ?? [])
+    .map((t) => ({ id: t.id, name: t.name, value: participantCount[t.id] ?? 0, secondary: t.sport }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5)
+
+  // ---- Revenue breakdown
+  const topClubsByRevenue = Object.entries(clubRevMap)
+    .map(([id, v]) => ({ id, name: clubsById[id] ?? id, revenue: v.revenue, matches: v.matches }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 6)
+  const avgPerMatch = reservationRows.length > 0 ? totalRevenue / reservationRows.length : 0
+
+  return {
+    kpis,
+    activityFeed,
+    growthData: { usersByMonth, matchesByMonth, revenueByMonth },
+    systemHealth,
+    topClubs,
+    topPlayers,
+    topTournaments,
+    revenue: {
+      total: totalRevenue,
+      thisMonth: revenueThisMonth,
+      lastMonth: revenueLastMonth,
+      avgPerMatch,
+      tournamentRevenue,
+      topClubsByRevenue,
+    },
+  }
+}
