@@ -19,7 +19,7 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className="flex h-screen overflow-hidden relative bg-[#ede9e1]">
+    <div className="flex h-screen overflow-hidden relative bg-[#f8f9fb]">
       {/* Warm subtle gradient overlay */}
       <div
         className="pointer-events-none absolute inset-0"
