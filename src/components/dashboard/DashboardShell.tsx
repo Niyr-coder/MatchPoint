@@ -22,14 +22,14 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className={`flex h-screen overflow-hidden relative ${darkMode ? "bg-zinc-950" : "bg-slate-100"}`}>
-      {/* Subtle brand gradient (light mode only) */}
+    <div className={`flex h-screen overflow-hidden relative ${darkMode ? "bg-zinc-950" : "bg-[#ede9e1]"}`}>
+      {/* Warm subtle gradient overlay (light mode only) */}
       {!darkMode && (
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 60% 50% at 5% 95%, rgba(22,163,74,0.07) 0%, transparent 100%)",
+              "radial-gradient(ellipse 70% 60% at 0% 100%, rgba(234,179,8,0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 100% 0%, rgba(249,115,22,0.05) 0%, transparent 60%)",
           }}
         />
       )}

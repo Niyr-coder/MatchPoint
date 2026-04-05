@@ -37,12 +37,18 @@ function formatDate(dateStr: string): string {
 
 export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps) {
   return (
-    <div className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col">
+    <div
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white"
+      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
         <div className="flex items-center gap-2">
-          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
-            <Calendar className="size-4 text-zinc-500" />
+          <div
+            className="size-8 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #fff7ed, #fed7aa)" }}
+          >
+            <Calendar className="size-4 text-orange-500" />
           </div>
           <h2 className="text-sm font-black uppercase tracking-tight text-[#0a0a0a]">
             Mis Reservas
@@ -57,7 +63,7 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
       </div>
 
       {/* Reservation list */}
-      <div className="flex-1 divide-y divide-[#f0f0f0]">
+      <div className="flex-1 divide-y divide-zinc-50">
         {reservations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 gap-2">
             <Clock className="size-7 text-zinc-300" />
@@ -74,8 +80,8 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
 
             return (
               <div key={r.id} className="flex items-center gap-3 px-6 py-3.5">
-                <div className="size-9 rounded-xl bg-[#f5f5f5] flex items-center justify-center shrink-0">
-                  <Clock className="size-3.5 text-zinc-400" />
+                <div className="size-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                  <Clock className="size-3.5 text-orange-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[#0a0a0a] truncate">{courtName || "Cancha"}</p>
@@ -93,7 +99,7 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-3 border-t border-[#f0f0f0]">
+      <div className="px-6 py-3 border-t border-zinc-50">
         {inviteCount > 0 ? (
           <Link href="/dashboard/reservations" className="text-[11px] font-bold text-[#16a34a] hover:underline">
             Ver invitaciones ({inviteCount}) →

@@ -38,7 +38,10 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
   return (
     <div
       className="animate-fade-in-up relative rounded-2xl overflow-hidden"
-      style={{ background: "#1a56db" }}
+      style={{
+        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+        boxShadow: "0 4px 20px rgba(15,23,42,0.25)",
+      }}
     >
       <div className="relative z-10">
         {/* Header */}
@@ -53,7 +56,8 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
           </div>
           <Link
             href="/dashboard/tournaments/create"
-            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 bg-white text-[#1d4ed8] rounded-full hover:bg-white/90 transition-colors"
+            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity"
+            style={{ background: "linear-gradient(135deg, #fb923c, #f97316)", color: "white" }}
           >
             <Plus className="size-3" />
             Crear Torneo

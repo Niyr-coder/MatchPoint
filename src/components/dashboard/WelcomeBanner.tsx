@@ -11,6 +11,31 @@ interface WelcomeBannerProps {
   stats: PlayerStats
 }
 
+interface StatCircleProps {
+  value: string | number
+  label: string
+  color: string
+  bg: string
+}
+
+function StatCircle({ value, label, color, bg }: StatCircleProps) {
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div
+        className="size-16 rounded-full flex flex-col items-center justify-center shadow-sm"
+        style={{ background: bg }}
+      >
+        <span className="text-lg font-black leading-none" style={{ color }}>
+          {value}
+        </span>
+      </div>
+      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-zinc-500 text-center leading-tight max-w-[60px]">
+        {label}
+      </span>
+    </div>
+  )
+}
+
 export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
   const firstName = profile.first_name ?? "Jugador"
   const displayName =
@@ -23,53 +48,66 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
     .map((n) => n![0].toUpperCase())
     .join("")
 
-  const statItems = [
-    { label: "Torneos jugados", value: stats.tournamentsPlayed.toString() },
-    { label: "Reservas este mes", value: stats.reservationsThisMonth.toString() },
-    { label: "Puntos ranking", value: stats.rankingScore.toString() },
-  ]
-
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-zinc-100 shadow-sm">
-      {/* Top accent stripe */}
-      <div className="h-1.5 w-full absolute top-0 left-0 right-0 bg-[#16a34a]" />
+    <div
+      className="animate-fade-in-up relative rounded-3xl overflow-hidden p-6 md:p-8"
+      style={{
+        background: "linear-gradient(135deg, #ffffff 0%, #fefce8 50%, #fff7ed 100%)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
+      }}
+    >
+      {/* Decorative blob top-right */}
+      <div
+        className="pointer-events-none absolute top-0 right-0 size-48 opacity-20"
+        style={{
+          background: "radial-gradient(circle, #fb923c 0%, transparent 70%)",
+          transform: "translate(30%, -30%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 size-32 opacity-15"
+        style={{
+          background: "radial-gradient(circle, #16a34a 0%, transparent 70%)",
+          transform: "translate(-30%, 30%)",
+        }}
+      />
 
-      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5">
         {/* Avatar */}
-        <Avatar className="size-16 shrink-0 ring-2 ring-zinc-200">
+        <Avatar className="size-14 shrink-0 ring-4 ring-white shadow-md">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-          <AvatarFallback className="bg-zinc-100 text-zinc-700 text-xl font-black">
+          <AvatarFallback className="bg-gradient-to-br from-green-400 to-emerald-600 text-white text-xl font-black">
             {initials || "J"}
           </AvatarFallback>
         </Avatar>
 
         {/* Name + date + sports */}
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16a34a] mb-1">
-            Bienvenido de vuelta
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-orange-500 mb-0.5">
+            Bienvenido de vuelta 👋
           </p>
           <h1
-            className="font-black text-zinc-900 uppercase leading-[0.9] tracking-[-0.03em] truncate"
-            style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}
+            className="font-black text-zinc-900 leading-[0.9] tracking-[-0.03em] truncate"
+            style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}
           >
             Hola, {firstName}.
           </h1>
           <p className="mt-1.5 text-zinc-400 text-sm capitalize">{date}</p>
 
-          {/* Sport chips — Pickleball highlighted as primary */}
+          {/* Sport chips — Pickleball highlighted */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {SPORT_OPTIONS.map(({ value, label }) =>
               value === PRIMARY_SPORT ? (
                 <span
                   key={value}
-                  className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#16a34a] text-white border border-[#16a34a]"
+                  className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-sm"
                 >
-                  {label}
+                  🏓 {label}
                 </span>
               ) : (
                 <span
                   key={value}
-                  className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200"
+                  className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/70 text-zinc-500 border border-zinc-200"
                 >
                   {label}
                 </span>
@@ -78,16 +116,26 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
           </div>
         </div>
 
-        {/* Mini stats */}
-        <div className="flex gap-6 shrink-0 sm:border-l sm:border-zinc-200 sm:pl-6">
-          {statItems.map(({ label, value }) => (
-            <div key={label} className="text-center">
-              <p className="text-xl font-black text-zinc-900">{value}</p>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mt-0.5">
-                {label}
-              </p>
-            </div>
-          ))}
+        {/* Stat circles — reference design style */}
+        <div className="flex items-end gap-4 shrink-0">
+          <StatCircle
+            value={stats.tournamentsPlayed}
+            label="Torneos jugados"
+            color="#fb923c"
+            bg="linear-gradient(135deg, #fff7ed, #fed7aa)"
+          />
+          <StatCircle
+            value={stats.reservationsThisMonth}
+            label="Reservas mes"
+            color="#16a34a"
+            bg="linear-gradient(135deg, #f0fdf4, #bbf7d0)"
+          />
+          <StatCircle
+            value={stats.rankingScore}
+            label="Puntos ranking"
+            color="#7c3aed"
+            bg="linear-gradient(135deg, #f5f3ff, #ddd6fe)"
+          />
         </div>
       </div>
     </div>

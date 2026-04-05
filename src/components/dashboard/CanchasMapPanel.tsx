@@ -17,9 +17,12 @@ const SPORT_LABEL: Record<string, string> = {
 
 export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
   return (
-    <div className="animate-fade-in-up rounded-2xl bg-[#f0fdf4] border border-[#bbf7d0] overflow-hidden flex flex-col">
+    <div
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white"
+      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#bbf7d0]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
         <div className="flex items-center gap-2">
           <div className="size-8 rounded-xl bg-[#16a34a]/10 flex items-center justify-center">
             <MapPin className="size-4 text-[#16a34a]" />
@@ -34,7 +37,13 @@ export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
       </div>
 
       {/* Map placeholder */}
-      <div className="mx-4 mt-4 rounded-xl bg-[#e2f3e8] border-2 border-dashed border-[#86efac] flex flex-col items-center justify-center gap-2 py-8">
+      <div
+        className="mx-4 mt-4 rounded-xl flex flex-col items-center justify-center gap-2 py-8"
+        style={{
+          background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+          border: "2px dashed #86efac",
+        }}
+      >
         <Navigation className="size-7 text-[#16a34a]/50" />
         <p className="text-xs font-bold text-[#16a34a]/60 text-center">
           Mapa interactivo próximamente
@@ -45,7 +54,7 @@ export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
       </div>
 
       {/* Court list */}
-      <div className="flex-1 divide-y divide-[#bbf7d0] mt-2">
+      <div className="flex-1 divide-y divide-zinc-50 mt-2">
         {courts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 gap-1">
             <p className="text-xs font-bold text-[#16a34a]/50">Sin canchas disponibles</p>
