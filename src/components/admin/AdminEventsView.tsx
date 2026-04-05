@@ -145,13 +145,9 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
     setModalLoading(true)
     setModalError(null)
 
-    const startIso = form.start_time
-      ? `${form.start_date}T${form.start_time}:00`
-      : form.start_date
+    const startIso = `${form.start_date}T${form.start_time || "00:00"}:00Z`
     const endIso = form.end_date
-      ? form.end_time
-        ? `${form.end_date}T${form.end_time}:00`
-        : form.end_date
+      ? `${form.end_date}T${form.end_time || "00:00"}:00Z`
       : undefined
 
     const payload = {
@@ -169,7 +165,9 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
       is_free:               form.is_free,
       price:                 !form.is_free && form.price ? parseFloat(form.price) : undefined,
       visibility:            form.visibility,
-      registration_deadline: form.registration_deadline || undefined,
+      registration_deadline: form.registration_deadline
+        ? `${form.registration_deadline}T00:00:00Z`
+        : undefined,
       min_participants:      form.min_participants ? parseInt(form.min_participants, 10) : undefined,
       organizer_name:        form.organizer_name || undefined,
       organizer_contact:     form.organizer_contact || undefined,
