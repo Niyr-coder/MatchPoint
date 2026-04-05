@@ -30,8 +30,8 @@ export default async function AdminInvitesPage() {
         title="Invitaciones"
         description="Todos los invite links generados en la plataforma."
         action={
-          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-zinc-100 text-zinc-500 border-zinc-200">
-            {invites.length} cargados
+          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-teal-50 text-teal-700 border-teal-200">
+            {invites.filter((i) => i.is_active).length} activos
           </span>
         }
       />

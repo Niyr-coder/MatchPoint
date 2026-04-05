@@ -117,3 +117,87 @@ export async function GET(
     )
   }
 }
+
+// ── POST /api/admin/invites ───────────────────────────────────────────────────
+
+interface CreateInviteBody {
+  entity_type: string
+  entity_id: string
+  max_uses?: number | null
+  expires_at?: string | null
+  metadata?: Record<string, unknown>
+}
+
+interface CreatedInvite {
+  id: string
+  code: string
+  invite_url: string
+}
+
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<ApiResponse<CreatedInvite>>> {
+  const authResult = await authorize({ requiredRoles: ["admin"] })
+  if (!authResult.ok) {
+    return NextResponse.json(
+      { success: false, data: null, error: "No autorizado" },
+      { status: 403 }
+    )
+  }
+
+  let body: CreateInviteBody
+  try {
+    body = (await request.json()) as CreateInviteBody
+  } catch {
+    return NextResponse.json(
+      { success: false, data: null, error: "Cuerpo de la solicitud inválido" },
+      { status: 400 }
+    )
+  }
+
+  const { entity_type, entity_id, max_uses, expires_at, metadata } = body
+
+  if (!entity_type || !entity_id) {
+    return NextResponse.json(
+      { success: false, data: null, error: "entity_type y entity_id son requeridos" },
+      { status: 400 }
+    )
+  }
+
+  try {
+    const supabase = createServiceClient()
+
+    const { data, error } = await supabase
+      .from("invite_links")
+      .insert({
+        entity_type,
+        entity_id,
+        created_by: authResult.context.userId,
+        max_uses: max_uses ?? null,
+        expires_at: expires_at ?? null,
+        metadata: metadata ?? {},
+        is_active: true,
+        uses_count: 0,
+      })
+      .select("id, code")
+      .single()
+
+    if (error) throw new Error(error.message)
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://matchpoint.top"
+    const created: CreatedInvite = {
+      id: data.id as string,
+      code: data.code as string,
+      invite_url: `${baseUrl}/invite/${data.code as string}`,
+    }
+
+    return NextResponse.json({ success: true, data: created, error: null })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Error desconocido"
+    console.error("[POST /api/admin/invites]", message)
+    return NextResponse.json(
+      { success: false, data: null, error: "Error al crear el invite link" },
+      { status: 500 }
+    )
+  }
+}
