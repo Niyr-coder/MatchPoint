@@ -1,9 +1,10 @@
 import type { SportCategory, Feature, Stat, NavLink, FooterColumn } from "@/types"
+import { SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
 
 export const SITE_NAME = "MATCHPOINT"
 export const SITE_TAGLINE = "DOMINA TU JUEGO"
 export const SITE_DESCRIPTION =
-  "La plataforma deportiva definitiva para fútbol, pádel, tenis y pickleball. Encuentra canchas, rivales y torneos cerca de ti."
+  "La plataforma #1 de Pickleball en Ecuador. Pickleball, pádel, tenis y fútbol. Encuentra canchas, rivales y torneos cerca de ti."
 
 export const NAV_LINKS: NavLink[] = [
   { label: "Deportes", href: "#deportes" },
@@ -12,44 +13,31 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Únete", href: "#waitlist" },
 ]
 
-export const SPORTS: SportCategory[] = [
-  {
-    id: "futbol",
-    name: "Fútbol 7",
-    emoji: "⚽",
-    description: "El deporte rey. Encuentra ligas, equipos y canchas cercanas.",
-    players: "11 vs 11",
-    gradient: "from-green-900/80 to-black/90",
-    image: "/images/landing/futbol.png",
-  },
-  {
-    id: "padel",
-    name: "Pádel",
-    emoji: "🎾",
-    description: "El deporte de moda. Reserva pistas y encuentra tu pareja ideal.",
-    players: "2 vs 2",
-    gradient: "from-emerald-900/80 to-black/90",
-    image: "/images/landing/padel.png",
-  },
-  {
-    id: "tenis",
-    name: "Tenis",
-    emoji: "🏸",
-    description: "Clásico y elegante. Compite en torneos locales y mejora tu ranking.",
-    players: "1 vs 1 / 2 vs 2",
-    gradient: "from-lime-900/80 to-black/90",
-    image: "/images/landing/tenis.png",
-  },
-  {
-    id: "pickleball",
-    name: "Pickleball",
-    emoji: "🏓",
-    description: "El deporte de más rápido crecimiento. Únete a la revolución.",
-    players: "2 vs 2",
-    gradient: "from-teal-900/80 to-black/90",
-    image: "/images/landing/pickleball.png",
-  },
-]
+// Landing-page display metadata that extends SportConfig with visual fields.
+// The canonical sport list comes from SPORT_IDS; this adds gradient + image.
+const SPORT_LANDING_EXTRAS: Record<
+  string,
+  { name: string; players: string; gradient: string; image: string }
+> = {
+  futbol:     { name: "Fútbol 7",   players: "11 vs 11",        gradient: "from-green-900/80 to-black/90",   image: "/images/landing/futbol.png" },
+  padel:      { name: "Pádel",      players: "2 vs 2",           gradient: "from-emerald-900/80 to-black/90", image: "/images/landing/padel.png" },
+  tenis:      { name: "Tenis",      players: "1 vs 1 / 2 vs 2",  gradient: "from-lime-900/80 to-black/90",    image: "/images/landing/tenis.png" },
+  pickleball: { name: "Pickleball", players: "2 vs 2",           gradient: "from-teal-900/80 to-black/90",    image: "/images/landing/pickleball.png" },
+}
+
+export const SPORTS: SportCategory[] = SPORT_IDS.map((id) => {
+  const cfg = SPORT_CONFIG[id]
+  const extras = SPORT_LANDING_EXTRAS[id]
+  return {
+    id: cfg.id,
+    name: extras.name,
+    emoji: cfg.emoji,
+    description: cfg.description,
+    players: extras.players,
+    gradient: extras.gradient,
+    image: extras.image,
+  }
+})
 
 export const FEATURES: Feature[] = [
   {

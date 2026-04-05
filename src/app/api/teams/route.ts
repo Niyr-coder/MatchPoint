@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
+import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 
 // ──────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ interface CreatedTeam {
 
 const createTeamSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(100),
-  sport: z.enum(["futbol", "padel", "tenis", "pickleball"]).nullish(),
+  sport: z.enum(SPORT_IDS).nullish(),
   description: z.string().max(500).nullish(),
 })
 

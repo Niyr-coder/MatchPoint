@@ -9,6 +9,7 @@ import {
   createEvent,
 } from "@/lib/events/queries"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
+import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { Event, EventFilters } from "@/lib/events/queries"
 
@@ -27,29 +28,24 @@ const EVENT_TYPES = [
   "other",
 ] as const
 
-const SPORT_TYPES = ["futbol", "padel", "tenis", "pickleball"] as const
-
 const VISIBILITY_TYPES = ["public", "club_only", "invite_only"] as const
 
 const createEventSchema = z.object({
   title: z.string().min(3, "El título debe tener al menos 3 caracteres").max(200),
   description: z.string().max(5000).nullish(),
-  sport: z.enum(SPORT_TYPES).nullish(),
+  sport: z.enum(SPORT_IDS).nullish(),
   event_type: z.enum(EVENT_TYPES, { message: "Tipo de evento inválido" }),
   club_id: z.string().uuid("club_id inválido").nullish(),
   location: z.string().min(1, "La ubicación es requerida").max(300),
   city: z.string().min(1, "La ciudad es requerida").max(100),
-  start_date: z.string().datetime({ message: "Fecha de inicio inválida" }),
-  end_date: z.string().datetime({ message: "Fecha de fin inválida" }).nullish(),
-  image_url: z.string().url("URL de imagen inválida").nullish(),
+  start_date: z.iso.datetime(),
+  end_date: z.iso.datetime().nullish(),
+  image_url: z.url().nullish(),
   max_capacity: z.number().int().positive().nullish(),
   price: z.number().min(0).default(0),
   is_free: z.boolean().default(true),
   visibility: z.enum(VISIBILITY_TYPES).default("public"),
-  registration_deadline: z
-    .string()
-    .datetime({ message: "Fecha límite inválida" })
-    .nullish(),
+  registration_deadline: z.iso.datetime().nullish(),
   min_participants: z.number().int().positive().nullish(),
   tags: z.array(z.string().max(50)).max(10).default([]),
   organizer_name: z.string().max(200).nullish(),

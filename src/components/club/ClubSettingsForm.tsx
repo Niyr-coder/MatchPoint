@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { ECUADOR_PROVINCES, ECUADOR_CITIES_BY_PROVINCE } from "@/lib/constants"
 import type { Club } from "@/types"
 
 interface ClubSettingsFormProps {
@@ -26,10 +27,17 @@ export function ClubSettingsForm({ club, clubId }: ClubSettingsFormProps) {
   const [deactivateLoading, setDeactivateLoading] = useState(false)
 
   function handleChange(field: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      // reset city when province changes
+      ...(field === "province" ? { city: "" } : {}),
+    }))
     setSuccess(false)
     setError(null)
   }
+
+  const availableCities = form.province ? (ECUADOR_CITIES_BY_PROVINCE[form.province] ?? []) : []
 
   async function handleSave() {
     setLoading(true)
@@ -119,23 +127,34 @@ export function ClubSettingsForm({ club, clubId }: ClubSettingsFormProps) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Ciudad</label>
-            <input
-              type="text"
-              value={form.city}
-              onChange={(e) => handleChange("city", e.target.value)}
-              className={inputClass}
-            />
+            <label className={labelClass}>Provincia</label>
+            <select
+              value={form.province}
+              onChange={(e) => handleChange("province", e.target.value)}
+              className={`${inputClass} appearance-none cursor-pointer`}
+            >
+              <option value="">Seleccionar provincia...</option>
+              {ECUADOR_PROVINCES.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Provincia</label>
-            <input
-              type="text"
-              value={form.province}
-              onChange={(e) => handleChange("province", e.target.value)}
-              className={inputClass}
-            />
+            <label className={`${labelClass} ${!form.province ? "opacity-40" : ""}`}>
+              Ciudad{!form.province && <span className="font-normal normal-case ml-1 tracking-normal">(elige provincia primero)</span>}
+            </label>
+            <select
+              value={form.city}
+              onChange={(e) => handleChange("city", e.target.value)}
+              disabled={!form.province}
+              className={`${inputClass} appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed`}
+            >
+              <option value="">{form.province ? "Seleccionar ciudad..." : "— Primero elige una provincia —"}</option>
+              {availableCities.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-col gap-1.5">

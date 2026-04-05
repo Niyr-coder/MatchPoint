@@ -2,7 +2,7 @@ import { authorizeOrRedirect } from "@/lib/auth/authorization"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { AccountForm } from "@/components/dashboard/AccountForm"
-import type { Profile } from "@/types"
+import type { Profile, PickleballProfile } from "@/types"
 
 function getDisplayName(profile: Profile & { username?: string | null }): string {
   return (
@@ -21,13 +21,15 @@ export default async function UserAccountPage() {
   const ctx = await authorizeOrRedirect()
 
   const supabase = await createServiceClient()
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", ctx.userId)
-    .single()
+
+  // Fetch both profile and pickleball profile in parallel
+  const [{ data: profileData }, { data: pickleballData }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", ctx.userId).single(),
+    supabase.from("pickleball_profiles").select("*").eq("user_id", ctx.userId).maybeSingle(),
+  ])
 
   const profile = profileData as Profile & { username?: string | null }
+  const pickleballProfile = (pickleballData ?? null) as PickleballProfile | null
   const displayName = getDisplayName(profile)
   const initial = getInitial(profile)
 
@@ -104,7 +106,7 @@ export default async function UserAccountPage() {
 
         {/* ── Right: edit form (col-span-2) ── */}
         <div className="col-span-1 lg:col-span-2">
-          <AccountForm profile={profile} email={email} />
+          <AccountForm profile={profile} email={email} pickleballProfile={pickleballProfile} />
         </div>
       </div>
     </div>

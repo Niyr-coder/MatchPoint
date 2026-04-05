@@ -1,4 +1,37 @@
 import { z } from "zod"
+import { SPORT_IDS } from "@/lib/sports/config"
+
+// ──────────────────────────────────────────────────────────
+// Pickleball-specific enums — single source of truth
+// ──────────────────────────────────────────────────────────
+
+export const PICKLEBALL_SKILL_LEVELS = ["beginner", "intermediate", "advanced", "pro"] as const
+export type PickleballSkillLevel = typeof PICKLEBALL_SKILL_LEVELS[number]
+
+export const PICKLEBALL_SKILL_LEVEL_LABELS: Record<PickleballSkillLevel, string> = {
+  beginner: "Principiante (1.0–2.5)",
+  intermediate: "Intermedio (2.5–4.0)",
+  advanced: "Avanzado (4.0–5.5)",
+  pro: "Pro (5.5+)",
+}
+
+export const PICKLEBALL_PLAY_STYLES = ["singles", "doubles", "both"] as const
+export type PickleballPlayStyle = typeof PICKLEBALL_PLAY_STYLES[number]
+
+export const PICKLEBALL_PLAY_STYLE_LABELS: Record<PickleballPlayStyle, string> = {
+  singles: "Individuales",
+  doubles: "Dobles",
+  both: "Ambos",
+}
+
+export const DOMINANT_HANDS = ["right", "left", "ambidextrous"] as const
+export type DominantHand = typeof DOMINANT_HANDS[number]
+
+export const DOMINANT_HAND_LABELS: Record<DominantHand, string> = {
+  right: "Derecha",
+  left: "Izquierda",
+  ambidextrous: "Ambidiestro",
+}
 
 export const waitlistSchema = z.object({
   email: z
@@ -54,6 +87,22 @@ export const onboardingSchema = z.object({
       const exactAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age
       return exactAge >= 14
     }, "Debes tener al menos 14 años"),
+  // Sport selection — optional fields added for Pickleball-First MVP
+  preferred_sport: z.enum(SPORT_IDS).optional().default("pickleball"),
+  pickleball_skill_level: z.enum(PICKLEBALL_SKILL_LEVELS).optional(),
+  pickleball_play_style: z.enum(PICKLEBALL_PLAY_STYLES).optional(),
 })
 
 export type OnboardingFormInput = z.infer<typeof onboardingSchema>
+
+// ──────────────────────────────────────────────────────────
+// Pickleball profile upsert schema (used by AccountForm)
+// ──────────────────────────────────────────────────────────
+
+export const pickleballProfileSchema = z.object({
+  skill_level: z.enum(PICKLEBALL_SKILL_LEVELS).optional(),
+  dominant_hand: z.enum(DOMINANT_HANDS).optional(),
+  play_style: z.enum(PICKLEBALL_PLAY_STYLES).optional(),
+})
+
+export type PickleballProfileInput = z.infer<typeof pickleballProfileSchema>

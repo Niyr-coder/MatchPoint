@@ -32,7 +32,7 @@ function StatItem({ icon: Icon, value, suffix, label, index }: StatItemProps) {
 
 const STATS_WITH_ICONS = [
   { icon: Users, value: 5000, suffix: "+", label: "Jugadores activos" },
-  { icon: Trophy, value: 4, suffix: "", label: "Deportes" },
+  { icon: Trophy, value: 4, suffix: "", label: "🏓 Pickleball + 3 deportes" },
   { icon: MapPin, value: 200, suffix: "+", label: "Canchas disponibles" },
   { icon: Star, value: 98, suffix: "%", label: "Satisfacción" },
 ] as const

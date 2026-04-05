@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { CoachClassInvitePanel } from "@/components/invites/CoachClassInvitePanel"
 import { Users } from "lucide-react"
 import type { StudentEntry } from "@/lib/coach/queries"
 
@@ -76,6 +77,9 @@ export default async function StudentsPage({
           variant="accent"
         />
       </div>
+
+      {/* Invite panel */}
+      <CoachClassInvitePanel coachUserId={ctx.userId} clubId={clubId} />
 
       {/* Students grid */}
       {students.length === 0 ? (

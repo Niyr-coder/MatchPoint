@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ECUADOR_PROVINCES } from "@/lib/constants"
+import { ECUADOR_PROVINCES, ECUADOR_CITIES_BY_PROVINCE } from "@/lib/constants"
+import { SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
 import { Loader2 } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -24,12 +25,11 @@ interface FormErrors {
   contactEmail?: string
 }
 
-const SPORTS_OPTIONS = [
-  { value: "futbol", label: "Fútbol", emoji: "⚽" },
-  { value: "padel", label: "Pádel", emoji: "🏓" },
-  { value: "tenis", label: "Tenis", emoji: "🎾" },
-  { value: "pickleball", label: "Pickleball", emoji: "🏸" },
-]
+const SPORTS_OPTIONS = SPORT_IDS.map((id) => ({
+  value: id,
+  label: SPORT_CONFIG[id].label,
+  emoji: SPORT_CONFIG[id].emoji,
+}))
 
 const INITIAL_FORM: FormState = {
   name: "",
@@ -78,9 +78,16 @@ export function ClubRequestForm() {
   const [submitted, setSubmitted] = useState(false)
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }))
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+      // reset city when province changes
+      ...(key === "province" ? { city: "" } : {}),
+    }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
+
+  const availableCities = form.province ? (ECUADOR_CITIES_BY_PROVINCE[form.province] ?? []) : []
 
   function toggleSport(value: string) {
     setForm((prev) => {
@@ -172,24 +179,8 @@ export function ClubRequestForm() {
         )}
       </div>
 
-      {/* City + Province */}
+      {/* Province → City (cascade) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-black uppercase tracking-wide text-zinc-500">
-            Ciudad <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={form.city}
-            onChange={(e) => updateField("city", e.target.value)}
-            placeholder="Ej. Quito"
-            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
-          />
-          {errors.city && (
-            <p className="text-xs text-red-600">{errors.city}</p>
-          )}
-        </div>
-
         <div className="flex flex-col gap-1.5">
           <label className="text-[11px] font-black uppercase tracking-wide text-zinc-500">
             Provincia <span className="text-red-500">*</span>
@@ -206,6 +197,27 @@ export function ClubRequestForm() {
           </select>
           {errors.province && (
             <p className="text-xs text-red-600">{errors.province}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-[11px] font-black uppercase tracking-wide ${form.province ? "text-zinc-500" : "text-zinc-300"}`}>
+            Ciudad <span className="text-red-500">*</span>
+            {!form.province && <span className="font-normal normal-case ml-1">(elige provincia primero)</span>}
+          </label>
+          <select
+            value={form.city}
+            onChange={(e) => updateField("city", e.target.value)}
+            disabled={!form.province}
+            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <option value="">{form.province ? "Seleccionar ciudad..." : "— Primero elige una provincia —"}</option>
+            {availableCities.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          {errors.city && (
+            <p className="text-xs text-red-600">{errors.city}</p>
           )}
         </div>
       </div>

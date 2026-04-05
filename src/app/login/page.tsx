@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const BENEFITS = [
   {
     title: "Encuentra partidos al instante",
-    description: "Conecta con jugadores de tu nivel en Fútbol, Pádel, Tenis y Pickleball.",
+    description: "Conecta con jugadores de tu nivel en Pickleball, Pádel, Tenis y Fútbol.",
   },
   {
     title: "Reserva pistas sin llamadas",
@@ -73,7 +73,7 @@ export default function LoginPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              {["⚽", "🎾", "🏓", "🏸"].map((emoji, i) => (
+              {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
                 <div
                   key={i}
                   className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0a0a0a] flex items-center justify-center text-sm"

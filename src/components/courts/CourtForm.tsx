@@ -3,18 +3,12 @@
 import { useState } from "react"
 import { z } from "zod"
 import { Loader2 } from "lucide-react"
+import { SPORT_IDS, SPORT_LABELS } from "@/lib/sports/config"
 import type { Court } from "@/lib/courts/queries"
-
-const SPORT_LABELS: Record<string, string> = {
-  futbol: "Fútbol",
-  padel: "Pádel",
-  tenis: "Tenis",
-  pickleball: "Pickleball",
-}
 
 const courtFormSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "Nombre demasiado largo"),
-  sport: z.enum(["futbol", "padel", "tenis", "pickleball"], "Selecciona un deporte"),
+  sport: z.enum(SPORT_IDS, { error: "Selecciona un deporte" }),
   surface_type: z.string().max(100).optional(),
   is_indoor: z.boolean(),
   price_per_hour: z

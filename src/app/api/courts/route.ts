@@ -2,9 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getCourts, getCourtsBySport } from "@/lib/courts/queries"
 import { z } from "zod"
+import { SPORT_IDS } from "@/lib/sports/config"
 
 const getCourtsSchema = z.object({
-  sport: z.enum(["futbol", "padel", "tenis", "pickleball"]).optional(),
+  sport: z.enum(SPORT_IDS).optional(),
   city: z.string().max(100).trim().optional(),
 })
 

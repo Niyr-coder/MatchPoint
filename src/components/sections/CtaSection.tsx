@@ -22,7 +22,7 @@ export function CtaSection() {
           </h2>
 
           <p className="text-white/60 text-lg font-medium mb-10 max-w-xl mx-auto">
-            Sé de los primeros en entrar.{" "}
+            La comunidad de Pickleball más grande de Ecuador.{" "}
             <span className="text-white font-semibold">Acceso anticipado gratuito</span>{" "}
             para los primeros 500 registrados.
           </p>
@@ -46,7 +46,7 @@ export function CtaSection() {
           style={{ animationDelay: "0.4s" }}
         >
           <div className="flex -space-x-2">
-            {["⚽", "🎾", "🏓", "🏸"].map((emoji, i) => (
+            {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
               <div
                 key={i}
                 className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0a0a0a] flex items-center justify-center text-sm"

@@ -1,6 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { SPORT_OPTIONS, PRIMARY_SPORT } from "@/lib/sports/config"
 import type { Profile } from "@/types"
 import type { PlayerStats } from "@/lib/stats/queries"
 
@@ -9,8 +10,6 @@ interface WelcomeBannerProps {
   date: string
   stats: PlayerStats
 }
-
-const SPORTS = ["Fútbol", "Pádel", "Tenis", "Pickleball"]
 
 export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
   const firstName = profile.first_name ?? "Jugador"
@@ -57,16 +56,25 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
           </h1>
           <p className="mt-1.5 text-zinc-400 text-sm capitalize">{date}</p>
 
-          {/* Sport chips */}
+          {/* Sport chips — Pickleball highlighted as primary */}
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {SPORTS.map((sport) => (
-              <span
-                key={sport}
-                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"
-              >
-                {sport}
-              </span>
-            ))}
+            {SPORT_OPTIONS.map(({ value, label }) =>
+              value === PRIMARY_SPORT ? (
+                <span
+                  key={value}
+                  className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#16a34a] text-white border border-[#16a34a]"
+                >
+                  {label}
+                </span>
+              ) : (
+                <span
+                  key={value}
+                  className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200"
+                >
+                  {label}
+                </span>
+              )
+            )}
           </div>
         </div>
 

@@ -29,7 +29,7 @@ export function HeroSection() {
           className="animate-fade-in label-green"
           style={{ animationDelay: "0.1s" }}
         >
-          Tu plataforma deportiva
+          La plataforma #1 de Pickleball en Ecuador
         </p>
 
         {/* Headline */}
@@ -45,7 +45,7 @@ export function HeroSection() {
           className="animate-fade-in-up text-white/70 text-lg md:text-xl max-w-md mb-10 font-medium leading-relaxed"
           style={{ animationDelay: "0.3s" }}
         >
-          Fútbol 7, Pádel, Tenis y Pickleball.{" "}
+          Pickleball, Pádel, Tenis y Fútbol.{" "}
           <span className="text-white">Canchas, rivales y torneos, todo en un solo lugar.</span>
         </p>
 

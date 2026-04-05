@@ -7,7 +7,19 @@ import {
   EVENT_TYPES,
   EVENT_VISIBILITIES,
 } from "@/lib/events/constants"
+import { ECUADOR_PROVINCES, ECUADOR_CITIES_BY_PROVINCE } from "@/lib/constants"
 import type { EventType, EventStatus, EventVisibility } from "@/lib/events/types"
+
+// ── helpers ────────────────────────────────────────────────────────────────────
+
+/** Find which province a city belongs to (used to restore province when editing) */
+function findProvinceByCity(city: string): string {
+  if (!city) return ""
+  for (const [province, cities] of Object.entries(ECUADOR_CITIES_BY_PROVINCE)) {
+    if (cities.includes(city)) return province
+  }
+  return ""
+}
 
 // ── types ──────────────────────────────────────────────────────────────────────
 
@@ -168,9 +180,17 @@ export function EventForm({
   onCancel,
 }: EventFormProps) {
   const [form, setForm] = useState<EventFormState>(initial)
+  const [province, setProvince] = useState<string>(() => findProvinceByCity(initial.city))
+
+  const availableCities = province ? (ECUADOR_CITIES_BY_PROVINCE[province] ?? []) : []
 
   function set<K extends keyof EventFormState>(key: K, value: EventFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function handleProvinceChange(value: string) {
+    setProvince(value)
+    set("city", "")
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -255,30 +275,48 @@ export function EventForm({
         </div>
       )}
 
-      {/* City + Location */}
+      {/* Province → City → Location */}
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <Label>Ciudad</Label>
-          <input
-            type="text"
+          <Label>Provincia</Label>
+          <select
+            value={province}
+            onChange={(e) => handleProvinceChange(e.target.value)}
+            className={`${inputCls} appearance-none cursor-pointer`}
+          >
+            <option value="">Seleccionar provincia...</option>
+            {ECUADOR_PROVINCES.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>Ciudad{!province ? <span className="font-normal normal-case ml-1 text-zinc-400 tracking-normal">(elige provincia)</span> : ""}</Label>
+          <select
             value={form.city}
             onChange={(e) => set("city", e.target.value)}
-            maxLength={80}
-            placeholder="Guayaquil"
-            className={inputCls}
-          />
+            disabled={!province}
+            className={`${inputCls} appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            <option value="">{province ? "Seleccionar ciudad..." : "— Primero elige provincia —"}</option>
+            {availableCities.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Ubicación</Label>
-          <input
-            type="text"
-            value={form.location}
-            onChange={(e) => set("location", e.target.value)}
-            maxLength={150}
-            placeholder="Club Deportivo Norte, Cancha 3"
-            className={inputCls}
-          />
-        </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label>Ubicación</Label>
+        <input
+          type="text"
+          value={form.location}
+          onChange={(e) => set("location", e.target.value)}
+          maxLength={150}
+          placeholder="Club Deportivo Norte, Cancha 3"
+          className={inputCls}
+        />
       </div>
 
       {/* Start date + time */}

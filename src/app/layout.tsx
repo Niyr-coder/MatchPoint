@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  keywords: ["fútbol", "pádel", "tenis", "pickleball", "deportes", "canchas", "torneos"],
+  keywords: ["pickleball", "pádel", "tenis", "fútbol", "deportes", "canchas", "torneos", "pickleball ecuador"],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://matchpoint.vercel.app"),

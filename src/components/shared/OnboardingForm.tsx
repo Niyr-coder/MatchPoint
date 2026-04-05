@@ -3,7 +3,15 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, CheckCircle, XCircle } from "lucide-react"
-import { onboardingSchema } from "@/lib/validations"
+import {
+  onboardingSchema,
+  PICKLEBALL_SKILL_LEVELS,
+  PICKLEBALL_SKILL_LEVEL_LABELS,
+  PICKLEBALL_PLAY_STYLE_LABELS,
+} from "@/lib/validations"
+import { SPORT_IDS, SPORT_CONFIG, PRIMARY_SPORT } from "@/lib/sports/config"
+import type { SportId } from "@/types"
+import type { PickleballSkillLevel, PickleballPlayStyle } from "@/lib/validations"
 import { ECUADOR_CITIES_BY_PROVINCE, ECUADOR_PROVINCES } from "@/lib/constants"
 
 type Status = "idle" | "loading" | "success" | "error"
@@ -40,6 +48,11 @@ export function OnboardingForm() {
   const [dobDay, setDobDay] = useState("")
   const [dobMonth, setDobMonth] = useState("")
   const [dobYear, setDobYear] = useState("")
+
+  // Sport selection — Pickleball-First MVP
+  const [preferredSport, setPreferredSport] = useState<SportId>(PRIMARY_SPORT)
+  const [pickleballSkillLevel, setPickleballSkillLevel] = useState<PickleballSkillLevel | "">("")
+  const [pickleballPlayStyle, setPickleballPlayStyle] = useState<PickleballPlayStyle | "">("")
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<Status>("idle")
@@ -109,6 +122,13 @@ export function OnboardingForm() {
       city,
       phone,
       date_of_birth: buildDob(),
+      preferred_sport: preferredSport,
+      ...(preferredSport === "pickleball" && pickleballSkillLevel
+        ? { pickleball_skill_level: pickleballSkillLevel }
+        : {}),
+      ...(preferredSport === "pickleball" && pickleballPlayStyle
+        ? { pickleball_play_style: pickleballPlayStyle }
+        : {}),
     }
 
     const parsed = onboardingSchema.safeParse(payload)
@@ -353,6 +373,96 @@ export function OnboardingForm() {
         </div>
         {fieldErrors.date_of_birth && (
           <p className="text-xs text-red-500 mt-1.5">{fieldErrors.date_of_birth}</p>
+        )}
+      </div>
+
+      {/* ── Deporte principal ─────────────────────────────── */}
+      <div className="pt-2 border-t border-[#f0f0f0]">
+        <p className="text-xs font-semibold text-[#0a0a0a] mb-3">Tu deporte principal</p>
+
+        {/* Sport selector — pill buttons */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {SPORT_IDS.map((sportId) => {
+            const cfg = SPORT_CONFIG[sportId]
+            const active = preferredSport === sportId
+            return (
+              <button
+                key={sportId}
+                type="button"
+                onClick={() => setPreferredSport(sportId)}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
+                  active
+                    ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
+                    : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                }`}
+              >
+                <span>{cfg.emoji}</span>
+                <span>{cfg.label}</span>
+                {cfg.isPrimary && !active && (
+                  <span className="ml-1 text-[9px] font-black text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] rounded-full px-1.5 py-0.5 uppercase tracking-wider">
+                    Nuevo
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Pickleball extra fields — shown only when pickleball is selected */}
+        {preferredSport === "pickleball" && (
+          <div className="space-y-3 rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+              Perfil de Pickleball
+            </p>
+
+            {/* Skill level */}
+            <div>
+              <label htmlFor="pickleball_skill_level" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+                ¿Cuál es tu nivel?
+              </label>
+              <select
+                id="pickleball_skill_level"
+                value={pickleballSkillLevel}
+                onChange={(e) => setPickleballSkillLevel(e.target.value as PickleballSkillLevel | "")}
+                className={selectClass()}
+              >
+                <option value="">Selecciona tu nivel (opcional)</option>
+                {PICKLEBALL_SKILL_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {PICKLEBALL_SKILL_LEVEL_LABELS[level]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Play style */}
+            <div>
+              <span className="block text-xs font-semibold text-[#0a0a0a] mb-2">
+                ¿Cómo prefieres jugar?
+              </span>
+              <div className="flex gap-2">
+                {(["singles", "doubles", "both"] as const).map((style) => {
+                  const active = pickleballPlayStyle === style
+                  return (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() =>
+                        setPickleballPlayStyle(active ? "" : style)
+                      }
+                      className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
+                        active
+                          ? "bg-[#16a34a] text-white border-[#16a34a]"
+                          : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                      }`}
+                    >
+                      {PICKLEBALL_PLAY_STYLE_LABELS[style]}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
         )}
       </div>
 

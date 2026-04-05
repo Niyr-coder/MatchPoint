@@ -92,6 +92,7 @@ export async function PATCH(
         province: onboardingParsed.data.province,
         phone: onboardingParsed.data.phone,
         date_of_birth: onboardingParsed.data.date_of_birth,
+        preferred_sport: onboardingParsed.data.preferred_sport ?? "pickleball",
         onboarding_completed: true,
         updated_at: new Date().toISOString(),
       })
@@ -108,6 +109,22 @@ export async function PATCH(
         { success: false, data: null, error: "Error al guardar el perfil. Intenta de nuevo." },
         { status: 500 }
       )
+    }
+
+    // If the user selected pickleball and provided skill/play-style, upsert the pickleball profile
+    const { pickleball_skill_level, pickleball_play_style } = onboardingParsed.data
+    if (pickleball_skill_level !== undefined || pickleball_play_style !== undefined) {
+      const pickleballUpdate: Record<string, unknown> = {
+        user_id: user.id,
+        updated_at: new Date().toISOString(),
+      }
+      if (pickleball_skill_level !== undefined) pickleballUpdate.skill_level = pickleball_skill_level
+      if (pickleball_play_style !== undefined) pickleballUpdate.play_style = pickleball_play_style
+
+      // Upsert — safe to ignore failure here; profile data is non-critical
+      await supabase
+        .from("pickleball_profiles")
+        .upsert(pickleballUpdate, { onConflict: "user_id" })
     }
 
     return NextResponse.json({ success: true, data: null, error: null })

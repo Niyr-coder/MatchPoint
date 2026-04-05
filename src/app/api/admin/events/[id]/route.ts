@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/lib/auth/authorization"
 import { getEventById, updateEvent, deleteEvent } from "@/lib/events/queries"
 import { logAdminAction } from "@/lib/audit/log"
+import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { Event } from "@/lib/events/queries"
 
@@ -21,8 +22,6 @@ const EVENT_TYPES = [
   "other",
 ] as const
 
-const SPORT_TYPES = ["futbol", "padel", "tenis", "pickleball"] as const
-
 const VISIBILITY_TYPES = ["public", "club_only", "invite_only"] as const
 
 const STATUS_TYPES = ["draft", "published", "cancelled", "completed"] as const
@@ -31,19 +30,19 @@ const adminUpdateEventSchema = z
   .object({
     title: z.string().min(3).max(200),
     description: z.string().max(5000).nullish(),
-    sport: z.enum(SPORT_TYPES).nullish(),
+    sport: z.enum(SPORT_IDS).nullish(),
     event_type: z.enum(EVENT_TYPES),
     club_id: z.string().uuid().nullish(),
     location: z.string().min(1).max(300),
     city: z.string().min(1).max(100),
-    start_date: z.string().datetime(),
-    end_date: z.string().datetime().nullish(),
-    image_url: z.string().url().nullish(),
+    start_date: z.iso.datetime(),
+    end_date: z.iso.datetime().nullish(),
+    image_url: z.url().nullish(),
     max_capacity: z.number().int().positive().nullish(),
     price: z.number().min(0),
     is_free: z.boolean(),
     visibility: z.enum(VISIBILITY_TYPES),
-    registration_deadline: z.string().datetime().nullish(),
+    registration_deadline: z.iso.datetime().nullish(),
     min_participants: z.number().int().positive().nullish(),
     tags: z.array(z.string().max(50)).max(10),
     organizer_name: z.string().max(200).nullish(),

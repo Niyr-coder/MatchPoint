@@ -3,10 +3,11 @@ import { createClient } from "@/lib/supabase/server"
 import { getOpenTournaments, createTournament } from "@/lib/tournaments/queries"
 import { authorize } from "@/lib/auth/authorization"
 import { z } from "zod"
+import { SPORT_IDS } from "@/lib/sports/config"
 
 const createTournamentSchema = z.object({
   name: z.string().min(3).max(100),
-  sport: z.enum(["futbol", "padel", "tenis", "pickleball"]),
+  sport: z.enum(SPORT_IDS),
   description: z.string().max(1000).optional(),
   max_participants: z.number().int().min(2).max(256).optional(),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

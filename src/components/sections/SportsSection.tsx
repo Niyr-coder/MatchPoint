@@ -3,12 +3,20 @@
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { SPORTS } from "@/lib/constants"
+import { PRIMARY_SPORT } from "@/lib/sports/config"
 import type { SportCategory } from "@/types"
 
 function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
+  const isPrimary = sport.id === PRIMARY_SPORT
+
   return (
     <div
-      className="animate-fade-in-up group relative h-64 overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer"
+      className={[
+        "animate-fade-in-up group relative overflow-hidden rounded-2xl bg-black border transition-all duration-500 cursor-pointer",
+        isPrimary
+          ? "h-80 border-[#16a34a]/60 hover:border-[#16a34a] lg:col-span-2"
+          : "h-64 border-white/10 hover:border-white/20",
+      ].join(" ")}
       style={{ animationDelay: `${index * 0.07}s` }}
     >
       {/* Background Image */}
@@ -22,9 +30,23 @@ function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
 
+      {/* Primary badge */}
+      {isPrimary && (
+        <div className="absolute top-4 left-4 z-20">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#16a34a] px-3 py-1 text-xs font-black text-white uppercase tracking-wider">
+            ⭐ Principal
+          </span>
+        </div>
+      )}
+
       {/* Content */}
       <div className="relative z-20 h-full p-6 flex flex-col justify-end">
-        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-1">
+        <h3
+          className={[
+            "font-black text-white uppercase tracking-tight mb-1",
+            isPrimary ? "text-2xl" : "text-xl",
+          ].join(" ")}
+        >
           {sport.name}
         </h3>
         <p className="text-sm text-white/70 font-medium line-clamp-2 mb-3">
@@ -46,11 +68,11 @@ export function SportsSection() {
             className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em] mb-12"
             style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
           >
-            Un deporte.<br />Mil partidos.
+            Pickleball primero.<br />Mil partidos.
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {SPORTS.map((sport, i) => (
             <SportCard key={sport.id} sport={sport} index={i} />
           ))}

@@ -4,14 +4,12 @@ import { useState } from "react"
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { SPORT_OPTIONS } from "@/lib/sports/config"
 import type { RankingEntry } from "@/lib/rankings/queries"
 
 const SPORTS = [
   { value: "", label: "Todos" },
-  { value: "futbol", label: "Fútbol" },
-  { value: "padel", label: "Pádel" },
-  { value: "tenis", label: "Tenis" },
-  { value: "pickleball", label: "Pickleball" },
+  ...SPORT_OPTIONS,
 ]
 
 const MEDALS = ["🥇", "🥈", "🥉"]
