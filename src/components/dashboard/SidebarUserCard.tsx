@@ -19,9 +19,14 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
     || "Usuario"
 
   return (
-    <div className="border-t border-slate-100 p-3 space-y-2">
+    <div
+      className="border-t border-slate-100 p-3 space-y-2"
+      style={{
+        background: "linear-gradient(to bottom, #ffffff, #f8faf8)",
+      }}
+    >
       <div className="flex items-center gap-3">
-        <Avatar className="size-8 shrink-0">
+        <Avatar className="size-8 shrink-0 ring-2 ring-green-400 ring-offset-1">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
           <AvatarFallback className="bg-green-100 text-green-700 text-xs font-bold">
             {initials || "U"}
@@ -35,7 +40,7 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
       <form action="/auth/signout" method="POST">
         <button
           type="submit"
-          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs font-semibold text-slate-500 border border-slate-200 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors"
         >
           <LogOut className="size-3.5" />
           Cerrar sesión

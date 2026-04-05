@@ -21,28 +21,32 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors"
+        className="lg:hidden p-2 text-slate-400 hover:text-slate-700 transition-colors rounded-lg hover:bg-slate-100"
         aria-label="Abrir menú"
       >
         <Menu className="size-5" />
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-zinc-950 border-r border-zinc-800">
+        <SheetContent side="left" className="w-64 p-0 bg-white border-r border-slate-100">
           <SheetHeader className="sr-only">
             <SheetTitle>Menú de navegación</SheetTitle>
           </SheetHeader>
 
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="flex items-center gap-2 px-4 py-4 border-b border-zinc-800">
-              <div className="size-7 rounded-full bg-green-600 flex items-center justify-center shrink-0">
-                <span className="text-white text-xs font-black">M</span>
+            <div className="flex items-center gap-2.5 px-4 py-4 border-b border-slate-100">
+              <div className="size-7 rounded-lg bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center shrink-0">
+                <span className="text-white text-xs font-black tracking-tighter">M</span>
               </div>
               <div className="min-w-0">
-                <p className="text-white font-black text-sm tracking-tight">MATCHPOINT</p>
+                <p className="text-[#1e293b] font-black text-sm tracking-[-0.03em] uppercase truncate">
+                  MATCHPOINT
+                </p>
                 {clubName && (
-                  <p className="text-zinc-500 text-xs truncate">{clubName}</p>
+                  <p className="text-green-600 text-[10px] font-black uppercase tracking-[0.18em] truncate">
+                    {clubName}
+                  </p>
                 )}
               </div>
             </div>
@@ -52,9 +56,12 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
               {sections.map((section, i) => (
                 <div key={i}>
                   {section.title && (
-                    <p className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-green-600">
-                      {section.title}
-                    </p>
+                    <div className="flex items-center gap-2 px-3 py-1.5">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {section.title}
+                      </p>
+                      <div className="flex-1 h-px bg-slate-100" />
+                    </div>
                   )}
                   <div className="space-y-0.5">
                     {section.items.map((item) => (

@@ -25,7 +25,7 @@ interface KPICardProps {
 function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardProps) {
   const a = ACCENT[accent]
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-5 flex flex-col gap-4 min-h-[130px]">
+    <div className="relative overflow-hidden rounded-2xl bg-white p-5 flex flex-col gap-4 min-h-[130px]" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}>
       <div className="flex items-start justify-between">
         <div className={cn("size-8 rounded-xl flex items-center justify-center shrink-0", a.iconBg, a.icon)}>
           {icon}
