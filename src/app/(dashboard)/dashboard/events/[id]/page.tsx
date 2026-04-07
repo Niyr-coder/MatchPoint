@@ -1,16 +1,16 @@
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatusBadge } from "@/components/shared/StatusBadge"
-import { EventRegisterButton } from "@/components/events/EventRegisterButton"
+import { EventRegisterButton } from "@/features/activities/components/EventRegisterButton"
 import {
   EVENT_TYPE_CONFIG,
   EVENT_STATUS_CONFIG,
   SPORT_LABELS,
-} from "@/lib/events/constants"
-import type { EventWithClub, EventType, EventStatus } from "@/lib/events/types"
+} from "@/features/activities/constants"
+import type { EventWithClub, EventType, EventStatus } from "@/features/activities/types"
 import {
   Calendar,
   MapPin,

@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic"
 
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getUserNav } from "@/lib/navigation/nav-configs"
-import { getUserRoles } from "@/lib/auth/get-user-roles"
-import { DashboardShell } from "@/components/dashboard/DashboardShell"
+import { getUserRoles } from "@/features/memberships/queries"
+import { DashboardShell } from "@/components/layout/DashboardShell"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import type { AppRole } from "@/types"

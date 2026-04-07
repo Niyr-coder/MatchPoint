@@ -1,9 +1,9 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubTeam } from "@/lib/team/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubTeam } from "@/features/clubs/queries/team"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
-import { TeamManager } from "@/components/team/TeamManager"
-import { InviteTogglePanel } from "@/components/invites/InviteTogglePanel"
+import { TeamManager } from "@/features/clubs/components/TeamManager"
+import { InviteTogglePanel } from "@/features/memberships/components/InviteTogglePanel"
 import { Users } from "lucide-react"
 
 export default async function TeamPage({

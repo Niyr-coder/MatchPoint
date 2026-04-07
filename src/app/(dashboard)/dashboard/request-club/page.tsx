@@ -1,7 +1,7 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { ClubRequestForm } from "@/components/dashboard/ClubRequestForm"
+import { ClubRequestForm } from "@/features/clubs/components/ClubRequestForm"
 import { Building2, Clock } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────

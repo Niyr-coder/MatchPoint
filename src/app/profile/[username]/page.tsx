@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { createServiceClient } from "@/lib/supabase/server"
-import { getPublicPlayerProfile } from "@/lib/stats/queries"
+import { getPublicPlayerProfile } from "@/features/users/queries"
 import { RoleBadge } from "@/components/shared/RoleBadge"
 import { Calendar, MapPin, Trophy, Building2 } from "lucide-react"
 import Link from "next/link"

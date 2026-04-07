@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic"
 
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getAdminNav } from "@/lib/navigation/nav-configs"
-import { DashboardShell } from "@/components/dashboard/DashboardShell"
+import { DashboardShell } from "@/components/layout/DashboardShell"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const ctx = await authorizeOrRedirect({ requiredRoles: ["admin"] })

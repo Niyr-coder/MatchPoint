@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SPORT_OPTIONS, PRIMARY_SPORT } from "@/lib/sports/config"
 import type { Profile } from "@/types"
-import type { PlayerStats } from "@/lib/stats/queries"
+import type { PlayerStats } from "@/features/users/queries"
 
 interface WelcomeBannerProps {
   profile: Profile

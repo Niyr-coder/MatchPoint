@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { ReservationWizard } from "@/components/reservations/ReservationWizard"
+import { ReservationWizard } from "@/features/bookings/components/ReservationWizard"
 
 export default async function NewReservationPage() {
   await authorizeOrRedirect()

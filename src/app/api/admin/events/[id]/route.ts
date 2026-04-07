@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
-import { getEventById, updateEvent, deleteEvent } from "@/lib/events/queries"
+import { authorize } from "@/features/auth/queries"
+import { getEventById, updateEvent, deleteEvent } from "@/features/activities/queries"
 import { logAdminAction } from "@/lib/audit/log"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
-import type { Event } from "@/lib/events/queries"
+import type { Event } from "@/features/activities/queries"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for admin event updates (all fields optional)

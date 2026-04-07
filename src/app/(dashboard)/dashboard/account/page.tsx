@@ -1,7 +1,7 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { AccountForm } from "@/components/dashboard/AccountForm"
+import { AccountForm } from "@/features/users/components/AccountForm"
 import type { Profile, PickleballProfile } from "@/types"
 
 function getDisplayName(profile: Profile & { username?: string | null }): string {

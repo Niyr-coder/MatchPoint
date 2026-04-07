@@ -17,9 +17,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limit"
-import { JOIN_HANDLER_REGISTRY } from "@/lib/invites/join-handlers"
+import { JOIN_HANDLER_REGISTRY } from "@/features/memberships/actions"
 import type { ApiResponse } from "@/types"
-import type { InviteLink, InviteEntityType } from "@/lib/invites/join-handlers"
+import type { InviteLink, InviteEntityType } from "@/features/memberships/actions"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constants

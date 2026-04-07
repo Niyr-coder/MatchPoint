@@ -1,10 +1,10 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubClients } from "@/lib/team/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubClients } from "@/features/clubs/queries/team"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { DataTable } from "@/components/shared/DataTable"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Users } from "lucide-react"
-import type { ClientEntry } from "@/lib/team/queries"
+import type { ClientEntry } from "@/features/clubs/queries/team"
 import type { Column } from "@/components/shared/DataTable"
 
 function formatDate(dateStr: string | null): string {

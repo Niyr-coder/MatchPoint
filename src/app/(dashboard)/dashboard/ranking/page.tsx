@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getRankingBySport } from "@/lib/rankings/queries"
-import { RankingView } from "@/components/dashboard/RankingView"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getRankingBySport } from "@/features/ratings/queries"
+import { RankingView } from "@/features/ratings/components/RankingView"
 
 const SPORTS = ["futbol", "padel", "tenis", "pickleball"]
 

@@ -1,8 +1,8 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { ClubSettingsForm } from "@/components/club/ClubSettingsForm"
-import { InviteLinkGenerator } from "@/components/invites/InviteLinkGenerator"
+import { ClubSettingsForm } from "@/features/clubs/components/ClubSettingsForm"
+import { InviteLinkGenerator } from "@/features/memberships/components/InviteLinkGenerator"
 import type { Club } from "@/types"
 
 export default async function SettingsPage({

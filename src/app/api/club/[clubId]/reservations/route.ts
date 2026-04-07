@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
-import { getClubReservations, updateReservationStatus } from "@/lib/reservations/queries"
+import { authorize } from "@/features/auth/queries"
+import { getClubReservations, updateReservationStatus } from "@/features/bookings/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
 

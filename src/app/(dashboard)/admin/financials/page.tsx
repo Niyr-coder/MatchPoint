@@ -1,4 +1,4 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getAdminFinancials } from "@/lib/admin/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"

@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
-import type { InviteLink } from "@/lib/invites/join-handlers"
+import type { InviteLink } from "@/features/memberships/actions"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Shared ownership guard

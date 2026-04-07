@@ -1,4 +1,4 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { BentoCard } from "@/components/dashboard/BentoCard"
 import { createClient } from "@/lib/supabase/server"

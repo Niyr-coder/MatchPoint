@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
-import { getPublicPlayerProfile } from "@/lib/stats/queries"
+import { getPublicPlayerProfile } from "@/features/users/queries"
 import { StatCard } from "@/components/shared/StatCard"
 import { ArrowLeft, Trophy, Target, TrendingUp, Swords } from "lucide-react"
 import Image from "next/image"

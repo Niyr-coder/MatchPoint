@@ -1,11 +1,11 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getCoachEarnings, getCoachEarningsSummary } from "@/lib/coach/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getCoachEarnings, getCoachEarningsSummary } from "@/features/clubs/queries/coach"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { DataTable } from "@/components/shared/DataTable"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { DollarSign, Users } from "lucide-react"
-import type { EarningEntry } from "@/lib/coach/queries"
+import type { EarningEntry } from "@/features/clubs/queries/coach"
 import type { Column } from "@/components/shared/DataTable"
 
 function formatDate(dateStr: string): string {

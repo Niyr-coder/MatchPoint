@@ -1,12 +1,12 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getCoachStudents } from "@/lib/coach/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getCoachStudents } from "@/features/clubs/queries/coach"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { CoachClassInvitePanel } from "@/components/invites/CoachClassInvitePanel"
+import { CoachClassInvitePanel } from "@/features/memberships/components/CoachClassInvitePanel"
 import { Users } from "lucide-react"
-import type { StudentEntry } from "@/lib/coach/queries"
+import type { StudentEntry } from "@/features/clubs/queries/coach"
 
 const SPORT_LABELS: Record<string, string> = {
   futbol: "Fútbol",

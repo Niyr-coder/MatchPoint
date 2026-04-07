@@ -1,11 +1,11 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getCourtsByClub } from "@/lib/courts/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getCourtsByClub } from "@/features/clubs/queries/courts"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Home } from "lucide-react"
-import type { Court } from "@/lib/courts/queries"
+import type { Court } from "@/features/clubs/queries/courts"
 
 const SPORT_LABELS: Record<string, string> = {
   futbol: "Fútbol",

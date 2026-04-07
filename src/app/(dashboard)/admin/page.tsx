@@ -1,4 +1,4 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getAdminControlTowerData } from "@/lib/admin/queries"
 import { ControlTowerKPIs } from "@/components/admin/ControlTowerKPIs"
 import { ControlTowerActivityFeed } from "@/components/admin/ControlTowerActivityFeed"

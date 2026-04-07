@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
-import { getClubCourts, createCourt } from "@/lib/courts/queries"
+import { authorize } from "@/features/auth/queries"
+import { getClubCourts, createCourt } from "@/features/clubs/queries/courts"
 import type { ApiResponse } from "@/types"
-import type { Court } from "@/lib/courts/queries"
+import type { Court } from "@/features/clubs/queries/courts"
 
 const createCourtSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "Nombre demasiado largo"),

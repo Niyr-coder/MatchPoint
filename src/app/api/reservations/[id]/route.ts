@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { cancelReservation } from "@/lib/reservations/queries"
+import { cancelReservation } from "@/features/bookings/queries"
 
 export async function PATCH(
   request: Request,

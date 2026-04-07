@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import {
   getCashRegisterToday,
   getCashSummaryToday,
   addCashEntry,
-} from "@/lib/cash-register/queries"
+} from "@/features/payments/queries"
 import type { ApiResponse } from "@/types"
-import type { CashEntry, CashSummary } from "@/lib/cash-register/queries"
+import type { CashEntry, CashSummary } from "@/features/payments/queries"
 
 const addEntrySchema = z.object({
   type: z.enum(["income", "expense"] as const, { message: "Tipo inválido" }),

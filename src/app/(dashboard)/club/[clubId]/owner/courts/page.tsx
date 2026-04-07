@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubCourts } from "@/lib/courts/queries"
-import { CourtsManager } from "@/components/courts/CourtsManager"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubCourts } from "@/features/clubs/queries/courts"
+import { CourtsManager } from "@/features/clubs/components/CourtsManager"
 
 export default async function OwnerCourtsPage({
   params,

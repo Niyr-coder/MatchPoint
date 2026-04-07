@@ -1,8 +1,8 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { AdminEventsView } from "@/components/admin/AdminEventsView"
-import type { EventWithClub, EventType, EventStatus } from "@/lib/events/types"
+import type { EventWithClub, EventType, EventStatus } from "@/features/activities/types"
 
 async function fetchAllEvents(): Promise<EventWithClub[]> {
   const supabase = createServiceClient()

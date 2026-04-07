@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import {
   getClubTeam,
   addTeamMemberByUserId,
   updateMemberRole,
   deactivateMember,
-} from "@/lib/team/queries"
+} from "@/features/clubs/queries/team"
 import type { ApiResponse } from "@/types"
-import type { TeamMember } from "@/lib/team/queries"
+import type { TeamMember } from "@/features/clubs/queries/team"
 
 const VALID_TEAM_ROLES = ["owner", "manager", "employee", "coach"] as const
 

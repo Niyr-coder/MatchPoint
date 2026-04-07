@@ -1,5 +1,5 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getTournamentById, isUserInTournament } from "@/lib/tournaments/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getTournamentById, isUserInTournament } from "@/features/tournaments/queries"
 import { notFound } from "next/navigation"
 import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft } from "lucide-react"
 import Link from "next/link"

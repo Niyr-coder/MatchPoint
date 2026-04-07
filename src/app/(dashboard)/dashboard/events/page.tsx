@@ -1,12 +1,12 @@
 import { Suspense } from "react"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { EventCard } from "@/components/events/EventCard"
-import { EventsFilters } from "@/components/events/EventsFilters"
+import { EventCard } from "@/features/activities/components/EventCard"
+import { EventsFilters } from "@/features/activities/components/EventsFilters"
 import { CalendarDays } from "lucide-react"
-import type { EventWithClub } from "@/lib/events/types"
+import type { EventWithClub } from "@/features/activities/types"
 
 const PAGE_SIZE = 12
 

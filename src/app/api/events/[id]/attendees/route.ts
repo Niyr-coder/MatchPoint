@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import {
   getEventById,
   getEventRegistrations,
-} from "@/lib/events/queries"
+} from "@/features/activities/queries"
 import type { ApiResponse } from "@/types"
-import type { EventRegistrationWithProfile } from "@/lib/events/queries"
+import type { EventRegistrationWithProfile } from "@/features/activities/queries"
 
 interface RouteContext {
   params: Promise<{ id: string }>

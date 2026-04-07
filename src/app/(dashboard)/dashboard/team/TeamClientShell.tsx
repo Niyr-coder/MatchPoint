@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { TeamView } from "@/components/dashboard/TeamView"
+import { TeamView } from "@/features/clubs/components/TeamView"
 import { TeamOnboarding } from "@/components/dashboard/TeamOnboarding"
-import { DashboardHeading } from "@/components/dashboard/DashboardHeading"
+import { DashboardHeading } from "@/components/layout/DashboardHeading"
 
 interface TeamMember {
   id: string

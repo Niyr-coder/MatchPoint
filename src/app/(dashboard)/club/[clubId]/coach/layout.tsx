@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getCoachNav } from "@/lib/navigation/nav-configs"
-import { DashboardShell } from "@/components/dashboard/DashboardShell"
+import { DashboardShell } from "@/components/layout/DashboardShell"
 
 export default async function CoachLayout({
   children,

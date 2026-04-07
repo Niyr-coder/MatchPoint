@@ -1,8 +1,8 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getCashRegisterToday, getCashSummaryToday } from "@/lib/cash-register/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getCashRegisterToday, getCashSummaryToday } from "@/features/payments/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
-import { CashRegisterManager } from "@/components/cash-register/CashRegisterManager"
+import { CashRegisterManager } from "@/features/payments/components/CashRegisterManager"
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react"
 
 function formatCurrency(amount: number): string {

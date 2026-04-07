@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 
 export async function GET() {

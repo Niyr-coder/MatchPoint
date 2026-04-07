@@ -1,4 +1,4 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { TeamClientShell } from "./TeamClientShell"
 

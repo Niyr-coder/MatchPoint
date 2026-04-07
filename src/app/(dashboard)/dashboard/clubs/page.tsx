@@ -1,6 +1,6 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubs, getDistinctProvinces } from "@/lib/clubs/queries"
-import { ClubsView } from "@/components/dashboard/ClubsView"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubs, getDistinctProvinces } from "@/features/clubs/queries/clubs"
+import { ClubsView } from "@/features/clubs/components/ClubsView"
 import { Building2 } from "lucide-react"
 
 export default async function ClubsPage() {

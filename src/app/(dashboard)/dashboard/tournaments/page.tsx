@@ -1,5 +1,5 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getOpenTournaments, getCreatedTournaments } from "@/lib/tournaments/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getOpenTournaments, getCreatedTournaments } from "@/features/tournaments/queries"
 import { Trophy, Users, Plus } from "lucide-react"
 import Link from "next/link"
 

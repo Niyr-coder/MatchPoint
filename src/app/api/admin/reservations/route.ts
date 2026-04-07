@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
 

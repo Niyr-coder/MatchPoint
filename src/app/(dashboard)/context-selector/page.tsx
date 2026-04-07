@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getUserRoles } from "@/lib/auth/get-user-roles"
-import { ContextSelectorCard } from "@/components/context-selector/ContextSelectorCard"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getUserRoles } from "@/features/memberships/queries"
+import { ContextSelectorCard } from "@/features/memberships/components/ContextSelectorCard"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 

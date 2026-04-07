@@ -1,4 +1,4 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { AdminShopView } from "@/components/admin/AdminShopView"
 import { createServiceClient } from "@/lib/supabase/server"

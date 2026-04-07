@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getUserRoles } from "@/lib/auth/get-user-roles"
-import { getPostLoginDestination } from "@/lib/auth/redirect-after-login"
+import { getUserRoles } from "@/features/memberships/queries"
+import { getPostLoginDestination } from "@/features/auth/helpers"
 import type { AppRole, Profile } from "@/types"
 
 export async function GET(request: NextRequest) {

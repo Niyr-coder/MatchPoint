@@ -1,8 +1,8 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { ClubEventsView } from "@/components/events/ClubEventsView"
-import type { EventWithClub, EventType, EventStatus } from "@/lib/events/types"
+import { ClubEventsView } from "@/features/activities/components/ClubEventsView"
+import type { EventWithClub, EventType, EventStatus } from "@/features/activities/types"
 
 async function fetchClubEvents(clubId: string): Promise<EventWithClub[]> {
   const supabase = await createClient()

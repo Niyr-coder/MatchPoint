@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import {
   getEventById,
   getUserEventRegistration,
   updateEvent,
   deleteEvent,
-} from "@/lib/events/queries"
+} from "@/features/activities/queries"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
-import type { EventWithRegistration } from "@/lib/events/queries"
+import type { EventWithRegistration } from "@/features/activities/queries"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for event updates

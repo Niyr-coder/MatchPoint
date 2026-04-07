@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import {
   getEventById,
   getUserEventRegistration,
   registerForEvent,
   unregisterFromEvent,
   getEventRegistrations,
-} from "@/lib/events/queries"
+} from "@/features/activities/queries"
 import type { ApiResponse } from "@/types"
-import type { EventRegistration } from "@/lib/events/queries"
+import type { EventRegistration } from "@/features/activities/queries"
 
 interface RouteContext {
   params: Promise<{ id: string }>

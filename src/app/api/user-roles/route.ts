@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { authorize } from "@/lib/auth/authorization"
-import { getUserRoles } from "@/lib/auth/get-user-roles"
+import { authorize } from "@/features/auth/queries"
+import { getUserRoles } from "@/features/memberships/queries"
 import type { ApiResponse, UserRoleEntry } from "@/types"
 
 export async function GET(): Promise<NextResponse<ApiResponse<UserRoleEntry[]>>> {

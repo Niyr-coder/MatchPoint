@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getCourts, getCourtsBySport } from "@/lib/courts/queries"
+import { getCourts, getCourtsBySport } from "@/features/clubs/queries/courts"
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
 

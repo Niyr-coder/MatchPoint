@@ -15,10 +15,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { checkRateLimit } from "@/lib/rate-limit"
 import type { ApiResponse, AppRole } from "@/types"
-import type { InviteEntityType, InviteLink } from "@/lib/invites/join-handlers"
+import type { InviteEntityType, InviteLink } from "@/features/memberships/actions"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constants

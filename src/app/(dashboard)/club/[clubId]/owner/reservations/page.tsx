@@ -1,10 +1,10 @@
 import { Calendar, Clock, CheckCircle } from "lucide-react"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubReservations, getClubReservationsToday } from "@/lib/reservations/queries"
-import { getCourtsByClub } from "@/lib/courts/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubReservations, getClubReservationsToday } from "@/features/bookings/queries"
+import { getCourtsByClub } from "@/features/clubs/queries/courts"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
-import { ClubReservationsTable } from "@/components/reservations/ClubReservationsTable"
+import { ClubReservationsTable } from "@/features/bookings/components/ClubReservationsTable"
 
 export default async function OwnerReservationsPage({
   params,

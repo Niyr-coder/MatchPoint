@@ -10,7 +10,7 @@ import { ConfirmDialog as SharedConfirmDialog } from "@/components/shared/Confir
 import { CreateUserModal } from "@/components/admin/CreateUserModal"
 import { useBulkSelection } from "@/hooks/useBulkSelection"
 import { UserBulkBar } from "@/components/admin/UserBulkBar"
-import { ROLE_LABELS } from "@/lib/roles"
+import { ROLE_LABELS } from "@/features/memberships/constants"
 import type { Column } from "@/components/shared/DataTable"
 import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
 import type { AppRole, ApiResponse } from "@/types"

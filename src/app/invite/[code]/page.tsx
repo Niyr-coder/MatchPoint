@@ -3,8 +3,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_NAME } from "@/lib/constants"
-import { InviteRedeemClient } from "@/components/invites/InviteRedeemClient"
-import type { InviteEntityType } from "@/lib/invites/join-handlers"
+import { InviteRedeemClient } from "@/features/memberships/components/InviteRedeemClient"
+import type { InviteEntityType } from "@/features/memberships/actions"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Metadata

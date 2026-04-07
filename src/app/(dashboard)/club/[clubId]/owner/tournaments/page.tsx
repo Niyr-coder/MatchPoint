@@ -1,10 +1,10 @@
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
-import { InviteTogglePanel } from "@/components/invites/InviteTogglePanel"
+import { InviteTogglePanel } from "@/features/memberships/components/InviteTogglePanel"
 import { Trophy, Users, CheckCircle } from "lucide-react"
 
 interface Tournament {

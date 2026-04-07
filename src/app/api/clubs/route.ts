@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getClubs } from "@/lib/clubs/queries"
+import { getClubs } from "@/features/clubs/queries/clubs"
 import type { ApiResponse } from "@/types"
-import type { ClubWithSports } from "@/lib/clubs/queries"
+import type { ClubWithSports } from "@/features/clubs/queries/clubs"
 
 export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<ClubWithSports[]>>> {
   try {

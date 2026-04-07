@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { authorize } from "@/lib/auth/authorization"
+import { authorize } from "@/features/auth/queries"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 
 const patchBodySchema = z.object({

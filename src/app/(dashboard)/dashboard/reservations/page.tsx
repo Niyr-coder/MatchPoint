@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getAllUserReservations, getReservationInvites } from "@/lib/reservations/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getAllUserReservations, getReservationInvites } from "@/features/bookings/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { ReservationsList } from "@/components/reservations/ReservationsList"
+import { ReservationsList } from "@/features/bookings/components/ReservationsList"
 
 export default async function ReservationsPage() {
   const ctx = await authorizeOrRedirect()

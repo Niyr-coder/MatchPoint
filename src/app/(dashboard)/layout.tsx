@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic"
 
 import { redirect } from "next/navigation"
-import { authorize } from "@/lib/auth/authorization"
-import { getUserRoles } from "@/lib/auth/get-user-roles"
-import { RoleContextProvider } from "@/providers/RoleContextProvider"
+import { authorize } from "@/features/auth/queries"
+import { getUserRoles } from "@/features/memberships/queries"
+import { RoleContextProvider } from "@/features/memberships/hooks"
 import type { AuthContext } from "@/types"
 
 export default async function DashboardLayout({

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { joinTournament, isUserInTournament, getTournamentById } from "@/lib/tournaments/queries"
+import { joinTournament, isUserInTournament, getTournamentById } from "@/features/tournaments/queries"
 
 export async function POST(
   _request: Request,

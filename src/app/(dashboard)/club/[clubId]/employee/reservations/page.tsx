@@ -1,9 +1,9 @@
 import { Calendar, Clock, CheckCircle } from "lucide-react"
-import { authorizeOrRedirect } from "@/lib/auth/authorization"
-import { getClubReservationsToday } from "@/lib/reservations/queries"
+import { authorizeOrRedirect } from "@/features/auth/queries"
+import { getClubReservationsToday } from "@/features/bookings/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { StatCard } from "@/components/shared/StatCard"
-import { TodayTimeline } from "@/components/reservations/TodayTimeline"
+import { TodayTimeline } from "@/features/bookings/components/TodayTimeline"
 
 export default async function EmployeeReservationsPage({
   params,

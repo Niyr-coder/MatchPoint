@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getCourtAvailability } from "@/lib/courts/queries"
+import { getCourtAvailability } from "@/features/clubs/queries/courts"
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
 
