@@ -10,6 +10,15 @@ export interface SportCategory {
   players: string
   gradient: string
   image: string
+  stat?: string
+}
+
+export interface Testimonial {
+  quote: string
+  name: string
+  sport: string
+  city: string
+  emoji: string
 }
 
 export interface Feature {

@@ -8,6 +8,13 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
+    <>
+    <div className="bg-[#16a34a] text-white text-center py-2">
+      <p className="text-xs font-black uppercase tracking-wider">
+        ACCESO ANTICIPADO — Solo 500 cupos gratuitos.{" "}
+        <a href="/login" className="underline underline-offset-2 hover:opacity-80">No te quedes fuera →</a>
+      </p>
+    </div>
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e5e5e5]">
       <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
@@ -78,5 +85,6 @@ export function Navbar() {
         </div>
       </div>
     </header>
+    </>
   )
 }

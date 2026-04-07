@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, Calendar, TrendingUp, type LucideIcon } from "lucide-react"
+import { Search, Calendar, TrendingUp, ArrowRight, type LucideIcon } from "lucide-react"
 
 interface StepProps {
   number: string
@@ -34,26 +34,26 @@ const STEPS = [
   {
     number: "01",
     icon: Search,
-    title: "Encuentra tu cancha",
-    desc: "Busca instalaciones cerca de ti, filtra por deporte y descubre canchas verificadas con disponibilidad en tiempo real.",
+    title: "BUSCA TU CANCHA",
+    desc: "Filtra por deporte, ubicación y horario. Solo canchas verificadas con disponibilidad en tiempo real.",
   },
   {
     number: "02",
     icon: Calendar,
-    title: "Reserva y juega",
-    desc: "Únete a partidos abiertos, organiza quedadas con jugadores de tu nivel o crea tu propio torneo.",
+    title: "RESERVA AL INSTANTE",
+    desc: "Paga en línea, confirma tu horario y listo. Sin llamadas, sin esperas, sin excusas para no jugar.",
   },
   {
     number: "03",
     icon: TrendingUp,
-    title: "Sube tu ranking",
-    desc: "Cada partido suma a tu rating oficial. Sube de categoría, desbloquea torneos y compite por la cima.",
+    title: "SUBE TU NIVEL",
+    desc: "Cada partido cuenta. Tu rating sube, desbloqueas torneos y la comunidad conoce tu nombre.",
   },
 ]
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="section-dark py-24 border-t border-white/5">
+    <section id="como-funciona" className="section-dark py-24 border-t border-white/5">
       <div className="container mx-auto px-6 sm:px-8">
         <div className="animate-fade-in-up-16">
           <p className="label-green">Cómo funciona</p>
@@ -61,7 +61,7 @@ export function FeaturesSection() {
             className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-16"
             style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
           >
-            Tres pasos.<br />Cero complicaciones.
+            DE CERO A CANCHA<br />EN 60 SEGUNDOS.
           </h2>
         </div>
 
@@ -69,6 +69,12 @@ export function FeaturesSection() {
           {STEPS.map((step, i) => (
             <Step key={step.number} {...step} index={i} />
           ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <a href="/login" className="btn-pill bg-[#16a34a] text-white px-10 py-3.5 inline-flex items-center gap-2">
+            Empieza Ahora <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </div>
     </section>

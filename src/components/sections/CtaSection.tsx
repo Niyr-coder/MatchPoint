@@ -18,13 +18,13 @@ export function CtaSection() {
             className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-6"
             style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
           >
-            Tu próximo<br />partido empieza<br />aquí.
+            NO TE QUEDES<br />FUERA.
           </h2>
 
           <p className="text-white/60 text-lg font-medium mb-10 max-w-xl mx-auto">
-            La comunidad de Pickleball más grande de Ecuador.{" "}
-            <span className="text-white font-semibold">Acceso anticipado gratuito</span>{" "}
-            para los primeros 500 registrados.
+            Acceso anticipado gratuito para los primeros 500 registrados.{" "}
+            <br />
+            <span className="text-white font-semibold">Después, será de pago.</span>
           </p>
         </div>
 
@@ -38,6 +38,14 @@ export function CtaSection() {
           >
             Únete Gratis <ArrowRight className="w-5 h-5" />
           </a>
+        </div>
+
+        {/* Cupos bar */}
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <div className="w-48 h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-full bg-[#16a34a] rounded-full" style={{ width: "74%" }} />
+          </div>
+          <span className="text-xs text-white/40 font-semibold tracking-wider">370 / 500 CUPOS TOMADOS</span>
         </div>
 
         {/* Social proof */}

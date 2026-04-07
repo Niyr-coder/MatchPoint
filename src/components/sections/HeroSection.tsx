@@ -29,7 +29,7 @@ export function HeroSection() {
           className="animate-fade-in label-green"
           style={{ animationDelay: "0.1s" }}
         >
-          La plataforma #1 de Pickleball en Ecuador
+          LA COMUNIDAD #1 DE DEPORTES DE RAQUETA EN ECUADOR
         </p>
 
         {/* Headline */}
@@ -37,7 +37,7 @@ export function HeroSection() {
           className="animate-fade-in-up-16 font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-8"
           style={{ fontSize: "clamp(3.5rem, 10vw, 9rem)", animationDelay: "0.15s" }}
         >
-          Tu nivel.<br />Tu cancha.
+          JUEGA MÁS.<br />JUEGA MEJOR.
         </h1>
 
         {/* Subheading */}
@@ -45,8 +45,8 @@ export function HeroSection() {
           className="animate-fade-in-up text-white/70 text-lg md:text-xl max-w-md mb-10 font-medium leading-relaxed"
           style={{ animationDelay: "0.3s" }}
         >
-          Pickleball, Pádel, Tenis y Fútbol.{" "}
-          <span className="text-white">Canchas, rivales y torneos, todo en un solo lugar.</span>
+          Encuentra rivales de tu nivel, reserva canchas al instante y sube tu ranking.{" "}
+          <span className="text-white">Pickleball · Pádel · Tenis · Fútbol</span>
         </p>
 
         {/* CTAs */}
@@ -61,11 +61,23 @@ export function HeroSection() {
             Únete Gratis <ArrowRight className="w-4 h-4" />
           </a>
           <a
-            href="#deportes"
+            href="#como-funciona"
             className="btn-pill border border-white/30 text-white hover:bg-white hover:text-[#0a0a0a] px-8 py-3.5"
           >
-            Ver deportes
+            Mira cómo funciona
           </a>
+        </div>
+
+        {/* Social proof */}
+        <div className="flex items-center gap-3 mt-8 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+          <div className="flex -space-x-2">
+            {["🏓", "🎾", "⚽", "🏸"].map((e, i) => (
+              <div key={i} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm">{e}</div>
+            ))}
+          </div>
+          <p className="text-xs text-white/50">
+            <span className="text-white font-semibold">+2,000</span> jugadores ya en la plataforma
+          </p>
         </div>
       </div>
 

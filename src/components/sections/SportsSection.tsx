@@ -52,6 +52,9 @@ function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
         <p className="text-sm text-white/70 font-medium line-clamp-2 mb-3">
           {sport.description}
         </p>
+        {sport.stat && (
+          <span className="text-xs font-black text-white/60 uppercase tracking-wider mb-3">{sport.stat}</span>
+        )}
         <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
       </div>
     </div>
@@ -68,7 +71,7 @@ export function SportsSection() {
             className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em] mb-12"
             style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
           >
-            Pickleball primero.<br />Mil partidos.
+            ELIGE TU DEPORTE.<br />ENCUENTRA TU RIVAL.
           </h2>
         </div>
 
@@ -78,16 +81,6 @@ export function SportsSection() {
           ))}
         </div>
 
-        {/* Coming soon */}
-        <div
-          className="animate-fade-in mt-8 flex items-center gap-3"
-          style={{ animationDelay: "0.3s" }}
-        >
-          <span className="text-xs text-[#737373]">Próximamente:</span>
-          <span className="text-xs font-medium text-[#737373]">
-            Natación · Baloncesto · Béisbol · Crossfit
-          </span>
-        </div>
       </div>
     </section>
   )

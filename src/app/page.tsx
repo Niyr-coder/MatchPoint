@@ -6,6 +6,8 @@ import { FeaturesSection } from "@/components/sections/FeaturesSection"
 import { SportsSection } from "@/components/sections/SportsSection"
 import { StatsSection } from "@/components/sections/StatsSection"
 import { CtaSection } from "@/components/sections/CtaSection"
+import { SocialProofBar } from "@/components/sections/SocialProofBar"
+import { TestimonialsSection } from "@/components/sections/TestimonialsSection"
 
 export default async function HomePage({
   searchParams,
@@ -26,8 +28,10 @@ export default async function HomePage({
       <Navbar />
       <main>
         <HeroSection />
+        <SocialProofBar />
         <SportsSection />
         <FeaturesSection />
+        <TestimonialsSection />
         <StatsSection />
         <CtaSection />
       </main>

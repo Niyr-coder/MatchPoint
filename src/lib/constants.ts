@@ -1,4 +1,4 @@
-import type { SportCategory, Feature, Stat, NavLink, FooterColumn } from "@/types"
+import type { SportCategory, Feature, Stat, NavLink, FooterColumn, Testimonial } from "@/types"
 import { SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
 
 export const SITE_NAME = "MATCHPOINT"
@@ -8,8 +8,8 @@ export const SITE_DESCRIPTION =
 
 export const NAV_LINKS: NavLink[] = [
   { label: "Deportes", href: "#deportes" },
-  { label: "Features", href: "#features" },
-  { label: "Comunidad", href: "#stats" },
+  { label: "Cómo funciona", href: "#como-funciona" },
+  { label: "Comunidad", href: "#comunidad" },
   { label: "Únete", href: "#waitlist" },
 ]
 
@@ -17,12 +17,12 @@ export const NAV_LINKS: NavLink[] = [
 // The canonical sport list comes from SPORT_IDS; this adds gradient + image.
 const SPORT_LANDING_EXTRAS: Record<
   string,
-  { name: string; players: string; gradient: string; image: string }
+  { name: string; players: string; gradient: string; image: string; stat: string }
 > = {
-  futbol:     { name: "Fútbol 7",   players: "11 vs 11",        gradient: "from-green-900/80 to-black/90",   image: "/images/landing/futbol.png" },
-  padel:      { name: "Pádel",      players: "2 vs 2",           gradient: "from-emerald-900/80 to-black/90", image: "/images/landing/padel.png" },
-  tenis:      { name: "Tenis",      players: "1 vs 1 / 2 vs 2",  gradient: "from-lime-900/80 to-black/90",    image: "/images/landing/tenis.png" },
-  pickleball: { name: "Pickleball", players: "2 vs 2",           gradient: "from-teal-900/80 to-black/90",    image: "/images/landing/pickleball.png" },
+  futbol:     { name: "Fútbol 7",   players: "11 vs 11",        gradient: "from-green-900/80 to-black/90",   image: "/images/landing/futbol.png",       stat: "80+ canchas" },
+  padel:      { name: "Pádel",      players: "2 vs 2",           gradient: "from-emerald-900/80 to-black/90", image: "/images/landing/padel.png",         stat: "45+ canchas" },
+  tenis:      { name: "Tenis",      players: "1 vs 1 / 2 vs 2",  gradient: "from-lime-900/80 to-black/90",    image: "/images/landing/tenis.png",         stat: "35+ canchas" },
+  pickleball: { name: "Pickleball", players: "2 vs 2",           gradient: "from-teal-900/80 to-black/90",    image: "/images/landing/pickleball.png",    stat: "500+ jugadores" },
 }
 
 export const SPORTS: SportCategory[] = SPORT_IDS.map((id) => {
@@ -36,6 +36,7 @@ export const SPORTS: SportCategory[] = SPORT_IDS.map((id) => {
     players: extras.players,
     gradient: extras.gradient,
     image: extras.image,
+    stat: extras.stat,
   }
 })
 
@@ -82,7 +83,19 @@ export const STATS: Stat[] = [
   { value: 5000, suffix: "+", label: "Jugadores Activos" },
   { value: 4, suffix: "", label: "Deportes" },
   { value: 200, suffix: "+", label: "Canchas Disponibles" },
-  { value: 98, suffix: "%", label: "Satisfacción" },
+  { value: 15, suffix: "+", label: "Ciudades en Ecuador" },
+]
+
+export const TESTIMONIALS: Testimonial[] = [
+  { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
+  { quote: "Encontré una comunidad de pádel increíble. Ya no juego solo, juego con amigos.", name: "María L.", sport: "Pádel", city: "Guayaquil", emoji: "🎾" },
+  { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Tenis", city: "Cuenca", emoji: "🎾" },
+]
+
+export const PARTNER_CLUBS: string[] = [
+  "Club Arrayanes", "Quito Tenis & Pádel", "Liga Pickleball EC",
+  "Pádel Center GYE", "Complejo Los Chillos", "Arena Sports UIO",
+  "Club El Nacional", "Pickleball Quito Norte",
 ]
 
 export const ECUADOR_CITIES_BY_PROVINCE: Record<string, string[]> = {
