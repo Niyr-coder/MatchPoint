@@ -1,5 +1,5 @@
 import type { EventStatus, EventType } from "./types"
-import { SPORT_OPTIONS, SPORT_LABELS as SPORT_LABELS_CONFIG } from "@/lib/sports/config"
+import { VISIBLE_SPORT_OPTIONS, SPORT_LABELS as SPORT_LABELS_CONFIG } from "@/lib/sports/config"
 
 export const EVENT_TYPE_CONFIG: Record<
   EventType,
@@ -27,7 +27,7 @@ export const EVENT_STATUS_CONFIG: Record<
 
 // Re-exported for backwards compatibility — source of truth is @/lib/sports/config
 export const SPORT_LABELS: Record<string, string> = SPORT_LABELS_CONFIG
-export const SPORTS = SPORT_OPTIONS
+export const SPORTS = VISIBLE_SPORT_OPTIONS
 
 export const EVENT_TYPES = Object.entries(EVENT_TYPE_CONFIG).map(([value, cfg]) => ({
   value: value as EventType,

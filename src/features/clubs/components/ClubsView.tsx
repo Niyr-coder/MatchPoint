@@ -4,13 +4,11 @@ import { useState, useMemo } from "react"
 import { Search, Building2 } from "lucide-react"
 import { ClubCard } from "./ClubCard"
 import type { ClubWithSports } from "@/features/clubs/queries/clubs"
+import { VISIBLE_SPORT_OPTIONS, SINGLE_SPORT_MODE } from "@/lib/sports/config"
 
 const SPORTS = [
   { value: "", label: "Todos" },
-  { value: "futbol", label: "Fútbol" },
-  { value: "padel", label: "Pádel" },
-  { value: "tenis", label: "Tenis" },
-  { value: "pickleball", label: "Pickleball" },
+  ...VISIBLE_SPORT_OPTIONS,
 ]
 
 interface ClubsViewProps {
@@ -58,21 +56,23 @@ export function ClubsView({ clubs, provinces }: ClubsViewProps) {
 
         {/* Sport tabs + province */}
         <div className="flex flex-wrap gap-2 items-center justify-between">
-          <div className="flex flex-wrap gap-1.5">
-            {SPORTS.map((sport) => (
-              <button
-                key={sport.value}
-                onClick={() => setActiveSport(sport.value)}
-                className={
-                  activeSport === sport.value
-                    ? "bg-[#0a0a0a] text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
-                    : "border border-[#e5e5e5] text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-[#0a0a0a] transition-colors"
-                }
-              >
-                {sport.label}
-              </button>
-            ))}
-          </div>
+          {!SINGLE_SPORT_MODE && (
+            <div className="flex flex-wrap gap-1.5">
+              {SPORTS.map((sport) => (
+                <button
+                  key={sport.value}
+                  onClick={() => setActiveSport(sport.value)}
+                  className={
+                    activeSport === sport.value
+                      ? "bg-[#0a0a0a] text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
+                      : "border border-[#e5e5e5] text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-[#0a0a0a] transition-colors"
+                  }
+                >
+                  {sport.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {provinces.length > 0 && (
             <select

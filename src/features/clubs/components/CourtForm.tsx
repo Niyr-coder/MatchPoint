@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { z } from "zod"
 import { Loader2 } from "lucide-react"
-import { SPORT_IDS, SPORT_LABELS } from "@/lib/sports/config"
+import { SPORT_IDS, SPORT_LABELS, VISIBLE_SPORT_IDS, SINGLE_SPORT_MODE } from "@/lib/sports/config"
 import type { Court } from "@/features/clubs/types"
 
 const courtFormSchema = z.object({
@@ -30,7 +30,7 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
 
   const [formData, setFormData] = useState<CourtFormValues>({
     name: court?.name ?? "",
-    sport: (court?.sport as CourtFormValues["sport"]) ?? "padel",
+    sport: (court?.sport as CourtFormValues["sport"]) ?? VISIBLE_SPORT_IDS[0],
     surface_type: court?.surface_type ?? "",
     is_indoor: court?.is_indoor ?? false,
     price_per_hour: court?.price_per_hour ?? 0,
@@ -121,28 +121,30 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
         )}
       </div>
 
-      {/* Sport */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
-          Deporte
-        </label>
-        <select
-          value={formData.sport}
-          onChange={(e) =>
-            handleChange("sport", e.target.value as CourtFormValues["sport"])
-          }
-          className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
-        >
-          {Object.entries(SPORT_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-        {errors.sport && (
-          <p className="text-[11px] text-red-500">{errors.sport}</p>
-        )}
-      </div>
+      {/* Sport — hidden when only one sport is active */}
+      {!SINGLE_SPORT_MODE && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
+            Deporte
+          </label>
+          <select
+            value={formData.sport}
+            onChange={(e) =>
+              handleChange("sport", e.target.value as CourtFormValues["sport"])
+            }
+            className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+          >
+            {VISIBLE_SPORT_IDS.map((id) => (
+              <option key={id} value={id}>
+                {SPORT_LABELS[id]}
+              </option>
+            ))}
+          </select>
+          {errors.sport && (
+            <p className="text-[11px] text-red-500">{errors.sport}</p>
+          )}
+        </div>
+      )}
 
       {/* Surface type */}
       <div className="flex flex-col gap-1.5">

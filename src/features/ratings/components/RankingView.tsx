@@ -4,12 +4,12 @@ import { useState } from "react"
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { SPORT_OPTIONS } from "@/lib/sports/config"
+import { VISIBLE_SPORT_OPTIONS, SINGLE_SPORT_MODE } from "@/lib/sports/config"
 import type { RankingEntry } from "@/features/ratings/types"
 
 const SPORTS = [
   { value: "", label: "Todos" },
-  ...SPORT_OPTIONS,
+  ...VISIBLE_SPORT_OPTIONS,
 ]
 
 const MEDALS = ["🥇", "🥈", "🥉"]
@@ -190,22 +190,24 @@ export function RankingView({ all, bySport }: RankingViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Sport tabs */}
-      <div className="flex flex-wrap gap-1.5">
-        {SPORTS.map((sport) => (
-          <button
-            key={sport.value}
-            onClick={() => setActiveSport(sport.value)}
-            className={
-              activeSport === sport.value
-                ? "bg-[#0a0a0a] text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
-                : "border border-[#e5e5e5] text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-[#0a0a0a] transition-colors"
-            }
-          >
-            {sport.label}
-          </button>
-        ))}
-      </div>
+      {/* Sport tabs — hidden in single-sport mode */}
+      {!SINGLE_SPORT_MODE && (
+        <div className="flex flex-wrap gap-1.5">
+          {SPORTS.map((sport) => (
+            <button
+              key={sport.value}
+              onClick={() => setActiveSport(sport.value)}
+              className={
+                activeSport === sport.value
+                  ? "bg-[#0a0a0a] text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
+                  : "border border-[#e5e5e5] text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-[#0a0a0a] transition-colors"
+              }
+            >
+              {sport.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <RankingList entries={currentEntries} />
     </div>

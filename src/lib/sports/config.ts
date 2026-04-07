@@ -11,6 +11,19 @@ export type SportId = typeof SPORT_IDS[number]
 export const PRIMARY_SPORT: SportId = "pickleball"
 
 // ──────────────────────────────────────────────────────────
+// Visibility control — sports shown in the UI
+// To enable more sports, add them to this array.
+// SPORT_IDS, types, DB schema, and API validation are unaffected.
+// ──────────────────────────────────────────────────────────
+
+export const VISIBLE_SPORT_IDS = [PRIMARY_SPORT] as const satisfies readonly SportId[]
+
+export type VisibleSportId = typeof VISIBLE_SPORT_IDS[number]
+
+/** True when only one sport is visible — use to hide redundant sport selectors */
+export const SINGLE_SPORT_MODE = VISIBLE_SPORT_IDS.length === 1
+
+// ──────────────────────────────────────────────────────────
 // Per-sport configuration
 // ──────────────────────────────────────────────────────────
 
@@ -78,3 +91,13 @@ export const SPORT_OPTIONS = SPORT_IDS.map((id) => ({
   value: id,
   label: SPORT_CONFIG[id].label,
 }))
+
+/** Visible-only versions — use these in UI selectors */
+export const VISIBLE_SPORT_OPTIONS = VISIBLE_SPORT_IDS.map((id) => ({
+  value: id,
+  label: SPORT_CONFIG[id].label,
+}))
+
+export const VISIBLE_SPORT_LABELS: Partial<Record<SportId, string>> = Object.fromEntries(
+  VISIBLE_SPORT_IDS.map((id) => [id, SPORT_CONFIG[id].label])
+) as Partial<Record<SportId, string>>

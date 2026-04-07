@@ -4,6 +4,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 import { Search, X } from "lucide-react"
 import { SPORTS, EVENT_TYPES } from "@/features/activities/constants"
+import { SINGLE_SPORT_MODE } from "@/lib/sports/config"
 
 export function EventsFilters() {
   const router = useRouter()
@@ -52,16 +53,18 @@ export function EventsFilters() {
 
       {/* Filter row */}
       <div className="flex flex-wrap gap-2 items-center">
-        <select
-          value={sport}
-          onChange={(e) => updateParam("sport", e.target.value)}
-          className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] bg-white"
-        >
-          <option value="">Todos los deportes</option>
-          {SPORTS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
+        {!SINGLE_SPORT_MODE && (
+          <select
+            value={sport}
+            onChange={(e) => updateParam("sport", e.target.value)}
+            className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] bg-white"
+          >
+            <option value="">Todos los deportes</option>
+            {SPORTS.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+        )}
 
         <select
           value={eventType}

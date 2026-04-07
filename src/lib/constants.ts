@@ -1,13 +1,13 @@
 import type { SportCategory, Feature, Stat, NavLink, FooterColumn, Testimonial } from "@/types"
-import { SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
+import { VISIBLE_SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
 
 export const SITE_NAME = "MATCHPOINT"
 export const SITE_TAGLINE = "DOMINA TU JUEGO"
 export const SITE_DESCRIPTION =
-  "La plataforma #1 de Pickleball en Ecuador. Pickleball, pádel, tenis y fútbol. Encuentra canchas, rivales y torneos cerca de ti."
+  "La plataforma #1 de Pickleball en Ecuador. Encuentra canchas, rivales y torneos cerca de ti."
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "Deportes", href: "#deportes" },
+  { label: "Pickleball", href: "#deportes" },
   { label: "Cómo funciona", href: "#como-funciona" },
   { label: "Comunidad", href: "#comunidad" },
   { label: "Únete", href: "#waitlist" },
@@ -25,7 +25,7 @@ const SPORT_LANDING_EXTRAS: Record<
   pickleball: { name: "Pickleball", players: "2 vs 2",           gradient: "from-teal-900/80 to-black/90",    image: "/images/landing/pickleball.png",    stat: "500+ jugadores" },
 }
 
-export const SPORTS: SportCategory[] = SPORT_IDS.map((id) => {
+export const SPORTS: SportCategory[] = VISIBLE_SPORT_IDS.map((id) => {
   const cfg = SPORT_CONFIG[id]
   const extras = SPORT_LANDING_EXTRAS[id]
   return {
@@ -81,21 +81,21 @@ export const FEATURES: Feature[] = [
 
 export const STATS: Stat[] = [
   { value: 5000, suffix: "+", label: "Jugadores Activos" },
-  { value: 4, suffix: "", label: "Deportes" },
+  { value: 50, suffix: "+", label: "Torneos Jugados" },
   { value: 200, suffix: "+", label: "Canchas Disponibles" },
   { value: 15, suffix: "+", label: "Ciudades en Ecuador" },
 ]
 
 export const TESTIMONIALS: Testimonial[] = [
   { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
-  { quote: "Encontré una comunidad de pádel increíble. Ya no juego solo, juego con amigos.", name: "María L.", sport: "Pádel", city: "Guayaquil", emoji: "🎾" },
-  { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Tenis", city: "Cuenca", emoji: "🎾" },
+  { quote: "Encontré rivales de mi nivel en días. Antes tardaba semanas buscando en grupos de WhatsApp.", name: "María L.", sport: "Pickleball", city: "Guayaquil", emoji: "🏓" },
+  { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Pickleball", city: "Cuenca", emoji: "🏓" },
 ]
 
 export const PARTNER_CLUBS: string[] = [
-  "Club Arrayanes", "Quito Tenis & Pádel", "Liga Pickleball EC",
-  "Pádel Center GYE", "Complejo Los Chillos", "Arena Sports UIO",
-  "Club El Nacional", "Pickleball Quito Norte",
+  "Club Arrayanes", "Liga Pickleball EC", "Pickleball Quito Norte",
+  "Pickleball GYE", "Complejo Los Chillos", "Arena Sports UIO",
+  "Pickleball Cuenca", "Quito Pickleball Club",
 ]
 
 export const ECUADOR_CITIES_BY_PROVINCE: Record<string, string[]> = {
@@ -132,7 +132,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     title: "Producto",
     links: [
       { label: "Características", href: "#features" },
-      { label: "Deportes", href: "#deportes" },
+      { label: "Pickleball", href: "#deportes" },
       { label: "Precios", href: "#" },
       { label: "App Móvil", href: "#" },
     ],

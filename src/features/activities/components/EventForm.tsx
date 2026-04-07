@@ -7,6 +7,7 @@ import {
   EVENT_TYPES,
   EVENT_VISIBILITIES,
 } from "@/features/activities/constants"
+import { SINGLE_SPORT_MODE, VISIBLE_SPORT_IDS } from "@/lib/sports/config"
 import { ECUADOR_PROVINCES, ECUADOR_CITIES_BY_PROVINCE } from "@/lib/constants"
 import type { EventType, EventStatus, EventVisibility } from "@/features/activities/types"
 
@@ -51,7 +52,7 @@ export const EMPTY_EVENT_FORM: EventFormState = {
   title: "",
   description: "",
   event_type: "social",
-  sport: "",
+  sport: SINGLE_SPORT_MODE ? VISIBLE_SPORT_IDS[0] : "",
   club_id: "",
   city: "",
   location: "",
@@ -243,19 +244,21 @@ export function EventForm({
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Deporte</Label>
-          <select
-            value={form.sport}
-            onChange={(e) => set("sport", e.target.value)}
-            className={inputCls}
-          >
-            <option value="">Todos los deportes</option>
-            {SPORTS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
-        </div>
+        {!SINGLE_SPORT_MODE && (
+          <div className="flex flex-col gap-1.5">
+            <Label>Deporte</Label>
+            <select
+              value={form.sport}
+              onChange={(e) => set("sport", e.target.value)}
+              className={inputCls}
+            >
+              <option value="">Todos los deportes</option>
+              {SPORTS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Club */}

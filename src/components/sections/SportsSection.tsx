@@ -6,16 +6,18 @@ import { SPORTS } from "@/lib/constants"
 import { PRIMARY_SPORT } from "@/lib/sports/config"
 import type { SportCategory } from "@/types"
 
-function SportCard({ sport, index }: { sport: SportCategory; index: number }) {
+function SportCard({ sport, index, single = false }: { sport: SportCategory; index: number; single?: boolean }) {
   const isPrimary = sport.id === PRIMARY_SPORT
 
   return (
     <div
       className={[
         "animate-fade-in-up group relative overflow-hidden rounded-2xl bg-black border transition-all duration-500 cursor-pointer",
-        isPrimary
-          ? "h-80 border-[#16a34a]/60 hover:border-[#16a34a] lg:col-span-2"
-          : "h-64 border-white/10 hover:border-white/20",
+        single
+          ? "h-96 border-[#16a34a]/60 hover:border-[#16a34a] w-full"
+          : isPrimary
+            ? "h-80 border-[#16a34a]/60 hover:border-[#16a34a] lg:col-span-2"
+            : "h-64 border-white/10 hover:border-white/20",
       ].join(" ")}
       style={{ animationDelay: `${index * 0.07}s` }}
     >
@@ -66,18 +68,18 @@ export function SportsSection() {
     <section id="deportes" className="bg-white py-24 border-t border-[#e5e5e5]">
       <div className="container mx-auto px-6 sm:px-8">
         <div className="animate-fade-in-up-16">
-          <p className="label-green">Deportes</p>
+          <p className="label-green">Pickleball</p>
           <h2
             className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em] mb-12"
             style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
           >
-            ELIGE TU DEPORTE.<br />ENCUENTRA TU RIVAL.
+            PICKLEBALL.<br />ENCUENTRA TU RIVAL.
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={SPORTS.length === 1 ? "max-w-3xl" : "grid grid-cols-2 lg:grid-cols-4 gap-4"}>
           {SPORTS.map((sport, i) => (
-            <SportCard key={sport.id} sport={sport} index={i} />
+            <SportCard key={sport.id} sport={sport} index={i} single={SPORTS.length === 1} />
           ))}
         </div>
 

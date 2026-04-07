@@ -13,8 +13,10 @@ import {
   DOMINANT_HAND_LABELS,
 } from "@/lib/validations"
 
-const SPORTS = ["Fútbol", "Pádel", "Tenis", "Pickleball"] as const
-type Sport = (typeof SPORTS)[number]
+import { VISIBLE_SPORT_IDS, SPORT_CONFIG, SINGLE_SPORT_MODE } from "@/lib/sports/config"
+
+const SPORTS = VISIBLE_SPORT_IDS.map((id) => SPORT_CONFIG[id].label) as readonly string[]
+type Sport = string
 
 const accountFormSchema = z.object({
   first_name: z.string().min(1, "El nombre es requerido").max(50, "Nombre demasiado largo"),
@@ -238,32 +240,34 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
             </div>
           </div>
 
-          {/* Favorite sports */}
-          <div className="flex flex-col gap-2 pt-1">
-            <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
-              Deportes favoritos
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {SPORTS.map((sport) => {
-                const active = selectedSports.includes(sport)
-                return (
-                  <button
-                    key={sport}
-                    type="button"
-                    onClick={() => toggleSport(sport)}
-                    className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
-                      active
-                        ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                        : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
-                    }`}
-                  >
-                    {sport}
-                  </button>
-                )
-              })}
+          {/* Favorite sports — hidden when only one sport is active */}
+          {!SINGLE_SPORT_MODE && (
+            <div className="flex flex-col gap-2 pt-1">
+              <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
+                Deportes favoritos
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {SPORTS.map((sport) => {
+                  const active = selectedSports.includes(sport)
+                  return (
+                    <button
+                      key={sport}
+                      type="button"
+                      onClick={() => toggleSport(sport)}
+                      className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
+                        active
+                          ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
+                          : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                      }`}
+                    >
+                      {sport}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-[10px] text-zinc-400">Selecciona los deportes que practicas</p>
             </div>
-            <p className="text-[10px] text-zinc-400">Selecciona los deportes que practicas</p>
-          </div>
+          )}
 
           <div className="pt-1">
             <button

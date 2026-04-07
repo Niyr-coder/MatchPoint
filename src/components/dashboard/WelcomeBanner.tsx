@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { SPORT_OPTIONS, PRIMARY_SPORT } from "@/lib/sports/config"
+import { SINGLE_SPORT_MODE } from "@/lib/sports/config"
 import type { Profile } from "@/types"
 import type { PlayerStats } from "@/features/users/queries"
 
@@ -73,26 +73,14 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
           </h1>
           <p className="mt-1.5 text-white/40 text-sm capitalize">{date}</p>
 
-          {/* Sport chips — Pickleball highlighted */}
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {SPORT_OPTIONS.map(({ value, label }) =>
-              value === PRIMARY_SPORT ? (
-                <span
-                  key={value}
-                  className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white"
-                >
-                  {label}
-                </span>
-              ) : (
-                <span
-                  key={value}
-                  className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-white/50 border border-white/10"
-                >
-                  {label}
-                </span>
-              )
-            )}
-          </div>
+          {/* Sport chip — only shown when multiple sports are active */}
+          {!SINGLE_SPORT_MODE && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+                Pickleball
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Stat circles — reference design style */}

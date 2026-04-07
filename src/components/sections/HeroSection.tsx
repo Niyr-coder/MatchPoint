@@ -29,7 +29,7 @@ export function HeroSection() {
           className="animate-fade-in label-green"
           style={{ animationDelay: "0.1s" }}
         >
-          LA COMUNIDAD #1 DE DEPORTES DE RAQUETA EN ECUADOR
+          LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
         </p>
 
         {/* Headline */}
@@ -45,8 +45,8 @@ export function HeroSection() {
           className="animate-fade-in-up text-white/70 text-lg md:text-xl max-w-md mb-10 font-medium leading-relaxed"
           style={{ animationDelay: "0.3s" }}
         >
-          Encuentra rivales de tu nivel, reserva canchas al instante y sube tu ranking.{" "}
-          <span className="text-white">Pickleball · Pádel · Tenis · Fútbol</span>
+          Encuentra rivales de tu nivel, reserva canchas al instante y sube tu ranking en{" "}
+          <span className="text-white">Pickleball.</span>
         </p>
 
         {/* CTAs */}
@@ -71,8 +71,8 @@ export function HeroSection() {
         {/* Social proof */}
         <div className="flex items-center gap-3 mt-8 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
           <div className="flex -space-x-2">
-            {["🏓", "🎾", "⚽", "🏸"].map((e, i) => (
-              <div key={i} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm">{e}</div>
+            {["C", "M", "A", "L"].map((e, i) => (
+              <div key={i} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-black text-white/70">{e}</div>
             ))}
           </div>
           <p className="text-xs text-white/50">

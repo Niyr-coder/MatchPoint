@@ -1,18 +1,17 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getRankingBySport } from "@/features/ratings/queries"
 import { RankingView } from "@/features/ratings/components/RankingView"
-
-const SPORTS = ["futbol", "padel", "tenis", "pickleball"]
+import { VISIBLE_SPORT_IDS } from "@/lib/sports/config"
 
 export default async function RankingPage() {
   await authorizeOrRedirect()
 
   const [all, ...sportResults] = await Promise.all([
     getRankingBySport(undefined, 50),
-    ...SPORTS.map((sport) => getRankingBySport(sport, 50)),
+    ...VISIBLE_SPORT_IDS.map((sport) => getRankingBySport(sport, 50)),
   ])
 
-  const bySport = SPORTS.map((sport, i) => ({
+  const bySport = VISIBLE_SPORT_IDS.map((sport, i) => ({
     sport,
     entries: sportResults[i],
   }))
