@@ -22,7 +22,7 @@ function KpiCard({
   const colorMap = {
     green: "text-green-600",
     red: "text-red-600",
-    blue: "text-blue-600",
+    blue: "text-[#0a0a0a]",
     zinc: "text-zinc-800",
   }
   return (
@@ -208,7 +208,7 @@ export default async function PartnerFinancialsPage({
                     </div>
                     <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#1e40af]"
+                        className="h-full rounded-full bg-[#0a0a0a]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -283,7 +283,7 @@ export default async function PartnerFinancialsPage({
               return (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className={`w-full rounded-t-sm ${m.isCurrent ? "bg-[#1e40af]" : "bg-zinc-200"}`}
+                    className={`w-full rounded-t-sm ${m.isCurrent ? "bg-[#0a0a0a]" : "bg-zinc-200"}`}
                     style={{ height: `${Math.max(heightPct * 0.8, 6)}px` }}
                   />
                 </div>

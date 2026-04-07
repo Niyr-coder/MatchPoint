@@ -280,7 +280,7 @@ export function ChatView({ userId }: ChatViewProps) {
                         <div
                           className={`max-w-xs rounded-2xl px-3.5 py-2 ${
                             isOwn
-                              ? "bg-blue-700 text-white rounded-tr-sm"
+                              ? "bg-[#0a0a0a] text-white rounded-tr-sm"
                               : "bg-zinc-100 text-zinc-800 rounded-tl-sm"
                           }`}
                         >
@@ -292,7 +292,7 @@ export function ChatView({ userId }: ChatViewProps) {
                           <p className="text-sm leading-relaxed">{msg.content}</p>
                           <p
                             className={`text-[10px] mt-1 ${
-                              isOwn ? "text-blue-200" : "text-zinc-400"
+                              isOwn ? "text-zinc-300" : "text-zinc-400"
                             }`}
                           >
                             {new Date(msg.created_at).toLocaleTimeString("es-EC", {
@@ -323,12 +323,12 @@ export function ChatView({ userId }: ChatViewProps) {
                   onKeyDown={handleKeyDown}
                   placeholder="Escribe un mensaje..."
                   disabled={sending}
-                  className="flex-1 px-4 py-2.5 bg-zinc-100 rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 bg-zinc-100 rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:bg-white transition-all disabled:opacity-50"
                 />
                 <button
                   onClick={() => void sendMessage()}
                   disabled={!input.trim() || sending}
-                  className="size-10 rounded-xl bg-blue-700 text-white flex items-center justify-center hover:bg-blue-800 transition-colors disabled:opacity-40 shrink-0"
+                  className="size-10 rounded-xl bg-[#0a0a0a] text-white flex items-center justify-center hover:bg-[#222222] transition-colors disabled:opacity-40 shrink-0"
                   aria-label="Enviar mensaje"
                 >
                   <Send className="size-4" />

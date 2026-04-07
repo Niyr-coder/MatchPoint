@@ -129,7 +129,7 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
           action={
             <button
               onClick={openCreateSheet}
-              className="text-[11px] font-black text-[#1a56db] hover:underline"
+              className="text-[11px] font-black text-[#0a0a0a] hover:underline"
             >
               Agregar cancha →
             </button>

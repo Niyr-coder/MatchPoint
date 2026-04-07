@@ -5,7 +5,7 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   warning: "bg-amber-50 text-amber-700 border-amber-200",
   error:   "bg-red-50 text-red-600 border-red-200",
   neutral: "bg-zinc-100 text-zinc-500 border-zinc-200",
-  info:    "bg-blue-50 text-[#1a56db] border-blue-200",
+  info:    "bg-white text-[#0a0a0a] border-[#e5e5e5]",
   accent:  "bg-[#0a0a0a] text-white border-[#0a0a0a]",
 }
 

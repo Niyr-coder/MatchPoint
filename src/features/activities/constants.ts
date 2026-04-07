@@ -6,7 +6,7 @@ export const EVENT_TYPE_CONFIG: Record<
   { label: string; color: string; bg: string; border: string }
 > = {
   social:      { label: "Social",      color: "text-pink-700",   bg: "bg-pink-50",   border: "border-pink-200" },
-  clinic:      { label: "Clínica",     color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200" },
+  clinic:      { label: "Clínica",     color: "text-[#0a0a0a]",   bg: "bg-[#f5f5f5]",   border: "border-[#e5e5e5]" },
   workshop:    { label: "Workshop",    color: "text-violet-700", bg: "bg-violet-50", border: "border-violet-200" },
   open_day:    { label: "Día Abierto", color: "text-emerald-700",bg: "bg-emerald-50",border: "border-emerald-200" },
   exhibition:  { label: "Exhibición",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200" },

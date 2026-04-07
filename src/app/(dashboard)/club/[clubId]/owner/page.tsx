@@ -100,7 +100,7 @@ export default async function OwnerDashboardPage({
               {weekBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className="w-full rounded-t-sm bg-[#1e40af]"
+                    className="w-full rounded-t-sm bg-[#0a0a0a]"
                     style={{ height: `${bar.height * 0.7}px`, opacity: i === weekBars.length - 1 ? 1 : 0.3 + i * 0.1 }}
                   />
                 </div>
@@ -133,7 +133,7 @@ export default async function OwnerDashboardPage({
               </p>
             </div>
             <div className="flex flex-col items-end gap-1">
-              <span className="text-xs font-black text-[#1e40af] bg-[#1e40af]/10 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-black text-[#0a0a0a] bg-[#0a0a0a]/10 px-2 py-0.5 rounded-full">
                 Activos
               </span>
             </div>
@@ -157,7 +157,7 @@ export default async function OwnerDashboardPage({
               </p>
             </div>
             <div
-              className="size-10 rounded-xl bg-[#1e40af]/10 flex items-center justify-center"
+              className="size-10 rounded-xl bg-[#0a0a0a]/10 flex items-center justify-center"
               aria-hidden="true"
             >
               <span className="text-lg">🏟️</span>

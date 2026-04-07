@@ -32,7 +32,7 @@ function actionColorClass(action: string): string {
     return "bg-green-50 text-green-700 border-green-100"
   }
   if (action.includes("created") || action.includes("bulk.")) {
-    return "bg-blue-50 text-blue-700 border-blue-100"
+    return "bg-white text-[#0a0a0a] border-[#e5e5e5]"
   }
   if (action.includes("updated") || action.includes("role_changed")) {
     return "bg-purple-50 text-purple-700 border-purple-100"

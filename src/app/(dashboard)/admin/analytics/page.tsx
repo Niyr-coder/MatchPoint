@@ -8,7 +8,7 @@ import { DollarSign, Users, Calendar, Trophy, Building2 } from "lucide-react"
 
 function BarChart({
   bars,
-  color = "#1a56db",
+  color = "#0a0a0a",
 }: {
   bars: Array<{ label: string; value: number }>
   color?: string
@@ -55,7 +55,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  open: "bg-blue-50 text-blue-700",
+  open: "bg-[#f0fdf4] text-[#16a34a]",
   in_progress: "bg-emerald-50 text-emerald-700",
   completed: "bg-zinc-100 text-zinc-600",
   cancelled: "bg-red-50 text-red-600",
@@ -102,8 +102,8 @@ export default async function AdminAnalyticsPage() {
         {/* User growth */}
         <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-[#1a56db]/10 flex items-center justify-center">
-              <Users className="size-4 text-[#1a56db]" />
+            <div className="size-8 rounded-xl bg-[#0a0a0a]/10 flex items-center justify-center">
+              <Users className="size-4 text-[#0a0a0a]" />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
@@ -112,7 +112,7 @@ export default async function AdminAnalyticsPage() {
               <p className="text-xs text-zinc-500">Últimos 6 meses</p>
             </div>
           </div>
-          <BarChart bars={userBars} color="#1a56db" />
+          <BarChart bars={userBars} color="#0a0a0a" />
           <div className="pt-3 border-t border-[#f0f0f0] flex justify-between">
             {analytics.usersByMonth.map((m, i) => (
               <div key={i} className="text-center">
@@ -220,7 +220,7 @@ export default async function AdminAnalyticsPage() {
                   <span className="text-[11px] font-black text-zinc-300 w-5 text-right">{i + 1}</span>
                   <span className="text-sm font-bold text-[#0a0a0a]">{club.name}</span>
                 </div>
-                <span className="text-xs font-black text-[#1a56db] bg-[#1a56db]/10 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-black text-[#0a0a0a] bg-[#0a0a0a]/10 px-2.5 py-1 rounded-full">
                   {club.reservation_count} reservas
                 </span>
               </div>

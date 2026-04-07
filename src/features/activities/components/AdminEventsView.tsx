@@ -414,7 +414,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                         onClick={() => updateStatus(event, "completed")}
                         title="Marcar completado"
                         disabled={isActioning || event.status === "completed"}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-blue-50 transition-colors text-zinc-300 hover:text-blue-600 disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors text-zinc-300 hover:text-[#0a0a0a] disabled:opacity-40"
                       >
                         <CheckCircle className="size-3.5" />
                       </button>

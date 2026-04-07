@@ -46,8 +46,8 @@ function Avatar({ entry }: { entry: RankingEntry }) {
     )
   }
   return (
-    <div className="size-9 rounded-full bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center">
-      <span className="text-[11px] font-black text-[#1a56db]">
+    <div className="size-9 rounded-full bg-[#f5f5f5] border border-[#e5e5e5] flex items-center justify-center">
+      <span className="text-[11px] font-black text-[#0a0a0a]">
         {getInitials(entry.fullName)}
       </span>
     </div>
@@ -59,9 +59,9 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
   return (
     <Link
       href={`/dashboard/players/${entry.userId}`}
-      className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border transition-shadow hover:shadow-md ${
+      className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border transition-shadow ${
         isFirst
-          ? "bg-[#eff6ff] border-[#bfdbfe]"
+          ? "bg-[#f5f5f5] border-[#e5e5e5]"
           : "bg-white border-[#e5e5e5]"
       }`}
       style={{ animationDelay: `${(entry.position - 1) * 0.06}s` }}
@@ -74,14 +74,14 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
           width={isFirst ? 64 : 48}
           height={isFirst ? 64 : 48}
           className={`rounded-full object-cover border-2 ${
-            isFirst ? "size-16 border-[#1a56db]" : "size-12 border-[#e5e5e5]"
+            isFirst ? "size-16 border-[#0a0a0a]" : "size-12 border-[#e5e5e5]"
           }`}
         />
       ) : (
         <div
           className={`rounded-full flex items-center justify-center border-2 ${
             isFirst
-              ? "size-16 bg-[#1a56db] border-[#1a56db]"
+              ? "size-16 bg-[#0a0a0a] border-[#0a0a0a]"
               : "size-12 bg-[#f4f4f5] border-[#e5e5e5]"
           }`}
         >
@@ -100,7 +100,7 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
         </p>
         <p
           className={`text-[11px] font-black mt-0.5 ${
-            isFirst ? "text-[#1a56db]" : "text-zinc-400"
+            isFirst ? "text-[#0a0a0a]" : "text-zinc-400"
           }`}
         >
           {entry.score} pts
@@ -134,7 +134,7 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
           {entry.wins}V · {entry.losses}D
         </p>
       </div>
-      <span className="text-[11px] font-black text-[#1a56db] shrink-0">
+      <span className="text-[11px] font-black text-[#0a0a0a] shrink-0">
         {entry.score} pts
       </span>
     </Link>

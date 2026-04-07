@@ -172,7 +172,7 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
             <ShoppingCart className="size-4" />
             <span>Carrito</span>
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 size-5 bg-blue-700 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 size-5 bg-[#0a0a0a] text-white text-[10px] font-black rounded-full flex items-center justify-center">
                 {cartCount}
               </span>
             )}
@@ -423,7 +423,7 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
                 <button
                   onClick={() => void confirmOrder()}
                   disabled={ordering}
-                  className="w-full py-3 rounded-xl bg-blue-700 text-white text-sm font-bold hover:bg-blue-800 transition-colors disabled:opacity-50"
+                  className="w-full py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-bold hover:bg-[#222222] transition-colors disabled:opacity-50"
                 >
                   {ordering ? "Procesando..." : "Confirmar Pedido"}
                 </button>

@@ -50,7 +50,7 @@ export function ClubsView({ clubs, provinces }: ClubsViewProps) {
             placeholder="Buscar por nombre o ciudad…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 text-[12px] border border-[#e5e5e5] rounded-full bg-white text-[#0a0a0a] placeholder:text-zinc-400 focus:outline-none focus:border-[#1a56db] transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 text-[12px] border border-[#e5e5e5] rounded-full bg-white text-[#0a0a0a] placeholder:text-zinc-400 focus:outline-none focus:border-[#0a0a0a] transition-colors"
           />
         </div>
 
@@ -78,7 +78,7 @@ export function ClubsView({ clubs, provinces }: ClubsViewProps) {
             <select
               value={activeProvince}
               onChange={(e) => setActiveProvince(e.target.value)}
-              className="text-[11px] font-black uppercase tracking-[0.1em] border border-[#e5e5e5] rounded-full px-3 py-1.5 bg-white text-zinc-500 focus:outline-none focus:border-[#1a56db] transition-colors"
+              className="text-[11px] font-black uppercase tracking-[0.1em] border border-[#e5e5e5] rounded-full px-3 py-1.5 bg-white text-zinc-500 focus:outline-none focus:border-[#0a0a0a] transition-colors"
             >
               <option value="">Todas las provincias</option>
               {provinces.map((p) => (

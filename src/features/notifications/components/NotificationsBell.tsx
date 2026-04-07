@@ -26,7 +26,7 @@ function getTypeIcon(type: NotificationType) {
     case "club_request_rejected":
       return { Icon: XCircle, colorClass: "text-zinc-400" }
     case "team_invite":
-      return { Icon: Users, colorClass: "text-blue-500" }
+      return { Icon: Users, colorClass: "text-zinc-500" }
     default:
       return { Icon: Bell, colorClass: "text-zinc-400" }
   }
@@ -157,7 +157,7 @@ export function NotificationsBell() {
                     key={n.id}
                     className={cn(
                       "flex items-start gap-3 px-4 py-3 border-b border-[#f7f7f7] last:border-0 transition-colors",
-                      !n.read ? "bg-blue-50/50" : "hover:bg-[#f9f9f9]"
+                      !n.read ? "bg-[#f5f5f5]/50" : "hover:bg-[#f9f9f9]"
                     )}
                   >
                     <div
@@ -172,7 +172,7 @@ export function NotificationsBell() {
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-xs font-bold text-[#0a0a0a] leading-snug">{n.title}</p>
                         {!n.read && (
-                          <span className="size-2 rounded-full bg-blue-500 shrink-0 mt-1" />
+                          <span className="size-2 rounded-full bg-[#f5f5f5]0 shrink-0 mt-1" />
                         )}
                       </div>
                       <p className="text-[11px] text-zinc-500 mt-0.5 leading-relaxed line-clamp-2">

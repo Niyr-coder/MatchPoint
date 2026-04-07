@@ -18,7 +18,7 @@ interface ClubCardProps {
 export function ClubCard({ club, index = 0 }: ClubCardProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#1a56db]/40 transition-colors"
+      className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#0a0a0a]/40 transition-colors"
       style={{ animationDelay: `${index * 0.04}s` }}
     >
       {/* Cover */}
@@ -29,7 +29,7 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
           className="w-full h-36 object-cover"
         />
       ) : (
-        <div className="w-full h-36 bg-[#1a56db] flex items-center justify-center">
+        <div className="w-full h-36 bg-[#0a0a0a] flex items-center justify-center">
           <Building2 className="size-10 text-white/30" />
         </div>
       )}
@@ -56,7 +56,7 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
             {club.sports.map((sport) => (
               <span
                 key={sport}
-                className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-[#eff6ff] text-[#1a56db] border-[#bfdbfe]"
+                className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-[#f5f5f5] text-[#0a0a0a] border-[#e5e5e5]"
               >
                 {SPORT_LABEL[sport] ?? sport}
               </span>

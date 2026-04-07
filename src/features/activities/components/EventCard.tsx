@@ -53,7 +53,7 @@ export function EventCard({
   const cardHref = href ?? `/dashboard/events/${id}`
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-zinc-300 hover:shadow-sm transition-all group">
+    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-zinc-300 transition-all group">
       {/* Cover image */}
       <div className="relative w-full h-44 shrink-0">
         {image_url ? (

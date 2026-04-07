@@ -140,7 +140,7 @@ export function BracketView({
           <button
             onClick={() => void generate()}
             disabled={generating}
-            className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-[#1a56db] text-white hover:bg-[#1648c0] disabled:opacity-50 transition-colors"
+            className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-[#0a0a0a] text-white hover:bg-[#222222] disabled:opacity-50 transition-colors"
           >
             {generating ? <RefreshCw className="size-3.5 animate-spin" /> : <Shuffle className="size-3.5" />}
             {matches.length > 0 ? "Regenerar sorteo" : "Generar sorteo"}
@@ -218,7 +218,7 @@ export function BracketView({
                   {rMatches.map((m) => (
                     <div
                       key={m.id}
-                      className={`w-44 rounded-xl border overflow-hidden ${m.status === "bye" ? "opacity-40" : ""} ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:border-[#1a56db]/40" : ""}`}
+                      className={`w-44 rounded-xl border overflow-hidden ${m.status === "bye" ? "opacity-40" : ""} ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:border-[#0a0a0a]/40" : ""}`}
                       onClick={() => { if (canEditMatch && m.status !== "bye" && m.status !== "completed") openScoreSheet(m) }}
                     >
                       <div className={`flex items-center gap-2 px-3 py-2 border-b ${m.winner?.id === m.player1?.id ? "bg-green-50" : "bg-white"}`}>
@@ -318,7 +318,7 @@ export function BracketView({
                 <button
                   onClick={() => void submitScore()}
                   disabled={scoreLoading || !winnerId}
-                  className="flex-1 bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                 >
                   {scoreLoading && <RefreshCw className="size-3.5 animate-spin" />}
                   Guardar

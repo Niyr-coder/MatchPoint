@@ -98,7 +98,7 @@ export function TodayTimeline({ initialReservations, clubId }: TodayTimelineProp
             <button
               onClick={() => handleCheckin(r.id)}
               disabled={updatingId === r.id}
-              className="shrink-0 flex items-center gap-1.5 bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wide transition-colors disabled:opacity-50"
+              className="shrink-0 flex items-center gap-1.5 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wide transition-colors disabled:opacity-50"
             >
               <CheckCircle className="size-3" />
               Check-in

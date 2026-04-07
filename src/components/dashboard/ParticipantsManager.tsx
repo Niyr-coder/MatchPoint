@@ -38,7 +38,7 @@ const PAYMENT_META: Record<PaymentStatus, { label: string; icon: React.ElementTy
   paid:      { label: "Pagado",       icon: Check,         cls: "bg-green-100 text-green-700 border-green-200" },
   pending:   { label: "Pendiente",    icon: Clock,         cls: "bg-amber-50 text-amber-700 border-amber-200" },
   waived:    { label: "Gratis",       icon: Gift,          cls: "bg-zinc-100 text-zinc-500 border-zinc-200" },
-  refunded:  { label: "Reembolsado",  icon: AlertCircle,   cls: "bg-blue-50 text-blue-600 border-blue-200" },
+  refunded:  { label: "Reembolsado",  icon: AlertCircle,   cls: "bg-white text-[#0a0a0a] border-[#e5e5e5]" },
 }
 
 const FILTER_TABS: { key: PaymentFilter; label: string }[] = [
@@ -273,7 +273,7 @@ export function ParticipantsManager({
             </button>
             <button
               onClick={openAddSheet}
-              className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-[#1a56db] text-white hover:bg-[#1648c0] transition-colors"
+              className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-[#0a0a0a] text-white hover:bg-[#222222] transition-colors"
             >
               <UserPlus className="size-3.5" />
               {isInProgress ? "Agregar tardío" : "Agregar"}
@@ -341,8 +341,8 @@ export function ParticipantsManager({
                 </span>
 
                 {/* Avatar */}
-                <div className="size-8 rounded-full bg-[#1a56db]/10 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-black text-[#1a56db]">{initials(p)}</span>
+                <div className="size-8 rounded-full bg-[#0a0a0a]/10 flex items-center justify-center shrink-0">
+                  <span className="text-xs font-black text-[#0a0a0a]">{initials(p)}</span>
                 </div>
 
                 {/* Name */}
@@ -454,8 +454,8 @@ export function ParticipantsManager({
                     const alreadyIn = participants.some(p => p.user_id === u.id)
                     return (
                       <li key={u.id} className="flex items-center gap-3 py-3">
-                        <div className="size-8 rounded-full bg-[#1a56db]/10 flex items-center justify-center shrink-0">
-                          <span className="text-xs font-black text-[#1a56db]">
+                        <div className="size-8 rounded-full bg-[#0a0a0a]/10 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-black text-[#0a0a0a]">
                             {(u.full_name ?? u.username ?? "?").charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -469,7 +469,7 @@ export function ParticipantsManager({
                           <button
                             onClick={() => void addParticipant(u.id)}
                             disabled={actionId === u.id}
-                            className="text-[10px] font-black uppercase tracking-wide text-[#1a56db] hover:text-[#1648c0] disabled:opacity-50 transition-colors"
+                            className="text-[10px] font-black uppercase tracking-wide text-[#0a0a0a] hover:text-[#222222] disabled:opacity-50 transition-colors"
                           >
                             {actionId === u.id ? "Agregando…" : "Agregar"}
                           </button>

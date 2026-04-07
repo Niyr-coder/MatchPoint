@@ -75,7 +75,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Describe los eventos relevantes del día: clientes especiales, problemas con canchas, comentarios del equipo..."
           rows={4}
-          className="w-full rounded-xl border border-[#e5e5e5] px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] resize-none transition-colors"
+          className="w-full rounded-xl border border-[#e5e5e5] px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/20 focus:border-[#0a0a0a] resize-none transition-colors"
         />
       </div>
 

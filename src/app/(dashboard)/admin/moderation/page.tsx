@@ -19,7 +19,7 @@ const ROLE_LABELS: Record<string, string> = {
 const ROLE_CLASSES: Record<string, string> = {
   admin: "bg-red-50 text-red-700",
   owner: "bg-violet-50 text-violet-700",
-  partner: "bg-blue-50 text-blue-700",
+  partner: "bg-[#f0fdf4] text-[#16a34a]",
   manager: "bg-indigo-50 text-indigo-700",
   employee: "bg-zinc-100 text-zinc-600",
   coach: "bg-amber-50 text-amber-700",
@@ -121,7 +121,7 @@ export default async function AdminModerationPage() {
           </span>
           <Link
             href="/admin/clubs"
-            className="text-[10px] font-black uppercase tracking-wide text-[#1a56db] hover:underline flex items-center gap-1 ml-2"
+            className="text-[10px] font-black uppercase tracking-wide text-[#0a0a0a] hover:underline flex items-center gap-1 ml-2"
           >
             Gestionar <ExternalLink className="size-3" />
           </Link>
@@ -165,11 +165,11 @@ export default async function AdminModerationPage() {
               Clubs inactivos
             </p>
           </div>
-          <div className="rounded-xl bg-blue-50 p-4">
-            <p className="text-2xl font-black text-blue-700">
+          <div className="rounded-xl bg-[#f5f5f5] p-4">
+            <p className="text-2xl font-black text-[#0a0a0a]">
               {clubRequests.filter((r) => r.status === "pending").length}
             </p>
-            <p className="text-[11px] font-bold text-blue-400 uppercase tracking-wide mt-0.5">
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">
               Solicitudes pendientes
             </p>
           </div>

@@ -290,7 +290,7 @@ function AnnouncementsList({ announcements, loading }: AnnouncementsListProps) {
               {item.details?.target && (
                 <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full
                   ${item.details.target === "all"
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-[#f0fdf4] text-[#16a34a]"
                     : "bg-violet-50 text-violet-700"
                   }`}>
                   {item.details.target === "all" ? "Todos" : "Club"}

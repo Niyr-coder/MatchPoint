@@ -221,7 +221,7 @@ export default async function ManagerReportsPage({
                 return (
                   <div key={i} className="flex flex-col items-center gap-1 flex-1">
                     <div
-                      className="w-full rounded-t-sm bg-[#1e40af]"
+                      className="w-full rounded-t-sm bg-[#0a0a0a]"
                       style={{
                         height: `${Math.max(heightPct * 0.6, 4)}px`,
                         opacity: count > 0 ? 0.5 + (count / maxWeekDay) * 0.5 : 0.15,

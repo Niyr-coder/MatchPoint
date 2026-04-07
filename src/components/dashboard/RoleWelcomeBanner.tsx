@@ -5,12 +5,12 @@ import type { Profile, AppRole } from "@/types"
 
 const BANNER_BG: Record<AppRole, string> = {
   admin:    "#b91c1c",
-  owner:    "#1e40af",
+  owner:    "#0a0a0a",
   partner:  "#0f766e",
   manager:  "#15803d",
   employee: "#3f3f46",
   coach:    "#92400e",
-  user:     "#1a56db",
+  user:     "#0a0a0a",
 }
 
 const ROLE_LABEL: Record<AppRole, string> = {

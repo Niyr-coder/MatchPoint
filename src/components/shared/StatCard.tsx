@@ -10,7 +10,7 @@ interface StatCardProps {
 
 const VARIANT_STYLES: Record<NonNullable<StatCardProps["variant"]>, { icon: string; value: string }> = {
   default:  { icon: "bg-zinc-100 text-zinc-500", value: "text-[#0a0a0a]" },
-  accent:   { icon: "bg-[#1a56db]/10 text-[#1a56db]", value: "text-[#1a56db]" },
+  accent:   { icon: "bg-[#0a0a0a]/10 text-[#0a0a0a]", value: "text-[#0a0a0a]" },
   success:  { icon: "bg-[#f0fdf4] text-[#16a34a]", value: "text-[#16a34a]" },
   warning:  { icon: "bg-amber-50 text-amber-600", value: "text-amber-600" },
 }

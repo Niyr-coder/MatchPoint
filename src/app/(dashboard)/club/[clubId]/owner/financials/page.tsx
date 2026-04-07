@@ -22,7 +22,7 @@ function KpiCard({
   const colorMap = {
     green: "text-green-600",
     red: "text-red-600",
-    blue: "text-blue-600",
+    blue: "text-[#0a0a0a]",
     zinc: "text-zinc-800",
   }
   return (
@@ -45,7 +45,7 @@ const SPORT_LABELS: Record<string, string> = {
 
 const SPORT_COLORS: Record<string, string> = {
   futbol: "bg-green-500",
-  padel: "bg-blue-500",
+  padel: "bg-[#f5f5f5]0",
   tenis: "bg-yellow-500",
   pickleball: "bg-orange-500",
 }
@@ -317,7 +317,7 @@ export default async function OwnerFinancialsPage({
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
                     className={`w-full rounded-t-sm transition-all ${
-                      m.isCurrent ? "bg-[#1e40af]" : "bg-zinc-200"
+                      m.isCurrent ? "bg-[#0a0a0a]" : "bg-zinc-200"
                     }`}
                     style={{ height: `${Math.max(heightPct * 0.8, 6)}px` }}
                   />

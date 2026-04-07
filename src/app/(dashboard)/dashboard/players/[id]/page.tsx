@@ -69,7 +69,7 @@ export default async function PlayerProfilePage({
 
       {/* Profile hero */}
       <div className="flex flex-col items-center gap-4 py-8 border-b border-[#e5e5e5]">
-        <div className="size-20 rounded-full bg-[#1a56db] flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="size-20 rounded-full bg-[#0a0a0a] flex items-center justify-center shrink-0 overflow-hidden">
           {profile.avatar_url ? (
             <Image
               src={profile.avatar_url}
@@ -99,7 +99,7 @@ export default async function PlayerProfilePage({
         </div>
 
         {stats.ranking_position && (
-          <div className="flex items-center gap-1.5 bg-[#eff6ff] text-[#1a56db] rounded-full px-4 py-1.5">
+          <div className="flex items-center gap-1.5 bg-[#f5f5f5] text-[#0a0a0a] rounded-full px-4 py-1.5">
             <Trophy className="size-3.5" />
             <span className="text-[11px] font-black">
               #{stats.ranking_position} en el ranking

@@ -26,13 +26,13 @@ function KpiCard({ label, value, sub, color = "zinc", icon }: KpiCardProps) {
   const colorMap: Record<NonNullable<KpiCardProps["color"]>, string> = {
     green: "text-green-600",
     red: "text-red-600",
-    blue: "text-blue-600",
+    blue: "text-[#0a0a0a]",
     zinc: "text-zinc-800",
   }
   const iconBgMap: Record<NonNullable<KpiCardProps["color"]>, string> = {
     green: "bg-green-50 text-green-600",
     red: "bg-red-50 text-red-600",
-    blue: "bg-blue-50 text-blue-600",
+    blue: "bg-[#f5f5f5] text-[#0a0a0a]",
     zinc: "bg-zinc-100 text-zinc-500",
   }
   return (

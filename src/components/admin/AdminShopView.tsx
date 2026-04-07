@@ -33,7 +33,7 @@ function formatCurrency(amount: number): string {
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   pending: { label: "Pendiente", className: "bg-amber-50 text-amber-700" },
-  confirmed: { label: "Confirmado", className: "bg-blue-50 text-blue-700" },
+  confirmed: { label: "Confirmado", className: "bg-[#f0fdf4] text-[#16a34a]" },
   delivered: { label: "Entregado", className: "bg-emerald-50 text-emerald-700" },
   cancelled: { label: "Cancelado", className: "bg-red-50 text-red-700" },
 }
@@ -71,8 +71,8 @@ function StatsCards({ stats }: { stats: AdminShopStats }) {
 
       <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
         <div className="flex items-center gap-3 mb-2">
-          <div className="size-9 rounded-xl bg-blue-50 flex items-center justify-center">
-            <CheckCircle2 className="size-4 text-blue-600" />
+          <div className="size-9 rounded-xl bg-[#f5f5f5] flex items-center justify-center">
+            <CheckCircle2 className="size-4 text-[#0a0a0a]" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
             Productos activos

@@ -23,7 +23,7 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
 }
 
 const ENTITY_TYPE_BADGE_CLASSES: Record<string, string> = {
-  club: "bg-blue-50 text-[#1a56db] border-blue-200",
+  club: "bg-white text-[#0a0a0a] border-[#e5e5e5]",
   tournament: "bg-amber-50 text-amber-700 border-amber-200",
   event: "bg-purple-50 text-purple-700 border-purple-200",
   team: "bg-teal-50 text-teal-700 border-teal-200",

@@ -58,7 +58,7 @@ export function JoinTournamentButton({ tournamentId, alreadyJoined, onRefresh }:
         onClick={handleJoin}
         disabled={loading}
         className="w-full py-4 rounded-2xl text-white text-sm font-black uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-        style={{ background: "#1a56db" }}
+        style={{ background: "#0a0a0a" }}
       >
         {loading ? "Inscribiendo..." : "Inscribirse al Torneo"}
       </button>

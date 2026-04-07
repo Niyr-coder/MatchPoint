@@ -247,7 +247,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
             <button
               onClick={handleAddMember}
               disabled={addLoading}
-              className="bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
+              className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
             >
               {addLoading ? "Agregando..." : "Agregar al Equipo"}
             </button>

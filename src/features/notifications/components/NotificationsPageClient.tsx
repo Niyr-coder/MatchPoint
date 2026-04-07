@@ -37,7 +37,7 @@ function getTypeIcon(type: string) {
     case "club_request_rejected":
       return { Icon: XCircle, colorClass: "text-zinc-400", bgClass: "bg-zinc-100" }
     case "team_invite":
-      return { Icon: Users, colorClass: "text-blue-500", bgClass: "bg-blue-50" }
+      return { Icon: Users, colorClass: "text-zinc-500", bgClass: "bg-[#f5f5f5]" }
     default:
       return { Icon: Bell, colorClass: "text-zinc-400", bgClass: "bg-zinc-100" }
   }
@@ -114,7 +114,7 @@ function NotificationRow({ notification: n, onMarkRead, isPending }: Notificatio
     <div
       className={cn(
         "flex items-start gap-4 p-4 border-b border-[#f0f0f0] last:border-0 transition-colors",
-        !n.read ? "bg-blue-50/30" : "hover:bg-[#fafafa]"
+        !n.read ? "bg-[#f5f5f5]/30" : "hover:bg-[#fafafa]"
       )}
     >
       {/* Icon */}
@@ -143,7 +143,7 @@ function NotificationRow({ notification: n, onMarkRead, isPending }: Notificatio
               {formatRelativeTime(n.created_at)}
             </span>
             {!n.read && (
-              <span className="size-2 rounded-full bg-blue-500 shrink-0" />
+              <span className="size-2 rounded-full bg-[#f5f5f5]0 shrink-0" />
             )}
           </div>
         </div>

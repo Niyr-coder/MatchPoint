@@ -67,7 +67,7 @@ function QuickStat({
 }) {
   const colorMap = {
     green: "text-green-600",
-    blue: "text-blue-600",
+    blue: "text-[#0a0a0a]",
     zinc: "text-zinc-800",
   }
   return (

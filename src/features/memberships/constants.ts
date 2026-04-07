@@ -18,7 +18,7 @@ export interface RoleColor {
 
 export const ROLE_COLORS: Record<AppRole, RoleColor> = {
   admin:    { bg: "bg-[#0a0a0a]",      text: "text-white",        border: "border-[#0a0a0a]" },
-  owner:    { bg: "bg-blue-50",        text: "text-[#1a56db]",    border: "border-blue-200" },
+  owner:    { bg: "bg-[#f5f5f5]",        text: "text-[#0a0a0a]",    border: "border-[#e5e5e5]" },
   partner:  { bg: "bg-teal-50",        text: "text-teal-700",     border: "border-teal-200" },
   manager:  { bg: "bg-[#f0fdf4]",      text: "text-[#16a34a]",   border: "border-[#bbf7d0]" },
   employee: { bg: "bg-zinc-100",       text: "text-zinc-500",     border: "border-zinc-200" },

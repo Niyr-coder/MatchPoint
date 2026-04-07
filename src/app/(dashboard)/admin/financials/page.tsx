@@ -100,7 +100,7 @@ export default async function AdminFinancialsPage() {
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">
               Reservas este mes
             </p>
-            <p className="text-lg font-black text-[#1a56db]">{fin.reservationsThisMonth}</p>
+            <p className="text-lg font-black text-[#0a0a0a]">{fin.reservationsThisMonth}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">

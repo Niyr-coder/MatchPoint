@@ -56,7 +56,7 @@ function ProgressIndicator({ currentStep }: { currentStep: number }) {
                   isDone
                     ? "bg-[#0a0a0a] text-white"
                     : isActive
-                    ? "bg-[#1a56db] text-white"
+                    ? "bg-[#0a0a0a] text-white"
                     : "bg-zinc-200 text-zinc-400"
                 }`}
               >
@@ -68,7 +68,7 @@ function ProgressIndicator({ currentStep }: { currentStep: number }) {
               </div>
               <span
                 className={`text-[9px] font-black uppercase tracking-wide ${
-                  isActive ? "text-[#1a56db]" : isDone ? "text-[#0a0a0a]" : "text-zinc-400"
+                  isActive ? "text-[#0a0a0a]" : isDone ? "text-[#0a0a0a]" : "text-zinc-400"
                 }`}
               >
                 {step.label}
@@ -125,7 +125,7 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
         <button
           key={club.id}
           onClick={() => onSelect(club)}
-          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#0a0a0a] transition-all"
           style={{ animationDelay: `${i * 0.04}s` }}
         >
           <p className="text-sm font-black text-[#0a0a0a]">{club.name}</p>
@@ -193,12 +193,12 @@ function StepCourt({
         <button
           key={court.id}
           onClick={() => onSelect(court)}
-          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#1a56db] hover:shadow-sm transition-all"
+          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#0a0a0a] transition-all"
           style={{ animationDelay: `${i * 0.04}s` }}
         >
           <div className="flex items-start justify-between">
             <p className="text-sm font-black text-[#0a0a0a]">{court.name}</p>
-            <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-blue-50 text-[#1a56db] border-blue-200">
+            <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
               {SPORT_LABELS[court.sport] ?? court.sport}
             </span>
           </div>
@@ -292,8 +292,8 @@ function StepDateTime({
                       !slot.available
                         ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200"
                         : isSelected
-                        ? "bg-[#1a56db] text-white border border-[#1a56db]"
-                        : "bg-white text-[#0a0a0a] border border-[#e5e5e5] hover:border-[#1a56db] hover:text-[#1a56db]"
+                        ? "bg-[#0a0a0a] text-white border border-[#0a0a0a]"
+                        : "bg-white text-[#0a0a0a] border border-[#e5e5e5] hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
                     }`}
                   >
                     {slot.startTime.slice(0, 5)} – {slot.endTime.slice(0, 5)}
@@ -384,7 +384,7 @@ function StepConfirm({
       <button
         onClick={onSubmit}
         disabled={submitting}
-        className="bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full px-6 py-3 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+        className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-6 py-3 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
       >
         {submitting && <Loader2 className="size-3.5 animate-spin" />}
         Confirmar reserva

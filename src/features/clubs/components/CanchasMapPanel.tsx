@@ -18,8 +18,7 @@ const SPORT_LABEL: Record<string, string> = {
 export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white"
-      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white border border-[#e5e5e5]"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">

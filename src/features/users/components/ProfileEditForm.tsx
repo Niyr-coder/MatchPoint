@@ -265,7 +265,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           <button
             type="submit"
             disabled={submitting}
-            className="flex-1 bg-[#1a56db] hover:bg-[#1648c0] text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+            className="flex-1 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
           >
             {submitting && <Loader2 className="size-3.5 animate-spin" />}
             Guardar cambios

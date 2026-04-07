@@ -76,7 +76,7 @@ function ReservationCard({ reservation, showCancel, onCancel, cancellingId }: Re
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {reservation.courts?.sport && (
-            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-blue-50 text-[#1a56db] border-blue-200">
+            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
               {SPORT_LABELS[reservation.courts.sport] ?? reservation.courts.sport}
             </span>
           )}

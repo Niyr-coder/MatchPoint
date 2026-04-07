@@ -100,7 +100,7 @@ function OriginBadge({ origin }: { origin: string | null }) {
   const label = originLabel(origin)
   const colorClass =
     origin === "google"
-      ? "bg-blue-50 text-blue-700 border-blue-100"
+      ? "bg-white text-[#0a0a0a] border-[#e5e5e5]"
       : origin === "admin_created"
       ? "bg-purple-50 text-purple-700 border-purple-100"
       : origin === "invite"

@@ -44,7 +44,7 @@ export function ControlTowerRevenue({ revenue }: Props) {
   const maxRev = Math.max(...revenue.topClubsByRevenue.map((c) => c.revenue), 1)
 
   return (
-    <div className="rounded-2xl bg-white overflow-hidden flex flex-col" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}>
+    <div className="rounded-2xl bg-white overflow-hidden flex flex-col">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
         <DollarSign className="size-3.5 text-emerald-600" />
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Revenue</p>

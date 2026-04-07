@@ -187,7 +187,7 @@ export function ClubReservationsTable({
       header: "Deporte",
       render: (r) =>
         r.courts?.sport ? (
-          <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-blue-50 text-[#1a56db] border-blue-200">
+          <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
             {r.courts.sport}
           </span>
         ) : (

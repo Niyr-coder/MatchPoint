@@ -38,10 +38,7 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
   return (
     <div
       className="animate-fade-in-up relative rounded-2xl overflow-hidden"
-      style={{
-        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-        boxShadow: "0 4px 20px rgba(15,23,42,0.25)",
-      }}
+      style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)" }}
     >
       <div className="relative z-10">
         {/* Header */}

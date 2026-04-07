@@ -46,7 +46,7 @@ export default async function ProfilePage() {
       {/* Profile hero */}
       <div className="flex flex-col items-center gap-4 py-8 border-b border-[#e5e5e5]">
         {/* Avatar */}
-        <div className="size-20 rounded-full bg-[#1a56db] flex items-center justify-center shrink-0">
+        <div className="size-20 rounded-full bg-[#0a0a0a] flex items-center justify-center shrink-0">
           <span className="text-2xl font-black text-white">
             {getInitials(profile)}
           </span>

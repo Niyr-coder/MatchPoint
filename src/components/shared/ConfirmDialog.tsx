@@ -27,7 +27,7 @@ export function ConfirmDialog({
   const confirmClasses =
     variant === "danger"
       ? "bg-red-600 hover:bg-red-700 text-white"
-      : "bg-[#1a56db] hover:bg-[#1648c0] text-white"
+      : "bg-[#0a0a0a] hover:bg-[#222222] text-white"
 
   async function handleConfirm() {
     await onConfirm()

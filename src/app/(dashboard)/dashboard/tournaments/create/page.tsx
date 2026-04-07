@@ -31,7 +31,7 @@ interface ExtrasState {
 }
 
 const inputCls =
-  "w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm font-medium text-[#0a0a0a] placeholder:text-zinc-300 focus:outline-none focus:border-[#1a56db] transition-colors bg-white"
+  "w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm font-medium text-[#0a0a0a] placeholder:text-zinc-300 focus:outline-none focus:border-[#0a0a0a] transition-colors bg-white"
 const labelCls =
   "text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500"
 
@@ -45,9 +45,9 @@ function ProgressBar({ current }: { current: number }) {
             <div
               className={`size-7 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all ${
                 i + 1 < current
-                  ? "bg-[#1a56db] border-[#1a56db] text-white"
+                  ? "bg-[#0a0a0a] border-[#0a0a0a] text-white"
                   : i + 1 === current
-                  ? "border-[#1a56db] text-[#1a56db] bg-white"
+                  ? "border-[#0a0a0a] text-[#0a0a0a] bg-white"
                   : "border-zinc-200 text-zinc-300 bg-white"
               }`}
             >
@@ -55,7 +55,7 @@ function ProgressBar({ current }: { current: number }) {
             </div>
             <span
               className={`text-[10px] font-black uppercase tracking-wide hidden sm:block ${
-                i + 1 <= current ? "text-[#1a56db]" : "text-zinc-300"
+                i + 1 <= current ? "text-[#0a0a0a]" : "text-zinc-300"
               }`}
             >
               {label}
@@ -64,7 +64,7 @@ function ProgressBar({ current }: { current: number }) {
           {i < steps.length - 1 && (
             <div
               className={`flex-1 h-0.5 mx-3 transition-colors ${
-                i + 1 < current ? "bg-[#1a56db]" : "bg-zinc-200"
+                i + 1 < current ? "bg-[#0a0a0a]" : "bg-zinc-200"
               }`}
             />
           )}
@@ -103,7 +103,7 @@ function ExtraToggle({
           type="button"
           onClick={onToggle}
           className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-            enabled ? "bg-[#1a56db]" : "bg-zinc-200"
+            enabled ? "bg-[#0a0a0a]" : "bg-zinc-200"
           }`}
         >
           <span
@@ -214,7 +214,7 @@ export default function CreateTournamentPage() {
           <ArrowLeft className="size-3" /> Volver a torneos
         </Link>
         <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-[#1a56db] flex items-center justify-center">
+          <div className="size-10 rounded-xl bg-[#0a0a0a] flex items-center justify-center">
             <Trophy className="size-5 text-white" />
           </div>
           <div>
@@ -256,7 +256,7 @@ export default function CreateTournamentPage() {
                     }
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all font-bold text-sm ${
                       form.sport === s.value
-                        ? "border-[#1a56db] bg-[#1a56db] text-white"
+                        ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
                         : "border-[#e5e5e5] text-zinc-600 hover:border-zinc-300"
                     }`}
                   >
@@ -283,7 +283,7 @@ export default function CreateTournamentPage() {
                       }
                       className={`px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
                         form.modality === m
-                          ? "border-[#1a56db] bg-[#1a56db] text-white"
+                          ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
                           : "border-[#e5e5e5] text-zinc-600 hover:border-zinc-300"
                       }`}
                     >
@@ -316,7 +316,7 @@ export default function CreateTournamentPage() {
               type="button"
               disabled={!canProceedStep1}
               onClick={() => setStep(2)}
-              className="w-full py-3 rounded-xl bg-[#1a56db] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#1648c0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Siguiente →
             </button>
@@ -390,7 +390,7 @@ export default function CreateTournamentPage() {
 
             <div className="flex flex-col gap-1.5">
               <label className={labelCls}>Costo de inscripción</label>
-              <div className="flex items-center border border-[#e5e5e5] rounded-xl overflow-hidden focus-within:border-[#1a56db] transition-colors">
+              <div className="flex items-center border border-[#e5e5e5] rounded-xl overflow-hidden focus-within:border-[#0a0a0a] transition-colors">
                 <span className="px-3 py-2.5 bg-zinc-50 border-r border-[#e5e5e5] text-sm text-zinc-500 font-medium">
                   $
                 </span>
@@ -437,7 +437,7 @@ export default function CreateTournamentPage() {
                 type="button"
                 disabled={!canProceedStep2}
                 onClick={() => setStep(3)}
-                className="flex-1 py-3 rounded-xl bg-[#1a56db] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#1648c0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Siguiente →
               </button>
@@ -686,7 +686,7 @@ export default function CreateTournamentPage() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 py-3 rounded-xl bg-[#1a56db] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#1648c0] transition-colors disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-50"
               >
                 {loading ? "Creando..." : "Crear Torneo 🏆"}
               </button>

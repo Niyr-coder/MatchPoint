@@ -38,8 +38,7 @@ function formatDate(dateStr: string): string {
 export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white"
-      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white border border-[#e5e5e5]"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
@@ -68,7 +67,7 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
           <div className="flex flex-col items-center justify-center py-10 gap-2">
             <Clock className="size-7 text-zinc-300" />
             <p className="text-xs font-bold text-zinc-400">Sin reservas próximas</p>
-            <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-[#1a56db] hover:underline">
+            <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-[#0a0a0a] hover:underline">
               Reservar una cancha →
             </Link>
           </div>

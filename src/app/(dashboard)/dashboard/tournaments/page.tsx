@@ -68,7 +68,7 @@ export default async function TournamentsPage() {
                 <Link
                   key={t.id}
                   href={`/dashboard/tournaments/${t.id}`}
-                  className="rounded-2xl bg-white border border-[#1a56db]/30 p-5 flex flex-col gap-3 hover:border-[#1a56db] transition-colors"
+                  className="rounded-2xl bg-white border border-[#0a0a0a]/30 p-5 flex flex-col gap-3 hover:border-[#0a0a0a] transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${st.classes}`}>
@@ -104,7 +104,7 @@ export default async function TournamentsPage() {
             <p className="text-sm font-bold text-zinc-400">No hay torneos abiertos</p>
             <Link
               href="/dashboard/tournaments/create"
-              className="text-[11px] font-black text-[#1a56db] hover:underline"
+              className="text-[11px] font-black text-[#0a0a0a] hover:underline"
             >
               Crea el primero →
             </Link>
@@ -117,7 +117,7 @@ export default async function TournamentsPage() {
                 <Link
                   key={t.id}
                   href={`/dashboard/tournaments/${t.id}`}
-                  className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3 hover:border-[#1a56db]/40 transition-colors"
+                  className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3 hover:border-[#0a0a0a]/40 transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${st.classes}`}>
@@ -143,7 +143,7 @@ export default async function TournamentsPage() {
                       <Users className="size-3" />
                       <span>{t.max_participants} cupos</span>
                     </div>
-                    <span className="text-[11px] font-black text-[#1a56db]">
+                    <span className="text-[11px] font-black text-[#0a0a0a]">
                       {t.entry_fee > 0 ? `$${t.entry_fee}` : "Gratis"}
                     </span>
                   </div>
