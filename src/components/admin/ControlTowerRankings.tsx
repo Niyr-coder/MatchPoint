@@ -64,7 +64,7 @@ interface Props {
 export function ControlTowerRankings({ topClubs, topPlayers, topTournaments }: Props) {
   return (
     <div className="rounded-2xl bg-white overflow-hidden">
-      <div className="px-4 py-3 border-b border-slate-100">
+      <div className="px-4 py-3 border-b border-[#e5e5e5]">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Top Rankings</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100">

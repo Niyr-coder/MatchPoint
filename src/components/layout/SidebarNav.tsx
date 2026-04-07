@@ -15,7 +15,7 @@ export function SidebarNav({ sections, onItemClick }: SidebarNavProps) {
         <div key={i} className={i > 0 ? "mt-4" : ""}>
           {section.title && (
             <div className="px-3 pb-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
                 {section.title}
               </p>
             </div>

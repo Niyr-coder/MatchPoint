@@ -27,7 +27,7 @@ export function DataTable<T extends { id?: string }>({
   return (
     <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
       {/* Header */}
-      <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-zinc-50/60"
+      <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-white"
         style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
       >
         {columns.map((col) => (

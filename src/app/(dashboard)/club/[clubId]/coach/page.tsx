@@ -72,7 +72,7 @@ export default async function CoachClassesPage({
               students.map((s, i) => {
                 const profile = (Array.isArray(s.profiles) ? s.profiles[0] : s.profiles) as { full_name: string | null } | null
                 return (
-                  <div key={i} className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-zinc-50">
+                  <div key={i} className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-[#f5f5f5]">
                     <div className="flex items-center gap-2.5">
                       <span className="size-6 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-black text-amber-700">
                         {(profile?.full_name ?? "?")[0]?.toUpperCase()}

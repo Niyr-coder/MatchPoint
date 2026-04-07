@@ -35,13 +35,13 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
     || "Usuario"
 
   return (
-    <div ref={containerRef} className="relative border-t border-slate-100 p-3">
+    <div ref={containerRef} className="relative border-t border-[#e5e5e5] p-3">
       {open && (
-        <div className="absolute bottom-full left-3 right-3 mb-1 bg-white border border-slate-200 rounded-xl shadow-lg p-1 z-50">
+        <div className="absolute bottom-full left-3 right-3 mb-1 bg-white border border-[#e5e5e5] rounded-xl p-1 z-50">
           <form action="/auth/signout" method="POST">
             <button
               type="submit"
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-zinc-500 hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
             >
               <LogOut className="size-4" />
               Cerrar sesión
@@ -52,7 +52,7 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
 
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-colors text-left"
+        className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-lg hover:bg-[#f5f5f5] transition-colors text-left"
       >
         <Avatar className="size-8 shrink-0">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
@@ -61,10 +61,10 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-800 truncate">{displayName}</p>
+          <p className="text-sm font-bold text-[#0a0a0a] truncate">{displayName}</p>
           <RoleBadge role={currentRole} size="sm" className="mt-0.5" />
         </div>
-        <ChevronsUpDown className="size-4 text-slate-400 shrink-0" />
+        <ChevronsUpDown className="size-4 text-zinc-400 shrink-0" />
       </button>
     </div>
   )

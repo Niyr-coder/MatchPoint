@@ -391,7 +391,7 @@ export default function CreateTournamentPage() {
             <div className="flex flex-col gap-1.5">
               <label className={labelCls}>Costo de inscripción</label>
               <div className="flex items-center border border-[#e5e5e5] rounded-xl overflow-hidden focus-within:border-[#0a0a0a] transition-colors">
-                <span className="px-3 py-2.5 bg-zinc-50 border-r border-[#e5e5e5] text-sm text-zinc-500 font-medium">
+                <span className="px-3 py-2.5 bg-[#f5f5f5] border-r border-[#e5e5e5] text-sm text-zinc-500 font-bold">
                   $
                 </span>
                 <input
