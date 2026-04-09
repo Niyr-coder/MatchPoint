@@ -12,9 +12,14 @@ const createReservationSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   start_time: z.string().regex(/^\d{2}:\d{2}$/),
   end_time: z.string().regex(/^\d{2}:\d{2}$/),
-  total_price: z.number().min(0),
+  // total_price is intentionally omitted — calculated server-side from court.price_per_hour
   notes: z.string().max(500).optional(),
 })
+
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number)
+  return h * 60 + m
+}
 
 export async function GET() {
   const supabase = await createClient()
@@ -57,7 +62,30 @@ export async function POST(request: Request) {
   }
 
   try {
-    const reservation = await createReservation(user.id, parsed.data)
+    // Calculate price server-side — never trust client-provided price
+    const { data: court, error: courtErr } = await supabase
+      .from("courts")
+      .select("price_per_hour")
+      .eq("id", parsed.data.court_id)
+      .single()
+
+    if (courtErr || !court) {
+      return NextResponse.json({ success: false, error: "Cancha no encontrada" }, { status: 404 })
+    }
+
+    const durationHours =
+      (timeToMinutes(parsed.data.end_time) - timeToMinutes(parsed.data.start_time)) / 60
+
+    if (durationHours <= 0) {
+      return NextResponse.json(
+        { success: false, error: "El horario de fin debe ser posterior al de inicio" },
+        { status: 422 }
+      )
+    }
+
+    const serverPrice = Math.round(court.price_per_hour * durationHours * 100) / 100
+
+    const reservation = await createReservation(user.id, { ...parsed.data, total_price: serverPrice })
     return NextResponse.json({ success: true, data: reservation }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear reserva"

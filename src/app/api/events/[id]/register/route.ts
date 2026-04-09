@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
+import { createClient } from "@/lib/supabase/server"
 import {
   getEventById,
   getUserEventRegistration,
   registerForEvent,
   unregisterFromEvent,
-  getEventRegistrations,
 } from "@/features/activities/queries"
 import type { ApiResponse } from "@/types"
 import type { EventRegistration } from "@/features/activities/queries"
@@ -61,10 +61,22 @@ export async function POST(
       }
     }
 
-    // Check capacity
+    // Check capacity — use count query instead of fetching all registrations
     if (event.max_capacity !== null) {
-      const registrations = await getEventRegistrations(eventId)
-      if (registrations.length >= event.max_capacity) {
+      const supabase = await createClient()
+      const { count, error: countErr } = await supabase
+        .from("event_registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId)
+
+      if (countErr) {
+        return NextResponse.json(
+          { success: false, data: null, error: "Error al verificar capacidad" },
+          { status: 500 }
+        )
+      }
+
+      if (count !== null && count >= event.max_capacity) {
         return NextResponse.json(
           { success: false, data: null, error: "El evento está lleno" },
           { status: 409 }

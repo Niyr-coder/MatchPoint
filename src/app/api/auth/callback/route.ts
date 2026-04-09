@@ -46,8 +46,10 @@ export async function GET(request: NextRequest) {
   const roles = await getUserRoles(user.id)
   const destination = getPostLoginDestination(profile as Profile, globalRole, roles)
 
-  // Respect explicit `next` param only for safe same-origin paths
-  const redirectTo = next.startsWith("/") && next !== "/" ? next : destination
+  // Respect explicit `next` param only for safe same-origin paths.
+  // Reject protocol-relative URLs (//evil.com) and anything with a colon (javascript:, data:).
+  const isSafePath = /^\/(?!\/)[^:]*$/.test(next)
+  const redirectTo = isSafePath && next !== "/" ? next : destination
 
   return NextResponse.redirect(`${origin}${redirectTo}`)
 }

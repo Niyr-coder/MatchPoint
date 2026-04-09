@@ -89,9 +89,15 @@ async function handleUserBulk(
 
     if (fetchError) throw new Error(fetchError.message)
 
+    const RESTORABLE_ROLES = ["owner", "partner", "manager", "employee", "coach", "user"] as const
+    type RestorableRole = (typeof RESTORABLE_ROLES)[number]
+
     for (const profile of profiles ?? []) {
       const currentSettings = (profile.settings as Record<string, unknown> | null) ?? {}
-      const previousRole = (currentSettings.suspended_from_role as string | undefined) ?? "user"
+      const rawRole = currentSettings.suspended_from_role as string | undefined
+      const previousRole: RestorableRole = RESTORABLE_ROLES.includes(rawRole as RestorableRole)
+        ? (rawRole as RestorableRole)
+        : "user"
       const { suspended_from_role: _removed, ...cleanedSettings } = currentSettings
 
       const { error: updateError } = await supabase

@@ -264,9 +264,15 @@ export async function PATCH(
     }
 
     if (action === "unsuspend") {
-      // Restore the role that was saved at suspension time, fallback to 'user'
+      // Restore the role that was saved at suspension time, fallback to 'user'.
+      // Validate against allowed set to prevent privilege escalation via JSONB tampering.
+      const RESTORABLE_ROLES = ["owner", "partner", "manager", "employee", "coach", "user"] as const
+      type RestorableRole = (typeof RESTORABLE_ROLES)[number]
       const currentSettings = (existing.settings as Record<string, unknown> | null) ?? {}
-      const previousRole = (currentSettings.suspended_from_role as string | undefined) ?? "user"
+      const rawRole = currentSettings.suspended_from_role as string | undefined
+      const previousRole: RestorableRole = RESTORABLE_ROLES.includes(rawRole as RestorableRole)
+        ? (rawRole as RestorableRole)
+        : "user"
       const { suspended_from_role: _removed, ...cleanedSettings } = currentSettings
 
       const { error: updateError } = await supabase
