@@ -3,6 +3,7 @@ export type NotificationType =
   | 'club_request_rejected'
   | 'team_invite'
   | 'system'
+  | 'announcement'
 
 export interface Notification {
   id: string
