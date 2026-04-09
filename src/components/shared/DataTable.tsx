@@ -27,7 +27,7 @@ export function DataTable<T extends { id?: string }>({
   return (
     <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
       {/* Header */}
-      <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-white"
+      <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-[#fafafa]"
         style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
       >
         {columns.map((col) => (
@@ -47,7 +47,7 @@ export function DataTable<T extends { id?: string }>({
           data.map((item, i) => (
             <div
               key={getKey(item)}
-              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-zinc-50 transition-colors" : ""}`}
+              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-[#f5f5f5] transition-colors duration-150" : ""}`}
               style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, animationDelay: `${i * 0.03}s` }}
               onClick={() => onRowClick?.(item)}
             >

@@ -49,11 +49,13 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
     .join("")
 
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-[#0a0a0a] border border-white/10 shadow-none">
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-[#0a0a0a] border border-zinc-800 shadow-none">
+      {/* Ambient green glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(22,163,74,0.06),transparent_50%)] pointer-events-none" />
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5">
         {/* Avatar */}
-        <Avatar className="size-14 shrink-0 ring-2 ring-white/20">
+        <Avatar className="size-14 shrink-0 ring-2 ring-zinc-700">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
           <AvatarFallback className="bg-gradient-to-br from-green-400 to-emerald-600 text-white text-xl font-black">
             {initials || "J"}
@@ -85,24 +87,30 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
 
         {/* Stat circles — reference design style */}
         <div className="flex items-end gap-4 shrink-0">
-          <StatCircle
-            value={stats.tournamentsPlayed}
-            label="Torneos jugados"
-            color="#16a34a"
-            bg="linear-gradient(135deg, #052e16, #14532d)"
-          />
-          <StatCircle
-            value={stats.reservationsThisMonth}
-            label="Reservas mes"
-            color="#ffffff"
-            bg="linear-gradient(135deg, #1a1a1a, #2a2a2a)"
-          />
-          <StatCircle
-            value={stats.rankingScore}
-            label="Puntos ranking"
-            color="#4ade80"
-            bg="linear-gradient(135deg, #052e16, #14532d)"
-          />
+          <div className="transition-transform duration-200 hover:scale-105">
+            <StatCircle
+              value={stats.tournamentsPlayed}
+              label="Torneos jugados"
+              color="#16a34a"
+              bg="linear-gradient(135deg, #052e16, #14532d)"
+            />
+          </div>
+          <div className="transition-transform duration-200 hover:scale-105">
+            <StatCircle
+              value={stats.reservationsThisMonth}
+              label="Reservas mes"
+              color="#ffffff"
+              bg="linear-gradient(135deg, #1a1a1a, #2a2a2a)"
+            />
+          </div>
+          <div className="transition-transform duration-200 hover:scale-105">
+            <StatCircle
+              value={stats.rankingScore}
+              label="Puntos ranking"
+              color="#4ade80"
+              bg="linear-gradient(135deg, #052e16, #14532d)"
+            />
+          </div>
         </div>
       </div>
     </div>

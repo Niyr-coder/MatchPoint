@@ -7,7 +7,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ label, title, description, action }: PageHeaderProps) {
   return (
-    <div className="flex items-end justify-between gap-4">
+    <div className="flex items-end justify-between gap-4 pb-4 border-b border-zinc-200">
       <div>
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
           {label}

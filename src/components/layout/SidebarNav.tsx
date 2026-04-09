@@ -10,12 +10,12 @@ interface SidebarNavProps {
 
 export function SidebarNav({ sections, onItemClick }: SidebarNavProps) {
   return (
-    <nav className="flex-1 overflow-y-auto py-2 px-2">
+    <nav className="flex-1 overflow-y-auto py-2 px-2 scrollbar-thin">
       {sections.map((section, i) => (
         <div key={i} className={i > 0 ? "mt-4" : ""}>
           {section.title && (
             <div className="px-3 pb-1">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">
                 {section.title}
               </p>
             </div>

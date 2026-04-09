@@ -36,7 +36,7 @@ export function FilterBar({
           placeholder={searchPlaceholder}
           value={values["search"] ?? ""}
           onChange={(e) => onFilterChange("search", e.target.value)}
-          className="w-full border border-[#e5e5e5] rounded-xl pl-8 pr-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+          className="w-full border border-[#e5e5e5] rounded-xl pl-8 pr-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/12 bg-white transition-all duration-200"
         />
       </div>
 
@@ -46,7 +46,7 @@ export function FilterBar({
           key={f.key}
           value={values[f.key] ?? ""}
           onChange={(e) => onFilterChange(f.key, e.target.value)}
-          className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+          className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/12 bg-white appearance-none cursor-pointer transition-all duration-200"
         >
           <option value="">{f.label}</option>
           {f.options.map((opt) => (

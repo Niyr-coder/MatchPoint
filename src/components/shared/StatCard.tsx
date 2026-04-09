@@ -19,7 +19,7 @@ export function StatCard({ label, value, icon: Icon, variant = "default", descri
   const styles = VARIANT_STYLES[variant]
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3">
+    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] hover:-translate-y-0.5">
       {Icon && (
         <div className={`size-9 rounded-xl flex items-center justify-center ${styles.icon}`}>
           <Icon className="size-4" />

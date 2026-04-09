@@ -14,9 +14,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
 }
 
 const VARIANT_CLASSES: Record<string, string> = {
-  default: "bg-white border border-[#e5e5e5]",
-  dark: "bg-[#0a0a0a]",
-  accent: "bg-[#f0fdf4] border border-[#bbf7d0]",
+  default: "bg-white border border-[#e5e5e5] transition-all duration-200 ease-out hover:border-[#d4d4d4] hover:shadow-[0_6px_16px_rgba(0,0,0,0.06)] hover:-translate-y-1",
+  dark: "bg-[#0a0a0a] transition-all duration-200 ease-out hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1",
+  accent: "bg-[#f0fdf4] border border-[#bbf7d0] transition-all duration-200 ease-out hover:border-[#86efac] hover:shadow-[0_6px_16px_rgba(22,163,74,0.08)] hover:-translate-y-1",
 }
 
 interface BentoCardProps {
@@ -49,7 +49,7 @@ export function BentoCard({
   const inner = (
     <div
       className={cn(
-        "animate-fade-in-up relative rounded-2xl overflow-hidden flex flex-col p-6",
+        "animate-fade-in-up relative rounded-2xl overflow-hidden flex flex-col p-6 group",
         "min-h-[160px]",
         VARIANT_CLASSES[variant],
         !href && className,
@@ -109,7 +109,7 @@ export function BentoCard({
       {/* Arrow hint for clickable cards */}
       {href && (
         <span className={cn(
-          "absolute top-5 right-5 text-sm font-bold",
+          "absolute top-5 right-5 text-sm font-bold transition-transform duration-200 group-hover:translate-x-1",
           isDark ? "text-white/20" : "text-zinc-300",
         )}>
           →

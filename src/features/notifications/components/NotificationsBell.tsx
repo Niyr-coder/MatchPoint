@@ -113,7 +113,7 @@ export function NotificationsBell() {
         aria-label={`Notificaciones${unreadCount > 0 ? `, ${unreadCount} sin leer` : ""}`}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="relative p-2 rounded-full text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+        className="relative p-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors duration-200"
       >
         <Bell className="size-5" />
         {unreadCount > 0 && (

@@ -56,7 +56,7 @@ export function RoleWelcomeBanner({
   const accentColor = BANNER_BG[role]
 
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-zinc-100 shadow-sm">
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-[#e5e5e5] shadow-none transition-all duration-200 hover:border-[#d4d4d4]">
       {/* Top accent stripe */}
       <div
         className="h-1.5 w-full absolute top-0 left-0 right-0"
@@ -103,7 +103,7 @@ export function RoleWelcomeBanner({
           <div className="flex gap-6 shrink-0 sm:border-l sm:border-zinc-200 sm:pl-6">
             {stats.map(({ label, value }) => (
               <div key={label} className="text-center">
-                <p className="text-xl font-black text-zinc-900">{value}</p>
+                <p className="text-2xl font-black text-zinc-900">{value}</p>
                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mt-0.5">
                   {label}
                 </p>

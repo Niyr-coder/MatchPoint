@@ -14,15 +14,15 @@ interface SidebarProps {
 
 export function Sidebar({ sections, profile, currentRole, clubName }: SidebarProps) {
   return (
-    <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-white border-r border-[#e5e5e5]">
+    <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-zinc-950 border-r border-zinc-800">
       {/* Logo + notifications header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-[#e5e5e5] shrink-0">
+      <div className="h-14 px-4 flex items-center justify-between border-b border-zinc-800 shrink-0">
         <Link href="/" className="flex items-center gap-2.5 min-w-0">
           <div className="size-6 rounded-md bg-green-600 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-black tracking-tighter">M</span>
           </div>
           <div className="min-w-0">
-            <p className="text-[#0a0a0a] font-black text-sm tracking-[-0.03em] uppercase truncate">
+            <p className="text-white font-black text-sm tracking-[-0.03em] uppercase truncate">
               MATCHPOINT
             </p>
             {clubName && (

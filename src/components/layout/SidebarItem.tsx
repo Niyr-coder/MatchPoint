@@ -33,16 +33,16 @@ export function SidebarItem({ item, onItemClick }: SidebarItemProps) {
       href={item.href}
       onClick={onItemClick}
       className={cn(
-        "relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors",
+        "relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors duration-200",
         isActive
-          ? "text-[#0a0a0a] font-semibold"
-          : "text-zinc-400 hover:text-[#0a0a0a] hover:bg-[#f5f5f5] font-medium"
+          ? "text-white font-semibold"
+          : "text-zinc-500 hover:text-white hover:bg-zinc-800/60 font-medium"
       )}
     >
       {isActive && (
         <span className="absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-[3px] bg-green-500 rounded-full" />
       )}
-      <Icon className={cn("size-[18px] shrink-0", isActive ? "text-[#0a0a0a]" : "text-zinc-400")} />
+      <Icon className={cn("size-[18px] shrink-0", isActive ? "text-white" : "text-zinc-500")} />
       <span className="truncate">{item.label}</span>
     </Link>
   )
