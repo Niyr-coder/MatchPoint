@@ -5,7 +5,7 @@ export default function TournamentDetailLoading() {
       <div className="h-4 w-24 rounded-full bg-zinc-100" />
 
       {/* Tournament header card */}
-      <div className="rounded-2xl border border-[#e5e5e5] p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-border p-6 flex flex-col gap-4">
         {/* Status badge + date */}
         <div className="flex items-center justify-between">
           <div className="h-5 w-20 rounded-full bg-zinc-100" />
@@ -33,7 +33,7 @@ export default function TournamentDetailLoading() {
       </div>
 
       {/* Tabs skeleton */}
-      <div className="flex gap-2 border-b border-[#e5e5e5] pb-1">
+      <div className="flex gap-2 border-b border-border pb-1">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="h-8 w-24 rounded-lg bg-zinc-100" />
         ))}

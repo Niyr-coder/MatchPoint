@@ -45,7 +45,7 @@ export function ControlTowerRevenue({ revenue }: Props) {
 
   return (
     <div className="rounded-2xl bg-white overflow-hidden flex flex-col">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#e5e5e5]">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <DollarSign className="size-3.5 text-emerald-600" />
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Revenue</p>
       </div>

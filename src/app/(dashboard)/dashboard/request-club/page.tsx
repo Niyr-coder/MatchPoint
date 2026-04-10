@@ -94,7 +94,7 @@ function PendingRequestCard({ request }: { request: ClubRequest }) {
 function InfoBanner() {
   return (
     <div className="rounded-2xl bg-muted border border-border p-6 flex gap-4">
-      <div className="size-10 rounded-xl bg-[#111111] flex items-center justify-center shrink-0">
+      <div className="size-10 rounded-xl bg-foreground flex items-center justify-center shrink-0">
         <Building2 className="size-5 text-white" />
       </div>
       <div>

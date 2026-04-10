@@ -18,7 +18,7 @@ export default async function ContextSelectorPage() {
 
   if (roles.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-secondary flex items-center justify-center p-6">
         <div className="text-center">
           <p className="text-zinc-500 text-sm">No tienes acceso a ningún club.</p>
           <Link href="/dashboard" className="mt-4 inline-block text-green-600 hover:underline text-sm font-bold">
@@ -30,15 +30,15 @@ export default async function ContextSelectorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-secondary flex items-center justify-center p-6">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="size-8 rounded bg-[#0a0a0a] flex items-center justify-center">
+            <div className="size-8 rounded bg-foreground flex items-center justify-center">
               <span className="text-white text-sm font-black">M</span>
             </div>
-            <span className="text-[#0a0a0a] font-black text-sm uppercase tracking-[-0.03em]">MATCHPOINT</span>
+            <span className="text-foreground font-black text-sm uppercase tracking-[-0.03em]">MATCHPOINT</span>
           </div>
           <h1 className="dash-heading">Selecciona tu espacio</h1>
           <p className="mt-3 text-sm text-zinc-500 font-medium">
@@ -51,7 +51,7 @@ export default async function ContextSelectorPage() {
           <div className="mb-4">
             <Link
               href="/admin"
-              className="flex items-center gap-4 p-5 rounded-xl border border-[#0a0a0a] bg-[#0a0a0a] hover:opacity-90 transition-all group"
+              className="flex items-center gap-4 p-5 rounded-xl border border-foreground bg-foreground hover:opacity-90 transition-all group"
             >
               <div className="size-12 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
                 <span className="font-black text-white text-lg">A</span>
@@ -79,7 +79,7 @@ export default async function ContextSelectorPage() {
           <form action={enterPlayerMode}>
             <button
               type="submit"
-              className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-[#0a0a0a] transition-colors"
+              className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-foreground transition-colors"
             >
               Continuar como Jugador →
             </button>

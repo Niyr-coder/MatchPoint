@@ -21,7 +21,7 @@ export default async function ReservationsPage() {
         action={
           <Link
             href="/dashboard/reservations/new"
-            className="bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] hover:bg-zinc-800 transition-colors"
+            className="bg-foreground text-background rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] hover:bg-foreground/90 transition-colors"
           >
             + Nueva Reserva
           </Link>

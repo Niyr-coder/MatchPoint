@@ -161,10 +161,10 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
   }
 
   const inputClass =
-    "w-full border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white placeholder:text-zinc-400 transition-colors disabled:opacity-50"
+    "w-full border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground bg-card placeholder:text-zinc-400 transition-colors disabled:opacity-50"
 
   const selectClass =
-    "w-full border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer disabled:opacity-50"
+    "w-full border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground bg-card appearance-none cursor-pointer disabled:opacity-50"
 
   return (
     <>
@@ -180,13 +180,13 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-user-title"
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl border border-[#e5e5e5] shadow-2xl z-50 flex flex-col max-h-[90vh]"
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl z-50 flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f0f0] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle shrink-0">
           <div className="flex items-center gap-2">
-            <UserPlus className="size-4 text-[#0a0a0a]" />
-            <p id="create-user-title" className="text-sm font-black text-[#0a0a0a]">
+            <UserPlus className="size-4 text-foreground" />
+            <p id="create-user-title" className="text-sm font-black text-foreground">
               Crear cuenta
             </p>
           </div>
@@ -291,7 +291,7 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
           </FormField>
 
           {/* Optional club assignment */}
-          <div className="border-t border-[#f0f0f0] pt-4 flex flex-col gap-4">
+          <div className="border-t border-border-subtle pt-4 flex flex-col gap-4">
             <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
               Asignación a club (opcional)
             </p>
@@ -330,7 +330,7 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
           <button
             type="submit"
             disabled={loading || success}
-            className="w-full flex items-center justify-center gap-2 bg-[#0a0a0a] text-white rounded-full py-2.5 text-sm font-bold hover:bg-zinc-800 transition-colors disabled:opacity-50 mt-1"
+            className="w-full flex items-center justify-center gap-2 bg-foreground text-white rounded-full py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors disabled:opacity-50 mt-1"
           >
             {loading ? (
               <>

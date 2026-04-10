@@ -110,7 +110,7 @@ function MaintenanceToggle({ initialValue }: MaintenanceToggleProps) {
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+    <div className="rounded-2xl bg-card border border-border p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="size-10 rounded-xl bg-[#dc2626]/10 flex items-center justify-center">
           <AlertTriangle className="size-5 text-[#dc2626]" />
@@ -119,7 +119,7 @@ function MaintenanceToggle({ initialValue }: MaintenanceToggleProps) {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             Estado de la plataforma
           </p>
-          <p className="text-lg font-black text-[#0a0a0a] leading-none mt-0.5">Modo Mantenimiento</p>
+          <p className="text-lg font-black text-foreground leading-none mt-0.5">Modo Mantenimiento</p>
         </div>
       </div>
 
@@ -134,7 +134,7 @@ function MaintenanceToggle({ initialValue }: MaintenanceToggleProps) {
 
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-bold text-[#0a0a0a]">
+          <p className="text-sm font-bold text-foreground">
             {isOn ? "Mantenimiento activo" : "Plataforma operativa"}
           </p>
           <p className="text-xs text-zinc-500 mt-0.5">
@@ -213,7 +213,7 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+    <div className="rounded-2xl bg-card border border-border p-6">
       <div className="flex items-center gap-3 mb-5">
         <div className="size-10 rounded-xl bg-[#dc2626]/10 flex items-center justify-center">
           <Settings className="size-5 text-[#dc2626]" />
@@ -222,11 +222,11 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             Información de plataforma
           </p>
-          <p className="text-lg font-black text-[#0a0a0a] leading-none mt-0.5">MATCHPOINT</p>
+          <p className="text-lg font-black text-foreground leading-none mt-0.5">MATCHPOINT</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#f0f0f0]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-border-subtle">
         <div>
           <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 block mb-1.5">
             Versión
@@ -234,8 +234,8 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
           <input
             value={version}
             onChange={(e) => setVersion(e.target.value)}
-            className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-bold text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] transition-colors"
+            className="w-full rounded-xl border border-border px-3 py-2 text-sm font-bold text-foreground
+              focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
         <div>
@@ -245,8 +245,8 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
           <input
             value={region}
             onChange={(e) => setRegion(e.target.value)}
-            className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-bold text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] transition-colors"
+            className="w-full rounded-xl border border-border px-3 py-2 text-sm font-bold text-foreground
+              focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
         <div>
@@ -256,8 +256,8 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
           <input
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-bold text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] transition-colors"
+            className="w-full rounded-xl border border-border px-3 py-2 text-sm font-bold text-foreground
+              focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
       </div>
@@ -269,7 +269,7 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
         <button
           onClick={save}
           disabled={isPending}
-          className="btn-pill flex items-center gap-2 bg-[#0a0a0a] text-white px-5 py-2 text-sm font-black
+          className="btn-pill flex items-center gap-2 bg-foreground text-background px-5 py-2 text-sm font-black
             disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isPending ? (
@@ -298,7 +298,7 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
       <PlatformInfoForm initialSettings={settings} />
 
       {/* Sports — static, informational */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
           Deportes activos
         </p>
@@ -306,7 +306,7 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
           {SPORTS.map((sport) => {
             const Icon = sport.icon
             return (
-              <div key={sport.name} className="rounded-xl border border-[#f0f0f0] p-4">
+              <div key={sport.name} className="rounded-xl border border-border-subtle p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Icon className={`size-4 ${sport.iconColor}`} />
                   <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full ${sport.color}`}>
@@ -327,7 +327,7 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
       </div>
 
       {/* Quick links */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
           Accesos rápidos
         </p>
@@ -336,15 +336,15 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
             <Link
               key={link.href}
               href={link.href}
-              className="flex items-center gap-3 rounded-xl border border-[#f0f0f0] p-4 hover:border-[#e5e5e5]
-                hover:bg-zinc-50 transition-colors group"
+              className="flex items-center gap-3 rounded-xl border border-border-subtle p-4 hover:border-border
+                hover:bg-secondary transition-colors group"
             >
               <div className="size-9 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0
                 group-hover:bg-[#dc2626]/10 transition-colors">
                 <link.icon className="size-4 text-zinc-500 group-hover:text-[#dc2626] transition-colors" />
               </div>
               <div>
-                <p className="text-sm font-black text-[#0a0a0a]">{link.label}</p>
+                <p className="text-sm font-black text-foreground">{link.label}</p>
                 <p className="text-[10px] text-zinc-400 mt-0.5">{link.desc}</p>
               </div>
             </Link>
@@ -353,18 +353,18 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
       </div>
 
       {/* Service status */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
           Estado de los servicios
         </p>
-        <div className="flex flex-col divide-y divide-[#f0f0f0]">
+        <div className="flex flex-col divide-y divide-border-subtle">
           {STATUS_SERVICES.map((svc) => (
             <div key={svc.label} className="flex items-center justify-between py-3">
               <div className="flex items-center gap-3">
                 <svc.icon className="size-4 text-zinc-400" />
-                <p className="text-sm font-bold text-[#0a0a0a]">{svc.label}</p>
+                <p className="text-sm font-bold text-foreground">{svc.label}</p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-black text-[#16a34a]">
+              <div className="flex items-center gap-1.5 text-xs font-black text-primary">
                 <CheckCircle2 className="size-3.5" />
                 Operativo
               </div>

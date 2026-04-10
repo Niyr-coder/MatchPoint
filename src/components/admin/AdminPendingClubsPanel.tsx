@@ -82,7 +82,7 @@ export function AdminPendingClubsPanel({ clubs }: AdminPendingClubsPanelProps) {
 
   return (
     <>
-      <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 pb-2 border-b border-[#f0f0f0] mb-1">
+      <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 pb-2 border-b border-border-subtle mb-1">
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Club</p>
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Ciudad</p>
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Owner</p>
@@ -90,7 +90,7 @@ export function AdminPendingClubsPanel({ clubs }: AdminPendingClubsPanelProps) {
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 text-right">Acción</p>
       </div>
 
-      <div className="flex flex-col divide-y divide-[#f0f0f0]">
+      <div className="flex flex-col divide-y divide-border-subtle">
         {clubs.map((club) => {
           const isLoading = loadingIds.has(club.id)
           const error = errorById[club.id]
@@ -100,7 +100,7 @@ export function AdminPendingClubsPanel({ clubs }: AdminPendingClubsPanelProps) {
               <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 py-3 items-center">
                 {/* Club name + province */}
                 <div>
-                  <p className="text-sm font-bold text-[#0a0a0a]">{club.name}</p>
+                  <p className="text-sm font-bold text-foreground">{club.name}</p>
                   {club.province && (
                     <p className="text-[10px] text-zinc-400">{club.province}</p>
                   )}
@@ -115,7 +115,7 @@ export function AdminPendingClubsPanel({ clubs }: AdminPendingClubsPanelProps) {
                   <button
                     onClick={() => handleActivate(club)}
                     disabled={isLoading}
-                    className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-[#bbf7d0] text-[#16a34a] hover:bg-[#f0fdf4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-success-border text-primary hover:bg-success transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading && <Loader2 className="size-3 animate-spin" />}
                     Activar

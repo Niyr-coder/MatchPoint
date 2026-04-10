@@ -42,7 +42,7 @@ export function TopBar({ sections, profile, currentRole, clubName, darkMode = fa
 
       {/* Greeting */}
       <div className="flex-1 min-w-0">
-        <p className={`text-base font-black leading-tight truncate ${darkMode ? "text-white" : "text-[#0a0a0a]"}`}>
+        <p className={`text-base font-black leading-tight truncate ${darkMode ? "text-white" : "text-foreground"}`}>
           Hola, {firstName}.
         </p>
         <p className="text-[11px] text-zinc-400 capitalize hidden sm:block">{today}</p>
@@ -53,7 +53,7 @@ export function TopBar({ sections, profile, currentRole, clubName, darkMode = fa
         <NotificationsBell />
         <Avatar className="size-8 ml-1">
           <AvatarImage src={profile.avatar_url ?? undefined} />
-          <AvatarFallback className="bg-[#0a0a0a] text-white text-xs font-black">
+          <AvatarFallback className="bg-foreground text-background text-xs font-black">
             {initials || "U"}
           </AvatarFallback>
         </Avatar>

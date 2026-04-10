@@ -71,8 +71,8 @@ function StatCard({ icon, label, value, accent = false }: StatCardProps) {
     <div
       className={`rounded-2xl border p-5 flex items-center gap-4 ${
         accent
-          ? "bg-[#0a0a0a] border-[#0a0a0a] text-white"
-          : "bg-white border-[#e5e5e5] text-[#0a0a0a]"
+          ? "bg-foreground border-foreground text-white"
+          : "bg-card border-border text-foreground"
       }`}
     >
       <div
@@ -201,7 +201,7 @@ export function AdminReservationsView({
       header: "Usuario",
       render: (r) => (
         <div className="flex flex-col gap-0.5">
-          <span className="font-bold text-[#0a0a0a]">{r.user_name ?? "—"}</span>
+          <span className="font-bold text-foreground">{r.user_name ?? "—"}</span>
           {r.user_email && (
             <span className="text-[11px] text-zinc-400">{r.user_email}</span>
           )}
@@ -220,7 +220,7 @@ export function AdminReservationsView({
       header: "Cancha",
       render: (r) => (
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-semibold text-[#0a0a0a]">
+          <span className="text-sm font-semibold text-foreground">
             {r.court_name ?? "—"}
           </span>
           {r.court_sport && (
@@ -252,7 +252,7 @@ export function AdminReservationsView({
       key: "total_price",
       header: "Precio",
       render: (r) => (
-        <span className="font-bold text-[#0a0a0a]">{formatPrice(r.total_price)}</span>
+        <span className="font-bold text-foreground">{formatPrice(r.total_price)}</span>
       ),
     },
     {
@@ -328,7 +328,7 @@ export function AdminReservationsView({
               type="date"
               value={filters.from_date}
               onChange={(e) => handleFilterChange("from_date", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -339,7 +339,7 @@ export function AdminReservationsView({
               type="date"
               value={filters.to_date}
               onChange={(e) => handleFilterChange("to_date", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
             />
           </div>
         </div>

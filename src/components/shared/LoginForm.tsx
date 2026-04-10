@@ -46,7 +46,7 @@ export function LoginForm() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="font-black text-[#0a0a0a] text-3xl tracking-tight leading-tight mb-2">
+        <h1 className="font-black text-foreground text-3xl tracking-tight leading-tight mb-2">
           Empieza a jugar
         </h1>
         <p className="text-[#737373] text-sm">
@@ -58,7 +58,7 @@ export function LoginForm() {
       <button
         onClick={handleGoogleLogin}
         disabled={isLoading}
-        className="flex items-center gap-3 w-full border border-[#e5e5e5] bg-white hover:bg-[#f5f5f5] rounded-xl px-4 py-4 text-sm font-semibold text-[#0a0a0a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+        className="flex items-center gap-3 w-full border border-border bg-card hover:bg-secondary rounded-xl px-4 py-4 text-sm font-semibold text-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
       >
         {isLoading ? (
           <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-[#737373]" />

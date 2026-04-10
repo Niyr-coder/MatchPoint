@@ -27,7 +27,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_CLASSES: Record<string, string> = {
-  open:        "bg-white text-[#0a0a0a] border border-[#e5e5e5]",
+  open:        "bg-card text-foreground border border-border",
   in_progress: "bg-emerald-50 text-emerald-700 border border-emerald-100",
   completed:   "bg-zinc-100 text-zinc-600 border border-zinc-200",
   cancelled:   "bg-red-50 text-red-600 border border-red-100",
@@ -125,13 +125,13 @@ interface ConfirmDialogProps {
 function ConfirmDialog({ message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 w-full max-w-sm shadow-xl">
-        <p className="text-sm font-bold text-[#0a0a0a] leading-snug">{message}</p>
+      <div className="rounded-2xl bg-card border border-border p-6 w-full max-w-sm shadow-xl">
+        <p className="text-sm font-bold text-foreground leading-snug">{message}</p>
         <div className="flex gap-3 mt-5">
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 border border-[#e5e5e5] rounded-full py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="flex-1 border border-border rounded-full py-2 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -187,10 +187,10 @@ function TournamentModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 w-full max-w-lg shadow-xl my-8">
+      <div className="rounded-2xl bg-card border border-border p-6 w-full max-w-lg shadow-xl my-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+          <h2 className="text-base font-black uppercase tracking-tight text-foreground">
             {mode === "create" ? "Crear torneo" : "Editar torneo"}
           </h2>
           <button
@@ -215,7 +215,7 @@ function TournamentModal({
               minLength={3}
               maxLength={100}
               placeholder="Torneo de Pádel Abierto…"
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+              className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
             />
           </div>
 
@@ -228,7 +228,7 @@ function TournamentModal({
               value={form.clubId}
               onChange={(e) => set("clubId", e.target.value)}
               required
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
             >
               <option value="">Seleccionar club…</option>
               {clubs.map((c) => (
@@ -246,7 +246,7 @@ function TournamentModal({
               <select
                 value={form.sport}
                 onChange={(e) => set("sport", e.target.value as SportValue)}
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               >
                 {SPORTS.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -263,7 +263,7 @@ function TournamentModal({
                 onChange={(e) => set("modality", e.target.value)}
                 maxLength={50}
                 placeholder="Individual, Dobles…"
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
               />
             </div>
           </div>
@@ -281,7 +281,7 @@ function TournamentModal({
                 required
                 min={2}
                 max={256}
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -294,7 +294,7 @@ function TournamentModal({
                 onChange={(e) => set("entryFee", e.target.value)}
                 min={0}
                 step={0.01}
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
               />
             </div>
           </div>
@@ -310,7 +310,7 @@ function TournamentModal({
                 value={form.startDate}
                 onChange={(e) => set("startDate", e.target.value)}
                 required
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -321,7 +321,7 @@ function TournamentModal({
                 type="date"
                 value={form.endDate}
                 onChange={(e) => set("endDate", e.target.value)}
-                className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+                className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10"
               />
             </div>
           </div>
@@ -337,7 +337,7 @@ function TournamentModal({
               maxLength={1000}
               rows={3}
               placeholder="Descripción opcional del torneo…"
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 resize-none"
+              className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 resize-none"
             />
           </div>
 
@@ -354,14 +354,14 @@ function TournamentModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+              className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#0a0a0a] text-white rounded-full py-2.5 text-sm font-bold hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              className="flex-1 bg-foreground text-background rounded-full py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               {loading
                 ? mode === "create" ? "Creando…" : "Guardando…"
@@ -530,7 +530,7 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
         </p>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors"
+          className="flex items-center gap-2 bg-foreground text-background rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors"
         >
           <Plus className="size-3.5" />
           Crear torneo
@@ -538,14 +538,14 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         {tournaments.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-sm text-zinc-400">No hay torneos registrados</p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-[#f0f0f0] bg-zinc-50">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-border bg-secondary">
               {["Nombre", "Deporte", "Club", "Estado", "Participantes", "Fecha inicio", ""].map((h) => (
                 <p key={h} className="text-[10px] font-black uppercase tracking-wide text-zinc-400 last:text-right">
                   {h}
@@ -553,16 +553,16 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
               ))}
             </div>
 
-            <div className="flex flex-col divide-y divide-[#f0f0f0]">
+            <div className="flex flex-col divide-y divide-border">
               {tournaments.map((t) => {
                 const isTerminal = TERMINAL_STATUSES.has(t.status)
                 return (
                   <div
                     key={t.id}
-                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-zinc-50 transition-colors"
+                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-secondary transition-colors"
                   >
                     <div>
-                      <p className="text-sm font-bold text-[#0a0a0a] leading-tight">{t.name}</p>
+                      <p className="text-sm font-bold text-foreground leading-tight">{t.name}</p>
                       {t.entry_fee > 0 && (
                         <p className="text-[10px] text-zinc-400 mt-0.5">
                           Inscripción: ${t.entry_fee.toFixed(2)}
@@ -572,7 +572,7 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
                     <div><SportBadge sport={t.sport} /></div>
                     <p className="text-xs text-zinc-600 truncate">{t.club_name ?? "—"}</p>
                     <div><StatusBadge status={t.status} /></div>
-                    <p className="text-sm font-black text-[#0a0a0a] text-right">
+                    <p className="text-sm font-black text-foreground text-right">
                       {t.participant_count}
                       <span className="text-zinc-400 font-normal">/{t.max_participants}</span>
                     </p>
@@ -584,7 +584,7 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
                         <button
                           onClick={() => openEdit(t)}
                           title="Editar"
-                          className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-500 hover:text-[#0a0a0a]"
+                          className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-500 hover:text-foreground"
                         >
                           <Pencil className="size-3.5" />
                         </button>

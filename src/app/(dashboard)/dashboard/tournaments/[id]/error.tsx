@@ -32,7 +32,7 @@ export default function TournamentDetailError({ error, reset }: ErrorProps) {
         </div>
 
         <div className="text-center max-w-sm">
-          <h2 className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+          <h2 className="text-base font-black uppercase tracking-tight text-foreground">
             Error al cargar el torneo
           </h2>
           <p className="mt-2 text-sm text-zinc-400 leading-relaxed">

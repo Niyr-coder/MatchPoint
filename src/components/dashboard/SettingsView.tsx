@@ -94,11 +94,11 @@ interface SectionCardProps {
 
 function SectionCard({ label, title, children }: SectionCardProps) {
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+    <div className="rounded-2xl bg-card border border-border p-6">
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
         {label}
       </p>
-      <p className="text-lg font-black text-[#0a0a0a] mb-4">{title}</p>
+      <p className="text-lg font-black text-foreground mb-4">{title}</p>
       {children}
     </div>
   )
@@ -224,7 +224,7 @@ export function SettingsView() {
     return (
       <div className="flex flex-col gap-6 animate-pulse">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-2xl bg-white border border-[#e5e5e5] h-40" />
+          <div key={i} className="rounded-2xl bg-card border border-border h-40" />
         ))}
       </div>
     )
@@ -302,8 +302,8 @@ export function SettingsView() {
                 onClick={() => void update("tema", opt.value)}
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   active
-                    ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                    : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-card text-muted-foreground border-border hover:border-border/60"
                 }`}
               >
                 {active && (
@@ -359,8 +359,8 @@ export function SettingsView() {
                 onClick={() => void update("idioma", opt.value)}
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   active
-                    ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                    : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-card text-muted-foreground border-border hover:border-border/60"
                 }`}
               >
                 {active && (

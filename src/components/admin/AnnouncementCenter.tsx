@@ -90,7 +90,7 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+    <div className="rounded-2xl bg-card border border-border p-6">
       <div className="flex items-center gap-3 mb-5">
         <div className="size-10 rounded-xl bg-[#dc2626]/10 flex items-center justify-center">
           <Megaphone className="size-5 text-[#dc2626]" />
@@ -99,7 +99,7 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             Nuevo anuncio
           </p>
-          <p className="text-lg font-black text-[#0a0a0a] leading-none mt-0.5">Enviar Anuncio</p>
+          <p className="text-lg font-black text-foreground leading-none mt-0.5">Enviar Anuncio</p>
         </div>
       </div>
 
@@ -114,8 +114,8 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Ej: Mantenimiento programado el viernes"
             maxLength={200}
-            className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2.5 text-sm font-medium text-[#0a0a0a]
-              placeholder:text-zinc-400 focus:outline-none focus:border-[#0a0a0a] transition-colors"
+            className="w-full rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground
+              placeholder:text-zinc-400 focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
 
@@ -130,8 +130,8 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
             placeholder="Escribe el mensaje completo del anuncio..."
             rows={4}
             maxLength={2000}
-            className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2.5 text-sm font-medium text-[#0a0a0a]
-              placeholder:text-zinc-400 focus:outline-none focus:border-[#0a0a0a] transition-colors resize-none"
+            className="w-full rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground
+              placeholder:text-zinc-400 focus:outline-none focus:border-foreground transition-colors resize-none"
           />
           <p className="text-[10px] text-zinc-400 mt-1 text-right">{message.length}/2000</p>
         </div>
@@ -146,8 +146,8 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
               onClick={() => setTarget("all")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-black transition-colors
                 ${target === "all"
-                  ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
-                  : "border-[#e5e5e5] bg-white text-zinc-600 hover:border-zinc-400"
+                  ? "border-foreground bg-foreground text-white"
+                  : "border-border bg-card text-zinc-600 hover:border-zinc-400"
                 }`}
             >
               <Users className="size-3.5" />
@@ -157,8 +157,8 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
               onClick={() => setTarget("club")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-black transition-colors
                 ${target === "club"
-                  ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
-                  : "border-[#e5e5e5] bg-white text-zinc-600 hover:border-zinc-400"
+                  ? "border-foreground bg-foreground text-white"
+                  : "border-border bg-card text-zinc-600 hover:border-zinc-400"
                 }`}
             >
               <Building2 className="size-3.5" />
@@ -177,8 +177,8 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
               <select
                 value={selectedClubId}
                 onChange={(e) => setSelectedClubId(e.target.value)}
-                className="w-full rounded-xl border border-[#e5e5e5] px-3 py-2.5 text-sm font-medium text-[#0a0a0a]
-                  focus:outline-none focus:border-[#0a0a0a] transition-colors appearance-none pr-8"
+                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground
+                  focus:outline-none focus:border-foreground transition-colors appearance-none pr-8"
               >
                 <option value="">Selecciona un club...</option>
                 {clubs.map((club) => (
@@ -212,7 +212,7 @@ function AnnouncementForm({ clubs, onSent }: AnnouncementFormProps) {
           <button
             onClick={handleSubmit}
             disabled={isPending}
-            className="btn-pill flex items-center gap-2 bg-[#0a0a0a] text-white px-6 py-2.5 text-sm font-black
+            className="btn-pill flex items-center gap-2 bg-foreground text-white px-6 py-2.5 text-sm font-black
               disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isPending ? (
@@ -272,14 +272,14 @@ function AnnouncementsList({ announcements, loading }: AnnouncementsListProps) {
   }
 
   return (
-    <div className="flex flex-col divide-y divide-[#f0f0f0]">
+    <div className="flex flex-col divide-y divide-border-subtle">
       {announcements.map((item) => (
         <div key={item.id} className="py-3.5 flex items-start gap-3">
           <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
             <Megaphone className="size-4 text-zinc-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-black text-[#0a0a0a] truncate">
+            <p className="text-sm font-black text-foreground truncate">
               {item.details?.title ?? "Sin título"}
             </p>
             <div className="flex items-center gap-3 mt-1">
@@ -290,7 +290,7 @@ function AnnouncementsList({ announcements, loading }: AnnouncementsListProps) {
               {item.details?.target && (
                 <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full
                   ${item.details.target === "all"
-                    ? "bg-[#f0fdf4] text-[#16a34a]"
+                    ? "bg-[#f0fdf4] text-primary"
                     : "bg-violet-50 text-violet-700"
                   }`}>
                   {item.details.target === "all" ? "Todos" : "Club"}
@@ -359,7 +359,7 @@ export function AnnouncementCenter({ clubs }: AnnouncementCenterProps) {
 
       <AnnouncementForm clubs={clubs} onSent={handleSent} />
 
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
           Anuncios enviados recientes
         </p>

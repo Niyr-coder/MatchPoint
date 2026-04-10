@@ -123,12 +123,12 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
       {/* Panel */}
       <div className="relative z-10 w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 p-6 border-b border-[#e5e5e5]">
+        <div className="flex items-start justify-between gap-4 p-6 border-b border-border">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-0.5">
               Solicitud de club
             </p>
-            <h2 className="text-lg font-black text-[#0a0a0a] tracking-[-0.02em]">
+            <h2 className="text-lg font-black text-foreground tracking-[-0.02em]">
               {request.name}
             </h2>
           </div>
@@ -154,7 +154,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 mb-1">
               Solicitante
             </p>
-            <p className="text-sm font-bold text-[#0a0a0a]">
+            <p className="text-sm font-bold text-foreground">
               {request.requester_name ?? <span className="italic text-zinc-400">Sin nombre</span>}
             </p>
             {request.requester_username && (
@@ -214,7 +214,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
 
           {/* Admin notes (if reviewed) */}
           {request.admin_notes && (
-            <div className="rounded-xl bg-zinc-50 border border-[#e5e5e5] p-4">
+            <div className="rounded-xl bg-secondary border border-border p-4">
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 mb-1">
                 Notas del admin
               </p>
@@ -269,7 +269,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
                       onChange={(e) => setRejectNotes(e.target.value)}
                       placeholder="Explica al solicitante por qué fue rechazada..."
                       rows={3}
-                      className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 resize-none"
+                      className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 resize-none"
                     />
                   </div>
                   <div className="flex gap-3">
@@ -284,7 +284,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
                     <button
                       onClick={() => { setShowRejectForm(false); setRejectNotes("") }}
                       disabled={isActioning}
-                      className="px-4 py-3 rounded-full border border-[#e5e5e5] text-zinc-600 text-sm font-bold hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                      className="px-4 py-3 rounded-full border border-border text-zinc-600 text-sm font-bold hover:bg-secondary transition-colors disabled:opacity-50"
                     >
                       Cancelar
                     </button>
@@ -406,7 +406,7 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
       ) : (
         <>
           {/* Header row */}
-          <div className="grid grid-cols-[2fr_1.5fr_1.5fr_1fr_1fr_auto] gap-3 pb-2 border-b border-[#f0f0f0] mb-1 px-1">
+          <div className="grid grid-cols-[2fr_1.5fr_1.5fr_1fr_1fr_auto] gap-3 pb-2 border-b border-border-subtle mb-1 px-1">
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Solicitante</p>
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Club</p>
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Ciudad / Provincia</p>
@@ -416,7 +416,7 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
           </div>
 
           {/* Data rows */}
-          <div className="flex flex-col divide-y divide-[#f0f0f0]">
+          <div className="flex flex-col divide-y divide-border-subtle">
             {filtered.map((req) => (
               <div
                 key={req.id}
@@ -425,7 +425,7 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
               >
                 {/* Requester */}
                 <div>
-                  <p className="text-sm font-bold text-[#0a0a0a]">
+                  <p className="text-sm font-bold text-foreground">
                     {req.requester_name ?? <span className="italic text-zinc-400">Sin nombre</span>}
                   </p>
                   {req.requester_username && (

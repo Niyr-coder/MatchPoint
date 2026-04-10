@@ -32,7 +32,7 @@ function actionColorClass(action: string): string {
     return "bg-green-50 text-green-700 border-green-100"
   }
   if (action.includes("created") || action.includes("bulk.")) {
-    return "bg-white text-[#0a0a0a] border-[#e5e5e5]"
+    return "bg-card text-foreground border-border"
   }
   if (action.includes("updated") || action.includes("role_changed")) {
     return "bg-purple-50 text-purple-700 border-purple-100"
@@ -111,7 +111,7 @@ function DateInput({
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+        className="border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
       />
     </div>
   )
@@ -140,7 +140,7 @@ function Pagination({ page, total, limit, onPageChange }: PaginationProps) {
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="size-8 flex items-center justify-center rounded-full border border-[#e5e5e5] text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="size-8 flex items-center justify-center rounded-full border border-border text-zinc-500 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Página anterior"
         >
           <ChevronLeft className="size-4" />
@@ -151,7 +151,7 @@ function Pagination({ page, total, limit, onPageChange }: PaginationProps) {
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="size-8 flex items-center justify-center rounded-full border border-[#e5e5e5] text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="size-8 flex items-center justify-center rounded-full border border-border text-zinc-500 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Página siguiente"
         >
           <ChevronRight className="size-4" />
@@ -270,7 +270,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
   return (
     <div className="flex flex-col gap-6">
       {/* Filters */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-4">
+      <div className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-4">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
           Filtros
         </p>
@@ -285,7 +285,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
               value={filters.action}
               onChange={(e) => handleFilterChange("action", e.target.value)}
               placeholder="Ej. user.suspended"
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
             />
           </div>
 
@@ -297,7 +297,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
             <select
               value={filters.entity_type}
               onChange={(e) => handleFilterChange("entity_type", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+              className="border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card appearance-none cursor-pointer"
             >
               {ENTITY_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -317,7 +317,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
               value={filters.actor}
               onChange={(e) => handleFilterChange("actor", e.target.value)}
               placeholder="UUID del administrador"
-              className="border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white font-mono"
+              className="border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card font-mono"
             />
           </div>
 
@@ -336,7 +336,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
           <div className="flex items-end">
             <button
               onClick={handleClearFilters}
-              className="text-[11px] font-black uppercase tracking-wide px-4 py-2 rounded-full border border-[#e5e5e5] text-zinc-500 hover:bg-zinc-50 transition-colors"
+              className="text-[11px] font-black uppercase tracking-wide px-4 py-2 rounded-full border border-border text-zinc-500 hover:bg-secondary transition-colors"
             >
               Limpiar filtros
             </button>
@@ -345,9 +345,9 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         {/* Header */}
-        <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-zinc-50/60"
+        <div className="grid border-b border-border px-5 py-3 bg-secondary/60"
           style={{ gridTemplateColumns: "2fr 1fr 1fr 2fr 1.5fr" }}
         >
           {["Acción", "Entidad", "Actor", "Detalles", "Fecha"].map((col) => (
@@ -361,7 +361,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
         </div>
 
         {/* Body */}
-        <div className="divide-y divide-[#f0f0f0]">
+        <div className="divide-y divide-border-subtle">
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => (
               <div

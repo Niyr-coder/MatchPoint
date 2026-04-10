@@ -50,7 +50,7 @@ export function WaitlistForm() {
 
   if (status === "success") {
     return (
-      <div className="flex items-center gap-3 bg-[#16a34a]/10 border border-[#16a34a]/20 rounded-full px-6 py-4 text-[#16a34a]">
+      <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-full px-6 py-4 text-primary">
         <CheckCircle className="w-5 h-5 shrink-0" />
         <p className="text-sm font-semibold">{message}</p>
       </div>
@@ -72,7 +72,7 @@ export function WaitlistForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="btn-pill bg-white text-[#0a0a0a] px-6 py-2.5 text-xs shrink-0 disabled:opacity-60"
+          className="btn-pill bg-white text-foreground px-6 py-2.5 text-xs shrink-0 disabled:opacity-60"
         >
           {status === "loading" ? (
             <Loader2 className="w-4 h-4 animate-spin" />
