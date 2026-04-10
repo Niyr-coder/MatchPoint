@@ -80,6 +80,11 @@ export async function GET(
       .order("start_time", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1)
 
+    if (clubId) {
+      // Filter by the court's club — PostgREST dot-notation for embedded relation
+      query = query.eq("courts.club_id", clubId)
+    }
+
     if (status) {
       query = query.eq("status", status)
     }
@@ -96,16 +101,7 @@ export async function GET(
 
     if (error) throw new Error(error.message)
 
-    // Filter by club_id after fetch since it's a nested field
-    const rawRows = data ?? []
-    const filteredRows = clubId
-      ? rawRows.filter((row) => {
-          const court = Array.isArray(row.courts) ? row.courts[0] : row.courts
-          return (court as { club_id?: string } | null)?.club_id === clubId
-        })
-      : rawRows
-
-    const rows: ReservationAdmin[] = filteredRows.map((row) => {
+    const rows: ReservationAdmin[] = (data ?? []).map((row) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
       const court = Array.isArray(row.courts) ? row.courts[0] : row.courts
       const club = court

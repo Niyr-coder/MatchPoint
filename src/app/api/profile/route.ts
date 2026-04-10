@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { onboardingSchema } from "@/lib/validations"
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse, Profile } from "@/types"
 
 const profileUpdateSchema = z.object({
@@ -59,6 +60,14 @@ export async function GET(
 export async function PATCH(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<null>>> {
+  const rl = await checkRateLimit("profileUpdate", getClientIp(request), RATE_LIMITS.profileUpdate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()

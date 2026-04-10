@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getUserReservations, createReservation, cancelReservation } from "@/features/bookings/queries"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const cancelReservationSchema = z.object({
@@ -38,12 +39,20 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rl = await checkRateLimit("reservations", user.id, RATE_LIMITS.reservations)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   let body: unknown

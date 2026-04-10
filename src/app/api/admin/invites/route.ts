@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
@@ -120,13 +121,16 @@ export async function GET(
 
 // ── POST /api/admin/invites ───────────────────────────────────────────────────
 
-interface CreateInviteBody {
-  entity_type: string
-  entity_id: string
-  max_uses?: number | null
-  expires_at?: string | null
-  metadata?: Record<string, unknown>
-}
+const createInviteSchema = z.object({
+  entity_type: z.enum(
+    ["club", "tournament", "team", "event", "coach_class", "reservation"],
+    { message: "entity_type inválido" }
+  ),
+  entity_id: z.string().uuid("entity_id debe ser un UUID válido"),
+  max_uses: z.number().int().positive().nullable().optional(),
+  expires_at: z.string().datetime({ message: "expires_at debe ser ISO 8601" }).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+})
 
 interface CreatedInvite {
   id: string
@@ -145,9 +149,9 @@ export async function POST(
     )
   }
 
-  let body: CreateInviteBody
+  let rawBody: unknown
   try {
-    body = (await request.json()) as CreateInviteBody
+    rawBody = await request.json()
   } catch {
     return NextResponse.json(
       { success: false, data: null, error: "Cuerpo de la solicitud inválido" },
@@ -155,14 +159,15 @@ export async function POST(
     )
   }
 
-  const { entity_type, entity_id, max_uses, expires_at, metadata } = body
-
-  if (!entity_type || !entity_id) {
+  const parsed = createInviteSchema.safeParse(rawBody)
+  if (!parsed.success) {
     return NextResponse.json(
-      { success: false, data: null, error: "entity_type y entity_id son requeridos" },
-      { status: 400 }
+      { success: false, data: null, error: parsed.error.issues[0].message },
+      { status: 422 }
     )
   }
+
+  const { entity_type, entity_id, max_uses, expires_at, metadata } = parsed.data
 
   try {
     const supabase = createServiceClient()

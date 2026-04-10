@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { joinTournament, isUserInTournament, getTournamentById } from "@/features/tournaments/queries"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function POST(
   _request: Request,
@@ -11,6 +12,14 @@ export async function POST(
 
   if (!user) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rl = await checkRateLimit("tournamentJoin", user.id, RATE_LIMITS.tournamentJoin)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   const { id } = await params

@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse, AppRole } from "@/types"
 
 // ──────────────────────────────────────────────────────────
@@ -56,6 +57,14 @@ export async function POST(
     return NextResponse.json(
       { success: false, data: null, error: "No autorizado" },
       { status: 403 }
+    )
+  }
+
+  const rl = await checkRateLimit("adminCreateUser", authResult.context.userId, RATE_LIMITS.adminCreateUser)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 

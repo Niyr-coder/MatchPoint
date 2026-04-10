@@ -5,8 +5,9 @@
  * requests in a rolling window and inserts the current request when allowed.
  * State is shared across all Vercel instances and survives cold starts.
  *
- * Fails open: if the DB call errors, the request is allowed through so that
- * a database hiccup never takes down the entire API.
+ * Fails CLOSED: if the DB call errors, the request is denied. A transient
+ * database hiccup will cause temporary 429s, but this is preferable to
+ * allowing unlimited requests when the rate-limit service is unreachable.
  */
 
 import { createServiceClient } from "@/lib/supabase/server"
@@ -54,9 +55,9 @@ export async function checkRateLimit(
     })
 
     if (error || !data) {
-      // Fail open — never block traffic due to a rate-limit DB error
-      console.error("[rate-limit] RPC error, failing open:", error?.message)
-      return { allowed: true, remaining: limit, resetAt: Date.now() + windowMs, retryAfterSeconds: 0 }
+      // Fail closed — deny when the rate-limit service is unavailable
+      console.error("[rate-limit] RPC error, failing closed:", error?.message)
+      return { allowed: false, remaining: 0, resetAt: Date.now() + windowMs, retryAfterSeconds: windowMs / 1000 }
     }
 
     const result = data as { allowed: boolean; remaining: number; reset_at: number; retry_after_seconds: number }
@@ -67,8 +68,8 @@ export async function checkRateLimit(
       retryAfterSeconds: result.retry_after_seconds,
     }
   } catch (err) {
-    console.error("[rate-limit] Unexpected error, failing open:", err)
-    return { allowed: true, remaining: limit, resetAt: Date.now() + windowMs, retryAfterSeconds: 0 }
+    console.error("[rate-limit] Unexpected error, failing closed:", err)
+    return { allowed: false, remaining: 0, resetAt: Date.now() + windowMs, retryAfterSeconds: windowMs / 1000 }
   }
 }
 
@@ -98,4 +99,10 @@ export const RATE_LIMITS = {
   invitesCreate:  { limit: 20, windowMs: 3_600_000 } satisfies RateLimitConfig,
   invitesRedeem:  { limit: 10, windowMs: 3_600_000 } satisfies RateLimitConfig,
   eventsCreate:   { limit: 10, windowMs: 3_600_000 } satisfies RateLimitConfig,
+  // Added in Phase 3 audit
+  reservations:    { limit: 10, windowMs:    60_000 } satisfies RateLimitConfig,  // 10 bookings/min per user
+  tournamentJoin:  { limit: 5,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 5 joins/hour per user
+  profileUpdate:   { limit: 20, windowMs:    60_000 } satisfies RateLimitConfig,  // 20 updates/min per IP
+  clubRequests:    { limit: 3,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 3 requests/hour per user
+  adminCreateUser: { limit: 20, windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 creates/hour per admin
 } as const

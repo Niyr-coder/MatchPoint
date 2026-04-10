@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
 
 // ──────────────────────────────────────────────────────────
@@ -104,6 +105,14 @@ export async function POST(
     return NextResponse.json(
       { success: false, data: null, error: "No autenticado" },
       { status: 401 }
+    )
+  }
+
+  const rl = await checkRateLimit("clubRequests", user.id, RATE_LIMITS.clubRequests)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 
