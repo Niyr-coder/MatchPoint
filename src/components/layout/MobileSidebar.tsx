@@ -36,17 +36,17 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
 
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="h-14 px-4 flex items-center border-b border-zinc-800 shrink-0">
+            <div className="h-14 px-4 flex items-center border-b border-zinc-800/80 shrink-0">
               <Link href="/" className="flex items-center gap-2.5 min-w-0">
-                <div className="size-6 rounded-md bg-green-600 flex items-center justify-center shrink-0">
+                <div className="size-7 rounded-lg bg-green-600 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(22,163,74,0.4)]">
                   <span className="text-white text-xs font-black tracking-tighter">M</span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-white font-black text-sm tracking-[-0.03em] uppercase truncate">
+                  <p className="text-white font-black text-[13px] tracking-[-0.02em] uppercase leading-none">
                     MATCHPOINT
                   </p>
                   {clubName && (
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-green-600 truncate">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-green-500 truncate mt-0.5">
                       {clubName}
                     </p>
                   )}

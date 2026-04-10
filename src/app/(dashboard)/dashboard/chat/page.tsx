@@ -1,11 +1,8 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { authorizeOrRedirect } from "@/features/auth/queries"
 import { ChatView } from "@/components/dashboard/ChatView"
 
 export default async function UserChatPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/login")
+  const ctx = await authorizeOrRedirect()
 
-  return <ChatView userId={user.id} />
+  return <ChatView userId={ctx.userId} />
 }

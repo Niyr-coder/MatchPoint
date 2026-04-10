@@ -1,5 +1,7 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { authorize } from "@/features/auth/queries"
 import { OnboardingForm } from "@/components/shared/OnboardingForm"
 import { SITE_NAME } from "@/lib/constants"
 
@@ -8,7 +10,11 @@ export const metadata: Metadata = {
   description: "Completa tu perfil en MATCHPOINT para empezar a jugar.",
 }
 
-export default function OnboardingPage() {
+export default async function OnboardingPage() {
+  const result = await authorize()
+  if (result.ok && result.context.profile.onboarding_completed) {
+    redirect("/dashboard")
+  }
   return (
     <div className="min-h-screen bg-card flex flex-col">
       {/* Header */}
