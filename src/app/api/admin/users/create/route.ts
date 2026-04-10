@@ -12,10 +12,6 @@ import type { ApiResponse, AppRole } from "@/types"
 
 const createUserSchema = z.object({
   email: z.string().email("Email inválido"),
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .max(72, "La contraseña no puede exceder 72 caracteres"),
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(100),
   globalRole: z
     .enum(["admin", "owner", "partner", "manager", "employee", "coach", "user"], {
@@ -101,9 +97,12 @@ export async function POST(
   const now = new Date().toISOString()
 
   // Step 1 — create the auth user via admin API
+  // Generate a secure random password — user will always log in via Google
+  const tempPassword = `MP_${crypto.randomUUID().replace(/-/g, "")}_${Date.now()}`
+
   const { data: authData, error: createError } = await supabase.auth.admin.createUser({
     email: input.email,
-    password: input.password,
+    password: tempPassword,
     email_confirm: true, // admin-created accounts skip email verification
   })
 

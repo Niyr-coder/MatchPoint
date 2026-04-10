@@ -100,8 +100,8 @@ export default async function OwnerDashboardPage({
               {weekBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className="w-full rounded-t-sm bg-foreground"
-                    style={{ height: `${bar.height * 0.7}px`, opacity: i === weekBars.length - 1 ? 1 : 0.3 + i * 0.1 }}
+                    className="w-full rounded-t-sm bg-primary"
+                    style={{ height: `${bar.height * 0.7}px`, opacity: i === weekBars.length - 1 ? 1 : 0.25 + i * 0.1 }}
                   />
                 </div>
               ))}

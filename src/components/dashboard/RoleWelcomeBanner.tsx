@@ -3,18 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Profile, AppRole } from "@/types"
 
-const BANNER_BG: Record<AppRole, string> = {
-  admin:    "#b91c1c",
-  owner:    "#0a0a0a",
-  partner:  "#0f766e",
-  manager:  "#15803d",
-  employee: "#3f3f46",
-  coach:    "#92400e",
-  user:     "#0a0a0a",
-}
-
 const ROLE_LABEL: Record<AppRole, string> = {
-  admin:    "Plataforma Global",
+  admin:    "Administrador Global",
   owner:    "Dueño del Club",
   partner:  "Socio del Club",
   manager:  "Vista Operativa",
@@ -53,64 +43,62 @@ export function RoleWelcomeBanner({
     .map((n) => n![0].toUpperCase())
     .join("")
 
-  const accentColor = BANNER_BG[role]
-
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-card border border-border shadow-none transition-all duration-200 hover:border-border/60">
-      {/* Top accent stripe */}
-      <div
-        className="h-1.5 w-full absolute top-0 left-0 right-0"
-        style={{ background: accentColor }}
-      />
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden bg-[#0a0a0a] border border-zinc-800">
+      {/* Top green accent bar */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-primary via-green-400 to-transparent" />
 
-      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-        {/* Avatar */}
-        <div style={{ outline: `2px solid ${accentColor}40`, borderRadius: "9999px" }}>
-          <Avatar className="size-16 shrink-0 ring-2 ring-zinc-200">
+      {/* Ambient glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_100%,rgba(22,163,74,0.1),transparent_55%)] pointer-events-none" />
+
+      <div className="relative z-10 p-5 md:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          {/* Avatar */}
+          <Avatar className="size-14 shrink-0 ring-2 ring-zinc-800">
             <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-            <AvatarFallback className="bg-muted text-zinc-700 text-xl font-black">
+            <AvatarFallback className="bg-zinc-800 text-zinc-300 text-xl font-black">
               {initials || "U"}
             </AvatarFallback>
           </Avatar>
-        </div>
 
-        {/* Name + date + club chip */}
-        <div className="flex-1 min-w-0">
-          <p
-            className="text-[10px] font-black uppercase tracking-[0.2em] mb-1"
-            style={{ color: accentColor }}
-          >
-            {ROLE_LABEL[role]}
-          </p>
-          <h1
-            className="font-black text-foreground uppercase leading-[0.9] tracking-[-0.03em] truncate"
-            style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}
-          >
-            Hola, {firstName}.
-          </h1>
-          <p className="mt-1.5 text-zinc-400 text-sm capitalize">{date}</p>
-          {clubName && (
-            <div className="mt-3">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-foreground border border-border">
-                {clubName}
-              </span>
+          {/* Name + date + club */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">
+              {ROLE_LABEL[role]}
+            </p>
+            <h1
+              className="font-black text-white uppercase leading-[0.9] tracking-[-0.03em] truncate"
+              style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}
+            >
+              Hola, {firstName}.
+            </h1>
+            <p className="mt-1.5 text-white/40 text-sm capitalize">{date}</p>
+            {clubName && (
+              <div className="mt-2.5">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                  {clubName}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Stats strip */}
+          {stats.length > 0 && (
+            <div className="flex items-center gap-0 shrink-0 rounded-xl border border-zinc-800 overflow-hidden">
+              {stats.map((s, i) => (
+                <div
+                  key={s.label}
+                  className={`px-4 py-3 text-center ${i < stats.length - 1 ? "border-r border-zinc-800" : ""}`}
+                >
+                  <p className="text-xl font-black text-white leading-none tabular-nums">{s.value}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/40 mt-0.5 max-w-[70px]">
+                    {s.label}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Mini stats */}
-        {stats.length > 0 && (
-          <div className="flex gap-6 shrink-0 sm:border-l sm:border-border sm:pl-6">
-            {stats.map(({ label, value }) => (
-              <div key={label} className="text-center">
-                <p className="text-2xl font-black text-foreground">{value}</p>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mt-0.5">
-                  {label}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )

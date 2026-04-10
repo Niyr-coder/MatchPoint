@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { X, Eye, EyeOff, UserPlus } from "lucide-react"
+import { X, UserPlus } from "lucide-react"
 import type { ClubAdmin } from "@/lib/admin/queries"
 import type { ApiResponse } from "@/types"
 
@@ -25,7 +25,6 @@ const CLUB_ROLE_OPTIONS = [
 
 interface CreateUserPayload {
   email: string
-  password: string
   firstName: string
   lastName: string
   globalRole: string
@@ -35,7 +34,6 @@ interface CreateUserPayload {
 
 interface FieldError {
   email?: string
-  password?: string
   firstName?: string
   lastName?: string
   globalRole?: string
@@ -55,12 +53,6 @@ function validatePayload(data: CreateUserPayload): FieldError {
     errors.email = "El email es requerido"
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.email = "El email no es válido"
-  }
-
-  if (!data.password) {
-    errors.password = "La contraseña es requerida"
-  } else if (data.password.length < 8) {
-    errors.password = "La contraseña debe tener al menos 8 caracteres"
   }
 
   if (!data.firstName.trim()) {
@@ -104,8 +96,6 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
   const router = useRouter()
 
   const [email, setEmail]           = useState("")
-  const [password, setPassword]     = useState("")
-  const [showPassword, setShowPassword] = useState(false)
   const [firstName, setFirstName]   = useState("")
   const [lastName, setLastName]     = useState("")
   const [globalRole, setGlobalRole] = useState("user")
@@ -123,7 +113,6 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
 
     const payload: CreateUserPayload = {
       email: email.trim(),
-      password,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       globalRole,
@@ -252,29 +241,6 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
               className={inputClass}
               autoComplete="email"
             />
-          </FormField>
-
-          <FormField label="Contraseña" error={fieldErrors.password}>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setFieldErrors((p) => ({ ...p, password: undefined })) }}
-                placeholder="Mínimo 8 caracteres"
-                disabled={loading || success}
-                className={`${inputClass} pr-10`}
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                disabled={loading || success}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center text-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
-            </div>
           </FormField>
 
           <FormField label="Rol global" error={fieldErrors.globalRole}>
