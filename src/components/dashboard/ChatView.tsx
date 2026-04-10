@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Send, MessageSquare, Users } from "lucide-react"
 import { PageHeader } from "@/components/shared/PageHeader"
+import { createClient } from "@/lib/supabase/client"
 
 interface MessageSender {
   id: string
@@ -52,62 +53,101 @@ export function ChatView({ userId }: ChatViewProps) {
   const [sendError, setSendError] = useState<string | null>(null)
   const [loadingConvs, setLoadingConvs] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const supabase = createClient()
 
-  const fetchConversations = () => {
-    fetch("/api/messages")
-      .then((r) => r.json())
-      .then((d: { data?: Conversation[] }) => setConversations(d.data ?? []))
-      .catch(() => setConversations([]))
-  }
+  // ── fetch helpers ──────────────────────────────────────────────────────────
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      const r = await fetch("/api/messages")
+      const d = (await r.json()) as { data?: Conversation[] }
+      setConversations(d.data ?? [])
+    } catch {
+      // keep stale list on error
+    }
+  }, [])
+
+  const fetchMessages = useCallback(async (convId: string) => {
+    try {
+      const r = await fetch(`/api/messages?conversationId=${convId}`)
+      const d = (await r.json()) as { data?: Message[] }
+      setMessages(d.data ?? [])
+    } catch {
+      // keep stale messages on error
+    }
+  }, [])
+
+  // ── initial conversation list load ─────────────────────────────────────────
 
   useEffect(() => {
     setLoadingConvs(true)
-    fetch("/api/messages")
-      .then((r) => r.json())
-      .then((d: { data?: Conversation[] }) => setConversations(d.data ?? []))
-      .catch(() => setConversations([]))
-      .finally(() => setLoadingConvs(false))
+    void fetchConversations().finally(() => setLoadingConvs(false))
+  }, [fetchConversations])
 
-    // Auto-refresh conversations list every 10s
-    const convPollId = setInterval(fetchConversations, 10000)
-    return () => clearInterval(convPollId)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // ── Realtime: notify when user is added to a new conversation ─────────────
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("user-conversation-participants")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "conversation_participants",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          void fetchConversations()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [userId, fetchConversations, supabase])
+
+  // ── messages load + Realtime subscription (active conversation) ────────────
 
   useEffect(() => {
     if (!activeConv) return
 
-    // Clear stale messages when switching conversations
     setMessages([])
+    void fetchMessages(activeConv)
 
-    let currentController: AbortController | null = null
+    // Subscribe to new messages in this conversation — replaces 5s polling (F1)
+    const channel = supabase
+      .channel(`messages-conv-${activeConv}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${activeConv}`,
+        },
+        () => {
+          // Reload with full sender info (Realtime payload lacks JOIN data)
+          void fetchMessages(activeConv)
+          // Keep conversation list order up-to-date
+          void fetchConversations()
+        }
+      )
+      .subscribe()
 
-    const load = () => {
-      currentController?.abort()
-      currentController = new AbortController()
-      fetch(`/api/messages?conversationId=${activeConv}`, { signal: currentController.signal })
-        .then((r) => r.json())
-        .then((d: { data?: Message[] }) => setMessages(d.data ?? []))
-        .catch((err: unknown) => {
-          if (!(err instanceof Error && err.name === "AbortError")) {
-            setSendError("Error al cargar mensajes. Intenta de nuevo.")
-            setTimeout(() => setSendError(null), 4000)
-          }
-        })
-    }
-
-    load()
-    pollRef.current = setInterval(load, 5000)
     return () => {
-      currentController?.abort()
-      if (pollRef.current) clearInterval(pollRef.current)
+      void supabase.removeChannel(channel)
     }
-  }, [activeConv])
+  }, [activeConv, fetchMessages, fetchConversations, supabase])
+
+  // ── auto-scroll on new messages ────────────────────────────────────────────
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  // ── send message ───────────────────────────────────────────────────────────
 
   const sendMessage = async () => {
     if (!input.trim() || !activeConv || sending) return
@@ -125,18 +165,13 @@ export function ChatView({ userId }: ChatViewProps) {
       })
 
       if (!res.ok) {
-        const data = await res.json() as { error?: string }
+        const data = (await res.json()) as { error?: string }
         throw new Error(data.error ?? "Error al enviar el mensaje")
       }
 
-      const [msgRes, convRes] = await Promise.all([
-        fetch(`/api/messages?conversationId=${activeConv}`),
-        fetch("/api/messages"),
-      ])
-      const msgData = (await msgRes.json()) as { data?: Message[] }
-      const convData = (await convRes.json()) as { data?: Conversation[] }
-      setMessages(msgData.data ?? [])
-      setConversations(convData.data ?? [])
+      // Realtime will fire and reload messages automatically.
+      // Refresh conversation list order immediately so the updated_at is current.
+      void fetchConversations()
     } catch (err) {
       setInput(tempContent)
       setSendError(err instanceof Error ? err.message : "Error al enviar el mensaje")
@@ -154,6 +189,8 @@ export function ChatView({ userId }: ChatViewProps) {
   }
 
   const activeConvData = conversations.find((c) => c.id === activeConv)
+
+  // ── render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col gap-6">
@@ -205,9 +242,7 @@ export function ChatView({ userId }: ChatViewProps) {
                     key={conv.id}
                     onClick={() => setActiveConv(conv.id)}
                     className={`w-full p-4 text-left border-b border-[#f0f0f0] transition-colors ${
-                      isActive
-                        ? "bg-zinc-50"
-                        : "hover:bg-zinc-50"
+                      isActive ? "bg-zinc-50" : "hover:bg-zinc-50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
