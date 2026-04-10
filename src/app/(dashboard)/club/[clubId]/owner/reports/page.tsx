@@ -97,8 +97,8 @@ export default async function OwnerReportsPage({
             disabled
             className={`text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-colors ${
               label === "Este mes"
-                ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                : "bg-white text-zinc-400 border-[#e5e5e5] cursor-not-allowed"
+                ? "bg-foreground text-white border-foreground"
+                : "bg-card text-zinc-400 border-border cursor-not-allowed"
             }`}
           >
             {label}
@@ -117,7 +117,7 @@ export default async function OwnerReportsPage({
           subtitle={monthLabel}
           index={0}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {[
               { label: "Reservas totales", value: String(totalCount) },
               { label: "Clientes únicos", value: String(uniqueClients) },
@@ -144,14 +144,14 @@ export default async function OwnerReportsPage({
           subtitle="Distribución semanal del mes actual"
           index={1}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             <div className="flex items-end justify-between gap-1.5 h-[80px]">
               {dayBuckets.map((count, i) => {
                 const heightPct = (count / maxDayCount) * 100
                 return (
                   <div key={i} className="flex flex-col items-center gap-1 flex-1">
                     <div
-                      className="w-full rounded-t-sm bg-[#16a34a]"
+                      className="w-full rounded-t-sm bg-primary"
                       style={{
                         height: `${Math.max(heightPct * 0.8, 4)}px`,
                         opacity: count > 0 ? 0.5 + (count / maxDayCount) * 0.5 : 0.15,
@@ -183,7 +183,7 @@ export default async function OwnerReportsPage({
           subtitle="Ranking por cantidad de reservas"
           index={2}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {courtRanking.length === 0 ? (
               <p className="text-xs text-zinc-400 text-center py-4">
                 Sin datos de canchas este mes
@@ -204,7 +204,7 @@ export default async function OwnerReportsPage({
                     </div>
                     <div className="h-1.5 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#16a34a]"
+                        className="h-full rounded-full bg-primary"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -224,7 +224,7 @@ export default async function OwnerReportsPage({
           subtitle="Descarga y comparte los datos del período"
           index={3}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {[
               {
                 label: "Descargar PDF",
@@ -249,7 +249,7 @@ export default async function OwnerReportsPage({
                 <button
                   disabled
                   title="Próximamente"
-                  className="shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-[#e5e5e5] text-zinc-300 cursor-not-allowed"
+                  className="shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-border text-zinc-300 cursor-not-allowed"
                 >
                   Pronto
                 </button>

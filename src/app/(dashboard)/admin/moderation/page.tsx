@@ -19,7 +19,7 @@ const ROLE_LABELS: Record<string, string> = {
 const ROLE_CLASSES: Record<string, string> = {
   admin: "bg-red-50 text-red-700",
   owner: "bg-violet-50 text-violet-700",
-  partner: "bg-[#f0fdf4] text-[#16a34a]",
+  partner: "bg-success text-primary",
   manager: "bg-indigo-50 text-indigo-700",
   employee: "bg-zinc-100 text-zinc-600",
   coach: "bg-amber-50 text-amber-700",
@@ -69,24 +69,24 @@ export default async function AdminModerationPage() {
       />
 
       {/* Section 1: Recent users */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <SectionHeader icon={Users} title="Usuarios registrados recientemente" count={data.recentUsers.length} />
 
         {data.recentUsers.length === 0 ? (
           <p className="text-sm text-zinc-400 text-center py-6">Sin usuarios recientes</p>
         ) : (
           <>
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 pb-2 border-b border-[#f0f0f0] mb-1">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 pb-2 border-b border-border mb-1">
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Nombre</p>
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Rol</p>
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Ciudad</p>
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 text-right">Registro</p>
             </div>
-            <div className="flex flex-col divide-y divide-[#f0f0f0]">
+            <div className="flex flex-col divide-y divide-border-subtle">
               {data.recentUsers.map((u) => (
                 <div key={u.id} className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 py-3 items-center">
                   <div>
-                    <p className="text-sm font-bold text-[#0a0a0a]">
+                    <p className="text-sm font-bold text-foreground">
                       {u.full_name ?? <span className="text-zinc-400 italic">Sin nombre</span>}
                     </p>
                     {u.username && (
@@ -108,7 +108,7 @@ export default async function AdminModerationPage() {
       </div>
 
       {/* Section 2: Inactive / pending clubs */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center gap-2 mb-4">
           <div className="size-8 rounded-xl bg-amber-50 flex items-center justify-center">
             <Building2 className="size-4 text-amber-600" />
@@ -121,7 +121,7 @@ export default async function AdminModerationPage() {
           </span>
           <Link
             href="/admin/clubs"
-            className="text-[10px] font-black uppercase tracking-wide text-[#0a0a0a] hover:underline flex items-center gap-1 ml-2"
+            className="text-[10px] font-black uppercase tracking-wide text-foreground hover:underline flex items-center gap-1 ml-2 hover:opacity-80"
           >
             Gestionar <ExternalLink className="size-3" />
           </Link>
@@ -131,7 +131,7 @@ export default async function AdminModerationPage() {
       </div>
 
       {/* Section 3: Club requests */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center gap-2 mb-5">
           <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
             <FileText className="size-4 text-zinc-500" />
@@ -148,13 +148,13 @@ export default async function AdminModerationPage() {
       </div>
 
       {/* Section 4: Summary */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3">
           Resumen de moderación
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-xl bg-zinc-50 p-4">
-            <p className="text-2xl font-black text-[#0a0a0a]">{data.recentUsers.length}</p>
+          <div className="rounded-xl bg-secondary p-4">
+            <p className="text-2xl font-black text-foreground">{data.recentUsers.length}</p>
             <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">
               Usuarios recientes
             </p>
@@ -165,16 +165,16 @@ export default async function AdminModerationPage() {
               Clubs inactivos
             </p>
           </div>
-          <div className="rounded-xl bg-[#f5f5f5] p-4">
-            <p className="text-2xl font-black text-[#0a0a0a]">
+          <div className="rounded-xl bg-secondary p-4">
+            <p className="text-2xl font-black text-foreground">
               {clubRequests.filter((r) => r.status === "pending").length}
             </p>
             <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">
               Solicitudes pendientes
             </p>
           </div>
-          <div className="rounded-xl bg-zinc-50 p-4">
-            <p className="text-2xl font-black text-[#0a0a0a]">
+          <div className="rounded-xl bg-secondary p-4">
+            <p className="text-2xl font-black text-foreground">
               {data.recentUsers.filter((u) => u.global_role === "admin").length}
             </p>
             <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">

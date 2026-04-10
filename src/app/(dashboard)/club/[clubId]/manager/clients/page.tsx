@@ -35,7 +35,7 @@ const columns: Column<ClientEntry & { id: string }>[] = [
         <div className="size-8 rounded-full bg-zinc-100 text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
           {getInitials(item.fullName)}
         </div>
-        <span className="font-medium text-[#0a0a0a]">{item.fullName ?? "Sin nombre"}</span>
+        <span className="font-medium text-foreground">{item.fullName ?? "Sin nombre"}</span>
       </div>
     ),
   },
@@ -50,7 +50,7 @@ const columns: Column<ClientEntry & { id: string }>[] = [
     key: "totalReservations",
     header: "Reservas Totales",
     render: (item) => (
-      <span className="font-black text-[#0a0a0a]">{item.totalReservations}</span>
+      <span className="font-black text-foreground">{item.totalReservations}</span>
     ),
   },
   {

@@ -33,7 +33,7 @@ function formatCurrency(amount: number): string {
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   pending: { label: "Pendiente", className: "bg-amber-50 text-amber-700" },
-  confirmed: { label: "Confirmado", className: "bg-[#f0fdf4] text-[#16a34a]" },
+  confirmed: { label: "Confirmado", className: "bg-success text-primary" },
   delivered: { label: "Entregado", className: "bg-emerald-50 text-emerald-700" },
   cancelled: { label: "Cancelado", className: "bg-red-50 text-red-700" },
 }
@@ -43,7 +43,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 function StatsCards({ stats }: { stats: AdminShopStats }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+      <div className="rounded-2xl bg-card border border-border p-5">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-9 rounded-xl bg-emerald-50 flex items-center justify-center">
             <DollarSign className="size-4 text-emerald-600" />
@@ -52,11 +52,11 @@ function StatsCards({ stats }: { stats: AdminShopStats }) {
             Ingresos totales
           </p>
         </div>
-        <p className="text-2xl font-black text-[#0a0a0a]">{formatCurrency(stats.total_revenue)}</p>
+        <p className="text-2xl font-black text-foreground">{formatCurrency(stats.total_revenue)}</p>
         <p className="text-xs text-zinc-500 mt-0.5">Órdenes no canceladas</p>
       </div>
 
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+      <div className="rounded-2xl bg-card border border-border p-5">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-9 rounded-xl bg-amber-50 flex items-center justify-center">
             <Clock className="size-4 text-amber-600" />
@@ -65,20 +65,20 @@ function StatsCards({ stats }: { stats: AdminShopStats }) {
             Órdenes pendientes
           </p>
         </div>
-        <p className="text-2xl font-black text-[#0a0a0a]">{stats.pending_orders}</p>
+        <p className="text-2xl font-black text-foreground">{stats.pending_orders}</p>
         <p className="text-xs text-zinc-500 mt-0.5">Requieren confirmación</p>
       </div>
 
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+      <div className="rounded-2xl bg-card border border-border p-5">
         <div className="flex items-center gap-3 mb-2">
-          <div className="size-9 rounded-xl bg-[#f5f5f5] flex items-center justify-center">
-            <CheckCircle2 className="size-4 text-[#0a0a0a]" />
+          <div className="size-9 rounded-xl bg-secondary flex items-center justify-center">
+            <CheckCircle2 className="size-4 text-foreground" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
             Productos activos
           </p>
         </div>
-        <p className="text-2xl font-black text-[#0a0a0a]">{stats.active_products}</p>
+        <p className="text-2xl font-black text-foreground">{stats.active_products}</p>
         <p className="text-xs text-zinc-500 mt-0.5">Disponibles para compra</p>
       </div>
     </div>
@@ -125,15 +125,15 @@ function OrdersTable({
   const totalPages = Math.max(1, Math.ceil(total / limit))
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 p-4 border-b border-[#f0f0f0]">
+      <div className="flex flex-wrap gap-3 p-4 border-b border-border">
         <div className="relative">
           <select
             value={clubFilter}
             onChange={(e) => onClubFilter(e.target.value)}
-            className="rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-medium text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] appearance-none pr-7"
+            className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground
+              focus:outline-none focus:border-foreground appearance-none pr-7"
           >
             <option value="">Todos los clubs</option>
             {clubs.map((c) => (
@@ -147,8 +147,8 @@ function OrdersTable({
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilter(e.target.value)}
-            className="rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-medium text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] appearance-none pr-7"
+            className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground
+              focus:outline-none focus:border-foreground appearance-none pr-7"
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -162,7 +162,7 @@ function OrdersTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#f0f0f0]">
+            <tr className="border-b border-border">
               {["Usuario", "Producto", "Cant.", "Total", "Estado", "Club", "Fecha"].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
                   {h}
@@ -173,7 +173,7 @@ function OrdersTable({
           <tbody>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[#f0f0f0]">
+                <tr key={i} className="border-b border-border">
                   {Array.from({ length: 7 }).map((__, j) => (
                     <td key={j} className="px-4 py-3">
                       <div className="h-4 bg-zinc-100 rounded animate-pulse w-20" />
@@ -192,19 +192,19 @@ function OrdersTable({
               orders.map((order) => {
                 const status = STATUS_LABELS[order.status] ?? { label: order.status, className: "bg-zinc-100 text-zinc-600" }
                 return (
-                  <tr key={order.id} className="border-b border-[#f0f0f0] hover:bg-zinc-50 transition-colors">
+                  <tr key={order.id} className="border-b border-border hover:bg-secondary transition-colors">
                     <td className="px-4 py-3">
-                      <p className="text-sm font-bold text-[#0a0a0a]">{order.user_name}</p>
+                      <p className="text-sm font-bold text-foreground">{order.user_name}</p>
                       <p className="text-[10px] text-zinc-400">{order.user_email}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-[#0a0a0a]">{order.product_name}</p>
+                      <p className="text-sm font-medium text-foreground">{order.product_name}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-bold text-[#0a0a0a]">{order.quantity}</p>
+                      <p className="text-sm font-bold text-foreground">{order.quantity}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-black text-[#0a0a0a]">{formatCurrency(order.total)}</p>
+                      <p className="text-sm font-black text-foreground">{formatCurrency(order.total)}</p>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full ${status.className}`}>
@@ -227,7 +227,7 @@ function OrdersTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0f0f0]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <p className="text-xs text-zinc-500 font-medium">
             {total} órdenes · Página {page} de {totalPages}
           </p>
@@ -235,16 +235,16 @@ function OrdersTable({
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="size-8 rounded-lg border border-[#e5e5e5] flex items-center justify-center
-                disabled:opacity-40 hover:bg-zinc-50 transition-colors"
+              className="size-8 rounded-lg border border-border flex items-center justify-center
+                disabled:opacity-40 hover:bg-secondary transition-colors"
             >
               <ChevronLeft className="size-4 text-zinc-500" />
             </button>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
-              className="size-8 rounded-lg border border-[#e5e5e5] flex items-center justify-center
-                disabled:opacity-40 hover:bg-zinc-50 transition-colors"
+              className="size-8 rounded-lg border border-border flex items-center justify-center
+                disabled:opacity-40 hover:bg-secondary transition-colors"
             >
               <ChevronRight className="size-4 text-zinc-500" />
             </button>
@@ -283,15 +283,15 @@ function ProductsTable({
   const totalPages = Math.max(1, Math.ceil(total / limit))
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Filter */}
-      <div className="flex gap-3 p-4 border-b border-[#f0f0f0]">
+      <div className="flex gap-3 p-4 border-b border-border">
         <div className="relative">
           <select
             value={clubFilter}
             onChange={(e) => onClubFilter(e.target.value)}
-            className="rounded-xl border border-[#e5e5e5] px-3 py-2 text-sm font-medium text-[#0a0a0a]
-              focus:outline-none focus:border-[#0a0a0a] appearance-none pr-7"
+            className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground
+              focus:outline-none focus:border-foreground appearance-none pr-7"
           >
             <option value="">Todos los clubs</option>
             {clubs.map((c) => (
@@ -305,7 +305,7 @@ function ProductsTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#f0f0f0]">
+            <tr className="border-b border-border">
               {["Nombre", "Club", "Precio", "Stock", "Categoría", "Estado"].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
                   {h}
@@ -316,7 +316,7 @@ function ProductsTable({
           <tbody>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[#f0f0f0]">
+                <tr key={i} className="border-b border-border">
                   {Array.from({ length: 6 }).map((__, j) => (
                     <td key={j} className="px-4 py-3">
                       <div className="h-4 bg-zinc-100 rounded animate-pulse w-20" />
@@ -333,9 +333,9 @@ function ProductsTable({
               </tr>
             ) : (
               products.map((product) => (
-                <tr key={product.id} className="border-b border-[#f0f0f0] hover:bg-zinc-50 transition-colors">
+                <tr key={product.id} className="border-b border-border hover:bg-secondary transition-colors">
                   <td className="px-4 py-3">
-                    <p className="text-sm font-bold text-[#0a0a0a]">{product.name}</p>
+                    <p className="text-sm font-bold text-foreground">{product.name}</p>
                     {product.description && (
                       <p className="text-[10px] text-zinc-400 truncate max-w-[200px]">{product.description}</p>
                     )}
@@ -344,10 +344,10 @@ function ProductsTable({
                     <p className="text-sm text-zinc-600">{product.club_name ?? "—"}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-black text-[#0a0a0a]">{formatCurrency(product.price)}</p>
+                    <p className="text-sm font-black text-foreground">{formatCurrency(product.price)}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-bold text-[#0a0a0a]">
+                    <p className="text-sm font-bold text-foreground">
                       {product.stock === -1 ? "Ilimitado" : product.stock}
                     </p>
                   </td>
@@ -373,7 +373,7 @@ function ProductsTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0f0f0]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <p className="text-xs text-zinc-500 font-medium">
             {total} productos · Página {page} de {totalPages}
           </p>
@@ -381,16 +381,16 @@ function ProductsTable({
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="size-8 rounded-lg border border-[#e5e5e5] flex items-center justify-center
-                disabled:opacity-40 hover:bg-zinc-50 transition-colors"
+              className="size-8 rounded-lg border border-border flex items-center justify-center
+                disabled:opacity-40 hover:bg-secondary transition-colors"
             >
               <ChevronLeft className="size-4 text-zinc-500" />
             </button>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
-              className="size-8 rounded-lg border border-[#e5e5e5] flex items-center justify-center
-                disabled:opacity-40 hover:bg-zinc-50 transition-colors"
+              className="size-8 rounded-lg border border-border flex items-center justify-center
+                disabled:opacity-40 hover:bg-secondary transition-colors"
             >
               <ChevronRight className="size-4 text-zinc-500" />
             </button>
@@ -528,7 +528,7 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
       <StatsCards stats={stats} />
 
       {/* Tab bar */}
-      <div className="flex gap-1 rounded-xl bg-zinc-100 p-1 w-fit">
+      <div className="flex gap-1 rounded-xl bg-secondary p-1 w-fit">
         {[
           { id: "orders" as Tab, label: "Órdenes", icon: ShoppingBag },
           { id: "products" as Tab, label: "Productos", icon: Package },
@@ -541,7 +541,7 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
               onClick={() => handleTabChange(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-black transition-colors
                 ${isActive
-                  ? "bg-white text-[#0a0a0a] shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-zinc-500 hover:text-zinc-700"
                 }`}
             >

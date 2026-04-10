@@ -76,43 +76,43 @@ export default async function AdminFinancialsPage() {
       </div>
 
       {/* Growth badge + secondary stats */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+      <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
               Tendencia mensual
             </p>
-            <p className="text-2xl font-black text-[#0a0a0a]">
+            <p className="text-2xl font-black text-foreground">
               ${fin.revenueThisMonth.toFixed(2)}
               <span className="text-sm font-bold text-zinc-400 ml-2">este mes</span>
             </p>
           </div>
           {growthBadge(fin.revenueThisMonth, fin.revenueLastMonth)}
         </div>
-        <div className="pt-4 border-t border-[#f0f0f0] grid grid-cols-3 gap-4">
+        <div className="pt-4 border-t border-border grid grid-cols-3 gap-4">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">
               Total reservas
             </p>
-            <p className="text-lg font-black text-[#0a0a0a]">{fin.totalReservations}</p>
+            <p className="text-lg font-black text-foreground">{fin.totalReservations}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">
               Reservas este mes
             </p>
-            <p className="text-lg font-black text-[#0a0a0a]">{fin.reservationsThisMonth}</p>
+            <p className="text-lg font-black text-foreground">{fin.reservationsThisMonth}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">
               Ingresos torneos
             </p>
-            <p className="text-lg font-black text-[#16a34a]">${fin.tournamentRevenue.toFixed(2)}</p>
+            <p className="text-lg font-black text-primary">${fin.tournamentRevenue.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
       {/* Tournament revenue card */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex items-center gap-4">
+      <div className="rounded-2xl bg-card border border-border p-6 flex items-center gap-4">
         <div className="size-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
           <Trophy className="size-5 text-amber-600" />
         </div>
@@ -120,7 +120,7 @@ export default async function AdminFinancialsPage() {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             Ingresos por torneos
           </p>
-          <p className="text-xl font-black text-[#0a0a0a]">${fin.tournamentRevenue.toFixed(2)}</p>
+          <p className="text-xl font-black text-foreground">${fin.tournamentRevenue.toFixed(2)}</p>
           <p className="text-xs text-zinc-400 mt-0.5">
             Suma de entry fees de participantes con pago confirmado
           </p>
@@ -128,9 +128,9 @@ export default async function AdminFinancialsPage() {
       </div>
 
       {/* Top clubs by revenue table */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
+          <div className="size-8 rounded-xl bg-secondary flex items-center justify-center">
             <Building2 className="size-4 text-zinc-500" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
@@ -143,22 +143,22 @@ export default async function AdminFinancialsPage() {
         ) : (
           <>
             {/* Table header */}
-            <div className="grid grid-cols-4 gap-2 pb-2 border-b border-[#f0f0f0] mb-1">
+            <div className="grid grid-cols-4 gap-2 pb-2 border-b border-border mb-1">
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 col-span-2">Club</p>
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 text-right">Reservas</p>
               <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 text-right">Ingresos</p>
             </div>
-            <div className="flex flex-col divide-y divide-[#f0f0f0]">
+            <div className="flex flex-col divide-y divide-border-subtle">
               {fin.topClubsByRevenue.map((club) => {
                 const avg = club.reservations > 0 ? club.revenue / club.reservations : 0
                 return (
                   <div key={club.club_id} className="grid grid-cols-4 gap-2 py-3 items-center">
                     <div className="col-span-2">
-                      <p className="text-sm font-bold text-[#0a0a0a]">{club.name}</p>
+                      <p className="text-sm font-bold text-foreground">{club.name}</p>
                       <p className="text-[10px] text-zinc-400">Prom. ${avg.toFixed(2)} / reserva</p>
                     </div>
                     <p className="text-sm font-black text-zinc-600 text-right">{club.reservations}</p>
-                    <p className="text-sm font-black text-[#16a34a] text-right">${club.revenue.toFixed(2)}</p>
+                    <p className="text-sm font-black text-primary text-right">${club.revenue.toFixed(2)}</p>
                   </div>
                 )
               })}

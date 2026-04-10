@@ -180,7 +180,7 @@ export default async function ManagerReportsPage({
           subtitle={`${today} — Actividad en tiempo real`}
           index={0}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {[
               { label: "Reservas del día", value: String(todayConfirmed.length) },
               {
@@ -214,14 +214,14 @@ export default async function ManagerReportsPage({
           subtitle="Lunes a viernes — reservas confirmadas"
           index={1}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             <div className="flex items-end justify-between gap-1.5 h-[60px]">
               {weekDayBuckets.map((count, i) => {
                 const heightPct = (count / maxWeekDay) * 100
                 return (
                   <div key={i} className="flex flex-col items-center gap-1 flex-1">
                     <div
-                      className="w-full rounded-t-sm bg-[#0a0a0a]"
+                      className="w-full rounded-t-sm bg-foreground"
                       style={{
                         height: `${Math.max(heightPct * 0.6, 4)}px`,
                         opacity: count > 0 ? 0.5 + (count / maxWeekDay) * 0.5 : 0.15,
@@ -262,7 +262,7 @@ export default async function ManagerReportsPage({
           subtitle="Situaciones que requieren atención"
           index={2}
         >
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
             {pendingToday.length === 0 ? (
               <p className="text-xs text-zinc-400 text-center py-4">
                 Sin alertas operativas hoy
@@ -299,7 +299,7 @@ export default async function ManagerReportsPage({
           subtitle="Las 5 reservas más cercanas"
           index={3}
         >
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
             {upcomingRes.length === 0 ? (
               <p className="text-xs text-zinc-400 text-center py-4">
                 No hay reservas próximas

@@ -23,7 +23,7 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
 }
 
 const ENTITY_TYPE_BADGE_CLASSES: Record<string, string> = {
-  club: "bg-white text-[#0a0a0a] border-[#e5e5e5]",
+  club: "bg-card text-foreground border-border",
   tournament: "bg-amber-50 text-amber-700 border-amber-200",
   event: "bg-purple-50 text-purple-700 border-purple-200",
   team: "bg-teal-50 text-teal-700 border-teal-200",
@@ -228,9 +228,9 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
       />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white border border-zinc-200 shadow-2xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
               <Link2 className="size-4 text-teal-700" />
@@ -239,7 +239,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">
                 Admin
               </p>
-              <h2 className="text-sm font-black text-[#0a0a0a] leading-none">
+              <h2 className="text-sm font-black text-foreground leading-none">
                 Crear Invite Link
               </h2>
             </div>
@@ -271,8 +271,8 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                 <p className="text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500">
                   Enlace de invitación
                 </p>
-                <div className="flex items-center gap-2 bg-zinc-50 rounded-xl px-3 py-2.5 border border-zinc-200">
-                  <span className="text-xs font-mono text-[#0a0a0a] truncate flex-1 select-all">
+                <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2.5 border border-border">
+                  <span className="text-xs font-mono text-foreground truncate flex-1 select-all">
                     {modalState.invite_url}
                   </span>
                   <button
@@ -295,14 +295,14 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                 <button
                   type="button"
                   onClick={handleCreateAnother}
-                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-colors"
+                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
                 >
                   Crear otro
                 </button>
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full bg-[#0a0a0a] text-white hover:bg-zinc-800 transition-colors"
+                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full bg-foreground text-white hover:bg-foreground/90 transition-colors"
                 >
                   Listo
                 </button>
@@ -336,7 +336,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                     value={form.entity_type}
                     onChange={(e) => handleFieldChange("entity_type", e.target.value)}
                     disabled={isLoading}
-                    className="w-full appearance-none border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 pr-8 transition-colors"
+                    className="w-full appearance-none border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 pr-8 transition-colors"
                   >
                     {CREATE_ENTITY_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -363,7 +363,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                   onChange={(e) => handleFieldChange("entity_id", e.target.value)}
                   disabled={isLoading || isPlatform}
                   placeholder={selectedEntityOption.placeholder}
-                  className="border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 disabled:bg-zinc-50 placeholder:text-zinc-400 transition-colors font-mono"
+                  className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 disabled:bg-muted placeholder:text-zinc-400 transition-colors font-mono"
                 />
               </div>
 
@@ -384,7 +384,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                     onChange={(e) => handleFieldChange("max_uses", e.target.value)}
                     disabled={isLoading}
                     placeholder="Ilimitado"
-                    className="border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 placeholder:text-zinc-400 transition-colors"
+                    className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 placeholder:text-zinc-400 transition-colors"
                   />
                 </div>
 
@@ -401,7 +401,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                     value={form.expires_at}
                     onChange={(e) => handleFieldChange("expires_at", e.target.value)}
                     disabled={isLoading}
-                    className="border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 transition-colors"
+                    className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 transition-colors"
                   />
                 </div>
               </div>
@@ -422,7 +422,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                   onChange={(e) => handleFieldChange("note", e.target.value)}
                   disabled={isLoading}
                   placeholder="Ej: Invite para campaña de verano"
-                  className="border border-zinc-200 rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 placeholder:text-zinc-400 transition-colors"
+                  className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 disabled:opacity-60 placeholder:text-zinc-400 transition-colors"
                 />
               </div>
 
@@ -432,7 +432,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
                   type="button"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-40"
+                  className="flex-1 text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-40"
                 >
                   Cancelar
                 </button>
@@ -542,7 +542,7 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
       key: "code",
       header: "Código",
       render: (invite) => (
-        <span className="font-mono text-xs font-bold text-[#0a0a0a] bg-zinc-100 px-2 py-0.5 rounded-lg tracking-wider">
+        <span className="font-mono text-xs font-bold text-foreground bg-secondary px-2 py-0.5 rounded-lg tracking-wider">
           {invite.code}
         </span>
       ),
@@ -553,7 +553,7 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
       render: (invite) => {
         const classes =
           ENTITY_TYPE_BADGE_CLASSES[invite.entity_type] ??
-          "bg-zinc-100 text-zinc-500 border-zinc-200"
+          "bg-secondary text-zinc-500 border-border"
         const label = ENTITY_TYPE_LABELS[invite.entity_type] ?? invite.entity_type
         return (
           <span
@@ -580,7 +580,7 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
       header: "Creado por",
       render: (invite) => (
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-semibold text-[#0a0a0a]">
+          <span className="text-sm font-semibold text-foreground">
             {invite.creator_name ?? "—"}
           </span>
           {invite.creator_email && (
@@ -666,7 +666,7 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="shrink-0 flex items-center gap-2 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-wide hover:bg-zinc-800 transition-colors"
+            className="shrink-0 flex items-center gap-2 bg-foreground text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-wide hover:bg-foreground/90 transition-colors"
           >
             <Plus className="size-3.5" />
             Crear invitación

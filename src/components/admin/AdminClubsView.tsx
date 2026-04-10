@@ -118,13 +118,13 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-lg rounded-2xl bg-white border border-[#e5e5e5] shadow-xl overflow-hidden"
+        className="w-full max-w-lg rounded-2xl bg-card border border-border shadow-xl overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="club-modal-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#e5e5e5]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
           <p
             id="club-modal-title"
             className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400"
@@ -135,7 +135,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
             onClick={onClose}
             disabled={loading}
             aria-label="Cerrar"
-            className="size-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-[#0a0a0a] hover:bg-zinc-100 transition-colors disabled:opacity-50"
+            className="size-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-foreground hover:bg-zinc-100 transition-colors disabled:opacity-50"
           >
             <X className="size-3.5" />
           </button>
@@ -154,7 +154,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
                 value={form.name}
                 onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Ej. Club Deportivo Quito"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
                 disabled={loading}
                 maxLength={100}
               />
@@ -170,7 +170,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
                 value={form.city}
                 onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
                 placeholder="Ej. Quito"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
                 disabled={loading}
                 maxLength={100}
               />
@@ -184,7 +184,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
               <select
                 value={form.province}
                 onChange={(e) => setForm((prev) => ({ ...prev, province: e.target.value }))}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+                className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card appearance-none cursor-pointer"
                 disabled={loading}
               >
                 <option value="">Selecciona una provincia</option>
@@ -204,7 +204,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                 placeholder="Breve descripción del club..."
                 rows={3}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white resize-none"
+                className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card resize-none"
                 disabled={loading}
                 maxLength={500}
               />
@@ -227,8 +227,8 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
                       disabled={loading}
                       className={`text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors disabled:opacity-50 ${
                         active
-                          ? "bg-[#0a0a0a] border-[#0a0a0a] text-white"
-                          : "border-[#e5e5e5] text-zinc-500 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+                          ? "bg-foreground border-foreground text-white"
+                          : "border-border text-zinc-500 hover:border-foreground hover:text-foreground"
                       }`}
                     >
                       {sport.label}
@@ -247,19 +247,19 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
           </div>
 
           {/* Footer */}
-          <div className="flex gap-3 px-6 py-4 border-t border-[#e5e5e5] bg-zinc-50/60">
+          <div className="flex gap-3 px-6 py-4 border-t border-border bg-muted/60">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-100 transition-colors disabled:opacity-50 bg-white"
+              className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-100 transition-colors disabled:opacity-50 bg-card"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#0a0a0a] hover:bg-zinc-800 text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="flex-1 bg-foreground hover:bg-foreground/90 text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="size-3.5 animate-spin" />}
               {mode === "create" ? "Crear club" : "Guardar cambios"}
@@ -489,7 +489,7 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
       key: "name",
       header: "Nombre",
       render: (club) => (
-        <span className="font-bold text-[#0a0a0a]">{club.name}</span>
+        <span className="font-bold text-foreground">{club.name}</span>
       ),
     },
     {
@@ -538,7 +538,7 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
             className={`text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors ${
               club.is_active
                 ? "border-red-200 text-red-600 hover:bg-red-50"
-                : "border-[#bbf7d0] text-[#16a34a] hover:bg-[#f0fdf4]"
+                : "border-success-border text-primary hover:bg-success"
             }`}
           >
             {club.is_active ? "Desactivar" : "Activar"}
@@ -551,7 +551,7 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
               setActionError(null)
               setModal({ type: "edit", club })
             }}
-            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-[#e5e5e5] text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
           >
             Editar
           </button>
@@ -600,7 +600,7 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
             setActionError(null)
             setModal({ type: "create" })
           }}
-          className="flex items-center gap-2 bg-[#0a0a0a] hover:bg-zinc-800 text-white text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full transition-colors"
+          className="flex items-center gap-2 bg-foreground hover:bg-foreground/90 text-white text-[11px] font-black uppercase tracking-wide px-4 py-2.5 rounded-full transition-colors"
         >
           <Plus className="size-3.5" />
           Crear club

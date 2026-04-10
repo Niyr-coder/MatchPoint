@@ -137,9 +137,9 @@ export default async function EmployeeClientsPage({
           description="Los miembros activos del club aparecerán aquí."
         />
       ) : (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
           {/* Header */}
-          <div className="grid grid-cols-4 border-b border-[#e5e5e5] px-5 py-3 bg-zinc-50/60">
+          <div className="grid grid-cols-4 border-b border-border px-5 py-3 bg-secondary/60">
             {["Miembro", "Usuario", "Rol", "Ingresó"].map((h) => (
               <div
                 key={h}
@@ -151,7 +151,7 @@ export default async function EmployeeClientsPage({
           </div>
 
           {/* Rows */}
-          <div className="divide-y divide-[#f0f0f0]">
+          <div className="divide-y divide-border-subtle">
             {members.map((member, i) => (
               <div
                 key={member.id}
@@ -163,7 +163,7 @@ export default async function EmployeeClientsPage({
                   <div className="size-8 rounded-full bg-zinc-100 text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
                     {getInitials(member.fullName)}
                   </div>
-                  <span className="text-sm font-medium text-[#0a0a0a] truncate">
+                  <span className="text-sm font-medium text-foreground truncate">
                     {member.fullName ?? "Sin nombre"}
                   </span>
                 </div>

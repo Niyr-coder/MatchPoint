@@ -55,7 +55,7 @@ export default async function ManagerCourtsPage({
           {courts.map((court: Court) => (
             <div
               key={court.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3"
+              className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-3"
             >
               <div className="flex items-center justify-between">
                 <StatusBadge
@@ -68,7 +68,7 @@ export default async function ManagerCourtsPage({
                 />
               </div>
 
-              <h3 className="text-sm font-black text-[#0a0a0a] leading-tight">
+              <h3 className="text-sm font-black text-foreground leading-tight">
                 {court.name}
               </h3>
 
@@ -79,7 +79,7 @@ export default async function ManagerCourtsPage({
                 <span>
                   {court.is_indoor ? "Cubierta (Indoor)" : "Descubierta (Outdoor)"}
                 </span>
-                <span className="font-bold text-[#0a0a0a]">
+                <span className="font-bold text-foreground">
                   ${court.price_per_hour.toFixed(2)} / hora
                 </span>
               </div>

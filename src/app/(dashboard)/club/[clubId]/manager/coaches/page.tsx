@@ -108,10 +108,10 @@ export default async function ManagerCoachesPage({
           {coaches.map((coach) => (
             <div
               key={coach.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+              className="rounded-2xl bg-card border border-border p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             >
               <div className="flex flex-col gap-1">
-                <p className="text-sm font-black text-[#0a0a0a]">
+                <p className="text-sm font-black text-foreground">
                   {coach.fullName ?? "Sin nombre"}
                 </p>
                 <p className="text-[11px] text-zinc-500">

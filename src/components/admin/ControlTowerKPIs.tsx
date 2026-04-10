@@ -6,7 +6,7 @@ type Accent = "green" | "blue" | "amber" | "red" | "purple" | "cyan"
 
 const ACCENT: Record<Accent, { icon: string; iconBg: string; badge: string; label: string }> = {
   green:  { icon: "text-emerald-600", iconBg: "bg-emerald-50",  badge: "text-emerald-700 bg-emerald-50 border-emerald-200",  label: "text-emerald-600" },
-  blue:   { icon: "text-[#0a0a0a]",    iconBg: "bg-[#f5f5f5]",     badge: "text-[#0a0a0a] bg-[#f5f5f5] border-[#e5e5e5]",            label: "text-[#0a0a0a]" },
+  blue:   { icon: "text-foreground",    iconBg: "bg-secondary",     badge: "text-foreground bg-secondary border-border",            label: "text-foreground" },
   cyan:   { icon: "text-cyan-600",    iconBg: "bg-cyan-50",     badge: "text-cyan-700 bg-cyan-50 border-cyan-200",            label: "text-cyan-600" },
   amber:  { icon: "text-amber-600",   iconBg: "bg-amber-50",    badge: "text-amber-700 bg-amber-50 border-amber-200",         label: "text-amber-600" },
   red:    { icon: "text-red-600",     iconBg: "bg-red-50",      badge: "text-red-700 bg-red-50 border-red-200",               label: "text-red-600" },
@@ -25,7 +25,7 @@ interface KPICardProps {
 function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardProps) {
   const a = ACCENT[accent]
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white p-5 flex flex-col gap-4 min-h-[130px]">
+    <div className="relative overflow-hidden rounded-2xl bg-card p-5 flex flex-col gap-4 min-h-[130px]">
       <div className="flex items-start justify-between">
         <div className={cn("size-8 rounded-xl flex items-center justify-center shrink-0", a.iconBg, a.icon)}>
           {icon}
@@ -37,7 +37,7 @@ function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardPr
         )}
       </div>
       <div className="mt-auto">
-        <p className="text-3xl font-black text-zinc-900 tracking-tight leading-none">{value}</p>
+        <p className="text-3xl font-black text-foreground tracking-tight leading-none">{value}</p>
         <p className={cn("text-[10px] font-black uppercase tracking-[0.16em] mt-1.5 truncate", a.label)}>{label}</p>
         <p className="text-[10px] text-zinc-400 mt-0.5 truncate">{sub}</p>
       </div>

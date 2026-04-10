@@ -40,9 +40,9 @@ const CustomTooltip = ({
   const item = payload[0]
   const isRevenue = item.name === "revenue"
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl px-3 py-2 shadow-lg">
+    <div className="bg-card border border-border rounded-xl px-3 py-2 shadow-lg">
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{label}</p>
-      <p className="text-sm font-black text-zinc-900">
+      <p className="text-sm font-black text-foreground">
         {isRevenue ? `$${Number(item.value).toFixed(0)}` : item.value}
       </p>
     </div>
@@ -70,8 +70,8 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
   const dataKey = activeTab
 
   return (
-    <div className="rounded-2xl bg-white border border-zinc-200 flex flex-col overflow-hidden h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200">
+    <div className="rounded-2xl bg-card border border-border flex flex-col overflow-hidden h-full">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
           Crecimiento · 6 meses
         </p>
@@ -82,7 +82,7 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
               onClick={() => setActiveTab(t.key)}
               className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg transition-all ${
                 activeTab === t.key
-                  ? "bg-zinc-100 text-zinc-900"
+                  ? "bg-secondary text-foreground"
                   : "text-zinc-400 hover:text-zinc-600"
               }`}
             >

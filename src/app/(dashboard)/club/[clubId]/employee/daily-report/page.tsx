@@ -26,17 +26,17 @@ function KpiCard({ label, value, sub, color = "zinc", icon }: KpiCardProps) {
   const colorMap: Record<NonNullable<KpiCardProps["color"]>, string> = {
     green: "text-green-600",
     red: "text-red-600",
-    blue: "text-[#0a0a0a]",
+    blue: "text-foreground",
     zinc: "text-zinc-800",
   }
   const iconBgMap: Record<NonNullable<KpiCardProps["color"]>, string> = {
     green: "bg-green-50 text-green-600",
     red: "bg-red-50 text-red-600",
-    blue: "bg-[#f5f5f5] text-[#0a0a0a]",
+    blue: "bg-secondary text-foreground",
     zinc: "bg-zinc-100 text-zinc-500",
   }
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3">
+    <div className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-3">
       <div className={`size-9 rounded-xl flex items-center justify-center ${iconBgMap[color]}`}>
         {icon}
       </div>
@@ -176,7 +176,7 @@ export default async function EmployeeDailyReportPage({
       </div>
 
       {/* Balance summary bar */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex items-center justify-between gap-4">
+      <div className="rounded-2xl bg-card border border-border p-5 flex items-center justify-between gap-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
             Balance neto del día

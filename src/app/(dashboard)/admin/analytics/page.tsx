@@ -55,7 +55,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  open: "bg-[#f0fdf4] text-[#16a34a]",
+  open: "bg-success text-primary",
   in_progress: "bg-emerald-50 text-emerald-700",
   completed: "bg-zinc-100 text-zinc-600",
   cancelled: "bg-red-50 text-red-600",
@@ -100,10 +100,10 @@ export default async function AdminAnalyticsPage() {
       {/* Monthly charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* User growth */}
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-[#0a0a0a]/10 flex items-center justify-center">
-              <Users className="size-4 text-[#0a0a0a]" />
+            <div className="size-8 rounded-xl bg-foreground/10 flex items-center justify-center">
+              <Users className="size-4 text-foreground" />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
@@ -113,20 +113,20 @@ export default async function AdminAnalyticsPage() {
             </div>
           </div>
           <BarChart bars={userBars} color="#0a0a0a" />
-          <div className="pt-3 border-t border-[#f0f0f0] flex justify-between">
+          <div className="pt-3 border-t border-border flex justify-between">
             {analytics.usersByMonth.map((m, i) => (
               <div key={i} className="text-center">
-                <p className="text-xs font-black text-[#0a0a0a]">{m.count}</p>
+                <p className="text-xs font-black text-foreground">{m.count}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Reservations */}
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-[#16a34a]/10 flex items-center justify-center">
-              <Calendar className="size-4 text-[#16a34a]" />
+            <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Calendar className="size-4 text-primary" />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
@@ -136,17 +136,17 @@ export default async function AdminAnalyticsPage() {
             </div>
           </div>
           <BarChart bars={reservationBars} color="#16a34a" />
-          <div className="pt-3 border-t border-[#f0f0f0] flex justify-between">
+          <div className="pt-3 border-t border-border flex justify-between">
             {analytics.reservationsByMonth.map((m, i) => (
               <div key={i} className="text-center">
-                <p className="text-xs font-black text-[#0a0a0a]">{m.count}</p>
+                <p className="text-xs font-black text-foreground">{m.count}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Revenue trend */}
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-xl bg-[#dc2626]/10 flex items-center justify-center">
               <DollarSign className="size-4 text-[#dc2626]" />
@@ -159,17 +159,17 @@ export default async function AdminAnalyticsPage() {
             </div>
           </div>
           <BarChart bars={revenueBars} color="#dc2626" />
-          <div className="pt-3 border-t border-[#f0f0f0] flex justify-between">
+          <div className="pt-3 border-t border-border flex justify-between">
             {analytics.reservationsByMonth.map((m, i) => (
               <div key={i} className="text-center">
-                <p className="text-[10px] font-black text-[#0a0a0a]">${m.revenue.toFixed(0)}</p>
+                <p className="text-[10px] font-black text-foreground">${m.revenue.toFixed(0)}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Tournaments by status */}
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-xl bg-amber-50 flex items-center justify-center">
               <Trophy className="size-4 text-amber-600" />
@@ -192,7 +192,7 @@ export default async function AdminAnalyticsPage() {
                   >
                     {STATUS_LABELS[s.status] ?? s.status}
                   </span>
-                  <span className="text-sm font-black text-[#0a0a0a]">{s.count}</span>
+                  <span className="text-sm font-black text-foreground">{s.count}</span>
                 </div>
               ))}
             </div>
@@ -201,9 +201,9 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       {/* Top clubs */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
+          <div className="size-8 rounded-xl bg-secondary flex items-center justify-center">
             <Building2 className="size-4 text-zinc-500" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
@@ -213,14 +213,14 @@ export default async function AdminAnalyticsPage() {
         {analytics.topClubs.length === 0 ? (
           <p className="text-sm text-zinc-400 text-center py-4">Sin datos de reservas por club</p>
         ) : (
-          <div className="flex flex-col divide-y divide-[#f0f0f0]">
+          <div className="flex flex-col divide-y divide-border-subtle">
             {analytics.topClubs.map((club, i) => (
               <div key={club.club_id} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] font-black text-zinc-300 w-5 text-right">{i + 1}</span>
-                  <span className="text-sm font-bold text-[#0a0a0a]">{club.name}</span>
+                  <span className="text-sm font-bold text-foreground">{club.name}</span>
                 </div>
-                <span className="text-xs font-black text-[#0a0a0a] bg-[#0a0a0a]/10 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-black text-foreground bg-foreground/10 px-2.5 py-1 rounded-full">
                   {club.reservation_count} reservas
                 </span>
               </div>

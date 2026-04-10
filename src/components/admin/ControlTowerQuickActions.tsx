@@ -66,8 +66,8 @@ const ACTIONS: ActionBtn[] = [
 
 export function ControlTowerQuickActions() {
   return (
-    <div className="rounded-2xl bg-white border border-zinc-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-zinc-200">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
+      <div className="px-4 py-3 border-b border-border">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
           Acciones rápidas
         </p>

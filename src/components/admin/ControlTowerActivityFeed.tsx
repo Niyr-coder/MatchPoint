@@ -79,8 +79,8 @@ export function ControlTowerActivityFeed({ initialFeed }: Props) {
   }, [feed])
 
   return (
-    <div className="rounded-2xl bg-white flex flex-col overflow-hidden h-full border border-[#e5e5e5]">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e5e5] shrink-0">
+    <div className="rounded-2xl bg-card flex flex-col overflow-hidden h-full border border-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Actividad</p>
         <div className="flex items-center gap-1.5">
           <span className={cn("size-1.5 rounded-full", pulse ? "bg-emerald-400" : "bg-emerald-500")} />

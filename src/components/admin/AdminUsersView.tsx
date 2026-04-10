@@ -100,12 +100,12 @@ function OriginBadge({ origin }: { origin: string | null }) {
   const label = originLabel(origin)
   const colorClass =
     origin === "google"
-      ? "bg-white text-[#0a0a0a] border-[#e5e5e5]"
+      ? "bg-card text-foreground border-border"
       : origin === "admin_created"
       ? "bg-purple-50 text-purple-700 border-purple-100"
       : origin === "invite"
       ? "bg-amber-50 text-amber-700 border-amber-100"
-      : "bg-zinc-50 text-zinc-600 border-zinc-200"
+      : "bg-secondary text-zinc-600 border-border"
 
   return (
     <span
@@ -139,8 +139,8 @@ function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 w-full max-w-sm shadow-xl">
-        <p className="text-sm font-bold text-[#0a0a0a] leading-snug">{message}</p>
+      <div className="rounded-2xl bg-card border border-border p-6 w-full max-w-sm shadow-xl">
+        <p className="text-sm font-bold text-foreground leading-snug">{message}</p>
         {error && (
           <p className="mt-3 text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 border border-red-100">
             {error}
@@ -150,7 +150,7 @@ function ConfirmDialog({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 border border-[#e5e5e5] rounded-full py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="flex-1 border border-border rounded-full py-2 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -298,10 +298,10 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
           {memberships.map((m) => (
             <div
               key={m.club_id}
-              className="flex items-center justify-between gap-2 rounded-xl border border-[#e5e5e5] px-3 py-2"
+              className="flex items-center justify-between gap-2 rounded-xl border border-border px-3 py-2"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-sm font-medium text-[#0a0a0a] truncate">
+                <span className="text-sm font-medium text-foreground truncate">
                   {m.club_name ?? m.club_id}
                 </span>
                 <RoleBadge role={m.role as AppRole} size="sm" />
@@ -336,7 +336,7 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
             <select
               value={addClubId}
               onChange={(e) => { setAddClubId(e.target.value); setAddError(null) }}
-              className="flex-1 min-w-0 border border-[#e5e5e5] rounded-xl px-2.5 py-1.5 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer"
+              className="flex-1 min-w-0 border border-border rounded-xl px-2.5 py-1.5 text-[11px] text-foreground outline-none focus:border-foreground bg-card appearance-none cursor-pointer"
             >
               <option value="">Seleccionar club…</option>
               {availableClubs.map((club) => (
@@ -348,7 +348,7 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
             <select
               value={addRole}
               onChange={(e) => setAddRole(e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-2.5 py-1.5 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer"
+              className="border border-border rounded-xl px-2.5 py-1.5 text-[11px] text-foreground outline-none focus:border-foreground bg-card appearance-none cursor-pointer"
             >
               {CLUB_ROLE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -365,7 +365,7 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
           <button
             onClick={() => void handleAdd()}
             disabled={addLoading || !addClubId}
-            className="flex items-center justify-center gap-1.5 w-full border border-[#e5e5e5] rounded-full py-2 text-[11px] font-bold text-[#0a0a0a] hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center gap-1.5 w-full border border-border rounded-full py-2 text-[11px] font-bold text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
           >
             {addLoading ? (
               "Agregando…"
@@ -430,7 +430,7 @@ function VerificationSection({ user, onVerified }: VerificationSectionProps) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-2 rounded-xl border border-[#e5e5e5] px-3 py-3">
+      <div className="flex flex-col gap-2 rounded-xl border border-border px-3 py-3">
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] text-zinc-500">Estado</span>
           {user.is_verified ? (
@@ -532,9 +532,9 @@ function UserDetailPanel({
       />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white border-l border-[#e5e5e5] z-50 flex flex-col shadow-2xl">
+      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-card border-l border-border z-50 flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0f0f0]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
             Detalle de usuario
           </p>
@@ -562,7 +562,7 @@ function UserDetailPanel({
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-base font-black text-[#0a0a0a] truncate">{name}</p>
+              <p className="text-base font-black text-foreground truncate">{name}</p>
               {user.username && (
                 <p className="text-sm text-zinc-400">@{user.username}</p>
               )}
@@ -592,13 +592,13 @@ function UserDetailPanel({
           </div>
 
           {/* Divider */}
-          <div className="border-t border-[#f0f0f0]" />
+          <div className="border-t border-border" />
 
           {/* Verification */}
           <VerificationSection user={user} onVerified={onVerified} />
 
           {/* Divider */}
-          <div className="border-t border-[#f0f0f0]" />
+          <div className="border-t border-border" />
 
           {/* Club memberships */}
           <MembershipsSection
@@ -609,13 +609,13 @@ function UserDetailPanel({
         </div>
 
         {/* Footer — suspend / reactivate / delete */}
-        <div className="px-5 py-4 border-t border-[#f0f0f0] flex flex-col gap-2">
+        <div className="px-5 py-4 border-t border-border flex flex-col gap-2">
           {suspended ? (
             <button
               onClick={() =>
                 onSuspendRequest({ userId: user.id, action: "unsuspend", userName: name })
               }
-              className="w-full flex items-center justify-center gap-2 bg-[#0a0a0a] text-white rounded-full py-2.5 text-sm font-bold hover:bg-zinc-800 transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-foreground text-white rounded-full py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors"
             >
               <ShieldCheck className="size-4" />
               Reactivar cuenta
@@ -652,9 +652,9 @@ function FieldRow({
   value: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-2 border-b border-[#f8f8f8]">
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-border">
       <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 shrink-0">{label}</p>
-      <div className="text-sm font-medium text-[#0a0a0a] text-right">{value}</div>
+      <div className="text-sm font-medium text-foreground text-right">{value}</div>
     </div>
   )
 }
@@ -865,7 +865,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
             )}
             <div className="flex flex-col min-w-0 gap-0.5">
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="font-bold text-[#0a0a0a] truncate">{name}</span>
+                <span className="font-bold text-foreground truncate">{name}</span>
                 {user.is_verified && (
                   <BadgeCheck className="size-3.5 text-green-600 shrink-0" aria-label="Verificado" />
                 )}
@@ -930,7 +930,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
           value={user.global_role}
           disabled={changingRole[user.id]}
           onChange={(e) => void handleRoleChange(user.id, e.target.value)}
-          className="border border-[#e5e5e5] rounded-lg px-2 py-1 text-[11px] text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white appearance-none cursor-pointer disabled:opacity-50"
+          className="border border-border rounded-lg px-2 py-1 text-[11px] text-foreground outline-none focus:border-foreground bg-card appearance-none cursor-pointer disabled:opacity-50"
           onClick={(e) => e.stopPropagation()}
         >
           {GLOBAL_ROLE_OPTIONS.map((opt) => (
@@ -963,7 +963,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-1.5 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors shrink-0"
+          className="flex items-center gap-1.5 bg-foreground text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors shrink-0"
         >
           <Plus className="size-4" />
           Crear cuenta
@@ -1053,7 +1053,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
           confirmClass={
             suspendTarget.action === "suspend"
               ? "bg-red-600 hover:bg-red-700"
-              : "bg-[#0a0a0a] hover:bg-zinc-800"
+              : "bg-foreground hover:bg-foreground/90"
           }
           onConfirm={() => void confirmSuspendAction()}
           onCancel={() => {

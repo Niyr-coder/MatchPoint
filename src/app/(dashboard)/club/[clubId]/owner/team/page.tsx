@@ -56,12 +56,12 @@ export default async function TeamPage({
       <TeamManager clubId={clubId} initialMembers={members} />
 
       {/* Invite to club */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+      <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">
             Invitaciones
           </p>
-          <h3 className="text-sm font-black text-[#0a0a0a] mt-0.5">
+          <h3 className="text-sm font-black text-foreground mt-0.5">
             Invitar nuevos miembros al equipo
           </h3>
           <p className="text-xs text-zinc-500 mt-1">

@@ -1,38 +1,15 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
+import { StatCard } from "@/components/shared/StatCard"
+import { StatusBadge } from "@/components/shared/StatusBadge"
 import { BentoCard } from "@/components/dashboard/BentoCard"
 import { createClient } from "@/lib/supabase/server"
+import { DollarSign, Calendar, TrendingUp } from "lucide-react"
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
 const fmt = (amount: number) =>
   new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" }).format(amount)
-
-function KpiCard({
-  label,
-  value,
-  sub,
-  color = "zinc",
-}: {
-  label: string
-  value: string
-  sub?: string
-  color?: "green" | "red" | "blue" | "zinc"
-}) {
-  const colorMap = {
-    green: "text-green-600",
-    red: "text-red-600",
-    blue: "text-[#0a0a0a]",
-    zinc: "text-zinc-800",
-  }
-  return (
-    <div className="border border-[#e5e5e5] rounded-2xl p-5 flex flex-col gap-2">
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{label}</p>
-      <p className={`text-3xl font-black tracking-tight ${colorMap[color]}`}>{value}</p>
-      {sub && <p className="text-xs text-zinc-400">{sub}</p>}
-    </div>
-  )
-}
 
 // ─── sport display map ───────────────────────────────────────────────────────
 
@@ -45,31 +22,9 @@ const SPORT_LABELS: Record<string, string> = {
 
 const SPORT_COLORS: Record<string, string> = {
   futbol: "bg-green-500",
-  padel: "bg-[#f5f5f5]0",
+  padel: "bg-secondary",
   tenis: "bg-yellow-500",
   pickleball: "bg-orange-500",
-}
-
-// ─── status badge ────────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: string }) {
-  if (status === "confirmed")
-    return (
-      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-        Confirmada
-      </span>
-    )
-  if (status === "pending")
-    return (
-      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
-        Pendiente
-      </span>
-    )
-  return (
-    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-      Cancelada
-    </span>
-  )
 }
 
 // ─── page ────────────────────────────────────────────────────────────────────
@@ -202,23 +157,26 @@ export default async function OwnerFinancialsPage({
 
       {/* KPI row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <KpiCard
+        <StatCard
           label="Ingresos del mes"
           value={fmt(totalRevenue)}
-          sub={cashIncome > 0 ? `+ ${fmt(cashIncome)} caja` : "Solo reservas"}
-          color="green"
+          icon={DollarSign}
+          variant="success"
+          description={cashIncome > 0 ? `+ ${fmt(cashIncome)} caja` : "Solo reservas"}
         />
-        <KpiCard
+        <StatCard
           label="Reservas del mes"
-          value={String(reservationCount)}
-          sub="Reservas no canceladas"
-          color="blue"
+          value={reservationCount}
+          icon={Calendar}
+          variant="default"
+          description="Reservas no canceladas"
         />
-        <KpiCard
+        <StatCard
           label="Ticket promedio"
           value={fmt(avgTicket)}
-          sub={cashExpense > 0 ? `Gastos: ${fmt(cashExpense)}` : "Sin gastos registrados"}
-          color="zinc"
+          icon={TrendingUp}
+          variant="default"
+          description={cashExpense > 0 ? `Gastos: ${fmt(cashExpense)}` : "Sin gastos registrados"}
         />
       </div>
 
@@ -234,7 +192,7 @@ export default async function OwnerFinancialsPage({
           subtitle={hasSportData ? "Datos reales del mes" : "Distribución estimada"}
           index={0}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {sportBars.map((bar) => (
               <div key={bar.sport} className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
@@ -265,7 +223,7 @@ export default async function OwnerFinancialsPage({
           subtitle="Las 5 reservas más recientes del mes"
           index={1}
         >
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
             {lastFive.length === 0 ? (
               <p className="text-xs text-zinc-400 text-center py-4">
                 No hay reservas este mes
@@ -288,7 +246,10 @@ export default async function OwnerFinancialsPage({
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <StatusBadge status={r.status} />
+                    <StatusBadge
+                      label={r.status === "confirmed" ? "Confirmada" : r.status === "pending" ? "Pendiente" : "Cancelada"}
+                      variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : "error"}
+                    />
                     <span className="text-xs font-black text-zinc-800">
                       {fmt(r.total_price ?? 0)}
                     </span>
@@ -309,7 +270,7 @@ export default async function OwnerFinancialsPage({
         subtitle="Evolución mensual de ingresos por reservas"
         index={2}
       >
-        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
           <div className="flex items-end justify-between gap-2 h-[80px]">
             {months.map((m, i) => {
               const heightPct = maxMonthAmount > 0 ? (m.amount / maxMonthAmount) * 100 : 8
@@ -317,7 +278,7 @@ export default async function OwnerFinancialsPage({
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
                     className={`w-full rounded-t-sm transition-all ${
-                      m.isCurrent ? "bg-[#0a0a0a]" : "bg-zinc-200"
+                      m.isCurrent ? "bg-foreground" : "bg-zinc-200"
                     }`}
                     style={{ height: `${Math.max(heightPct * 0.8, 6)}px` }}
                   />

@@ -74,7 +74,7 @@ export default async function EmployeeTodayPage({
           subtitle="Reservas activas para hoy"
           index={0}
         >
-          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
             {reservations.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-4 text-center">
                 <span className="text-2xl">📭</span>
@@ -96,11 +96,11 @@ export default async function EmployeeTodayPage({
                 return (
                   <div
                     key={r.id}
-                    className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-zinc-50"
+                    className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-secondary"
                   >
                     <div className="flex items-center gap-2">
                       <span className="size-2 rounded-full bg-zinc-300 shrink-0" />
-                      <span className="text-xs font-black text-[#0a0a0a]">{time}</span>
+                      <span className="text-xs font-black text-foreground">{time}</span>
                       <span className="text-xs text-zinc-500">{courtName}</span>
                     </div>
                     <span className="text-[9px] font-black uppercase tracking-wider text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full">
@@ -122,7 +122,7 @@ export default async function EmployeeTodayPage({
           subtitle="Apertura y cierre de jornada"
           index={1}
         >
-          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Estado</p>
@@ -135,7 +135,7 @@ export default async function EmployeeTodayPage({
                 <span className="text-sm">🟢</span>
                 <span className="text-[10px] font-black text-emerald-700 uppercase tracking-wide">Abrir turno</span>
               </div>
-              <div className="flex items-center gap-1.5 rounded-xl border border-[#e5e5e5] bg-zinc-50 px-3 py-2 cursor-default">
+              <div className="flex items-center gap-1.5 rounded-xl border border-border bg-zinc-50 px-3 py-2 cursor-default">
                 <span className="text-sm">🔴</span>
                 <span className="text-[10px] font-black text-zinc-500 uppercase tracking-wide">Cerrar turno</span>
               </div>
@@ -152,14 +152,14 @@ export default async function EmployeeTodayPage({
           subtitle="Ocupación de canchas hoy"
           index={2}
         >
-          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-border">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-black text-[#0a0a0a]">{totalReservations}</span>
+              <span className="text-2xl font-black text-foreground">{totalReservations}</span>
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">reservas activas</span>
             </div>
             <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
               <div
-                className="h-full rounded-full bg-zinc-400"
+                className="h-full rounded-full bg-primary"
                 style={{ width: totalReservations > 0 ? `${Math.min(100, totalReservations * 10)}%` : "2%" }}
               />
             </div>
@@ -178,9 +178,9 @@ export default async function EmployeeTodayPage({
           subtitle="Actividades de la jornada"
           index={3}
         >
-          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
             {PENDING_TASKS.map((task, i) => (
-              <div key={i} className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-zinc-50">
+              <div key={i} className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-secondary">
                 <div
                   className="size-4 rounded-full border-2 flex items-center justify-center shrink-0"
                   style={{

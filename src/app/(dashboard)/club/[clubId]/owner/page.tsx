@@ -95,12 +95,12 @@ export default async function OwnerDashboardPage({
           subtitle="Últimos 7 días del club"
           index={0}
         >
-          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-border">
             <div className="flex items-end justify-between gap-1.5 h-[80px]">
               {weekBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className="w-full rounded-t-sm bg-[#0a0a0a]"
+                    className="w-full rounded-t-sm bg-foreground"
                     style={{ height: `${bar.height * 0.7}px`, opacity: i === weekBars.length - 1 ? 1 : 0.3 + i * 0.1 }}
                   />
                 </div>
@@ -125,15 +125,15 @@ export default async function OwnerDashboardPage({
           subtitle="Entrenadores, empleados y socios"
           index={1}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{memberCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{memberCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 miembros registrados
               </p>
             </div>
             <div className="flex flex-col items-end gap-1">
-              <span className="text-xs font-black text-[#0a0a0a] bg-[#0a0a0a]/10 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-black text-foreground bg-foreground/10 px-2 py-0.5 rounded-full">
                 Activos
               </span>
             </div>
@@ -149,15 +149,15 @@ export default async function OwnerDashboardPage({
           subtitle="Canchas disponibles para reservas"
           index={2}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{courtCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{courtCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 canchas en operación
               </p>
             </div>
             <div
-              className="size-10 rounded-xl bg-[#0a0a0a]/10 flex items-center justify-center"
+              className="size-10 rounded-xl bg-foreground/10 flex items-center justify-center"
               aria-hidden="true"
             >
               <span className="text-lg">🏟️</span>
@@ -174,9 +174,9 @@ export default async function OwnerDashboardPage({
           subtitle={`Reservas activas para ${date}`}
           index={3}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{reservationsToday}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{reservationsToday}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 reservas confirmadas
               </p>
