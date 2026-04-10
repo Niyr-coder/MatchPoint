@@ -63,7 +63,7 @@ export default async function CoachClassesPage({
           subtitle={`Estudiantes activos en este club`}
           index={0}
         >
-          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
             {students.length === 0 ? (
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider py-3 text-center">
                 Sin estudiantes asignados aún
@@ -72,12 +72,12 @@ export default async function CoachClassesPage({
               students.map((s, i) => {
                 const profile = (Array.isArray(s.profiles) ? s.profiles[0] : s.profiles) as { full_name: string | null } | null
                 return (
-                  <div key={i} className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-[#f5f5f5]">
+                  <div key={i} className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-secondary">
                     <div className="flex items-center gap-2.5">
                       <span className="size-6 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-black text-amber-700">
                         {(profile?.full_name ?? "?")[0]?.toUpperCase()}
                       </span>
-                      <p className="text-xs font-black text-[#0a0a0a]">{profile?.full_name ?? "—"}</p>
+                      <p className="text-xs font-black text-foreground">{profile?.full_name ?? "—"}</p>
                     </div>
                     <span className="text-[9px] font-black uppercase tracking-wider text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full">
                       {s.sport}
@@ -98,9 +98,9 @@ export default async function CoachClassesPage({
           subtitle="Estudiantes activos registrados"
           index={1}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{studentCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{studentCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 miembros activos
               </p>
@@ -122,9 +122,9 @@ export default async function CoachClassesPage({
           subtitle="Registrados por el club este mes"
           index={2}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-3xl font-black text-[#0a0a0a] leading-none">{earningsDisplay}</p>
+              <p className="text-3xl font-black text-foreground leading-none">{earningsDisplay}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 {(earningsRes.data ?? []).length} registros este mes
               </p>
@@ -144,9 +144,9 @@ export default async function CoachClassesPage({
           subtitle="Estudiantes activos asignados"
           index={3}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{studentCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{studentCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 estudiantes activos
               </p>

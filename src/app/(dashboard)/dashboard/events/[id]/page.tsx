@@ -202,11 +202,11 @@ export default async function EventDetailPage({
               variant={statusCfg.variant}
             />
             {event.is_free ? (
-              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#16a34a] border border-[#bbf7d0]">
+              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-success text-primary border border-success-border">
                 Gratis
               </span>
             ) : event.price != null ? (
-              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-white text-[#0a0a0a] border border-[#e5e5e5]">
+              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-card text-foreground border border-border">
                 ${event.price.toFixed(2)}
               </span>
             ) : null}
@@ -214,7 +214,7 @@ export default async function EventDetailPage({
 
           {/* Description */}
           {event.description && (
-            <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+            <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 mb-3">
                 Descripción
               </p>
@@ -241,7 +241,7 @@ export default async function EventDetailPage({
 
           {/* Attendees */}
           {attendees.length > 0 && (
-            <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+            <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 mb-4">
                 Asistentes ({event.registration_count})
               </p>
@@ -274,7 +274,7 @@ export default async function EventDetailPage({
         {/* Sidebar */}
         <div className="flex flex-col gap-4">
           {/* Info card */}
-          <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-4">
+          <div className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-4">
             <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
               Detalles
             </p>

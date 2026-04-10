@@ -32,14 +32,14 @@ const columns: Column<EarningEntry>[] = [
     key: "description",
     header: "Descripción",
     render: (item) => (
-      <span className="text-[#0a0a0a] font-medium">{item.description}</span>
+      <span className="text-foreground font-medium">{item.description}</span>
     ),
   },
   {
     key: "amount",
     header: "Monto",
     render: (item) => (
-      <span className="text-[#16a34a] font-black">{formatCurrency(item.amount)}</span>
+      <span className="text-primary font-black">{formatCurrency(item.amount)}</span>
     ),
   },
 ]

@@ -88,12 +88,12 @@ export default async function CoachProfilePage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Avatar card */}
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col items-center gap-4">
+        <div className="rounded-2xl bg-card border border-border p-6 flex flex-col items-center gap-4">
           <div className="size-24 rounded-full bg-zinc-100 text-zinc-500 font-black text-2xl flex items-center justify-center">
             {getInitials(profile.full_name)}
           </div>
           <div className="text-center">
-            <p className="text-base font-black text-[#0a0a0a]">
+            <p className="text-base font-black text-foreground">
               {profile.full_name ?? "Sin nombre"}
             </p>
             {profile.username && (
@@ -121,11 +121,11 @@ export default async function CoachProfilePage({
         </div>
 
         {/* Info card */}
-        <div className="lg:col-span-2 rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+        <div className="lg:col-span-2 rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
             Información Personal
           </p>
-          <div className="divide-y divide-[#f0f0f0]">
+          <div className="divide-y divide-border-subtle">
             {fields.map((f) => (
               <div key={f.label} className="flex items-center justify-between py-3 gap-4">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -134,7 +134,7 @@ export default async function CoachProfilePage({
                     {f.label}
                   </span>
                 </div>
-                <span className="text-sm font-medium text-[#0a0a0a] text-right truncate">
+                <span className="text-sm font-medium text-foreground text-right truncate">
                   {f.value}
                 </span>
               </div>

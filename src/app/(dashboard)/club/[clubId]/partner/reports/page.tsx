@@ -119,17 +119,17 @@ export default async function PartnerReportsPage({
           {sportBreakdown.map(({ sport, count, revenue }) => (
             <div
               key={sport}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+              className="rounded-2xl bg-card border border-border p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             >
-              <p className="text-sm font-black text-[#0a0a0a]">
+              <p className="text-sm font-black text-foreground">
                 {SPORT_LABELS[sport] ?? sport}
               </p>
               <div className="flex items-center gap-6 text-[11px] text-zinc-500">
                 <span>
-                  <span className="font-bold text-[#0a0a0a]">{count}</span> reservas
+                  <span className="font-bold text-foreground">{count}</span> reservas
                 </span>
                 <span>
-                  <span className="font-bold text-[#16a34a]">${revenue.toFixed(2)}</span> ingresos
+                  <span className="font-bold text-primary">${revenue.toFixed(2)}</span> ingresos
                 </span>
               </div>
             </div>

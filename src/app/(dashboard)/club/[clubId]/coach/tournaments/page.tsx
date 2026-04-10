@@ -142,14 +142,14 @@ export default async function CoachTournamentsPage({
           {tournaments.map((t) => (
             <div
               key={t.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-4 flex items-center justify-between gap-4 hover:border-zinc-300 transition-colors"
+              className="rounded-2xl bg-card border border-border p-4 flex items-center justify-between gap-4 hover:border-border/60 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0">
                   <Trophy className="size-4 text-zinc-500" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-black text-[#0a0a0a] truncate">{t.name}</p>
+                  <p className="text-sm font-black text-foreground truncate">{t.name}</p>
                   <p className="text-[11px] text-zinc-400 mt-0.5">
                     {SPORT_LABELS[t.sport] ?? t.sport} · {formatDate(t.start_date)}
                   </p>

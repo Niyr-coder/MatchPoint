@@ -93,13 +93,13 @@ export default async function StudentsPage({
           {students.map((student) => (
             <div
               key={student.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-4 flex items-center gap-3 hover:border-zinc-300 transition-colors"
+              className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3 hover:border-foreground/40 transition-colors"
             >
               <div className="size-12 rounded-full bg-zinc-100 text-zinc-500 font-black text-sm flex items-center justify-center shrink-0">
                 {getInitials(student.fullName)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-[#0a0a0a] truncate">
+                <p className="text-sm font-black text-foreground truncate">
                   {student.fullName ?? "Sin nombre"}
                 </p>
                 <p className="text-[11px] text-zinc-400 mt-0.5">

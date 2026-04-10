@@ -13,7 +13,7 @@ const SPORT_LABEL: Record<string, string> = {
 }
 
 const STATUS_DOT: Record<string, { label: string; dot: string; badge: string }> = {
-  open:        { label: "Abierto",    dot: "bg-green-500",  badge: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
+  open:        { label: "Abierto",    dot: "bg-green-500",  badge: "bg-success text-primary border-success-border" },
   in_progress: { label: "En curso",   dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-200" },
   completed:   { label: "Completado", dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
   draft:       { label: "Borrador",   dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
@@ -71,7 +71,7 @@ export default async function TournamentDetailPage({
       </Link>
 
       {/* Hero — default card style, no color */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 md:p-8">
+      <div className="rounded-2xl bg-card border border-border p-6 md:p-8">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="size-12 rounded-xl bg-zinc-100 flex items-center justify-center">
             <Trophy className="size-6 text-zinc-400" />
@@ -88,7 +88,7 @@ export default async function TournamentDetailPage({
             </span>
           </div>
         </div>
-        <h1 className="text-2xl font-black text-[#0a0a0a] uppercase leading-tight tracking-[-0.02em] mb-3">
+        <h1 className="text-2xl font-black text-foreground uppercase leading-tight tracking-[-0.02em] mb-3">
           {t.name}
         </h1>
         <div className="flex items-center gap-2 flex-wrap">
@@ -107,13 +107,13 @@ export default async function TournamentDetailPage({
       </div>
 
       {/* Info grid */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] divide-y divide-[#f0f0f0]">
-        <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
+      <div className="rounded-2xl bg-card border border-border divide-y divide-border-subtle">
+        <div className="grid grid-cols-2 divide-x divide-border-subtle">
           <div className="p-5 flex items-center gap-2">
             <Calendar className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Fecha</p>
-              <p className="text-sm font-bold text-[#0a0a0a]">
+              <p className="text-sm font-bold text-foreground">
                 {new Date(t.start_date + "T12:00:00").toLocaleDateString("es-EC", {
                   day: "numeric", month: "long", year: "numeric",
                 })}
@@ -124,16 +124,16 @@ export default async function TournamentDetailPage({
             <Clock className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Hora</p>
-              <p className="text-sm font-bold text-[#0a0a0a]">{t.start_time ?? "Por confirmar"}</p>
+              <p className="text-sm font-bold text-foreground">{t.start_time ?? "Por confirmar"}</p>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 divide-x divide-[#f0f0f0]">
+        <div className="grid grid-cols-2 divide-x divide-border-subtle">
           <div className="p-5 flex items-center gap-2">
             <DollarSign className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Inscripción</p>
-              <p className="text-sm font-bold text-[#0a0a0a]">
+              <p className="text-sm font-bold text-foreground">
                 {t.entry_fee > 0 ? `$${t.entry_fee}` : "Gratis"}
               </p>
             </div>
@@ -142,7 +142,7 @@ export default async function TournamentDetailPage({
             <MapPin className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Club sede</p>
-              <p className="text-sm font-bold text-[#0a0a0a]">
+              <p className="text-sm font-bold text-foreground">
                 {t.clubs?.name ?? "Por confirmar"}
               </p>
             </div>
@@ -152,7 +152,7 @@ export default async function TournamentDetailPage({
 
       {/* Extras */}
       {enabledExtras.length > 0 && (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+        <div className="rounded-2xl bg-card border border-border p-5">
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">Incluye</p>
           <div className="flex flex-wrap gap-2">
             {enabledExtras.map(([key, val]) => {

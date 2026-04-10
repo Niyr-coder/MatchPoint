@@ -31,7 +31,7 @@ interface ExtrasState {
 }
 
 const inputCls =
-  "w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm font-medium text-[#0a0a0a] placeholder:text-zinc-300 focus:outline-none focus:border-[#0a0a0a] transition-colors bg-white"
+  "w-full px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-zinc-300 focus:outline-none focus:border-foreground transition-colors bg-white"
 const labelCls =
   "text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500"
 
@@ -45,9 +45,9 @@ function ProgressBar({ current }: { current: number }) {
             <div
               className={`size-7 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all ${
                 i + 1 < current
-                  ? "bg-[#0a0a0a] border-[#0a0a0a] text-white"
+                  ? "bg-foreground border-foreground text-white"
                   : i + 1 === current
-                  ? "border-[#0a0a0a] text-[#0a0a0a] bg-white"
+                  ? "border-foreground text-foreground bg-white"
                   : "border-zinc-200 text-zinc-300 bg-white"
               }`}
             >
@@ -55,7 +55,7 @@ function ProgressBar({ current }: { current: number }) {
             </div>
             <span
               className={`text-[10px] font-black uppercase tracking-wide hidden sm:block ${
-                i + 1 <= current ? "text-[#0a0a0a]" : "text-zinc-300"
+                i + 1 <= current ? "text-foreground" : "text-zinc-300"
               }`}
             >
               {label}
@@ -64,7 +64,7 @@ function ProgressBar({ current }: { current: number }) {
           {i < steps.length - 1 && (
             <div
               className={`flex-1 h-0.5 mx-3 transition-colors ${
-                i + 1 < current ? "bg-[#0a0a0a]" : "bg-zinc-200"
+                i + 1 < current ? "bg-foreground" : "bg-zinc-200"
               }`}
             />
           )}
@@ -90,7 +90,7 @@ function ExtraToggle({
   children?: React.ReactNode
 }) {
   return (
-    <div className="border border-[#e5e5e5] rounded-2xl p-4 flex flex-col gap-3">
+    <div className="border border-border rounded-2xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="text-xl leading-none">{icon}</span>
@@ -103,7 +103,7 @@ function ExtraToggle({
           type="button"
           onClick={onToggle}
           className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-            enabled ? "bg-[#0a0a0a]" : "bg-zinc-200"
+            enabled ? "bg-foreground" : "bg-zinc-200"
           }`}
         >
           <span
@@ -114,7 +114,7 @@ function ExtraToggle({
         </button>
       </div>
       {enabled && children && (
-        <div className="pt-3 border-t border-[#f0f0f0]">{children}</div>
+        <div className="pt-3 border-t border-border-subtle">{children}</div>
       )}
     </div>
   )
@@ -214,11 +214,11 @@ export default function CreateTournamentPage() {
           <ArrowLeft className="size-3" /> Volver a torneos
         </Link>
         <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-[#0a0a0a] flex items-center justify-center">
+          <div className="size-10 rounded-xl bg-foreground flex items-center justify-center">
             <Trophy className="size-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a]">
+            <h1 className="text-2xl font-black uppercase tracking-[-0.03em] text-foreground">
               Crear Torneo
             </h1>
             <p className="text-xs text-zinc-400">Organiza tu propia competencia</p>
@@ -226,7 +226,7 @@ export default function CreateTournamentPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <ProgressBar current={step} />
 
         {/* STEP 1 */}
@@ -256,8 +256,8 @@ export default function CreateTournamentPage() {
                     }
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all font-bold text-sm ${
                       form.sport === s.value
-                        ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
-                        : "border-[#e5e5e5] text-zinc-600 hover:border-zinc-300"
+                        ? "border-foreground bg-foreground text-white"
+                        : "border-border text-zinc-600 hover:border-border/60"
                     }`}
                   >
                     <span className="text-xl">{s.emoji}</span>
@@ -283,8 +283,8 @@ export default function CreateTournamentPage() {
                       }
                       className={`px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
                         form.modality === m
-                          ? "border-[#0a0a0a] bg-[#0a0a0a] text-white"
-                          : "border-[#e5e5e5] text-zinc-600 hover:border-zinc-300"
+                          ? "border-foreground bg-foreground text-white"
+                          : "border-border text-zinc-600 hover:border-border/60"
                       }`}
                     >
                       {m}
@@ -316,7 +316,7 @@ export default function CreateTournamentPage() {
               type="button"
               disabled={!canProceedStep1}
               onClick={() => setStep(2)}
-              className="w-full py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl bg-foreground text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Siguiente →
             </button>
@@ -390,8 +390,8 @@ export default function CreateTournamentPage() {
 
             <div className="flex flex-col gap-1.5">
               <label className={labelCls}>Costo de inscripción</label>
-              <div className="flex items-center border border-[#e5e5e5] rounded-xl overflow-hidden focus-within:border-[#0a0a0a] transition-colors">
-                <span className="px-3 py-2.5 bg-[#f5f5f5] border-r border-[#e5e5e5] text-sm text-zinc-500 font-bold">
+              <div className="flex items-center border border-border rounded-xl overflow-hidden focus-within:border-foreground transition-colors">
+                <span className="px-3 py-2.5 bg-secondary border-r border-border text-sm text-zinc-500 font-bold">
                   $
                 </span>
                 <input
@@ -405,7 +405,7 @@ export default function CreateTournamentPage() {
                       entry_fee: parseFloat(e.target.value) || 0,
                     }))
                   }
-                  className="flex-1 px-3 py-2.5 text-sm font-medium text-[#0a0a0a] focus:outline-none bg-white"
+                  className="flex-1 px-3 py-2.5 text-sm font-medium text-foreground focus:outline-none bg-white"
                   placeholder="0.00"
                 />
               </div>
@@ -429,7 +429,7 @@ export default function CreateTournamentPage() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="flex-1 py-3 rounded-xl border border-[#e5e5e5] text-zinc-600 text-sm font-black uppercase tracking-[0.1em] hover:bg-zinc-50 transition-colors"
+                className="flex-1 py-3 rounded-xl border border-border text-zinc-600 text-sm font-black uppercase tracking-[0.1em] hover:bg-secondary transition-colors"
               >
                 ← Atrás
               </button>
@@ -437,7 +437,7 @@ export default function CreateTournamentPage() {
                 type="button"
                 disabled={!canProceedStep2}
                 onClick={() => setStep(3)}
-                className="flex-1 py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Siguiente →
               </button>
@@ -627,7 +627,7 @@ export default function CreateTournamentPage() {
             </div>
 
             {/* Summary card */}
-            <div className="bg-zinc-50 border border-[#e5e5e5] rounded-2xl p-5">
+            <div className="bg-muted border border-border rounded-2xl p-5">
               <p className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">
                 Resumen
               </p>
@@ -678,7 +678,7 @@ export default function CreateTournamentPage() {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="flex-1 py-3 rounded-xl border border-[#e5e5e5] text-zinc-600 text-sm font-black uppercase tracking-[0.1em] hover:bg-zinc-50 transition-colors"
+                className="flex-1 py-3 rounded-xl border border-border text-zinc-600 text-sm font-black uppercase tracking-[0.1em] hover:bg-secondary transition-colors"
               >
                 ← Atrás
               </button>
@@ -686,7 +686,7 @@ export default function CreateTournamentPage() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 py-3 rounded-xl bg-[#0a0a0a] text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#222222] transition-colors disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-foreground/90 transition-colors disabled:opacity-50"
               >
                 {loading ? "Creando..." : "Crear Torneo 🏆"}
               </button>

@@ -44,9 +44,9 @@ export default async function ProfilePage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Profile hero */}
-      <div className="flex flex-col items-center gap-4 py-8 border-b border-[#e5e5e5]">
+      <div className="flex flex-col items-center gap-4 py-8 border-b border-border">
         {/* Avatar */}
-        <div className="size-20 rounded-full bg-[#0a0a0a] flex items-center justify-center shrink-0">
+        <div className="size-20 rounded-full bg-foreground flex items-center justify-center shrink-0">
           <span className="text-2xl font-black text-white">
             {getInitials(profile)}
           </span>
@@ -54,7 +54,7 @@ export default async function ProfilePage() {
 
         {/* Name & username */}
         <div className="text-center">
-          <h1 className="text-2xl font-black text-[#0a0a0a]">{displayName}</h1>
+          <h1 className="text-2xl font-black text-foreground">{displayName}</h1>
           {profile.username && (
             <p className="text-sm text-zinc-500 mt-0.5">@{profile.username}</p>
           )}

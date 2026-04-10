@@ -1,6 +1,7 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getRankingBySport } from "@/features/ratings/queries"
 import { RankingView } from "@/features/ratings/components/RankingView"
+import { PageHeader } from "@/components/shared/PageHeader"
 import { VISIBLE_SPORT_IDS } from "@/lib/sports/config"
 
 export default async function RankingPage() {
@@ -18,18 +19,7 @@ export default async function RankingPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Header */}
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
-          Competencia
-        </p>
-        <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a]">
-          Ranking
-        </h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          Clasificación de jugadores por deporte
-        </p>
-      </div>
+      <PageHeader label="Competencia" title="Ranking" description="Clasificación de jugadores por deporte" />
 
       <RankingView all={all} bySport={bySport} />
     </div>

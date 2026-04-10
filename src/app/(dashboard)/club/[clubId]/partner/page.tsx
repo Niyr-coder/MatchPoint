@@ -79,9 +79,9 @@ export default async function PartnerDashboardPage({
           subtitle="Comisión sobre ingresos del club"
           index={0}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-3xl font-black text-[#0a0a0a] leading-none">$0.00</p>
+              <p className="text-3xl font-black text-foreground leading-none">$0.00</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 comisión del mes actual
               </p>
@@ -103,9 +103,9 @@ export default async function PartnerDashboardPage({
           subtitle="Torneos del club en la plataforma"
           index={1}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{tournamentCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{tournamentCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 torneos registrados
               </p>
@@ -128,7 +128,7 @@ export default async function PartnerDashboardPage({
           subtitle="Últimos 6 meses del club"
           index={2}
         >
-          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-border">
             <div className="flex items-end justify-between gap-1.5 h-[60px]">
               {activityBars.map((bar, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
@@ -161,9 +161,9 @@ export default async function PartnerDashboardPage({
           subtitle="Miembros activos registrados"
           index={3}
         >
-          <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#e5e5e5]">
+          <div className="flex items-end justify-between mt-auto pt-4 border-t border-border">
             <div>
-              <p className="text-4xl font-black text-[#0a0a0a] leading-none">{teamCount}</p>
+              <p className="text-4xl font-black text-foreground leading-none">{teamCount}</p>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                 miembros en el club
               </p>

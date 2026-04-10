@@ -30,13 +30,13 @@ function formatDate(dateStr: string): string {
 
 function PendingRequestCard({ request }: { request: ClubRequest }) {
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+    <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
             Tu solicitud actual
           </p>
-          <h2 className="text-xl font-black text-[#0a0a0a] tracking-[-0.02em]">
+          <h2 className="text-xl font-black text-foreground tracking-[-0.02em]">
             {request.name}
           </h2>
           <p className="text-sm text-zinc-500 mt-0.5">
@@ -62,7 +62,7 @@ function PendingRequestCard({ request }: { request: ClubRequest }) {
         )}
       </div>
 
-      <div className="border-t border-[#f0f0f0] pt-4 flex flex-col gap-1.5">
+      <div className="border-t border-border-subtle pt-4 flex flex-col gap-1.5">
         <p className="text-xs text-zinc-400">
           Enviada el{" "}
           <span className="font-bold text-zinc-600">{formatDate(request.created_at)}</span>
@@ -93,12 +93,12 @@ function PendingRequestCard({ request }: { request: ClubRequest }) {
 
 function InfoBanner() {
   return (
-    <div className="rounded-2xl bg-zinc-50 border border-[#e5e5e5] p-6 flex gap-4">
+    <div className="rounded-2xl bg-muted border border-border p-6 flex gap-4">
       <div className="size-10 rounded-xl bg-[#111111] flex items-center justify-center shrink-0">
         <Building2 className="size-5 text-white" />
       </div>
       <div>
-        <p className="text-sm font-black text-[#0a0a0a] uppercase tracking-[-0.01em]">
+        <p className="text-sm font-black text-foreground uppercase tracking-[-0.01em]">
           ¿Tienes un club deportivo en Ecuador?
         </p>
         <p className="text-sm text-zinc-500 mt-1 leading-relaxed">
@@ -150,7 +150,7 @@ export default async function RequestClubPage() {
         <>
           {/* Show context about a previous rejection */}
           {latestRejected && (
-            <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5">
+            <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 mb-1">
                 Solicitud anterior rechazada
               </p>

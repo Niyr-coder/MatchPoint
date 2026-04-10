@@ -22,11 +22,11 @@ function KpiCard({
   const colorMap = {
     green: "text-green-600",
     red: "text-red-600",
-    blue: "text-[#0a0a0a]",
+    blue: "text-foreground",
     zinc: "text-zinc-800",
   }
   return (
-    <div className="border border-[#e5e5e5] rounded-2xl p-5 flex flex-col gap-2">
+    <div className="border border-border rounded-2xl p-5 flex flex-col gap-2">
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{label}</p>
       <p className={`text-3xl font-black tracking-tight ${colorMap[color]}`}>{value}</p>
       {sub && <p className="text-xs text-zinc-400">{sub}</p>}
@@ -192,7 +192,7 @@ export default async function PartnerFinancialsPage({
           subtitle={hasSportData ? "Este mes" : "Sin reservas este mes"}
           index={0}
         >
-          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
             {hasSportData ? (
               sportEntries.map(([sport, amount]) => {
                 const pct = spentThisMonth > 0 ? Math.round((amount / spentThisMonth) * 100) : 0
@@ -208,7 +208,7 @@ export default async function PartnerFinancialsPage({
                     </div>
                     <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#0a0a0a]"
+                        className="h-full rounded-full bg-foreground"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -232,7 +232,7 @@ export default async function PartnerFinancialsPage({
           subtitle="Las 5 más recientes en este club"
           index={1}
         >
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
             {lastFive.length === 0 ? (
               <p className="text-xs text-zinc-400 text-center py-4">
                 No hay reservas recientes
@@ -276,14 +276,14 @@ export default async function PartnerFinancialsPage({
         subtitle="Evolución mensual de tu inversión en el club"
         index={2}
       >
-        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[#e5e5e5]">
+        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
           <div className="flex items-end justify-between gap-2 h-[80px]">
             {months.map((m, i) => {
               const heightPct = (m.amount / maxMonthAmount) * 100
               return (
                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
                   <div
-                    className={`w-full rounded-t-sm ${m.isCurrent ? "bg-[#0a0a0a]" : "bg-zinc-200"}`}
+                    className={`w-full rounded-t-sm ${m.isCurrent ? "bg-foreground" : "bg-zinc-200"}`}
                     style={{ height: `${Math.max(heightPct * 0.8, 6)}px` }}
                   />
                 </div>

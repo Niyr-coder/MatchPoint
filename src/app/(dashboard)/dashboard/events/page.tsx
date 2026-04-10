@@ -131,7 +131,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#e5e5e5]">
+      <div className="flex gap-1 border-b border-border">
         {[
           { key: "all",  label: "Todos" },
           { key: "mine", label: "Mis registraciones" },
@@ -141,7 +141,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             href={buildHref({ tab: key, page: "0" })}
             className={`px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors border-b-2 -mb-px ${
               tab === key
-                ? "border-[#0a0a0a] text-[#0a0a0a]"
+                ? "border-foreground text-foreground"
                 : "border-transparent text-zinc-400 hover:text-zinc-700"
             }`}
           >
@@ -203,7 +203,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           {page > 0 && (
             <a
               href={buildHref({ page: String(page - 1) })}
-              className="border border-[#e5e5e5] rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="border border-border rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors"
             >
               Anterior
             </a>
@@ -211,7 +211,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           {(page + 1) * PAGE_SIZE < total && (
             <a
               href={buildHref({ page: String(page + 1) })}
-              className="bg-[#0a0a0a] text-white rounded-full px-5 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors"
+              className="bg-foreground text-white rounded-full px-5 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors"
             >
               Siguiente
             </a>

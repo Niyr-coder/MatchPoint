@@ -61,15 +61,15 @@ export default async function PlayerProfilePage({
       {/* Back */}
       <Link
         href="/dashboard/ranking"
-        className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 hover:text-[#0a0a0a] transition-colors w-fit"
+        className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 hover:text-foreground transition-colors w-fit"
       >
         <ArrowLeft className="size-3.5" />
         Ranking
       </Link>
 
       {/* Profile hero */}
-      <div className="flex flex-col items-center gap-4 py-8 border-b border-[#e5e5e5]">
-        <div className="size-20 rounded-full bg-[#0a0a0a] flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="flex flex-col items-center gap-4 py-8 border-b border-border">
+        <div className="size-20 rounded-full bg-foreground flex items-center justify-center shrink-0 overflow-hidden">
           {profile.avatar_url ? (
             <Image
               src={profile.avatar_url}
@@ -86,7 +86,7 @@ export default async function PlayerProfilePage({
         </div>
 
         <div className="text-center">
-          <h1 className="text-2xl font-black text-[#0a0a0a]">{displayName}</h1>
+          <h1 className="text-2xl font-black text-foreground">{displayName}</h1>
           {profile.username && (
             <p className="text-sm text-zinc-500 mt-0.5">@{profile.username}</p>
           )}
@@ -99,7 +99,7 @@ export default async function PlayerProfilePage({
         </div>
 
         {stats.ranking_position && (
-          <div className="flex items-center gap-1.5 bg-[#f5f5f5] text-[#0a0a0a] rounded-full px-4 py-1.5">
+          <div className="flex items-center gap-1.5 bg-secondary text-foreground rounded-full px-4 py-1.5">
             <Trophy className="size-3.5" />
             <span className="text-[11px] font-black">
               #{stats.ranking_position} en el ranking
@@ -151,9 +151,9 @@ export default async function PlayerProfilePage({
             {stats.sports.map(({ sport, count }) => (
               <div
                 key={sport}
-                className="flex items-center gap-2 bg-white border border-[#e5e5e5] rounded-full px-4 py-2"
+                className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2"
               >
-                <span className="text-xs font-black text-[#0a0a0a]">
+                <span className="text-xs font-black text-foreground">
                   {SPORT_LABELS[sport] ?? sport}
                 </span>
                 <span className="text-[10px] text-zinc-400">{count} reservas</span>
@@ -173,7 +173,7 @@ export default async function PlayerProfilePage({
             {stats.clubs.map((club) => (
               <div
                 key={club.id}
-                className="bg-white border border-[#e5e5e5] rounded-full px-4 py-2 text-xs font-black text-[#0a0a0a]"
+                className="bg-card border border-border rounded-full px-4 py-2 text-xs font-black text-foreground"
               >
                 {club.name}
               </div>
