@@ -27,7 +27,7 @@ export function ConfirmDialog({
   const confirmClasses =
     variant === "danger"
       ? "bg-red-600 hover:bg-red-700 text-white"
-      : "bg-[#0a0a0a] hover:bg-[#222222] text-white"
+      : "bg-foreground hover:bg-foreground-hover text-background"
 
   async function handleConfirm() {
     await onConfirm()
@@ -38,7 +38,7 @@ export function ConfirmDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-2xl max-w-md mx-auto">
         <SheetHeader className="text-left pb-4">
-          <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+          <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
             {title}
           </SheetTitle>
           <SheetDescription className="text-sm text-zinc-500">
@@ -50,7 +50,7 @@ export function ConfirmDialog({
           <button
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>

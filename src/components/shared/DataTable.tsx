@@ -25,9 +25,9 @@ export function DataTable<T extends { id?: string }>({
   const getKey = keyExtractor ?? ((item: T) => item.id ?? String(Math.random()))
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Header */}
-      <div className="grid border-b border-[#e5e5e5] px-5 py-3 bg-[#fafafa]"
+      <div className="grid border-b border-border px-5 py-3 bg-muted"
         style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
       >
         {columns.map((col) => (
@@ -38,7 +38,7 @@ export function DataTable<T extends { id?: string }>({
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-[#f0f0f0]">
+      <div className="divide-y divide-border-subtle">
         {data.length === 0 ? (
           <div className="flex items-center justify-center py-14">
             <p className="text-sm font-bold text-zinc-400">{emptyMessage}</p>
@@ -47,12 +47,12 @@ export function DataTable<T extends { id?: string }>({
           data.map((item, i) => (
             <div
               key={getKey(item)}
-              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-[#f5f5f5] transition-colors duration-150" : ""}`}
+              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-secondary transition-colors duration-150" : ""}`}
               style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, animationDelay: `${i * 0.03}s` }}
               onClick={() => onRowClick?.(item)}
             >
               {columns.map((col) => (
-                <div key={col.key} className={`text-sm text-[#0a0a0a] ${col.className ?? ""}`}>
+                <div key={col.key} className={`text-sm text-foreground ${col.className ?? ""}`}>
                   {col.render
                     ? col.render(item)
                     : String((item as Record<string, unknown>)[col.key] ?? "—")}

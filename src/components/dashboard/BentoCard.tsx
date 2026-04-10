@@ -14,9 +14,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
 }
 
 const VARIANT_CLASSES: Record<string, string> = {
-  default: "bg-white border border-[#e5e5e5] transition-all duration-200 ease-out hover:border-[#d4d4d4] hover:shadow-[0_6px_16px_rgba(0,0,0,0.06)] hover:-translate-y-1",
-  dark: "bg-[#0a0a0a] transition-all duration-200 ease-out hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1",
-  accent: "bg-[#f0fdf4] border border-[#bbf7d0] transition-all duration-200 ease-out hover:border-[#86efac] hover:shadow-[0_6px_16px_rgba(22,163,74,0.08)] hover:-translate-y-1",
+  default: "bg-card border border-border transition-all duration-200 ease-out hover:border-border/60 hover:shadow-[0_6px_16px_rgba(0,0,0,0.06)] hover:-translate-y-1",
+  dark: "bg-foreground transition-all duration-200 ease-out hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1",
+  accent: "bg-success border border-success-border transition-all duration-200 ease-out hover:border-green-300 hover:shadow-[0_6px_16px_rgba(22,163,74,0.08)] hover:-translate-y-1",
 }
 
 interface BentoCardProps {
@@ -66,11 +66,11 @@ export function BentoCard({
         {Icon && (
           <div className={cn(
             "size-9 rounded-xl flex items-center justify-center shrink-0",
-            isDark ? "bg-white/10" : isAccent ? "bg-[#16a34a]/10" : "bg-zinc-100",
+            isDark ? "bg-white/10" : isAccent ? "bg-primary/10" : "bg-secondary",
           )}>
             <Icon className={cn(
               "size-4",
-              isDark ? "text-white/70" : isAccent ? "text-[#16a34a]" : "text-zinc-500",
+              isDark ? "text-white/70" : isAccent ? "text-primary" : "text-muted-foreground",
             )} />
           </div>
         )}
@@ -79,14 +79,14 @@ export function BentoCard({
         {(label || title || subtitle) && (
           <div>
             {label && (
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16a34a] mb-0.5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">
                 {label}
               </p>
             )}
             {title && (
               <h2 className={cn(
                 "text-base font-black uppercase tracking-tight leading-tight",
-                isDark ? "text-white" : "text-[#0a0a0a]",
+                isDark ? "text-white" : "text-foreground",
               )}>
                 {title}
               </h2>

@@ -6,8 +6,6 @@ interface DashboardShellProps {
   profile: Profile & { username?: string | null }
   currentRole: AppRole
   clubName?: string | null
-  dashboardHref: string
-  pageTitle?: string
   children: React.ReactNode
 }
 
@@ -19,7 +17,7 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className="flex h-screen overflow-hidden bg-[#fafafa]">
+    <div className="flex h-screen overflow-hidden bg-muted">
 
       <Sidebar
         sections={navSections}

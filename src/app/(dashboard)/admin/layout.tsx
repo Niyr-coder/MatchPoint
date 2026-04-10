@@ -13,8 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       navSections={navSections}
       profile={ctx.profile}
       currentRole="admin"
-      dashboardHref="/admin"
-      pageTitle="Admin"
+
     >
       {children}
     </DashboardShell>

@@ -18,8 +18,7 @@ export default async function EmployeeLayout({
       navSections={navSections}
       profile={ctx.profile}
       currentRole="employee"
-      dashboardHref={`/club/${clubId}/employee`}
-      pageTitle="Vista Diaria"
+
     >
       {children}
     </DashboardShell>

@@ -18,8 +18,7 @@ export default async function OwnerLayout({
       navSections={navSections}
       profile={ctx.profile}
       currentRole="owner"
-      dashboardHref={`/club/${clubId}/owner`}
-      pageTitle="Mi Club"
+
     >
       {children}
     </DashboardShell>

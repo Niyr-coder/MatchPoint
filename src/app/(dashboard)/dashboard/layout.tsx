@@ -36,8 +36,7 @@ export default async function UserDashboardLayout({ children }: { children: Reac
       navSections={navSections}
       profile={ctx.profile}
       currentRole={ctx.globalRole as AppRole}
-      dashboardHref="/dashboard"
-      pageTitle="Mi espacio"
+
     >
       {children}
     </DashboardShell>

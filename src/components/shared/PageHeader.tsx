@@ -7,12 +7,12 @@ interface PageHeaderProps {
 
 export function PageHeader({ label, title, description, action }: PageHeaderProps) {
   return (
-    <div className="flex items-end justify-between gap-4 pb-4 border-b border-zinc-200">
+    <div className="flex items-end justify-between gap-4 pb-4 border-b border-border">
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">
           {label}
         </p>
-        <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a] leading-none">
+        <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-foreground leading-none">
           {title}
         </h1>
         {description && (

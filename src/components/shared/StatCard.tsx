@@ -9,9 +9,9 @@ interface StatCardProps {
 }
 
 const VARIANT_STYLES: Record<NonNullable<StatCardProps["variant"]>, { icon: string; value: string }> = {
-  default:  { icon: "bg-zinc-100 text-zinc-500", value: "text-[#0a0a0a]" },
-  accent:   { icon: "bg-[#0a0a0a]/10 text-[#0a0a0a]", value: "text-[#0a0a0a]" },
-  success:  { icon: "bg-[#f0fdf4] text-[#16a34a]", value: "text-[#16a34a]" },
+  default:  { icon: "bg-secondary text-muted-foreground", value: "text-foreground" },
+  accent:   { icon: "bg-foreground/10 text-foreground", value: "text-foreground" },
+  success:  { icon: "bg-success text-primary", value: "text-primary" },
   warning:  { icon: "bg-amber-50 text-amber-600", value: "text-amber-600" },
 }
 
@@ -19,7 +19,7 @@ export function StatCard({ label, value, icon: Icon, variant = "default", descri
   const styles = VARIANT_STYLES[variant]
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] hover:-translate-y-0.5">
+    <div className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-border/60 hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] hover:-translate-y-0.5">
       {Icon && (
         <div className={`size-9 rounded-xl flex items-center justify-center ${styles.icon}`}>
           <Icon className="size-4" />

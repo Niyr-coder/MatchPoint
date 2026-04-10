@@ -244,7 +244,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
                   <button
                     onClick={handleApprove}
                     disabled={isActioning}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-[#111111] text-white text-sm font-black uppercase tracking-wide hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-foreground text-background text-sm font-black uppercase tracking-wide hover:bg-foreground-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isActioning && <Loader2 className="size-4 animate-spin" />}
                     Aprobar
@@ -371,7 +371,7 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
             onClick={() => setStatusFilter(f.value)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-colors ${
               statusFilter === f.value
-                ? "bg-[#111111] text-white"
+                ? "bg-foreground text-background"
                 : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
             }`}
           >

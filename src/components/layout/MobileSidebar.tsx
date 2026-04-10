@@ -22,7 +22,7 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-zinc-500 hover:text-[#0a0a0a] transition-colors rounded-lg hover:bg-[#f5f5f5]"
+        className="lg:hidden p-2 text-zinc-500 hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
         aria-label="Abrir menú"
       >
         <Menu className="size-5" />

@@ -18,8 +18,7 @@ export default async function PartnerLayout({
       navSections={navSections}
       profile={ctx.profile}
       currentRole="partner"
-      dashboardHref={`/club/${clubId}/partner`}
-      pageTitle="Mi Club"
+
     >
       {children}
     </DashboardShell>

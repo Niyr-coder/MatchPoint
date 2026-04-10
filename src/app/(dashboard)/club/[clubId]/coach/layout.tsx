@@ -18,8 +18,7 @@ export default async function CoachLayout({
       navSections={navSections}
       profile={ctx.profile}
       currentRole="coach"
-      dashboardHref={`/club/${clubId}/coach`}
-      pageTitle="Mis Clases"
+
     >
       {children}
     </DashboardShell>
