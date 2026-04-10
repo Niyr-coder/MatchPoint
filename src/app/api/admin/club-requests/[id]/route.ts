@@ -99,7 +99,7 @@ export async function PATCH(
   const { action, adminNotes } = parsed.data
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const now = new Date().toISOString()
     const reviewerId = authResult.context.userId
 

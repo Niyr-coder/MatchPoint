@@ -61,7 +61,7 @@ export async function PATCH(
   }
 
   // Verify the reservation belongs to this club (via court → club relationship)
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data: authResult2 } = await service
     .from("reservations")
     .select("id, courts!inner(club_id)")

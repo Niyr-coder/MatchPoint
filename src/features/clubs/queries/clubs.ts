@@ -13,7 +13,7 @@ export interface ClubFilters {
 
 export async function getClubs(filters?: ClubFilters): Promise<ClubWithSports[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     let query = supabase
       .from("clubs")
@@ -59,7 +59,7 @@ export async function getClubs(filters?: ClubFilters): Promise<ClubWithSports[]>
 
 export async function getDistinctProvinces(): Promise<string[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const { data, error } = await supabase
       .from("clubs")

@@ -44,7 +44,7 @@ export async function GET(
     )
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("profiles")
     .select("settings")
@@ -96,7 +96,7 @@ export async function PATCH(
     )
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   // Read existing settings first so we can merge (partial update)
   const { data: existing, error: fetchError } = await supabase

@@ -13,7 +13,7 @@ interface ClubMemberRow {
 }
 
 export async function getUserRoles(userId: string): Promise<UserRoleEntry[]> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("club_members")
     .select(`

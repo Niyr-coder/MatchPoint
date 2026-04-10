@@ -53,7 +53,7 @@ export async function getCourtsBySport(sport: SportType): Promise<Court[]> {
 }
 
 export async function getCourtsByClub(clubId: string): Promise<Court[]> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data, error } = await supabase
     .from("courts")
@@ -68,7 +68,7 @@ export async function getCourtsByClub(clubId: string): Promise<Court[]> {
 
 export async function getClubCourts(clubId: string): Promise<Court[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { data, error } = await supabase
       .from("courts")
       .select("*")
@@ -82,7 +82,7 @@ export async function getClubCourts(clubId: string): Promise<Court[]> {
 }
 
 export async function createCourt(input: CreateCourtInput): Promise<Court> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("courts")
     .insert({
@@ -104,7 +104,7 @@ export async function updateCourt(
   id: string,
   input: Partial<CreateCourtInput & { is_active: boolean }>
 ): Promise<Court> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("courts")
     .update({ ...input })
@@ -116,7 +116,7 @@ export async function updateCourt(
 }
 
 export async function deactivateCourt(id: string): Promise<void> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { error } = await supabase
     .from("courts")
     .update({ is_active: false })
@@ -136,7 +136,7 @@ function timeToMinutes(time: string): number {
 }
 
 export async function getCourtAvailability(courtId: string, date: string): Promise<TimeSlot[]> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const dayOfWeek = new Date(date + "T12:00:00").getDay()
 

@@ -47,7 +47,7 @@ function roleLabel(role: string): string {
 
 async function getActiveMembers(clubId: string): Promise<MemberRow[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
 
     const { data, error } = await service
       .from("club_members")

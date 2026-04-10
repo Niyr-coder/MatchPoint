@@ -39,7 +39,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
   const { email, source } = result.data
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { error } = await supabase
     .from("waitlist")

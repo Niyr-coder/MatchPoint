@@ -57,7 +57,7 @@ export function ChatView({ userId }: ChatViewProps) {
   const fetchConversations = () => {
     fetch("/api/messages")
       .then((r) => r.json())
-      .then((d: { conversations?: Conversation[] }) => setConversations(d.conversations ?? []))
+      .then((d: { data?: Conversation[] }) => setConversations(d.data ?? []))
       .catch(() => setConversations([]))
   }
 
@@ -65,7 +65,7 @@ export function ChatView({ userId }: ChatViewProps) {
     setLoadingConvs(true)
     fetch("/api/messages")
       .then((r) => r.json())
-      .then((d: { conversations?: Conversation[] }) => setConversations(d.conversations ?? []))
+      .then((d: { data?: Conversation[] }) => setConversations(d.data ?? []))
       .catch(() => setConversations([]))
       .finally(() => setLoadingConvs(false))
 
@@ -88,7 +88,7 @@ export function ChatView({ userId }: ChatViewProps) {
       currentController = new AbortController()
       fetch(`/api/messages?conversationId=${activeConv}`, { signal: currentController.signal })
         .then((r) => r.json())
-        .then((d: { messages?: Message[] }) => setMessages(d.messages ?? []))
+        .then((d: { data?: Message[] }) => setMessages(d.data ?? []))
         .catch((err: unknown) => {
           if (!(err instanceof Error && err.name === "AbortError")) {
             setSendError("Error al cargar mensajes. Intenta de nuevo.")
@@ -133,10 +133,10 @@ export function ChatView({ userId }: ChatViewProps) {
         fetch(`/api/messages?conversationId=${activeConv}`),
         fetch("/api/messages"),
       ])
-      const msgData = (await msgRes.json()) as { messages?: Message[] }
-      const convData = (await convRes.json()) as { conversations?: Conversation[] }
-      setMessages(msgData.messages ?? [])
-      setConversations(convData.conversations ?? [])
+      const msgData = (await msgRes.json()) as { data?: Message[] }
+      const convData = (await convRes.json()) as { data?: Conversation[] }
+      setMessages(msgData.data ?? [])
+      setConversations(convData.data ?? [])
     } catch (err) {
       setInput(tempContent)
       setSendError(err instanceof Error ? err.message : "Error al enviar el mensaje")

@@ -10,7 +10,7 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("tournament_brackets")
     .select(`
@@ -56,7 +56,7 @@ export async function POST(
   const body = await request.json() as { type?: string }
   const type = body.type ?? "elimination"
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   // Fetch confirmed participants (or any registered if none confirmed)
   const { data: participants, error: pErr } = await service

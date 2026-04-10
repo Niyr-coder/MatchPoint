@@ -20,7 +20,7 @@ function getInitial(profile: Profile & { username?: string | null }): string {
 export default async function UserAccountPage() {
   const ctx = await authorizeOrRedirect()
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   // Fetch both profile and pickleball profile in parallel
   const [{ data: profileData }, { data: pickleballData }] = await Promise.all([

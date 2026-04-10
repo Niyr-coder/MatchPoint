@@ -34,7 +34,7 @@ export default async function PartnerReportsPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["partner", "owner"] })
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data: rawReservations } = await supabase
     .from("reservations")

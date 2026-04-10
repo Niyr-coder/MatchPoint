@@ -40,7 +40,7 @@ export async function GET(
     )
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
@@ -89,7 +89,7 @@ export async function PATCH(
       )
     }
 
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { error: updateError } = await supabase
       .from("profiles")
       .update({
@@ -168,7 +168,7 @@ export async function PATCH(
 
   // Rebuild full_name if first or last changed
   if (d.first_name !== undefined || d.last_name !== undefined) {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { data: existing } = await supabase
       .from("profiles")
       .select("first_name, last_name")
@@ -182,7 +182,7 @@ export async function PATCH(
     }
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { error: updateError } = await supabase
     .from("profiles")
     .update(updates)

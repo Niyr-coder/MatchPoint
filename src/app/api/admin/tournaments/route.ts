@@ -92,7 +92,7 @@ export async function POST(
     parsed.data
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Verify the target club exists before inserting
     const { data: club, error: clubError } = await supabase

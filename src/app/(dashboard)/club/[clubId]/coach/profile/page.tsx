@@ -31,7 +31,7 @@ const SPORT_LABELS: Record<string, string> = {
 
 async function getCoachSports(coachUserId: string, clubId: string): Promise<string[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("coach_students")
       .select("sport")

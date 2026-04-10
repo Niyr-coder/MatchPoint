@@ -116,7 +116,7 @@ export async function getAllClubsAdmin(
   filters?: { search?: string; province?: string }
 ): Promise<ClubAdmin[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     let query = supabase
       .from("clubs")
@@ -177,7 +177,7 @@ export async function getAllUsersAdmin(
   filters?: { search?: string; role?: string }
 ): Promise<UserAdmin[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     let query = supabase
       .from("profiles")
@@ -202,7 +202,7 @@ export async function getAllUsersAdmin(
 
 export async function getPlatformAnalytics(): Promise<PlatformAnalytics> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const now = new Date()
     const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -302,7 +302,7 @@ export async function getAdminAnalytics(): Promise<AdminAnalytics> {
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { start, months } = last6MonthsRange()
 
     const now = new Date()
@@ -394,7 +394,7 @@ export async function getAdminFinancials(): Promise<AdminFinancials> {
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const now = new Date()
     const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
@@ -470,7 +470,7 @@ export async function getAdminFinancials(): Promise<AdminFinancials> {
 
 export async function getAllTournamentsAdmin(): Promise<TournamentAdmin[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const [tournamentsRes, participantsRes] = await Promise.all([
       supabase
@@ -533,7 +533,7 @@ export async function getClubRequestsAdmin(
   status?: "pending" | "approved" | "rejected"
 ): Promise<ClubRequestAdmin[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     let query = supabase
       .from("club_requests")
@@ -583,7 +583,7 @@ export async function getAdminModerationData(): Promise<AdminModerationData> {
   const EMPTY: AdminModerationData = { pendingClubs: [], recentUsers: [], inactiveClubs: [] }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const [inactiveClubsRes, recentUsersRes, ownersRes] = await Promise.all([
       supabase
@@ -703,7 +703,7 @@ export interface ControlTowerData {
 }
 
 export async function getAdminControlTowerData(): Promise<ControlTowerData> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const now = new Date()
   const todayStr = now.toISOString().split("T")[0]

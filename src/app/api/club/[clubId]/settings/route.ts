@@ -30,7 +30,7 @@ export async function GET(
   }
 
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("clubs")
       .select("*")
@@ -86,7 +86,7 @@ export async function PATCH(
   }
 
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("clubs")
       .update({ ...parsed.data, updated_at: new Date().toISOString() })

@@ -91,7 +91,7 @@ export interface PublicPlayerProfile {
 }
 
 export async function getPublicPlayerProfile(userId: string): Promise<PublicPlayerProfile> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const [profileRes, matchesRes, clubMembershipsRes, reservationsRes] = await Promise.all([
     supabase

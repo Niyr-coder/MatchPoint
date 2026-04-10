@@ -13,7 +13,7 @@ export default async function SettingsPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["owner"] })
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data: club } = await service
     .from("clubs")
     .select("*")

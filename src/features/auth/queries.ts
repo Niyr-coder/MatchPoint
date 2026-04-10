@@ -26,7 +26,7 @@ async function checkAuthenticated() {
 // ──────────────────────────────────────────────────────────
 
 async function checkProfileExists(userId: string) {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("profiles")
     .select("*")
@@ -49,7 +49,7 @@ function checkIsAdmin(profile: Profile): boolean {
 // ──────────────────────────────────────────────────────────
 
 async function checkClubAccess(userId: string, clubId: string) {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("club_members")
     .select("role, is_active")
@@ -74,7 +74,7 @@ function checkRole(userRole: AppRole, required: AppRole[]): boolean {
 // ──────────────────────────────────────────────────────────
 
 async function loadPermissions(role: AppRole): Promise<AppPermission[]> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data } = await service
     .from("role_permissions")
     .select("permission")

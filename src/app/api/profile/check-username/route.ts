@@ -30,7 +30,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     )
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("profiles")
     .select("id")

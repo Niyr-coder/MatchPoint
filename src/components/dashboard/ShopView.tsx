@@ -81,7 +81,7 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
 
     fetch(`/api/shop/products?${params.toString()}`)
       .then((r) => r.json())
-      .then((d: { products?: Product[] }) => setProducts(d.products ?? []))
+      .then((d: { data?: Product[] }) => setProducts(d.data ?? []))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false))
   }, [activeCategory, clubId])

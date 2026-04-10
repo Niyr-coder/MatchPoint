@@ -61,7 +61,7 @@ export async function POST(
   const { clubId, role } = parsed.data as { clubId: string; role: ClubRole }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Verify the user exists
     const { data: profile, error: profileError } = await supabase
@@ -165,7 +165,7 @@ export async function DELETE(
   const { clubId } = parsed.data
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const { error } = await supabase
       .from("club_members")

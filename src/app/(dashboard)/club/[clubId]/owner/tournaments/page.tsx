@@ -47,7 +47,7 @@ export default async function OwnerTournamentsPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["owner"] })
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data: rawTournaments = null } = await supabase
     .from("tournaments")

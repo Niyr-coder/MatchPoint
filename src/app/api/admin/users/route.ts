@@ -79,7 +79,7 @@ export async function PATCH(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { error } = await supabase
       .from("profiles")
       .update({

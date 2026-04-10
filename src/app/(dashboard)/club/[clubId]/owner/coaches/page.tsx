@@ -40,7 +40,7 @@ export default async function OwnerCoachesPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["owner"] })
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const [membersResult, studentsResult] = await Promise.all([
     supabase

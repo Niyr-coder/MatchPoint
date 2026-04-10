@@ -99,7 +99,7 @@ export async function getClubReservations(
   filters?: { date?: string; status?: string; courtId?: string }
 ): Promise<ReservationWithProfile[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     let query = supabase
       .from("reservations")
@@ -135,7 +135,7 @@ export async function updateReservationStatus(
   id: string,
   status: "confirmed" | "cancelled"
 ): Promise<void> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { error } = await supabase
     .from("reservations")

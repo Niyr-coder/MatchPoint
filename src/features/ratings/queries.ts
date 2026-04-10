@@ -6,7 +6,7 @@ export async function getRankingBySport(
   limit = 50
 ): Promise<RankingEntry[]> {
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // LEFT JOIN: profiles → rankings so all users appear even without matches played.
     // Users with no ranking entry show score/wins/losses = 0.
@@ -38,36 +38,26 @@ export async function getRankingBySport(
       })
     }
 
-    // No sport filter: two queries then merge (rankings.user_id → auth.users, not profiles)
-    const [profilesRes, rankingsRes] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, avatar_url").limit(limit),
-      supabase.from("rankings").select("user_id, score, wins, losses").limit(200),
-    ])
+    // No sport filter: aggregate all sports per user via SQL GROUP BY (Q5)
+    const { data, error } = await supabase.rpc("get_global_rankings", { p_limit: limit })
+    if (error || !data) return []
 
-    if (profilesRes.error || !profilesRes.data) return []
-
-    type RankMap = Record<string, { score: number; wins: number; losses: number }>
-    const rankMap: RankMap = {}
-    for (const r of rankingsRes.data ?? []) {
-      const uid = r.user_id as string
-      rankMap[uid] = {
-        score: (rankMap[uid]?.score ?? 0) + (r.score as number),
-        wins:  (rankMap[uid]?.wins  ?? 0) + (r.wins  as number),
-        losses:(rankMap[uid]?.losses ?? 0) + (r.losses as number),
-      }
-    }
-
-    const rows = profilesRes.data.map(p => ({
-      userId: p.id as string,
-      fullName: (p.full_name as string | null) ?? "Jugador",
-      avatarUrl: (p.avatar_url as string | null) ?? null,
-      score:  rankMap[p.id]?.score  ?? 0,
-      wins:   rankMap[p.id]?.wins   ?? 0,
-      losses: rankMap[p.id]?.losses ?? 0,
+    return (data as Array<{
+      user_id: string
+      full_name: string | null
+      avatar_url: string | null
+      score: number
+      wins: number
+      losses: number
+    }>).map((row, index) => ({
+      position: index + 1,
+      userId: row.user_id,
+      fullName: row.full_name ?? "Jugador",
+      avatarUrl: row.avatar_url ?? null,
+      score: row.score,
+      wins: row.wins,
+      losses: row.losses,
     }))
-
-    rows.sort((a, b) => b.score - a.score || b.wins - a.wins)
-    return rows.map((r, index) => ({ ...r, position: index + 1 }))
   } catch {
     return []
   }

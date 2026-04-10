@@ -13,7 +13,7 @@ const PAGE_LIMIT = 50
 export default async function AdminAuditPage() {
   await authorizeOrRedirect({ requiredRoles: ["admin"] })
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   // Parallel: count + first page of entries
   const [countRes, dataRes] = await Promise.all([

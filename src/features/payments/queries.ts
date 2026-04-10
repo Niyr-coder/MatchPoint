@@ -5,7 +5,7 @@ export type { CashEntry, CashSummary } from "@/features/payments/types"
 
 export async function getCashRegisterToday(clubId: string): Promise<CashEntry[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const today = new Date().toISOString().split("T")[0]
 
     const { data, error } = await service
@@ -85,7 +85,7 @@ export async function addCashEntry(input: {
   payment_method: string
   reservation_id?: string
 }): Promise<CashEntry> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   const { data, error } = await service
     .from("cash_register_entries")

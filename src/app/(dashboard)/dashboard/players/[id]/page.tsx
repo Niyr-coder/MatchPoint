@@ -39,7 +39,7 @@ export default async function PlayerProfilePage({
   await authorizeOrRedirect()
   const { id } = await params
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data: profileData } = await supabase
     .from("profiles")
     .select("*")

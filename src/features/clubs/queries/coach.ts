@@ -8,7 +8,7 @@ export async function getCoachStudents(
   clubId: string
 ): Promise<StudentEntry[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("coach_students")
       .select(`
@@ -59,7 +59,7 @@ export async function getCoachEarnings(
   clubId: string
 ): Promise<EarningEntry[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("coach_earnings")
       .select("id, amount, description, date, created_at")

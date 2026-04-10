@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { data, error } = await supabase
       .from("audit_log")
       .select("id, action, entity_type, details, created_at")

@@ -33,7 +33,7 @@ export async function GET(
     )
   }
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("pickleball_profiles")
     .select("*")
@@ -99,7 +99,7 @@ export async function PUT(
   if (dominant_hand !== undefined) upsertPayload.dominant_hand = dominant_hand
   if (play_style !== undefined) upsertPayload.play_style = play_style
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { error: upsertError } = await supabase
     .from("pickleball_profiles")
     .upsert(upsertPayload, { onConflict: "user_id" })

@@ -63,7 +63,7 @@ export async function GET(
       : null
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Build query with join to profiles for requester info
     let query = supabase

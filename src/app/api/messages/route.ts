@@ -61,8 +61,8 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: true })
       .limit(50)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ messages: data ?? [] })
+    if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
+    return NextResponse.json({ data: data ?? [], error: null })
   }
 
   // Get user's conversations with participants
@@ -79,8 +79,8 @@ export async function GET(request: Request) {
     .eq("user_id", user.id)
     .order("joined_at", { ascending: false })
 
-  if (error) return NextResponse.json({ conversations: [] })
-  return NextResponse.json({ conversations: data?.map((d) => d.conversation) ?? [] })
+  if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
+  return NextResponse.json({ data: data?.map((d) => d.conversation) ?? [], error: null })
 }
 
 export async function POST(request: Request) {
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     .select("*, sender:profiles(id, full_name, username, avatar_url)")
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
 
   // Update conversation updated_at
   await supabase
@@ -137,5 +137,5 @@ export async function POST(request: Request) {
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId)
 
-  return NextResponse.json({ message: data })
+  return NextResponse.json({ data: data, error: null })
 }

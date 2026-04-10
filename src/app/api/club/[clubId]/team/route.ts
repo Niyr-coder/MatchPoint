@@ -132,7 +132,7 @@ export async function PATCH(
   }
 
   // Verify the member belongs to this club before modifying
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data: member } = await service
     .from("club_members")
     .select("id")

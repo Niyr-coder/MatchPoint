@@ -100,7 +100,7 @@ export async function PATCH(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const { error } = await supabase
       .from("clubs")
       .update({ is_active: parsed.data.isActive, updated_at: new Date().toISOString() })
@@ -155,7 +155,7 @@ export async function POST(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
     const now = new Date().toISOString()
     const slug = generateSlug(parsed.data.name)
 

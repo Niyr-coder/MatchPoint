@@ -46,7 +46,7 @@ export async function checkRateLimit(
   const { limit, windowMs } = config
 
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service.rpc("check_rate_limit", {
       p_bucket:     bucket,
       p_identifier: identifier,

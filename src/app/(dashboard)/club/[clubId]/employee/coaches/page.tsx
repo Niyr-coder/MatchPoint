@@ -37,7 +37,7 @@ function sportLabel(sport: string | null): string {
 
 async function getClubCoaches(clubId: string): Promise<CoachRow[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
 
     const { data: members, error: membersError } = await service
       .from("club_members")

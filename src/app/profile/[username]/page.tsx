@@ -13,7 +13,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data } = await supabase
     .from("profiles")
     .select("full_name, first_name, last_name, city")
@@ -80,7 +80,7 @@ function QuickStat({
 
 export default async function PublicProfilePage({ params }: Props) {
   const { username } = await params
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data: profileData } = await supabase
     .from("profiles")

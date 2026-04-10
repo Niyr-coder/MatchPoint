@@ -7,7 +7,7 @@ export type { ClubTeamMember as TeamMember } from "@/features/clubs/types"
 
 export async function getClubTeam(clubId: string): Promise<ClubTeamMember[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("club_members")
       .select(`
@@ -61,7 +61,7 @@ export async function addTeamMemberByUserId(
   role: string
 ): Promise<{ error?: string }> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
 
     const { data: profile } = await service
       .from("profiles")
@@ -86,78 +86,34 @@ export async function addTeamMemberByUserId(
 }
 
 export async function updateMemberRole(memberId: string, role: string): Promise<void> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   await service.from("club_members").update({ role }).eq("id", memberId)
 }
 
 export async function deactivateMember(memberId: string): Promise<void> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
   await service.from("club_members").update({ is_active: false }).eq("id", memberId)
 }
 
 export async function getClubClients(clubId: string): Promise<ClientEntry[]> {
   try {
-    const service = await createServiceClient()
-    const { data, error } = await service
-      .from("reservations")
-      .select(`
-        user_id,
-        date,
-        courts!inner ( club_id ),
-        profiles!reservations_user_profile_fk ( full_name, phone )
-      `)
-      .eq("courts.club_id", clubId)
-
+    const service = createServiceClient()
+    // SQL COUNT/GROUP BY via RPC — replaces full table scan + JS aggregation (Q6)
+    const { data, error } = await service.rpc("get_club_clients", { p_club_id: clubId })
     if (error || !data) return []
 
-    type RawClientRow = {
+    return (data as Array<{
       user_id: string
-      date: string
-      profiles: Array<{ full_name: string | null; phone: string | null }>
-    }
-
-    const map = new Map<string, {
-      fullName: string | null
+      full_name: string | null
       phone: string | null
-      count: number
-      lastVisit: string | null
-    }>()
-
-    for (const rawRow of data as unknown as RawClientRow[]) {
-      const profileObj = Array.isArray(rawRow.profiles) ? rawRow.profiles[0] : rawRow.profiles
-      const row = {
-        user_id: rawRow.user_id,
-        date: rawRow.date,
-        profiles: profileObj as { full_name: string | null; phone: string | null } | null,
-      }
-      const existing = map.get(row.user_id)
-      const rowDate = row.date ?? null
-      if (!existing) {
-        map.set(row.user_id, {
-          fullName: row.profiles?.full_name ?? null,
-          phone: row.profiles?.phone ?? null,
-          count: 1,
-          lastVisit: rowDate,
-        })
-      } else {
-        const updated = {
-          ...existing,
-          count: existing.count + 1,
-          lastVisit:
-            rowDate && (!existing.lastVisit || rowDate > existing.lastVisit)
-              ? rowDate
-              : existing.lastVisit,
-        }
-        map.set(row.user_id, updated)
-      }
-    }
-
-    return Array.from(map.entries()).map(([userId, entry]) => ({
-      userId,
-      fullName: entry.fullName,
-      phone: entry.phone,
-      totalReservations: entry.count,
-      lastVisit: entry.lastVisit,
+      total_reservations: number
+      last_visit: string | null
+    }>).map((row) => ({
+      userId: row.user_id,
+      fullName: row.full_name,
+      phone: row.phone,
+      totalReservations: row.total_reservations,
+      lastVisit: row.last_visit,
     }))
   } catch {
     return []

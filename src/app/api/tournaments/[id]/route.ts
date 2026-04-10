@@ -137,7 +137,7 @@ export async function PATCH(
     }, { status: 409 })
   }
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   // Guard: open → in_progress requires ≥ 4 participants and bracket generated
   if (status === "in_progress" && tournament.status === "open") {

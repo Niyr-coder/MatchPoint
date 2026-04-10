@@ -66,7 +66,7 @@ export async function GET(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const [profileRes, membershipsRes] = await Promise.all([
       supabase
@@ -168,7 +168,7 @@ export async function PATCH(
   const { action } = parsed.data
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Fetch current profile to validate state
     const { data: existing, error: fetchError } = await supabase

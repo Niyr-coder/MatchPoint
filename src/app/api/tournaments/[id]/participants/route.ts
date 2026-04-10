@@ -15,7 +15,7 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("tournament_participants")
     .select(`
@@ -74,7 +74,7 @@ export async function POST(
   }
   const body = parsed.data
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   // Check if already participating (including withdrawn)
   const { data: existing } = await service

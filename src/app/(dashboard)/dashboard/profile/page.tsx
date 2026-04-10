@@ -25,7 +25,7 @@ function formatJoinDate(dateStr: string): string {
 export default async function ProfilePage() {
   const ctx = await authorizeOrRedirect()
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const [{ data: profileData }, stats, clubRoles] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", ctx.userId).single(),
     getPlayerStats(ctx.userId),

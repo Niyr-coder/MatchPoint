@@ -66,7 +66,7 @@ export async function GET(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const { data, error } = await supabase
       .from("tournaments")
@@ -157,7 +157,7 @@ export async function PUT(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const { data: existing, error: fetchError } = await supabase
       .from("tournaments")
@@ -240,7 +240,7 @@ export async function DELETE(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     const { data: existing, error: fetchError } = await supabase
       .from("tournaments")

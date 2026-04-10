@@ -79,7 +79,7 @@ export async function PUT(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Verify the club exists before updating
     const { data: existing, error: fetchError } = await supabase
@@ -145,7 +145,7 @@ export async function DELETE(
   }
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Verify the club exists before deleting
     const { data: existing, error: fetchError } = await supabase

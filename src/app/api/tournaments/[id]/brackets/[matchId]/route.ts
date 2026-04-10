@@ -59,7 +59,7 @@ export async function PATCH(
   }
 
   // Call the atomic RPC — all writes happen inside a single DB transaction
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data: rpcData, error: rpcError } = await service.rpc("score_bracket_match", {
     p_match_id: matchId,
     p_tournament_id: tournamentId,

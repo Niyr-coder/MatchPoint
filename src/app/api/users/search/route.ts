@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   // Escape PostgREST filter metacharacters to prevent filter injection
   const safe = q.replace(/[%_\\,().]/g, "\\$&")
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("profiles")
     .select("id, username, full_name, avatar_url")

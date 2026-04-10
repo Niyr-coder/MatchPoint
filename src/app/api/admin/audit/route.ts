@@ -71,7 +71,7 @@ export async function GET(
   const offset = (page - 1) * limit
 
   try {
-    const supabase = await createServiceClient()
+    const supabase = createServiceClient()
 
     // Build count query
     let countQuery = supabase

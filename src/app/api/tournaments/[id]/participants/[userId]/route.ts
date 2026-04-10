@@ -48,7 +48,7 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "No hay campos para actualizar" }, { status: 400 })
   }
 
-  const service = await createServiceClient()
+  const service = createServiceClient()
   const { data, error } = await service
     .from("tournament_participants")
     .update(parsed.data)
@@ -82,7 +82,7 @@ export async function DELETE(
 
   const body = await request.json().catch(() => ({})) as { mode?: string; reason?: string }
   const mode = body.mode ?? (tournament.status === "in_progress" ? "withdraw" : "remove")
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   if (mode === "withdraw") {
     // Mark as withdrawn — keep record and bracket history

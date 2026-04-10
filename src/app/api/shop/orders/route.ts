@@ -25,8 +25,8 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(20)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ orders: data ?? [] })
+  if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
+  return NextResponse.json({ data: data ?? [], error: null })
 }
 
 export async function POST(request: Request) {
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     unit_price: serverPrices[item.product_id],
   }))
 
-  const serviceClient = await createServiceClient()
+  const serviceClient = createServiceClient()
   const { data, error } = await serviceClient.rpc("create_order_atomic", {
     p_user_id: user.id,
     p_items: rpcItems,

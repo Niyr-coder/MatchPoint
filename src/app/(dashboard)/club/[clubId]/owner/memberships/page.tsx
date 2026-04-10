@@ -50,7 +50,7 @@ export default async function OwnerMembershipsPage({
   const { clubId } = await params
   await authorizeOrRedirect({ clubId, requiredRoles: ["owner"] })
 
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data: rawMembers } = await supabase
     .from("club_members")

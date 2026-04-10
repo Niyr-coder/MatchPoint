@@ -64,7 +64,7 @@ async function getCoachTournaments(
   clubId: string
 ): Promise<TournamentRow[]> {
   try {
-    const service = await createServiceClient()
+    const service = createServiceClient()
     const { data, error } = await service
       .from("tournament_participants")
       .select(`

@@ -63,7 +63,7 @@ interface DayMetrics {
 }
 
 async function getDayMetrics(clubId: string, today: string): Promise<DayMetrics> {
-  const service = await createServiceClient()
+  const service = createServiceClient()
 
   const todayStart = `${today}T00:00:00`
   const todayEnd = `${today}T23:59:59`
