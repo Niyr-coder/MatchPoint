@@ -28,7 +28,7 @@ export function DashboardShell({
       />
 
       {/* Mobile + main content */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0">
         {/* Mobile top bar — hidden on desktop */}
         <div className="lg:hidden shrink-0">
           <TopBar
