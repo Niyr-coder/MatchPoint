@@ -31,7 +31,7 @@ interface ExtrasState {
 }
 
 const inputCls =
-  "w-full px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-zinc-300 focus:outline-none focus:border-foreground transition-colors bg-white"
+  "w-full px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-zinc-300 focus:outline-none focus:border-foreground transition-colors bg-card"
 const labelCls =
   "text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500"
 
@@ -47,8 +47,8 @@ function ProgressBar({ current }: { current: number }) {
                 i + 1 < current
                   ? "bg-foreground border-foreground text-white"
                   : i + 1 === current
-                  ? "border-foreground text-foreground bg-white"
-                  : "border-zinc-200 text-zinc-300 bg-white"
+                  ? "border-foreground text-foreground bg-card"
+                  : "border-zinc-200 text-zinc-300 bg-card"
               }`}
             >
               {i + 1 < current ? "✓" : i + 1}
@@ -107,7 +107,7 @@ function ExtraToggle({
           }`}
         >
           <span
-            className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${
+            className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-card shadow-sm transition-transform ${
               enabled ? "translate-x-5" : "translate-x-0"
             }`}
           />
@@ -405,7 +405,7 @@ export default function CreateTournamentPage() {
                       entry_fee: parseFloat(e.target.value) || 0,
                     }))
                   }
-                  className="flex-1 px-3 py-2.5 text-sm font-medium text-foreground focus:outline-none bg-white"
+                  className="flex-1 px-3 py-2.5 text-sm font-medium text-foreground focus:outline-none bg-card"
                   placeholder="0.00"
                 />
               </div>

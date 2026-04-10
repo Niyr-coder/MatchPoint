@@ -67,7 +67,7 @@ function SportPills({ sports }: { sports: string[] }) {
       {sports.map((s) => (
         <span
           key={s}
-          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-600"
+          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-muted text-zinc-600"
         >
           {SPORT_LABELS[s] ?? s}
         </span>
@@ -121,7 +121,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
       />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl flex flex-col">
+      <div className="relative z-10 w-full max-w-md bg-card h-full overflow-y-auto shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 p-6 border-b border-border">
           <div>
@@ -134,7 +134,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
           </div>
           <button
             onClick={onClose}
-            className="size-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors shrink-0 mt-0.5"
+            className="size-8 rounded-full bg-muted flex items-center justify-center hover:bg-zinc-200 transition-colors shrink-0 mt-0.5"
             aria-label="Cerrar panel"
           >
             <X className="size-4 text-zinc-600" />
@@ -150,7 +150,7 @@ function DetailPanel({ request, onClose, onApprove, onReject, isActioning }: Det
           </div>
 
           {/* Requester */}
-          <div className="rounded-xl bg-zinc-50 p-4 flex flex-col gap-1">
+          <div className="rounded-xl bg-muted/50 p-4 flex flex-col gap-1">
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 mb-1">
               Solicitante
             </p>
@@ -372,13 +372,13 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-colors ${
               statusFilter === f.value
                 ? "bg-foreground text-background"
-                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                : "bg-muted text-zinc-600 hover:bg-zinc-200"
             }`}
           >
             {f.label}
             <span
               className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-                statusFilter === f.value ? "bg-white/20 text-white" : "bg-zinc-200 text-zinc-500"
+                statusFilter === f.value ? "bg-card/20 text-white" : "bg-zinc-200 text-zinc-500"
               }`}
             >
               {counts[f.value]}
@@ -421,7 +421,7 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
               <div
                 key={req.id}
                 onClick={() => setSelectedRequest(req)}
-                className="grid grid-cols-[2fr_1.5fr_1.5fr_1fr_1fr_auto] gap-3 py-3.5 px-1 items-center cursor-pointer hover:bg-zinc-50 transition-colors rounded-lg"
+                className="grid grid-cols-[2fr_1.5fr_1.5fr_1fr_1fr_auto] gap-3 py-3.5 px-1 items-center cursor-pointer hover:bg-muted/50 transition-colors rounded-lg"
               >
                 {/* Requester */}
                 <div>
@@ -446,12 +446,12 @@ export function AdminClubRequestsView({ requests }: AdminClubRequestsViewProps) 
                 {/* Sports */}
                 <div className="flex flex-wrap gap-1">
                   {req.sports.slice(0, 2).map((s) => (
-                    <span key={s} className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600 font-medium">
+                    <span key={s} className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-zinc-600 font-medium">
                       {SPORT_LABELS[s]?.split(" ")[1] ?? s}
                     </span>
                   ))}
                   {req.sports.length > 2 && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 font-medium">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-zinc-400 font-medium">
                       +{req.sports.length - 2}
                     </span>
                   )}

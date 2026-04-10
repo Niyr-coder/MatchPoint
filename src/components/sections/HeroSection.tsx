@@ -56,13 +56,13 @@ export function HeroSection() {
         >
           <a
             href="#waitlist"
-            className="btn-pill bg-white text-[#0a0a0a] px-10 py-3.5"
+            className="btn-pill bg-card text-foreground px-10 py-3.5"
           >
             Únete Gratis <ArrowRight className="w-4 h-4" />
           </a>
           <a
             href="#como-funciona"
-            className="btn-pill border border-white/30 text-white hover:bg-white hover:text-[#0a0a0a] px-8 py-3.5"
+            className="btn-pill border border-white/30 text-white hover:bg-card hover:text-foreground px-8 py-3.5"
           >
             Mira cómo funciona
           </a>
@@ -72,7 +72,7 @@ export function HeroSection() {
         <div className="flex items-center gap-3 mt-8 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
           <div className="flex -space-x-2">
             {["C", "M", "A", "L"].map((e, i) => (
-              <div key={i} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-black text-white/70">{e}</div>
+              <div key={i} className="w-8 h-8 rounded-full bg-card/10 border border-white/20 flex items-center justify-center text-xs font-black text-white/70">{e}</div>
             ))}
           </div>
           <p className="text-xs text-white/50">

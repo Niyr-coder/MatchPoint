@@ -117,11 +117,11 @@ function TagInput({
   }
 
   return (
-    <div className="flex flex-wrap gap-1.5 p-2 border border-[#e5e5e5] rounded-xl min-h-[42px] focus-within:border-[#0a0a0a] focus-within:ring-2 focus-within:ring-[#0a0a0a]/8">
+    <div className="flex flex-wrap gap-1.5 p-2 border border-border rounded-xl min-h-[42px] focus-within:border-foreground focus-within:ring-2 focus-within:ring-[#0a0a0a]/8">
       {tags.map((tag) => (
         <span
           key={tag}
-          className="flex items-center gap-1 text-[11px] font-bold bg-zinc-100 text-zinc-700 rounded-full px-2 py-0.5"
+          className="flex items-center gap-1 text-[11px] font-bold bg-muted text-zinc-700 rounded-full px-2 py-0.5"
         >
           {tag}
           <button
@@ -167,7 +167,7 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
 }
 
 const inputCls =
-  "border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white w-full"
+  "border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card w-full"
 
 // ── EventForm ──────────────────────────────────────────────────────────────────
 
@@ -504,14 +504,14 @@ export function EventForm({
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-[#0a0a0a] text-white rounded-full py-2.5 text-sm font-bold hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          className="flex-1 bg-foreground text-white rounded-full py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors disabled:opacity-50"
         >
           {loading
             ? mode === "create" ? "Creando…" : "Guardando…"
@@ -535,14 +535,14 @@ export function EventFormModal({
 }: EventFormModalProps) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-4 overflow-y-auto">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 w-full max-w-2xl shadow-xl my-8">
+      <div className="rounded-2xl bg-card border border-border p-6 w-full max-w-2xl shadow-xl my-8">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+          <h2 className="text-base font-black uppercase tracking-tight text-foreground">
             {title}
           </h2>
           <button
             onClick={onCancel}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-zinc-100 transition-colors"
+            className="size-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
           >
             <X className="size-4 text-zinc-500" />
           </button>

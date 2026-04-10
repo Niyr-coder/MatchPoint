@@ -89,7 +89,7 @@ export default async function CoachProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Avatar card */}
         <div className="rounded-2xl bg-card border border-border p-6 flex flex-col items-center gap-4">
-          <div className="size-24 rounded-full bg-zinc-100 text-zinc-500 font-black text-2xl flex items-center justify-center">
+          <div className="size-24 rounded-full bg-muted text-zinc-500 font-black text-2xl flex items-center justify-center">
             {getInitials(profile.full_name)}
           </div>
           <div className="text-center">
@@ -111,7 +111,7 @@ export default async function CoachProfilePage({
               {sports.map((s) => (
                 <span
                   key={s}
-                  className="text-[10px] font-black px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500 uppercase tracking-wide"
+                  className="text-[10px] font-black px-2 py-0.5 rounded-full bg-muted text-zinc-500 uppercase tracking-wide"
                 >
                   {SPORT_LABELS[s] ?? s}
                 </span>

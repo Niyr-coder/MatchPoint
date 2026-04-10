@@ -57,7 +57,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   open: "bg-success text-primary",
   in_progress: "bg-emerald-50 text-emerald-700",
-  completed: "bg-zinc-100 text-zinc-600",
+  completed: "bg-muted text-zinc-600",
   cancelled: "bg-red-50 text-red-600",
   draft: "bg-amber-50 text-amber-700",
 }
@@ -188,7 +188,7 @@ export default async function AdminAnalyticsPage() {
               {analytics.tournamentsByStatus.map((s) => (
                 <div key={s.status} className="flex items-center justify-between">
                   <span
-                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${STATUS_COLORS[s.status] ?? "bg-zinc-100 text-zinc-500"}`}
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${STATUS_COLORS[s.status] ?? "bg-muted text-zinc-500"}`}
                   >
                     {STATUS_LABELS[s.status] ?? s.status}
                   </span>

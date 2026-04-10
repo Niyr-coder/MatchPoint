@@ -21,9 +21,9 @@ const ROLE_CLASSES: Record<string, string> = {
   owner: "bg-violet-50 text-violet-700",
   partner: "bg-success text-primary",
   manager: "bg-indigo-50 text-indigo-700",
-  employee: "bg-zinc-100 text-zinc-600",
+  employee: "bg-muted text-zinc-600",
   coach: "bg-amber-50 text-amber-700",
-  user: "bg-zinc-100 text-zinc-500",
+  user: "bg-muted text-zinc-500",
 }
 
 function formatDate(dateStr: string) {
@@ -37,14 +37,14 @@ function formatDate(dateStr: string) {
 function SectionHeader({ icon: Icon, title, count }: { icon: React.ElementType; title: string; count?: number }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
+      <div className="size-8 rounded-xl bg-muted flex items-center justify-center">
         <Icon className="size-4 text-zinc-500" />
       </div>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
         {title}
       </p>
       {count !== undefined && (
-        <span className="ml-auto text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">
+        <span className="ml-auto text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-muted text-zinc-500">
           {count}
         </span>
       )}
@@ -94,7 +94,7 @@ export default async function AdminModerationPage() {
                     )}
                   </div>
                   <span
-                    className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full w-fit ${ROLE_CLASSES[u.global_role] ?? "bg-zinc-100 text-zinc-500"}`}
+                    className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full w-fit ${ROLE_CLASSES[u.global_role] ?? "bg-muted text-zinc-500"}`}
                   >
                     {ROLE_LABELS[u.global_role] ?? u.global_role}
                   </span>
@@ -133,7 +133,7 @@ export default async function AdminModerationPage() {
       {/* Section 3: Club requests */}
       <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center gap-2 mb-5">
-          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center">
+          <div className="size-8 rounded-xl bg-muted flex items-center justify-center">
             <FileText className="size-4 text-zinc-500" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">

@@ -53,7 +53,12 @@ export async function POST(
     }, { status: 409 })
   }
 
-  const body = await request.json() as { type?: string }
+  let body: { type?: string } = {}
+  try {
+    body = await request.json() as { type?: string }
+  } catch {
+    // Default to elimination if body is missing/malformed
+  }
   const type = body.type ?? "elimination"
 
   const service = createServiceClient()

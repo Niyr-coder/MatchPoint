@@ -160,7 +160,7 @@ export default async function ManagerTodayPage({
                 ↑ Activo
               </span>
             ) : (
-              <span className="text-xs font-bold text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-zinc-400 bg-muted px-2 py-0.5 rounded-full">
                 Sin movimientos
               </span>
             )}
@@ -183,7 +183,7 @@ export default async function ManagerTodayPage({
                 {totalReservations}/{courtCount * 8} turnos
               </span>
             </div>
-            <div className="h-2.5 rounded-full bg-zinc-100 overflow-hidden">
+            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary transition-all"
                 style={{ width: `${Math.max(occupancyPct, 2)}%` }}

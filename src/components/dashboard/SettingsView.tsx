@@ -74,7 +74,7 @@ function Toggle({ checked, onChange, label, description, disabled }: ToggleProps
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${
+          className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-card shadow-sm transition-transform ${
             checked ? "translate-x-5" : "translate-x-0"
           }`}
         />
@@ -307,7 +307,7 @@ export function SettingsView() {
                 }`}
               >
                 {active && (
-                  <span className="size-1.5 rounded-full bg-white" />
+                  <span className="size-1.5 rounded-full bg-card" />
                 )}
                 {opt.label}
               </button>
@@ -364,7 +364,7 @@ export function SettingsView() {
                 }`}
               >
                 {active && (
-                  <span className="size-1.5 rounded-full bg-white" />
+                  <span className="size-1.5 rounded-full bg-card" />
                 )}
                 {opt.label}
               </button>

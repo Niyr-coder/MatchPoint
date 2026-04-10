@@ -65,6 +65,8 @@ export function NotificationsBell() {
 
   useEffect(() => {
     fetchNotifications()
+    const interval = setInterval(fetchNotifications, 30_000)
+    return () => clearInterval(interval)
   }, [fetchNotifications])
 
   // Close panel on outside click
@@ -113,7 +115,7 @@ export function NotificationsBell() {
         aria-label={`Notificaciones${unreadCount > 0 ? `, ${unreadCount} sin leer` : ""}`}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="relative p-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors duration-200"
+        className="relative p-2 rounded-full text-zinc-400 hover:text-white hover:bg-foreground/90/60 transition-colors duration-200"
       >
         <Bell className="size-5" />
         {unreadCount > 0 && (
@@ -163,7 +165,7 @@ export function NotificationsBell() {
                     <div
                       className={cn(
                         "size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-                        !n.read ? "bg-card border border-border" : "bg-zinc-100"
+                        !n.read ? "bg-card border border-border" : "bg-muted"
                       )}
                     >
                       <Icon className={cn("size-4", colorClass)} />

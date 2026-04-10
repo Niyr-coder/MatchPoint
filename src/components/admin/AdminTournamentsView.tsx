@@ -29,7 +29,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_CLASSES: Record<string, string> = {
   open:        "bg-card text-foreground border border-border",
   in_progress: "bg-emerald-50 text-emerald-700 border border-emerald-100",
-  completed:   "bg-zinc-100 text-zinc-600 border border-zinc-200",
+  completed:   "bg-muted text-zinc-600 border border-zinc-200",
   cancelled:   "bg-red-50 text-red-600 border border-red-100",
   draft:       "bg-amber-50 text-amber-700 border border-amber-100",
 }
@@ -55,7 +55,7 @@ function formatDate(dateStr: string | null) {
 }
 
 function SportBadge({ sport }: { sport: string }) {
-  const cls = SPORT_CLASSES[sport.toLowerCase()] ?? "bg-zinc-100 text-zinc-600"
+  const cls = SPORT_CLASSES[sport.toLowerCase()] ?? "bg-muted text-zinc-600"
   return (
     <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full ${cls}`}>
       {sport}
@@ -64,7 +64,7 @@ function SportBadge({ sport }: { sport: string }) {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_CLASSES[status] ?? "bg-zinc-100 text-zinc-500"
+  const cls = STATUS_CLASSES[status] ?? "bg-muted text-zinc-500"
   return (
     <span className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-0.5 rounded-full ${cls}`}>
       {STATUS_LABELS[status] ?? status}
@@ -195,7 +195,7 @@ function TournamentModal({
           </h2>
           <button
             onClick={onClose}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-zinc-100 transition-colors"
+            className="size-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
           >
             <X className="size-4 text-zinc-500" />
           </button>
@@ -584,7 +584,7 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
                         <button
                           onClick={() => openEdit(t)}
                           title="Editar"
-                          className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-500 hover:text-foreground"
+                          className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-500 hover:text-foreground"
                         >
                           <Pencil className="size-3.5" />
                         </button>

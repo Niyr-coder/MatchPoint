@@ -109,7 +109,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
 
   if (!editing) {
     return (
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+      <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             Información Personal
@@ -119,7 +119,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               setSuccessMsg(null)
               setEditing(true)
             }}
-            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 border border-[#e5e5e5] rounded-full text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 border border-border rounded-full text-zinc-600 hover:bg-muted/50 transition-colors"
           >
             <Pencil className="size-3" />
             Editar
@@ -145,7 +145,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+    <div className="rounded-2xl bg-card border border-border p-6">
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-5">
         Editar Información
       </p>
@@ -167,7 +167,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               type="text"
               value={formData.first_name}
               onChange={(e) => handleChange("first_name", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
             />
             {errors.first_name && (
               <p className="text-[11px] text-red-500">{errors.first_name}</p>
@@ -183,7 +183,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               type="text"
               value={formData.last_name}
               onChange={(e) => handleChange("last_name", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
             />
             {errors.last_name && (
               <p className="text-[11px] text-red-500">{errors.last_name}</p>
@@ -200,7 +200,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               maxLength={10}
               value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value.replace(/\D/g, ""))}
-              className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+              className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
             />
             {errors.phone && (
               <p className="text-[11px] text-red-500">{errors.phone}</p>
@@ -215,7 +215,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             <select
               value={formData.province}
               onChange={(e) => handleChange("province", e.target.value)}
-              className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+              className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card appearance-none cursor-pointer"
             >
               <option value="">Seleccionar provincia</option>
               {ECUADOR_PROVINCES.map((p) => (
@@ -238,7 +238,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               value={formData.city}
               onChange={(e) => handleChange("city", e.target.value)}
               disabled={availableCities.length === 0}
-              className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">Seleccionar ciudad</option>
               {availableCities.map((c) => (
@@ -258,14 +258,14 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="flex-1 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+            className="flex-1 bg-foreground hover:bg-foreground/90 text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
           >
             {submitting && <Loader2 className="size-3.5 animate-spin" />}
             Guardar cambios
@@ -288,7 +288,7 @@ function InfoRow({
       <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-0.5">
         {label}
       </p>
-      <p className="text-sm font-semibold text-[#0a0a0a]">{value || "—"}</p>
+      <p className="text-sm font-semibold text-foreground">{value || "—"}</p>
     </div>
   )
 }

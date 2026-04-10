@@ -74,7 +74,7 @@ export function InviteRedeemClient({
     return (
       <div className="flex flex-col items-center gap-3 py-4">
         <XCircle className="size-10 text-red-400" />
-        <p className="text-sm font-semibold text-[#0a0a0a]">Invitación expirada</p>
+        <p className="text-sm font-semibold text-foreground">Invitación expirada</p>
         <p className="text-xs text-zinc-500 text-center">
           Este link de invitación ya no es válido porque ha superado su fecha límite.
         </p>
@@ -86,7 +86,7 @@ export function InviteRedeemClient({
     return (
       <div className="flex flex-col items-center gap-3 py-4">
         <XCircle className="size-10 text-zinc-300" />
-        <p className="text-sm font-semibold text-[#0a0a0a]">Invitación desactivada</p>
+        <p className="text-sm font-semibold text-foreground">Invitación desactivada</p>
         <p className="text-xs text-zinc-500 text-center">
           El creador de esta invitación la ha revocado. Contacta a quien te la envió.
         </p>
@@ -105,7 +105,7 @@ export function InviteRedeemClient({
         </p>
         <a
           href={loginHref}
-          className="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] hover:bg-[#1a1a1a] text-white font-bold text-sm rounded-full px-6 py-3.5 transition-colors"
+          className="flex items-center justify-center gap-2 w-full bg-foreground hover:bg-[#1a1a1a] text-white font-bold text-sm rounded-full px-6 py-3.5 transition-colors"
         >
           <LogIn className="size-4" />
           Inicia sesión para unirte
@@ -123,7 +123,7 @@ export function InviteRedeemClient({
       <div className="flex flex-col items-center gap-4">
         <CheckCircle2 className="size-12 text-[#16a34a]" />
         <div className="text-center">
-          <p className="text-sm font-bold text-[#0a0a0a]">Te has unido exitosamente</p>
+          <p className="text-sm font-bold text-foreground">Te has unido exitosamente</p>
           <p className="text-xs text-zinc-500 mt-1">{state.message}</p>
         </div>
         <a
@@ -142,7 +142,7 @@ export function InviteRedeemClient({
       <div className="flex flex-col items-center gap-4">
         <XCircle className="size-10 text-red-400" />
         <div className="text-center">
-          <p className="text-sm font-semibold text-[#0a0a0a]">No se pudo procesar</p>
+          <p className="text-sm font-semibold text-foreground">No se pudo procesar</p>
           <p className="text-xs text-zinc-500 mt-1">{state.message}</p>
         </div>
         <button
@@ -200,7 +200,7 @@ export function InviteRedeemClient({
     <button
       onClick={handleRedeem}
       disabled={isLoading}
-      className="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3.5 transition-colors"
+      className="flex items-center justify-center gap-2 w-full bg-foreground hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3.5 transition-colors"
     >
       {isLoading ? (
         <>

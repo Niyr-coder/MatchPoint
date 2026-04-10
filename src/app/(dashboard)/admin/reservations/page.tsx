@@ -46,7 +46,7 @@ export default async function AdminReservationsPage() {
         title="Reservas"
         description="Todas las reservas de canchas en la plataforma."
         action={
-          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-zinc-100 text-zinc-500 border-zinc-200">
+          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-muted text-zinc-500 border-zinc-200">
             {reservations.length} cargadas
           </span>
         }

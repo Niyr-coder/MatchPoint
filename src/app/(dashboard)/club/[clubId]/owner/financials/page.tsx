@@ -203,7 +203,7 @@ export default async function OwnerFinancialsPage({
                     {bar.pct}%{hasSportData && bar.amount > 0 ? ` · ${fmt(bar.amount)}` : ""}
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
                   <div
                     className={`h-full rounded-full ${SPORT_COLORS[bar.sport] ?? "bg-zinc-400"}`}
                     style={{ width: `${bar.pct}%` }}

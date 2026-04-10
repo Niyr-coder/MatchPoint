@@ -74,7 +74,7 @@ export function EventRegisterButton({
 
   if (status === "completed") {
     return (
-      <div className="rounded-2xl bg-zinc-100 border border-zinc-200 px-4 py-3 text-center">
+      <div className="rounded-2xl bg-muted border border-zinc-200 px-4 py-3 text-center">
         <p className="text-sm font-bold text-zinc-500">Evento finalizado</p>
       </div>
     )
@@ -91,19 +91,19 @@ export function EventRegisterButton({
           {loading ? "Cancelando…" : "Cancelar registro"}
         </button>
       ) : isFull ? (
-        <div className="rounded-full bg-zinc-100 border border-zinc-200 px-4 py-3 text-center">
+        <div className="rounded-full bg-muted border border-zinc-200 px-4 py-3 text-center">
           <p className="text-sm font-bold text-zinc-500">Sin lugares disponibles</p>
         </div>
       ) : canRegister ? (
         <button
           onClick={handleRegister}
           disabled={loading}
-          className="w-full bg-[#0a0a0a] text-white rounded-full py-3 text-sm font-black uppercase tracking-wide hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          className="w-full bg-foreground text-white rounded-full py-3 text-sm font-black uppercase tracking-wide hover:bg-foreground/90 transition-colors disabled:opacity-50"
         >
           {loading ? "Registrando…" : "Registrarse"}
         </button>
       ) : (
-        <div className="rounded-full bg-zinc-100 border border-zinc-200 px-4 py-3 text-center">
+        <div className="rounded-full bg-muted border border-zinc-200 px-4 py-3 text-center">
           <p className="text-sm font-bold text-zinc-500">Registro cerrado</p>
         </div>
       )}

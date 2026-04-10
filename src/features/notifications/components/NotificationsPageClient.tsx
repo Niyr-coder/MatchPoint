@@ -35,11 +35,11 @@ function getTypeIcon(type: string) {
     case "club_request_approved":
       return { Icon: Building2, colorClass: "text-green-600", bgClass: "bg-green-50" }
     case "club_request_rejected":
-      return { Icon: XCircle, colorClass: "text-zinc-400", bgClass: "bg-zinc-100" }
+      return { Icon: XCircle, colorClass: "text-zinc-400", bgClass: "bg-muted" }
     case "team_invite":
-      return { Icon: Users, colorClass: "text-zinc-500", bgClass: "bg-[#f5f5f5]" }
+      return { Icon: Users, colorClass: "text-zinc-500", bgClass: "bg-muted" }
     default:
-      return { Icon: Bell, colorClass: "text-zinc-400", bgClass: "bg-zinc-100" }
+      return { Icon: Bell, colorClass: "text-zinc-400", bgClass: "bg-muted" }
   }
 }
 
@@ -78,8 +78,8 @@ function FilterPill({ label, active, count, onClick }: FilterPillProps) {
       className={cn(
         "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-colors",
         active
-          ? "bg-[#0a0a0a] text-white"
-          : "bg-[#f5f5f5] text-[#737373] hover:bg-[#ebebeb] hover:text-[#0a0a0a]"
+          ? "bg-foreground text-white"
+          : "bg-muted text-[#737373] hover:bg-[#ebebeb] hover:text-foreground"
       )}
     >
       {label}
@@ -87,7 +87,7 @@ function FilterPill({ label, active, count, onClick }: FilterPillProps) {
         <span
           className={cn(
             "size-4 flex items-center justify-center rounded-full text-[9px] font-black",
-            active ? "bg-white text-[#0a0a0a]" : "bg-[#0a0a0a] text-white"
+            active ? "bg-card text-foreground" : "bg-foreground text-white"
           )}
         >
           {count > 99 ? "99+" : count}
@@ -113,14 +113,14 @@ function NotificationRow({ notification: n, onMarkRead, isPending }: Notificatio
   return (
     <div
       className={cn(
-        "flex items-start gap-4 p-4 border-b border-[#f0f0f0] last:border-0 transition-colors",
-        !n.read ? "bg-[#f5f5f5]/30" : "hover:bg-[#fafafa]"
+        "flex items-start gap-4 p-4 border-b border-border last:border-0 transition-colors",
+        !n.read ? "bg-muted/30" : "hover:bg-muted"
       )}
     >
       {/* Icon */}
       <div
         className={cn(
-          "size-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-[#e5e5e5]",
+          "size-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-border",
           bgClass
         )}
       >
@@ -133,7 +133,7 @@ function NotificationRow({ notification: n, onMarkRead, isPending }: Notificatio
           <p
             className={cn(
               "text-sm leading-snug",
-              n.read ? "font-semibold text-[#404040]" : "font-bold text-[#0a0a0a]"
+              n.read ? "font-semibold text-[#404040]" : "font-bold text-foreground"
             )}
           >
             {n.title}
@@ -143,7 +143,7 @@ function NotificationRow({ notification: n, onMarkRead, isPending }: Notificatio
               {formatRelativeTime(n.created_at)}
             </span>
             {!n.read && (
-              <span className="size-2 rounded-full bg-[#f5f5f5]0 shrink-0" />
+              <span className="size-2 rounded-full bg-muted0 shrink-0" />
             )}
           </div>
         </div>
@@ -298,7 +298,7 @@ export function NotificationsPageClient({
           }
         />
       ) : (
-        <div className="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
           {filtered.map((n) => (
             <NotificationRow
               key={n.id}

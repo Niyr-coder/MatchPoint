@@ -27,7 +27,7 @@ const ENTITY_TYPE_BADGE_CLASSES: Record<string, string> = {
   tournament: "bg-amber-50 text-amber-700 border-amber-200",
   event: "bg-purple-50 text-purple-700 border-purple-200",
   team: "bg-teal-50 text-teal-700 border-teal-200",
-  platform: "bg-zinc-100 text-zinc-600 border-zinc-300",
+  platform: "bg-muted text-zinc-600 border-zinc-300",
 }
 
 const ENTITY_TYPE_OPTIONS = [
@@ -249,7 +249,7 @@ function CreateInviteModal({ open, onClose, onCreated }: CreateInviteModalProps)
             onClick={handleClose}
             disabled={isLoading}
             aria-label="Cerrar"
-            className="size-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors disabled:opacity-40"
+            className="size-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-muted transition-colors disabled:opacity-40"
           >
             <X className="size-4" />
           </button>

@@ -17,8 +17,8 @@ export async function GET() {
       .limit(40)
 
     if (error) throw error
-    return NextResponse.json(data ?? [])
+    return NextResponse.json({ success: true, data: data ?? [], error: null })
   } catch {
-    return NextResponse.json([], { status: 200 })
+    return NextResponse.json({ success: false, data: null, error: "Error al cargar la actividad" }, { status: 500 })
   }
 }

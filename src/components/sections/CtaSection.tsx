@@ -34,7 +34,7 @@ export function CtaSection() {
         >
           <a
             href="/login"
-            className="btn-pill bg-white text-[#0a0a0a] px-12 py-4 text-base"
+            className="btn-pill bg-card text-foreground px-12 py-4 text-base"
           >
             Únete Gratis <ArrowRight className="w-5 h-5" />
           </a>
@@ -42,7 +42,7 @@ export function CtaSection() {
 
         {/* Cupos bar */}
         <div className="mt-8 flex flex-col items-center gap-2">
-          <div className="w-48 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="w-48 h-1.5 rounded-full bg-card/10 overflow-hidden">
             <div className="h-full bg-[#16a34a] rounded-full" style={{ width: "74%" }} />
           </div>
           <span className="text-xs text-white/40 font-semibold tracking-wider">370 / 500 CUPOS TOMADOS</span>
@@ -57,7 +57,7 @@ export function CtaSection() {
             {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
               <div
                 key={i}
-                className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0a0a0a] flex items-center justify-center text-sm"
+                className="w-8 h-8 rounded-full bg-card/10 border-2 border-foreground flex items-center justify-center text-sm"
               >
                 {emoji}
               </div>

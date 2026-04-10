@@ -20,7 +20,7 @@ function StatChip({
   trend?: { up: boolean; pct: number } | null
 }) {
   return (
-    <div className="bg-zinc-50 border border-zinc-100 rounded-xl p-3">
+    <div className="bg-muted/50 border border-zinc-100 rounded-xl p-3">
       <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">{label}</p>
       <p className="text-xl font-black text-zinc-900 leading-none">{value}</p>
       {trend && (
@@ -44,7 +44,7 @@ export function ControlTowerRevenue({ revenue }: Props) {
   const maxRev = Math.max(...revenue.topClubsByRevenue.map((c) => c.revenue), 1)
 
   return (
-    <div className="rounded-2xl bg-white overflow-hidden flex flex-col">
+    <div className="rounded-2xl bg-card overflow-hidden flex flex-col">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <DollarSign className="size-3.5 text-emerald-600" />
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Revenue</p>
@@ -77,7 +77,7 @@ export function ControlTowerRevenue({ revenue }: Props) {
                     <span className="text-[10px] font-semibold text-zinc-700 truncate pr-2">{club.name}</span>
                     <span className="text-[10px] font-black text-emerald-600 shrink-0">${club.revenue.toFixed(0)}</span>
                   </div>
-                  <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                  <div className="h-1 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-emerald-500 rounded-full"
                       style={{ width: `${(club.revenue / maxRev) * 100}%` }}

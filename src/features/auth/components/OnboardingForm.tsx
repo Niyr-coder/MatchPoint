@@ -166,19 +166,19 @@ export function OnboardingForm() {
   }
 
   const inputClass = (hasError?: string) =>
-    `w-full border rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder:text-[#c0c0c0] outline-none transition-all bg-white ${
+    `w-full border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all bg-card ${
       hasError
         ? "border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/10"
-        : "border-[#e5e5e5] focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+        : "border-border focus:border-foreground focus:ring-2 focus:ring-foreground/8"
     }`
 
   const selectClass = (hasError?: string, disabled?: boolean) =>
-    `w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all bg-white appearance-none ${
+    `w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all bg-card appearance-none ${
       disabled
-        ? "border-[#e5e5e5] text-[#c0c0c0] cursor-not-allowed"
+        ? "border-border text-muted-foreground/50 cursor-not-allowed"
         : hasError
-        ? "border-red-400 text-[#0a0a0a] focus:border-red-400 focus:ring-2 focus:ring-red-400/10"
-        : "border-[#e5e5e5] text-[#0a0a0a] focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+        ? "border-red-400 text-foreground focus:border-red-400 focus:ring-2 focus:ring-red-400/10"
+        : "border-border text-foreground focus:border-foreground focus:ring-2 focus:ring-foreground/8"
     }`
 
   return (
@@ -186,7 +186,7 @@ export function OnboardingForm() {
 
       {/* Username */}
       <div>
-        <label htmlFor="username" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+        <label htmlFor="username" className="block text-xs font-semibold text-foreground mb-1.5">
           Nombre de usuario
         </label>
         <div className="relative">
@@ -227,7 +227,7 @@ export function OnboardingForm() {
       {/* Nombre + Apellido */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="first_name" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+          <label htmlFor="first_name" className="block text-xs font-semibold text-foreground mb-1.5">
             Nombre
           </label>
           <input
@@ -244,7 +244,7 @@ export function OnboardingForm() {
           )}
         </div>
         <div>
-          <label htmlFor="last_name" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+          <label htmlFor="last_name" className="block text-xs font-semibold text-foreground mb-1.5">
             Apellido
           </label>
           <input
@@ -264,7 +264,7 @@ export function OnboardingForm() {
 
       {/* Provincia */}
       <div>
-        <label htmlFor="province" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+        <label htmlFor="province" className="block text-xs font-semibold text-foreground mb-1.5">
           Provincia
         </label>
         <select
@@ -287,7 +287,7 @@ export function OnboardingForm() {
       <div>
         <label
           htmlFor="city"
-          className={`block text-xs font-semibold mb-1.5 ${province ? "text-[#0a0a0a]" : "text-[#c0c0c0]"}`}
+          className={`block text-xs font-semibold mb-1.5 ${province ? "text-foreground" : "text-muted-foreground/50"}`}
         >
           Ciudad
           {!province && <span className="font-normal ml-1">(selecciona una provincia primero)</span>}
@@ -313,7 +313,7 @@ export function OnboardingForm() {
 
       {/* Teléfono — solo números */}
       <div>
-        <label htmlFor="phone" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+        <label htmlFor="phone" className="block text-xs font-semibold text-foreground mb-1.5">
           Teléfono de contacto
         </label>
         <input
@@ -333,7 +333,7 @@ export function OnboardingForm() {
 
       {/* Fecha de nacimiento */}
       <div>
-        <span className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+        <span className="block text-xs font-semibold text-foreground mb-1.5">
           Fecha de nacimiento
         </span>
         <div className="grid grid-cols-3 gap-2">
@@ -377,8 +377,8 @@ export function OnboardingForm() {
       </div>
 
       {/* ── Deporte principal ─────────────────────────────── */}
-      <div className="pt-2 border-t border-[#f0f0f0]">
-        <p className="text-xs font-semibold text-[#0a0a0a] mb-3">Tu deporte principal</p>
+      <div className="pt-2 border-t border-border">
+        <p className="text-xs font-semibold text-foreground mb-3">Tu deporte principal</p>
 
         {/* Sport selector — pill buttons */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -392,8 +392,8 @@ export function OnboardingForm() {
                 onClick={() => setPreferredSport(sportId)}
                 className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
                   active
-                    ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                    : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                    ? "bg-foreground text-white border-foreground"
+                    : "bg-card text-zinc-600 border-border hover:border-zinc-300"
                 }`}
               >
                 <span>{cfg.emoji}</span>
@@ -410,14 +410,14 @@ export function OnboardingForm() {
 
         {/* Pickleball extra fields — shown only when pickleball is selected */}
         {preferredSport === "pickleball" && (
-          <div className="space-y-3 rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4">
+          <div className="space-y-3 rounded-xl border border-border bg-muted p-4">
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
               Perfil de Pickleball
             </p>
 
             {/* Skill level */}
             <div>
-              <label htmlFor="pickleball_skill_level" className="block text-xs font-semibold text-[#0a0a0a] mb-1.5">
+              <label htmlFor="pickleball_skill_level" className="block text-xs font-semibold text-foreground mb-1.5">
                 ¿Cuál es tu nivel?
               </label>
               <select
@@ -437,7 +437,7 @@ export function OnboardingForm() {
 
             {/* Play style */}
             <div>
-              <span className="block text-xs font-semibold text-[#0a0a0a] mb-2">
+              <span className="block text-xs font-semibold text-foreground mb-2">
                 ¿Cómo prefieres jugar?
               </span>
               <div className="flex gap-2">
@@ -453,7 +453,7 @@ export function OnboardingForm() {
                       className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
                         active
                           ? "bg-[#16a34a] text-white border-[#16a34a]"
-                          : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                          : "bg-card text-zinc-600 border-border hover:border-zinc-300"
                       }`}
                     >
                       {PICKLEBALL_PLAY_STYLE_LABELS[style]}

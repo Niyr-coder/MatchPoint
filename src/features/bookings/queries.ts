@@ -119,10 +119,11 @@ export async function getClubReservations(
     }
 
     const { data, error } = await query
-    if (error) return []
+    if (error) throw new Error(error.message)
     return (data ?? []) as ReservationWithProfile[]
-  } catch {
-    return []
+  } catch (err) {
+    console.error("[getClubReservations]", err)
+    throw err
   }
 }
 

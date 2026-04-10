@@ -202,7 +202,7 @@ export default async function OwnerReportsPage({
                         {court.count} reserva{court.count !== 1 ? "s" : ""}
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full bg-primary"
                         style={{ width: `${pct}%` }}

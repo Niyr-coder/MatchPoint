@@ -76,7 +76,7 @@ export default function LoginPage() {
               {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
                 <div
                   key={i}
-                  className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0a0a0a] flex items-center justify-center text-sm"
+                  className="w-8 h-8 rounded-full bg-card/10 border-2 border-foreground flex items-center justify-center text-sm"
                 >
                   {emoji}
                 </div>
@@ -90,10 +90,10 @@ export default function LoginPage() {
       </div>
 
       {/* Right — Login form */}
-      <div className="w-full lg:w-1/2 flex flex-col bg-white">
+      <div className="w-full lg:w-1/2 flex flex-col bg-card">
         {/* Mobile logo */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#e5e5e5] lg:hidden">
-          <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border lg:hidden">
+          <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-foreground">
             <span className="text-[#16a34a]">●</span>
             {SITE_NAME}
           </Link>
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="px-6 py-5 text-center lg:hidden border-t border-[#e5e5e5]">
+        <div className="px-6 py-5 text-center lg:hidden border-t border-border">
           <p className="text-xs text-[#737373]">
             ¿No tienes cuenta?{" "}
             <a href="/#waitlist" className="text-[#16a34a] font-semibold hover:underline">
@@ -114,14 +114,14 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="hidden lg:flex px-12 py-6 border-t border-[#e5e5e5] justify-between items-center">
+        <div className="hidden lg:flex px-12 py-6 border-t border-border justify-between items-center">
           <p className="text-xs text-[#737373]">
             ¿No tienes cuenta?{" "}
             <a href="/#waitlist" className="text-[#16a34a] font-semibold hover:underline">
               Únete gratis
             </a>
           </p>
-          <p className="text-xs text-[#c0c0c0]">© 2025 {SITE_NAME}</p>
+          <p className="text-xs text-muted-foreground/50">© 2025 {SITE_NAME}</p>
         </div>
       </div>
     </div>

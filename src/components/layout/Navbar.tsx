@@ -15,10 +15,10 @@ export function Navbar() {
         <a href="/login" className="underline underline-offset-2 hover:opacity-80">No te quedes fuera →</a>
       </p>
     </div>
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e5e5e5]">
+    <header className="sticky top-0 z-50 w-full bg-card border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a] shrink-0">
+        <a href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-foreground shrink-0">
           <span className="text-[#16a34a]">●</span>
           {SITE_NAME}
         </a>
@@ -29,7 +29,7 @@ export function Navbar() {
             <a
               key={href}
               href={href}
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[#737373] hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors"
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[#737373] hover:text-foreground hover:bg-muted transition-colors"
             >
               {label}
             </a>
@@ -40,7 +40,7 @@ export function Navbar() {
         <div className="hidden md:flex shrink-0">
           <a
             href="/login"
-            className="btn-pill bg-[#0a0a0a] text-white px-6 py-2 text-sm"
+            className="btn-pill bg-foreground text-white px-6 py-2 text-sm"
           >
             Únete Gratis
           </a>
@@ -48,7 +48,7 @@ export function Navbar() {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden p-2 text-[#0a0a0a] rounded-lg hover:bg-[#f5f5f5] transition-colors"
+          className="md:hidden p-2 text-foreground rounded-lg hover:bg-muted transition-colors"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -58,26 +58,26 @@ export function Navbar() {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden bg-white overflow-hidden transition-all duration-300 ${
+        className={`md:hidden bg-card overflow-hidden transition-all duration-300 ${
           isMenuOpen ? "max-h-64" : "max-h-0"
         }`}
       >
-        <div className="px-4 pb-4 pt-2 space-y-1 border-t border-[#e5e5e5]">
+        <div className="px-4 pb-4 pt-2 space-y-1 border-t border-border">
           {NAV_LINKS.map(({ href, label }) => (
             <a
               key={href}
               href={href}
               onClick={() => setIsMenuOpen(false)}
-              className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-[#0a0a0a]"
+              className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-[#737373] hover:text-foreground"
             >
               {label}
             </a>
           ))}
-          <div className="pt-3 border-t border-[#e5e5e5]">
+          <div className="pt-3 border-t border-border">
             <a
               href="/login"
               onClick={() => setIsMenuOpen(false)}
-              className="btn-pill bg-[#0a0a0a] text-white px-6 py-2.5 w-full text-sm"
+              className="btn-pill bg-foreground text-white px-6 py-2.5 w-full text-sm"
             >
               Únete Gratis
             </a>

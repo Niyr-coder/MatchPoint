@@ -256,7 +256,7 @@ function AnnouncementsList({ announcements, loading }: AnnouncementsListProps) {
     return (
       <div className="flex flex-col gap-2">
         {[1, 2, 3].map((n) => (
-          <div key={n} className="h-16 rounded-xl bg-zinc-100 animate-pulse" />
+          <div key={n} className="h-16 rounded-xl bg-muted animate-pulse" />
         ))}
       </div>
     )
@@ -275,7 +275,7 @@ function AnnouncementsList({ announcements, loading }: AnnouncementsListProps) {
     <div className="flex flex-col divide-y divide-border-subtle">
       {announcements.map((item) => (
         <div key={item.id} className="py-3.5 flex items-start gap-3">
-          <div className="size-8 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="size-8 rounded-xl bg-muted flex items-center justify-center shrink-0 mt-0.5">
             <Megaphone className="size-4 text-zinc-400" />
           </div>
           <div className="flex-1 min-w-0">

@@ -28,7 +28,7 @@ export function AdminChatShell({ userId, clubs }: AdminChatShellProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Tab bar */}
-      <div className="flex gap-1 rounded-xl bg-zinc-100 p-1 w-fit">
+      <div className="flex gap-1 rounded-xl bg-muted p-1 w-fit">
         {TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id

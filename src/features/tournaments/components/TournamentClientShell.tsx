@@ -79,7 +79,7 @@ export function TournamentClientShell({
 
       {/* Closed notice for non-creators */}
       {!isCreator && currentStatus !== "open" && (
-        <div className="rounded-2xl bg-zinc-50 border border-zinc-200 p-5 text-center">
+        <div className="rounded-2xl bg-muted/50 border border-zinc-200 p-5 text-center">
           <p className="text-sm font-bold text-zinc-500">
             {currentStatus === "in_progress" ? "Este torneo ya está en curso." :
              currentStatus === "completed" ? "Este torneo ha finalizado." :
@@ -91,14 +91,14 @@ export function TournamentClientShell({
 
       {/* Tabs */}
       {tabs.length > 1 && (
-        <div className="flex gap-1 p-1 bg-zinc-100 rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2 rounded-lg text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
                 activeTab === tab.key
-                  ? "bg-white text-[#0a0a0a] shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-zinc-400 hover:text-zinc-600"
               }`}
             >

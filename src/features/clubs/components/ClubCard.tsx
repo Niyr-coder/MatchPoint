@@ -18,7 +18,7 @@ interface ClubCardProps {
 export function ClubCard({ club, index = 0 }: ClubCardProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-[#0a0a0a]/40 transition-colors"
+      className="animate-fade-in-up rounded-2xl bg-card border border-border overflow-hidden flex flex-col hover:border-foreground/40 transition-colors"
       style={{ animationDelay: `${index * 0.04}s` }}
     >
       {/* Cover */}
@@ -29,14 +29,14 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
           className="w-full h-36 object-cover"
         />
       ) : (
-        <div className="w-full h-36 bg-[#0a0a0a] flex items-center justify-center">
+        <div className="w-full h-36 bg-foreground flex items-center justify-center">
           <Building2 className="size-10 text-white/30" />
         </div>
       )}
 
       <div className="flex flex-col gap-3 p-5 flex-1">
         {/* Name */}
-        <h3 className="text-sm font-black text-[#0a0a0a] leading-tight">
+        <h3 className="text-sm font-black text-foreground leading-tight">
           {club.name}
         </h3>
 
@@ -56,7 +56,7 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
             {club.sports.map((sport) => (
               <span
                 key={sport}
-                className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-[#f5f5f5] text-[#0a0a0a] border-[#e5e5e5]"
+                className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-muted text-foreground border-border"
               >
                 {SPORT_LABEL[sport] ?? sport}
               </span>
@@ -66,7 +66,7 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
 
         {/* Footer */}
         {club.phone && (
-          <div className="mt-auto pt-3 border-t border-[#f0f0f0] flex items-center gap-1.5">
+          <div className="mt-auto pt-3 border-t border-border flex items-center gap-1.5">
             <Phone className="size-3 text-zinc-400 shrink-0" />
             <span className="text-[11px] text-zinc-500">{club.phone}</span>
           </div>

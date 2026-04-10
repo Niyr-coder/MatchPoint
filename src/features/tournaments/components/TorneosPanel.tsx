@@ -13,7 +13,7 @@ type DisplayEstado = "abierto" | "en_curso" | "completado"
 const ESTADO_STYLES: Record<DisplayEstado, { label: string; classes: string }> = {
   abierto: { label: "Abierto", classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
   en_curso: { label: "En curso", classes: "bg-amber-50 text-amber-700 border-amber-200" },
-  completado: { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  completado: { label: "Completado", classes: "bg-muted text-zinc-500 border-zinc-200" },
 }
 
 const STATUS_MAP: Record<string, DisplayEstado> = {
@@ -44,7 +44,7 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-white/20 flex items-center justify-center">
+            <div className="size-8 rounded-xl bg-card/20 flex items-center justify-center">
               <Trophy className="size-4 text-white" />
             </div>
             <h2 className="text-sm font-black uppercase tracking-tight text-white">
@@ -83,7 +83,7 @@ export function TorneosPanel({ tournaments }: TorneosPanelProps) {
                 <Link
                   key={t.id}
                   href={`/dashboard/tournaments/${t.id}`}
-                  className="shrink-0 w-52 rounded-xl bg-white/15 border border-white/20 p-4 hover:bg-white/25 transition-colors"
+                  className="shrink-0 w-52 rounded-xl bg-card/15 border border-white/20 p-4 hover:bg-card/25 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${est.classes}`}>

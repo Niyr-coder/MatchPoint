@@ -137,9 +137,9 @@ export function InviteLinkGenerator({
   if (state.status === "generated") {
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 bg-[#f5f5f5] rounded-xl px-3 py-2.5 border border-[#e5e5e5]">
+        <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2.5 border border-border">
           <Link2 className="size-4 text-zinc-400 shrink-0" />
-          <span className="text-xs text-[#0a0a0a] font-mono truncate flex-1 select-all">
+          <span className="text-xs text-foreground font-mono truncate flex-1 select-all">
             {state.url}
           </span>
           <button
@@ -208,7 +208,7 @@ export function InviteLinkGenerator({
                 value={maxUses}
                 onChange={(e) => setMaxUses(e.target.value)}
                 disabled={isLoading}
-                className="w-full appearance-none border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
+                className="w-full appearance-none border border-border rounded-lg px-3 py-2 text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
               >
                 {MAX_USES_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -230,7 +230,7 @@ export function InviteLinkGenerator({
                 value={expiresDays}
                 onChange={(e) => setExpiresDays(e.target.value)}
                 disabled={isLoading}
-                className="w-full appearance-none border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
+                className="w-full appearance-none border border-border rounded-lg px-3 py-2 text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
               >
                 {EXPIRES_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -248,7 +248,7 @@ export function InviteLinkGenerator({
       <button
         onClick={handleGenerate}
         disabled={isLoading}
-        className="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
+        className="flex items-center justify-center gap-2 w-full bg-foreground hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
       >
         {isLoading ? (
           <>

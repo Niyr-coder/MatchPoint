@@ -59,7 +59,7 @@ export function WaitlistForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
-      <div className="flex gap-2 p-1.5 bg-white/10 rounded-full border border-white/15">
+      <div className="flex gap-2 p-1.5 bg-card/10 rounded-full border border-white/15">
         <input
           type="email"
           value={email}
@@ -72,7 +72,7 @@ export function WaitlistForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="btn-pill bg-white text-foreground px-6 py-2.5 text-xs shrink-0 disabled:opacity-60"
+          className="btn-pill bg-card text-foreground px-6 py-2.5 text-xs shrink-0 disabled:opacity-60"
         >
           {status === "loading" ? (
             <Loader2 className="w-4 h-4 animate-spin" />

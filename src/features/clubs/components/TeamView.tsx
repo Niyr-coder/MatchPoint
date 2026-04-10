@@ -51,12 +51,12 @@ function MemberAvatar({ member }: { member: TeamMember }) {
       <img
         src={member.profile.avatar_url}
         alt={name}
-        className="size-9 rounded-full object-cover bg-zinc-100"
+        className="size-9 rounded-full object-cover bg-muted"
       />
     )
   }
   return (
-    <div className="size-9 rounded-full bg-[#0a0a0a] flex items-center justify-center text-white text-xs font-black shrink-0">
+    <div className="size-9 rounded-full bg-foreground flex items-center justify-center text-white text-xs font-black shrink-0">
       {initials || "?"}
     </div>
   )
@@ -179,7 +179,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
   return (
     <div className="space-y-6">
       {/* Header card */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             {isEditing ? (
@@ -195,7 +195,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                       setEditForm((prev) => ({ ...prev, name: e.target.value }))
                     }
                     maxLength={60}
-                    className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm font-semibold text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10"
+                    className="w-full border border-border rounded-xl px-3 py-2 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10"
                   />
                 </div>
                 <div>
@@ -209,7 +209,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                     }
                     rows={2}
                     maxLength={200}
-                    className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10 resize-none"
+                    className="w-full border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 resize-none"
                   />
                 </div>
                 {error && <p className="text-xs font-semibold text-red-500">{error}</p>}
@@ -217,7 +217,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                   <button
                     onClick={handleSaveEdit}
                     disabled={isSubmitting}
-                    className="bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-wide disabled:opacity-50"
+                    className="bg-foreground text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-wide disabled:opacity-50"
                   >
                     {isSubmitting ? "Guardando..." : "Guardar"}
                   </button>
@@ -227,7 +227,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                       setEditForm({ name: localTeam.name, description: localTeam.description ?? "" })
                       setError(null)
                     }}
-                    className="px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-[#0a0a0a] transition-colors"
+                    className="px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-foreground transition-colors"
                   >
                     Cancelar
                   </button>
@@ -235,10 +235,10 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
               </div>
             ) : (
               <>
-                <h1 className="text-2xl font-black tracking-tight text-[#0a0a0a] truncate">
+                <h1 className="text-2xl font-black tracking-tight text-foreground truncate">
                   {localTeam.name}
                 </h1>
-                <span className="inline-block mt-1.5 text-[10px] font-black uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-[#0a0a0a] text-white">
+                <span className="inline-block mt-1.5 text-[10px] font-black uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-foreground text-white">
                   {sportLabel}
                 </span>
                 {localTeam.description && (
@@ -252,7 +252,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
           {isCaptain && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="p-2 rounded-full text-zinc-400 hover:text-[#0a0a0a] hover:bg-[#f5f5f5] transition-colors shrink-0"
+              className="p-2 rounded-full text-zinc-400 hover:text-foreground hover:bg-muted transition-colors shrink-0"
               aria-label="Editar team"
             >
               <Pencil className="size-4" />
@@ -262,12 +262,12 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
       </div>
 
       {/* Invite code card */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 mb-3">
           Código de invitación
         </p>
         <div className="flex items-center gap-3">
-          <span className="flex-1 bg-zinc-50 border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm font-black text-[#0a0a0a] tracking-widest select-all">
+          <span className="flex-1 bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm font-black text-foreground tracking-widest select-all">
             {localTeam.invite_code}
           </span>
           <button
@@ -276,7 +276,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
               "flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-wide transition-colors shrink-0",
               copied
                 ? "bg-green-600 text-white"
-                : "bg-[#0a0a0a] text-white hover:bg-zinc-800"
+                : "bg-foreground text-white hover:bg-foreground/90"
             )}
           >
             {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
@@ -286,7 +286,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
       </div>
 
       {/* Members card */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 mb-4">
           Miembros · {localTeam.members.length}
         </p>
@@ -297,11 +297,11 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
             return (
               <li
                 key={m.id}
-                className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-zinc-50 transition-colors"
+                className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-muted/50 transition-colors"
               >
                 <MemberAvatar member={m} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[#0a0a0a] truncate">
+                  <p className="text-sm font-bold text-foreground truncate">
                     {memberName}
                     {isCurrentUser && (
                       <span className="ml-1.5 text-[10px] font-black text-zinc-300">(tú)</span>
@@ -312,7 +312,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                       "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",
                       m.role === "captain"
                         ? "bg-amber-100 text-amber-700"
-                        : "bg-zinc-100 text-zinc-500"
+                        : "bg-muted text-zinc-500"
                     )}
                   >
                     {m.role === "captain" ? "Capitán" : "Miembro"}
@@ -332,7 +332,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                       </button>
                       <button
                         onClick={() => setConfirmRemove(null)}
-                        className="p-1 rounded-full text-zinc-400 hover:text-[#0a0a0a] transition-colors"
+                        className="p-1 rounded-full text-zinc-400 hover:text-foreground transition-colors"
                       >
                         <X className="size-4" />
                       </button>
@@ -362,8 +362,8 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
       {!isCaptain && (
         <div className="flex justify-end">
           {confirmLeave ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-white border border-red-200 px-4 py-3">
-              <p className="text-sm font-semibold text-[#0a0a0a]">
+            <div className="flex items-center gap-3 rounded-2xl bg-card border border-red-200 px-4 py-3">
+              <p className="text-sm font-semibold text-foreground">
                 ¿Abandonar <span className="font-black">{localTeam.name}</span>?
               </p>
               <button
@@ -375,7 +375,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
               </button>
               <button
                 onClick={() => setConfirmLeave(false)}
-                className="px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-[#0a0a0a] transition-colors"
+                className="px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-foreground transition-colors"
               >
                 Cancelar
               </button>
@@ -383,7 +383,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
           ) : (
             <button
               onClick={() => setConfirmLeave(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-border text-[11px] font-black uppercase tracking-wide text-zinc-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
             >
               <LogOut className="size-3.5" />
               Abandonar team

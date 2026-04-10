@@ -18,7 +18,7 @@ const SPORT_LABEL: Record<string, string> = {
 export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white border border-[#e5e5e5]"
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-card border border-border"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
@@ -26,7 +26,7 @@ export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
           <div className="size-8 rounded-xl bg-[#16a34a]/10 flex items-center justify-center">
             <MapPin className="size-4 text-[#16a34a]" />
           </div>
-          <h2 className="text-sm font-black uppercase tracking-tight text-[#0a0a0a]">
+          <h2 className="text-sm font-black uppercase tracking-tight text-foreground">
             Canchas Disponibles
           </h2>
         </div>
@@ -65,7 +65,7 @@ export function CanchasMapPanel({ courts }: CanchasMapPanelProps) {
                 <MapPin className="size-3.5 text-[#16a34a]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#0a0a0a] truncate">
+                <p className="text-sm font-bold text-foreground truncate">
                   {c.clubs?.name ?? "Club"} — {c.name}
                 </p>
                 <p className="text-[11px] text-[#16a34a]/70">

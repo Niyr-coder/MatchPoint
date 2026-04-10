@@ -15,8 +15,8 @@ const SPORT_LABEL: Record<string, string> = {
 const STATUS_DOT: Record<string, { label: string; dot: string; badge: string }> = {
   open:        { label: "Abierto",    dot: "bg-green-500",  badge: "bg-success text-primary border-success-border" },
   in_progress: { label: "En curso",   dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed:   { label: "Completado", dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
-  draft:       { label: "Borrador",   dot: "bg-zinc-400",   badge: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  completed:   { label: "Completado", dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
+  draft:       { label: "Borrador",   dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
   cancelled:   { label: "Cancelado",  dot: "bg-red-500",    badge: "bg-red-50 text-red-600 border-red-200" },
 }
 
@@ -73,7 +73,7 @@ export default async function TournamentDetailPage({
       {/* Hero — default card style, no color */}
       <div className="rounded-2xl bg-card border border-border p-6 md:p-8">
         <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="size-12 rounded-xl bg-zinc-100 flex items-center justify-center">
+          <div className="size-12 rounded-xl bg-muted flex items-center justify-center">
             <Trophy className="size-6 text-zinc-400" />
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -92,11 +92,11 @@ export default async function TournamentDetailPage({
           {t.name}
         </h1>
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-muted text-zinc-600">
             {SPORT_LABEL[t.sport] ?? t.sport}
           </span>
           {t.modality && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-muted text-zinc-600">
               {t.modality}
             </span>
           )}
@@ -160,7 +160,7 @@ export default async function TournamentDetailPage({
               const label = val.name ?? meta?.label ?? key
               const emoji = meta?.emoji ?? "✅"
               return (
-                <span key={key} className="text-xs font-bold px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-700 flex items-center gap-1.5">
+                <span key={key} className="text-xs font-bold px-3 py-1.5 rounded-full bg-muted text-zinc-700 flex items-center gap-1.5">
                   <span>{emoji}</span>
                   {label}
                   {val.detail && <span className="text-zinc-400 font-normal">· {val.detail}</span>}

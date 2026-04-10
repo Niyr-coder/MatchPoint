@@ -135,7 +135,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
             onClick={onClose}
             disabled={loading}
             aria-label="Cerrar"
-            className="size-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-foreground hover:bg-zinc-100 transition-colors disabled:opacity-50"
+            className="size-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
           >
             <X className="size-3.5" />
           </button>
@@ -252,7 +252,7 @@ function ClubModal({ mode, initial, onClose, onSave, loading, error }: ClubModal
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-100 transition-colors disabled:opacity-50 bg-card"
+              className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted transition-colors disabled:opacity-50 bg-card"
             >
               Cancelar
             </button>

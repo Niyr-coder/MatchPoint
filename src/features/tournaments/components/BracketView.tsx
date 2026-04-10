@@ -126,7 +126,7 @@ export function BracketView({
           {isRoundRobin ? "Fixture" : "Cuadro de juego"}
         </p>
         {modality && (
-          <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">
+          <span className="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-zinc-500">
             {modality}
           </span>
         )}

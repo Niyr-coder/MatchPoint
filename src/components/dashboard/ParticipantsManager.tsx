@@ -37,7 +37,7 @@ interface SearchUser {
 const PAYMENT_META: Record<PaymentStatus, { label: string; icon: React.ElementType; cls: string }> = {
   paid:      { label: "Pagado",       icon: Check,         cls: "bg-green-100 text-green-700 border-green-200" },
   pending:   { label: "Pendiente",    icon: Clock,         cls: "bg-amber-50 text-amber-700 border-amber-200" },
-  waived:    { label: "Gratis",       icon: Gift,          cls: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  waived:    { label: "Gratis",       icon: Gift,          cls: "bg-muted text-zinc-500 border-zinc-200" },
   refunded:  { label: "Reembolsado",  icon: AlertCircle,   cls: "bg-card text-foreground border-border" },
 }
 
@@ -252,7 +252,7 @@ export function ParticipantsManager({
       <div className="p-5 border-b border-border-subtle flex flex-wrap items-center gap-2">
         <Users className="size-4 text-zinc-400 shrink-0" />
         <p className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Participantes</p>
-        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-muted text-zinc-500">
           {activeParticipants.length}
         </span>
         {entryFee > 0 && isCreator && (
@@ -426,7 +426,7 @@ export function ParticipantsManager({
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre o @usuario…"
                 autoFocus
-                className="w-full border border-border rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white"
+                className="w-full border border-border rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
               {searchQuery && (
                 <button onClick={() => { setSearchQuery(""); setSearchResults([]) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
@@ -519,7 +519,7 @@ export function ParticipantsManager({
                 value={withdrawReason}
                 onChange={e => setWithdrawReason(e.target.value)}
                 placeholder="Lesión, inasistencia…"
-                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
             </div>
             <div className="flex gap-3">

@@ -95,7 +95,7 @@ export default async function StudentsPage({
               key={student.id}
               className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3 hover:border-foreground/40 transition-colors"
             >
-              <div className="size-12 rounded-full bg-zinc-100 text-zinc-500 font-black text-sm flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-full bg-muted text-zinc-500 font-black text-sm flex items-center justify-center shrink-0">
                 {getInitials(student.fullName)}
               </div>
               <div className="flex-1 min-w-0">

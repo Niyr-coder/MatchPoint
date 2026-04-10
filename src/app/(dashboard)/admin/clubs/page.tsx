@@ -14,7 +14,7 @@ export default async function AdminClubsPage() {
         label="Gestión Global"
         title="Clubs"
         action={
-          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-zinc-100 text-zinc-500 border-zinc-200">
+          <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border bg-muted text-zinc-500 border-zinc-200">
             {clubs.length} total
           </span>
         }

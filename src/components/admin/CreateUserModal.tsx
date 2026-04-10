@@ -193,7 +193,7 @@ export function CreateUserModal({ clubs, onClose }: CreateUserModalProps) {
           <button
             onClick={onClose}
             disabled={loading}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-zinc-100 transition-colors disabled:opacity-50"
+            className="size-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors disabled:opacity-50"
           >
             <X className="size-4 text-zinc-500" />
           </button>

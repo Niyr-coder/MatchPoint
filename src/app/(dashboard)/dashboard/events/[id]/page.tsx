@@ -193,7 +193,7 @@ export default async function EventDetailPage({
               </span>
             )}
             {event.sport && (
-              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200">
+              <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-muted text-zinc-600 border border-zinc-200">
                 {SPORT_LABELS[event.sport] ?? event.sport}
               </span>
             )}
@@ -231,7 +231,7 @@ export default async function EventDetailPage({
               {event.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[11px] font-bold bg-zinc-100 text-zinc-600 rounded-full px-2.5 py-0.5"
+                  className="text-[11px] font-bold bg-muted text-zinc-600 rounded-full px-2.5 py-0.5"
                 >
                   {tag}
                 </span>
@@ -248,7 +248,7 @@ export default async function EventDetailPage({
               <div className="flex flex-col gap-2">
                 {attendees.map((a) => (
                   <div key={a.user_id} className="flex items-center gap-2.5">
-                    <div className="size-7 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="size-7 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
                       {a.avatar_url ? (
                         <Image
                           src={a.avatar_url}

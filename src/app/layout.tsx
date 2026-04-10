@@ -55,7 +55,7 @@ export default function RootLayout({
       className={`${inter.variable} ${plusJakartaSans.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-white text-[#0a0a0a] antialiased">
+      <body className="min-h-full bg-card text-foreground antialiased">
         {children}
       </body>
     </html>

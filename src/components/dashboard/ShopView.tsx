@@ -215,11 +215,11 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="border border-border rounded-2xl overflow-hidden">
-              <div className="h-40 bg-zinc-100 animate-pulse" />
+              <div className="h-40 bg-muted animate-pulse" />
               <div className="p-4 space-y-2">
-                <div className="h-4 bg-zinc-100 rounded animate-pulse w-3/4" />
-                <div className="h-3 bg-zinc-100 rounded animate-pulse w-1/2" />
-                <div className="h-8 bg-zinc-100 rounded-xl animate-pulse mt-3" />
+                <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+                <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
+                <div className="h-8 bg-muted rounded-xl animate-pulse mt-3" />
               </div>
             </div>
           ))}
@@ -342,7 +342,7 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
               </div>
               <button
                 onClick={() => setCartOpen(false)}
-                className="p-2 rounded-xl hover:bg-zinc-100 transition-colors"
+                className="p-2 rounded-xl hover:bg-muted transition-colors"
                 aria-label="Cerrar"
               >
                 <X className="size-5 text-zinc-600" />

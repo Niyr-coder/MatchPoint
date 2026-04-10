@@ -114,7 +114,7 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder="Cancha 1"
-          className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+          className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
         />
         {errors.name && (
           <p className="text-[11px] text-red-500">{errors.name}</p>
@@ -132,7 +132,7 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
             onChange={(e) =>
               handleChange("sport", e.target.value as CourtFormValues["sport"])
             }
-            className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+            className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card appearance-none cursor-pointer"
           >
             {VISIBLE_SPORT_IDS.map((id) => (
               <option key={id} value={id}>
@@ -159,7 +159,7 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
           value={formData.surface_type ?? ""}
           onChange={(e) => handleChange("surface_type", e.target.value)}
           placeholder="Ej: Cemento, Arcilla, Sintético..."
-          className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+          className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
         />
         {errors.surface_type && (
           <p className="text-[11px] text-red-500">{errors.surface_type}</p>
@@ -179,7 +179,7 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
           onChange={(e) =>
             handleChange("price_per_hour", parseFloat(e.target.value) || 0)
           }
-          className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+          className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
         />
         {errors.price_per_hour && (
           <p className="text-[11px] text-red-500">{errors.price_per_hour}</p>
@@ -195,10 +195,10 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
             onChange={(e) => handleChange("is_indoor", e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-10 h-6 rounded-full bg-zinc-200 peer-checked:bg-[#0a0a0a] transition-colors" />
-          <div className="absolute top-1 left-1 size-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
+          <div className="w-10 h-6 rounded-full bg-zinc-200 peer-checked:bg-foreground transition-colors" />
+          <div className="absolute top-1 left-1 size-4 rounded-full bg-card shadow transition-transform peer-checked:translate-x-4" />
         </div>
-        <span className="text-sm font-bold text-[#0a0a0a]">
+        <span className="text-sm font-bold text-foreground">
           Cancha cubierta (indoor)
         </span>
       </label>
@@ -209,14 +209,14 @@ export function CourtForm({ court, clubId, onSuccess, onCancel }: CourtFormProps
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 bg-[#0a0a0a] text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-[#222] transition-colors disabled:opacity-50"
+          className="flex-1 bg-foreground text-white rounded-full py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-[#222] transition-colors disabled:opacity-50"
         >
           {submitting && <Loader2 className="size-3.5 animate-spin" />}
           {isEdit ? "Guardar cambios" : "Crear cancha"}

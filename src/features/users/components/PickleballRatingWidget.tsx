@@ -152,7 +152,7 @@ export function PickleballRatingWidget({ profile }: PickleballRatingWidgetProps)
       </div>
 
       {/* Divider */}
-      <div className="w-px self-stretch bg-zinc-100 shrink-0" />
+      <div className="w-px self-stretch bg-muted shrink-0" />
 
       {/* Rating rings */}
       <div className="flex items-center gap-6 flex-1">

@@ -65,12 +65,12 @@ function SportCard({ sport, index, single = false }: { sport: SportCategory; ind
 
 export function SportsSection() {
   return (
-    <section id="deportes" className="bg-white py-24 border-t border-[#e5e5e5]">
+    <section id="deportes" className="bg-card py-24 border-t border-border">
       <div className="container mx-auto px-6 sm:px-8">
         <div className="animate-fade-in-up-16">
           <p className="label-green">Pickleball</p>
           <h2
-            className="font-black text-[#0a0a0a] uppercase leading-[0.88] tracking-[-0.03em] mb-12"
+            className="font-black text-foreground uppercase leading-[0.88] tracking-[-0.03em] mb-12"
             style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
           >
             PICKLEBALL.<br />ENCUENTRA TU RIVAL.

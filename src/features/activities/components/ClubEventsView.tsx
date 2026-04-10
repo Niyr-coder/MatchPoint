@@ -83,15 +83,15 @@ function AttendeesModal({ eventTitle, eventId, onClose }: AttendeesModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 w-full max-w-md shadow-xl max-h-[80vh] flex flex-col">
+      <div className="rounded-2xl bg-card border border-border p-6 w-full max-w-md shadow-xl max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Asistentes</p>
-            <h3 className="text-sm font-black text-[#0a0a0a] leading-tight">{eventTitle}</h3>
+            <h3 className="text-sm font-black text-foreground leading-tight">{eventTitle}</h3>
           </div>
           <button
             onClick={onClose}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-zinc-100 transition-colors text-zinc-400"
+            className="size-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-zinc-400"
           >
             <XCircle className="size-4" />
           </button>
@@ -108,7 +108,7 @@ function AttendeesModal({ eventTitle, eventId, onClose }: AttendeesModalProps) {
             <div className="flex flex-col divide-y divide-[#f5f5f5]">
               {attendees.map((a) => (
                 <div key={a.user_id} className="py-2.5 flex items-center gap-2">
-                  <div className="size-7 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
+                  <div className="size-7 rounded-full bg-muted flex items-center justify-center shrink-0">
                     <Users className="size-3.5 text-zinc-400" />
                   </div>
                   <span className="text-sm text-zinc-700">{a.display_name ?? "Usuario"}</span>
@@ -305,7 +305,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
         </p>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors"
+          className="flex items-center gap-2 bg-foreground text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors"
         >
           <Plus className="size-3.5" />
           Crear evento
@@ -327,9 +327,9 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
           description="Crea el primer evento del club para empezar a recibir inscripciones."
         />
       ) : (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
           {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-[#f0f0f0] bg-zinc-50">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-border bg-muted/50">
             {["Título", "Tipo", "Estado", "Inscritos", "Fecha", ""].map((h) => (
               <p
                 key={h}
@@ -351,11 +351,11 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
               return (
                 <div key={event.id} className="flex flex-col">
                 <div
-                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-zinc-50 transition-colors"
+                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-muted/50 transition-colors"
                 >
                   {/* Title */}
                   <div>
-                    <p className="text-sm font-bold text-[#0a0a0a] leading-tight truncate">
+                    <p className="text-sm font-bold text-foreground leading-tight truncate">
                       {event.title}
                     </p>
                     {!event.is_free && event.price != null && (
@@ -382,7 +382,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                   </div>
 
                   {/* Registrations */}
-                  <p className="text-sm font-black text-[#0a0a0a]">
+                  <p className="text-sm font-black text-foreground">
                     {event.registration_count}
                     {event.max_capacity != null && (
                       <span className="text-zinc-400 font-normal">/{event.max_capacity}</span>
@@ -397,7 +397,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                     <button
                       onClick={() => setAttendeesTarget({ id: event.id, title: event.title })}
                       title="Ver asistentes"
-                      className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a]"
+                      className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground"
                     >
                       <Users className="size-3.5" />
                     </button>
@@ -409,7 +409,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                         className={`size-7 flex items-center justify-center rounded-lg transition-colors ${
                           inviteOpenId === event.id
                             ? "bg-[#16a34a] text-white"
-                            : "hover:bg-zinc-100 text-zinc-400 hover:text-[#16a34a]"
+                            : "hover:bg-muted text-zinc-400 hover:text-[#16a34a]"
                         }`}
                       >
                         <Link2 className="size-3.5" />
@@ -421,7 +421,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                         onClick={() => openEdit(event)}
                         title="Editar"
                         disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
                       >
                         <Pencil className="size-3.5" />
                       </button>
@@ -432,7 +432,7 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
                         onClick={() => togglePublish(event)}
                         title={event.status === "published" ? "Despublicar" : "Publicar"}
                         disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
                       >
                         {event.status === "published"
                           ? <EyeOff className="size-3.5" />
@@ -459,8 +459,8 @@ export function ClubEventsView({ events, clubId, role }: ClubEventsViewProps) {
 
                 {/* Inline invite panel */}
                 {inviteOpenId === event.id && (
-                  <div className="px-5 pb-4 border-t border-[#f0f0f0]">
-                    <div className="rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4 mt-3">
+                  <div className="px-5 pb-4 border-t border-border">
+                    <div className="rounded-xl border border-border bg-muted p-4 mt-3">
                       <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 mb-3">
                         Link de invitación — {event.title}
                       </p>

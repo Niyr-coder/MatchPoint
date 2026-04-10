@@ -110,7 +110,7 @@ export function InviteRedeemButton({
     <button
       onClick={handleRedeem}
       disabled={buttonState === "loading"}
-      className="flex items-center gap-2 bg-[#0a0a0a] hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
+      className="flex items-center gap-2 bg-foreground hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
     >
       {buttonState === "loading" ? (
         <>

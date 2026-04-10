@@ -67,7 +67,7 @@ function QuickStat({
 }) {
   const colorMap = {
     green: "text-green-600",
-    blue: "text-[#0a0a0a]",
+    blue: "text-foreground",
     zinc: "text-zinc-800",
   }
   return (
@@ -124,20 +124,20 @@ export default async function PublicProfilePage({ params }: Props) {
       : String(playerProfile.current_streak)
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-muted">
       {/* Top nav */}
-      <header className="bg-white border-b border-[#e5e5e5]">
+      <header className="bg-card border-b border-border">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-1.5 font-black text-lg tracking-tight text-[#0a0a0a]"
+            className="flex items-center gap-1.5 font-black text-lg tracking-tight text-foreground"
           >
             <div className="size-2 rounded-full bg-[#16a34a]" />
             MATCHPOINT
           </Link>
           <Link
             href="/dashboard"
-            className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-[#0a0a0a] transition-colors"
+            className="text-xs font-black uppercase tracking-[0.1em] text-zinc-400 hover:text-foreground transition-colors"
           >
             Mi Dashboard →
           </Link>
@@ -145,7 +145,7 @@ export default async function PublicProfilePage({ params }: Props) {
       </header>
 
       {/* Hero section */}
-      <div className="bg-white border-b border-[#e5e5e5]">
+      <div className="bg-card border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-start gap-6">
             {/* Avatar with rating badge */}
@@ -162,7 +162,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
             {/* Name, username, meta */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-black uppercase tracking-tight text-[#0a0a0a] truncate">
+              <h1 className="text-3xl font-black uppercase tracking-tight text-foreground truncate">
                 {displayName}
               </h1>
               <p className="text-zinc-400 text-sm mt-0.5">@{username}</p>
@@ -189,7 +189,7 @@ export default async function PublicProfilePage({ params }: Props) {
                   {playerProfile.sports.map(({ sport, count }) => (
                     <span
                       key={sport}
-                      className="px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold"
+                      className="px-3 py-1 rounded-full bg-muted text-zinc-700 text-xs font-bold"
                     >
                       {SPORT_LABELS[sport] ?? sport} · {count} partidos
                     </span>
@@ -200,7 +200,7 @@ export default async function PublicProfilePage({ params }: Props) {
           </div>
 
           {/* Quick stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-[#e5e5e5]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
             <QuickStat label="Partidos" value={playerProfile.matches_played} />
             <QuickStat label="Victorias" value={playerProfile.matches_won} color="green" />
             <QuickStat label="% Victorias" value={`${playerProfile.win_rate}%`} color="blue" />
@@ -214,7 +214,7 @@ export default async function PublicProfilePage({ params }: Props) {
         {/* Left column */}
         <div className="flex flex-col gap-6 lg:col-span-1">
           {/* Rating card */}
-          <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+          <div className="bg-card border border-border rounded-2xl p-6">
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">
               Rating Matchpoint
             </p>
@@ -228,13 +228,13 @@ export default async function PublicProfilePage({ params }: Props) {
             ) : (
               <p className="text-sm text-zinc-400 mt-2">Sin posición en ranking</p>
             )}
-            <div className="mt-3 text-[10px] text-zinc-400 bg-zinc-50 rounded-xl p-3 leading-relaxed">
+            <div className="mt-3 text-[10px] text-zinc-400 bg-muted/50 rounded-xl p-3 leading-relaxed">
               ⚡ El rating solo se calcula en torneos y quedadas oficiales supervisadas.
             </div>
           </div>
 
           {/* Clubs card */}
-          <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+          <div className="bg-card border border-border rounded-2xl p-6">
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">
               Clubes
             </p>
@@ -254,7 +254,7 @@ export default async function PublicProfilePage({ params }: Props) {
         </div>
 
         {/* Right column: match history */}
-        <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6 lg:col-span-2">
+        <div className="bg-card border border-border rounded-2xl p-6 lg:col-span-2">
           <div className="flex items-start justify-between mb-4">
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
               Historial de Partidos
@@ -276,7 +276,7 @@ export default async function PublicProfilePage({ params }: Props) {
                 const resultStyles = {
                   win: "bg-green-50 text-green-700 border border-green-200",
                   loss: "bg-red-50 text-red-700 border border-red-200",
-                  draw: "bg-zinc-100 text-zinc-600 border border-zinc-200",
+                  draw: "bg-muted text-zinc-600 border border-zinc-200",
                 } as const
                 const resultLabels = {
                   win: "VICTORIA",

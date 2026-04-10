@@ -47,7 +47,7 @@ export function EventsFilters() {
           value={search}
           onChange={(e) => updateParam("search", e.target.value)}
           placeholder="Buscar eventos…"
-          className="w-full border border-[#e5e5e5] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+          className="w-full border border-border rounded-xl pl-9 pr-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8"
         />
       </div>
 
@@ -57,7 +57,7 @@ export function EventsFilters() {
           <select
             value={sport}
             onChange={(e) => updateParam("sport", e.target.value)}
-            className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] bg-white"
+            className="border border-border rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-foreground bg-card"
           >
             <option value="">Todos los deportes</option>
             {SPORTS.map((s) => (
@@ -69,7 +69,7 @@ export function EventsFilters() {
         <select
           value={eventType}
           onChange={(e) => updateParam("event_type", e.target.value)}
-          className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] bg-white"
+          className="border border-border rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-foreground bg-card"
         >
           <option value="">Todos los tipos</option>
           {EVENT_TYPES.map((t) => (
@@ -82,10 +82,10 @@ export function EventsFilters() {
           value={city}
           onChange={(e) => updateParam("city", e.target.value)}
           placeholder="Ciudad…"
-          className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] placeholder:text-zinc-400 bg-white"
+          className="border border-border rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-foreground placeholder:text-zinc-400 bg-card"
         />
 
-        <label className="flex items-center gap-1.5 border border-[#e5e5e5] rounded-full px-3 py-1.5 cursor-pointer hover:bg-zinc-50 transition-colors">
+        <label className="flex items-center gap-1.5 border border-border rounded-full px-3 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors">
           <input
             type="checkbox"
             checked={isFree === "true"}

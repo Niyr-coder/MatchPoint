@@ -143,12 +143,12 @@ export function ClubRequestForm() {
 
   if (submitted) {
     return (
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-8 flex flex-col items-center gap-4 text-center">
+      <div className="rounded-2xl bg-card border border-border p-8 flex flex-col items-center gap-4 text-center">
         <div className="size-14 rounded-full bg-green-50 flex items-center justify-center">
           <span className="text-2xl">✅</span>
         </div>
         <div>
-          <p className="text-lg font-black text-[#0a0a0a] uppercase tracking-[-0.02em]">
+          <p className="text-lg font-black text-foreground uppercase tracking-[-0.02em]">
             Solicitud enviada
           </p>
           <p className="text-sm text-zinc-500 mt-1.5 max-w-sm">
@@ -160,7 +160,7 @@ export function ClubRequestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-6">
+    <form onSubmit={handleSubmit} noValidate className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-6">
 
       {/* Club name */}
       <div className="flex flex-col gap-1.5">
@@ -172,7 +172,7 @@ export function ClubRequestForm() {
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
           placeholder="Ej. Club Deportivo Quito Norte"
-          className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+          className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8"
         />
         {errors.name && (
           <p className="text-xs text-red-600">{errors.name}</p>
@@ -188,7 +188,7 @@ export function ClubRequestForm() {
           <select
             value={form.province}
             onChange={(e) => updateField("province", e.target.value)}
-            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer"
+            className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card appearance-none cursor-pointer"
           >
             <option value="">Seleccionar provincia...</option>
             {ECUADOR_PROVINCES.map((p) => (
@@ -209,7 +209,7 @@ export function ClubRequestForm() {
             value={form.city}
             onChange={(e) => updateField("city", e.target.value)}
             disabled={!form.province}
-            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <option value="">{form.province ? "Seleccionar ciudad..." : "— Primero elige una provincia —"}</option>
             {availableCities.map((c) => (
@@ -233,7 +233,7 @@ export function ClubRequestForm() {
           onChange={(e) => updateField("description", e.target.value)}
           placeholder="¿Qué hace especial a tu club?"
           rows={3}
-          className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 resize-none"
+          className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 resize-none"
         />
       </div>
 
@@ -253,7 +253,7 @@ export function ClubRequestForm() {
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold border transition-colors ${
                   selected
                     ? "bg-[#111111] text-white border-[#111111]"
-                    : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-400"
+                    : "bg-card text-zinc-600 border-border hover:border-zinc-400"
                 }`}
               >
                 <span>{sport.emoji}</span>
@@ -279,7 +279,7 @@ export function ClubRequestForm() {
             value={form.contactPhone}
             onChange={(e) => updateField("contactPhone", e.target.value)}
             placeholder="Ej. +593 99 000 0000"
-            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+            className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8"
           />
         </div>
 
@@ -293,7 +293,7 @@ export function ClubRequestForm() {
             value={form.contactEmail}
             onChange={(e) => updateField("contactEmail", e.target.value)}
             placeholder="contacto@miclub.ec"
-            className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8"
+            className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8"
           />
           {errors.contactEmail && (
             <p className="text-xs text-red-600">{errors.contactEmail}</p>
@@ -313,7 +313,7 @@ export function ClubRequestForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#111111] text-white text-sm font-black uppercase tracking-wide hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#111111] text-white text-sm font-black uppercase tracking-wide hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting && <Loader2 className="size-4 animate-spin" />}
           Enviar solicitud

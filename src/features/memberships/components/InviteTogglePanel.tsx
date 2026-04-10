@@ -22,7 +22,7 @@ export function InviteTogglePanel({ entityType, entityId, label }: InviteToggleP
         className={`flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5 border transition-colors ${
           open
             ? "bg-[#16a34a] text-white border-[#16a34a]"
-            : "border-[#e5e5e5] text-zinc-500 hover:border-[#16a34a] hover:text-[#16a34a]"
+            : "border-border text-zinc-500 hover:border-[#16a34a] hover:text-[#16a34a]"
         }`}
       >
         <Link2 className="size-3.5" />
@@ -30,7 +30,7 @@ export function InviteTogglePanel({ entityType, entityId, label }: InviteToggleP
       </button>
 
       {open && (
-        <div className="rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4">
+        <div className="rounded-xl border border-border bg-muted p-4">
           <InviteLinkGenerator
             entityType={entityType}
             entityId={entityId}

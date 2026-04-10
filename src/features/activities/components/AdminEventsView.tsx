@@ -72,12 +72,12 @@ function FilterBar({ filter, onFilterChange, clubs, statusFilter, onStatusFilter
         value={filter}
         onChange={(e) => onFilterChange(e.target.value)}
         placeholder="Buscar por título…"
-        className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs text-zinc-700 placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] bg-white"
+        className="border border-border rounded-full px-3 py-1.5 text-xs text-zinc-700 placeholder:text-zinc-400 outline-none focus:border-foreground bg-card"
       />
       <select
         value={statusFilter}
         onChange={(e) => onStatusFilter(e.target.value)}
-        className="border border-[#e5e5e5] rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-[#0a0a0a] bg-white"
+        className="border border-border rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-foreground bg-card"
       >
         <option value="">Todos los estados</option>
         <option value="draft">Borrador</option>
@@ -271,7 +271,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
         />
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-zinc-800 transition-colors shrink-0"
+          className="flex items-center gap-2 bg-foreground text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors shrink-0"
         >
           <Plus className="size-3.5" />
           Crear evento
@@ -293,9 +293,9 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
           description="No hay eventos que coincidan con los filtros seleccionados."
         />
       ) : (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
           {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-[#f0f0f0] bg-zinc-50">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-border bg-muted/50">
             {["Título", "Tipo", "Club", "Estado", "Inscritos", "Fecha", ""].map((h) => (
               <p
                 key={h}
@@ -317,11 +317,11 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
               return (
                 <div
                   key={event.id}
-                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-zinc-50 transition-colors"
+                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-muted/50 transition-colors"
                 >
                   {/* Title */}
                   <div>
-                    <p className="text-sm font-bold text-[#0a0a0a] leading-tight truncate">
+                    <p className="text-sm font-bold text-foreground leading-tight truncate">
                       {event.title}
                     </p>
                     {event.sport && (
@@ -353,7 +353,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                   </div>
 
                   {/* Registrations */}
-                  <p className="text-sm font-black text-[#0a0a0a]">
+                  <p className="text-sm font-black text-foreground">
                     {event.registration_count}
                     {event.max_capacity != null && (
                       <span className="text-zinc-400 font-normal">/{event.max_capacity}</span>
@@ -370,7 +370,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                         onClick={() => openEdit(event)}
                         title="Editar"
                         disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
                       >
                         <Pencil className="size-3.5" />
                       </button>
@@ -381,7 +381,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                         onClick={() => updateStatus(event, "draft")}
                         title="Despublicar"
                         disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
                       >
                         <EyeOff className="size-3.5" />
                       </button>
@@ -392,7 +392,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                         onClick={() => updateStatus(event, "published")}
                         title="Publicar"
                         disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
                       >
                         <Eye className="size-3.5" />
                       </button>
@@ -414,7 +414,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
                         onClick={() => updateStatus(event, "completed")}
                         title="Marcar completado"
                         disabled={isActioning || event.status === "completed"}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] transition-colors text-zinc-300 hover:text-[#0a0a0a] disabled:opacity-40"
+                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-300 hover:text-foreground disabled:opacity-40"
                       >
                         <CheckCircle className="size-3.5" />
                       </button>

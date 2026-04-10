@@ -114,11 +114,11 @@ export default async function InvitePage({
   const isInactive = preview !== null && !preview.is_active
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-16">
+    <div className="min-h-screen bg-card flex flex-col items-center justify-center px-4 py-16">
       {/* Card */}
-      <div className="w-full max-w-md rounded-2xl border border-[#e5e5e5] bg-white shadow-sm p-8 flex flex-col items-center gap-6">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-sm p-8 flex flex-col items-center gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-[#0a0a0a]">
+        <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-foreground">
           <span className="text-[#16a34a]">●</span>
           {SITE_NAME}
         </Link>
@@ -131,7 +131,7 @@ export default async function InvitePage({
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
             {SITE_NAME}
           </p>
-          <h1 className="text-2xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a] leading-tight">
+          <h1 className="text-2xl font-black uppercase tracking-[-0.03em] text-foreground leading-tight">
             {title}
           </h1>
           <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">

@@ -28,7 +28,7 @@ function growthBadge(thisMonth: number, lastMonth: number) {
     )
   }
   return (
-    <span className="text-xs font-black text-zinc-400 bg-zinc-100 px-2.5 py-1 rounded-full">
+    <span className="text-xs font-black text-zinc-400 bg-muted px-2.5 py-1 rounded-full">
       Sin cambio
     </span>
   )

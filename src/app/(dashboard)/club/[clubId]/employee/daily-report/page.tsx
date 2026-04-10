@@ -33,7 +33,7 @@ function KpiCard({ label, value, sub, color = "zinc", icon }: KpiCardProps) {
     green: "bg-green-50 text-green-600",
     red: "bg-red-50 text-red-600",
     blue: "bg-secondary text-foreground",
-    zinc: "bg-zinc-100 text-zinc-500",
+    zinc: "bg-muted text-zinc-500",
   }
   return (
     <div className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-3">

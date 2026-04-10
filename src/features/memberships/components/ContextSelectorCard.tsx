@@ -10,17 +10,17 @@ export function ContextSelectorCard({ entry }: { entry: UserRoleEntry }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-4 p-5 rounded-xl border border-zinc-200 bg-white hover:border-[#0a0a0a] transition-all group"
+      className="flex items-center gap-4 p-5 rounded-xl border border-zinc-200 bg-card hover:border-foreground transition-all group"
     >
       <Avatar className="size-12 shrink-0">
         <AvatarImage src={entry.clubLogo ?? undefined} alt={entry.clubName} />
-        <AvatarFallback className="bg-zinc-100 text-[#0a0a0a] font-black text-sm border border-zinc-200">
+        <AvatarFallback className="bg-muted text-foreground font-black text-sm border border-zinc-200">
           {initials}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
-        <p className="font-black text-[#0a0a0a] truncate text-sm uppercase tracking-tight">
+        <p className="font-black text-foreground truncate text-sm uppercase tracking-tight">
           {entry.clubName}
         </p>
         <div className="mt-1">
@@ -28,7 +28,7 @@ export function ContextSelectorCard({ entry }: { entry: UserRoleEntry }) {
         </div>
       </div>
 
-      <span className="text-zinc-300 group-hover:text-[#0a0a0a] transition-colors text-lg">→</span>
+      <span className="text-zinc-300 group-hover:text-foreground transition-colors text-lg">→</span>
     </Link>
   )
 }

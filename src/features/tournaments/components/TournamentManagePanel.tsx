@@ -17,7 +17,7 @@ interface StatusAction {
 
 const STATUS_FLOW: StatusAction[] = [
   { from: "draft",       action: "Publicar torneo",   to: "open",        icon: Play,        color: "bg-green-600 hover:bg-green-700 text-white",  description: "Los jugadores podrán inscribirse" },
-  { from: "open",        action: "Iniciar torneo",     to: "in_progress", icon: Play,        color: "bg-[#0a0a0a] hover:bg-[#222222] text-white", description: "Cierra inscripciones e inicia la competencia" },
+  { from: "open",        action: "Iniciar torneo",     to: "in_progress", icon: Play,        color: "bg-foreground hover:bg-foreground/90 text-white", description: "Cierra inscripciones e inicia la competencia" },
   { from: "in_progress", action: "Finalizar torneo",   to: "completed",   icon: CheckCircle, color: "bg-zinc-800 hover:bg-zinc-900 text-white",    description: "Marca el torneo como completado" },
 ]
 
@@ -145,22 +145,22 @@ export function TournamentManagePanel({
   }
 
   return (
-    <div className="bg-white border-2 border-dashed border-[#0a0a0a]/30 rounded-2xl p-5 flex flex-col gap-4">
+    <div className="bg-card border-2 border-dashed border-foreground/30 rounded-2xl p-5 flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <Settings className="size-4 text-[#0a0a0a]" />
-        <p className="text-[11px] font-black uppercase tracking-[0.15em] text-[#0a0a0a]">Panel de gestión</p>
+        <Settings className="size-4 text-foreground" />
+        <p className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground">Panel de gestión</p>
         <span className="ml-auto text-[10px] text-zinc-400">Solo visible para ti</span>
         {!["completed", "cancelled"].includes(currentStatus) && (
           <button
             onClick={() => void openEdit()}
-            className="flex items-center gap-1 text-[10px] font-black text-zinc-400 hover:text-[#0a0a0a] transition-colors"
+            className="flex items-center gap-1 text-[10px] font-black text-zinc-400 hover:text-foreground transition-colors"
           >
             <Pencil className="size-3" /> Editar
           </button>
         )}
       </div>
 
-      <div className="bg-zinc-50 rounded-xl p-3">
+      <div className="bg-muted/50 rounded-xl p-3">
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Estado actual</p>
         <p className="text-sm font-black text-zinc-800 mt-0.5">
           {currentStatus === "draft" ? "Borrador — No visible para otros" :
@@ -188,7 +188,7 @@ export function TournamentManagePanel({
       )})()}
 
       {CANCEL_ALLOWED.includes(currentStatus) && (
-        <div className="border-t border-[#f0f0f0] pt-3">
+        <div className="border-t border-border pt-3">
           <button
             onClick={() => setCancelOpen(true)}
             className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-red-600 transition-colors font-bold"
@@ -230,49 +230,49 @@ export function TournamentManagePanel({
       <Sheet open={editOpen} onOpenChange={setEditOpen}>
         <SheetContent side="right" className="w-full max-w-sm flex flex-col gap-4 overflow-y-auto">
           <SheetHeader>
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">Editar torneo</SheetTitle>
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">Editar torneo</SheetTitle>
           </SheetHeader>
           {editError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{editError}</p>}
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Nombre *</label>
-              <input className="w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} maxLength={100} />
+              <input className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} maxLength={100} />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Modalidad</label>
-              <input className="w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.modality} onChange={e => setEditForm(f => ({ ...f, modality: e.target.value }))} placeholder="Singles, Dobles…" />
+              <input className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.modality} onChange={e => setEditForm(f => ({ ...f, modality: e.target.value }))} placeholder="Singles, Dobles…" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Fecha</label>
-                <input type="date" className="w-full px-3 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.start_date} onChange={e => setEditForm(f => ({ ...f, start_date: e.target.value }))} />
+                <input type="date" className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.start_date} onChange={e => setEditForm(f => ({ ...f, start_date: e.target.value }))} />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Hora</label>
-                <input type="time" className="w-full px-3 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.start_time} onChange={e => setEditForm(f => ({ ...f, start_time: e.target.value }))} />
+                <input type="time" className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.start_time} onChange={e => setEditForm(f => ({ ...f, start_time: e.target.value }))} />
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Fecha cierre</label>
-              <input type="date" className="w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.end_date} onChange={e => setEditForm(f => ({ ...f, end_date: e.target.value }))} />
+              <input type="date" className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.end_date} onChange={e => setEditForm(f => ({ ...f, end_date: e.target.value }))} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Máx. jugadores</label>
-                <input type="number" min={2} max={256} className="w-full px-3 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.max_participants} onChange={e => setEditForm(f => ({ ...f, max_participants: parseInt(e.target.value) || 16 }))} />
+                <input type="number" min={2} max={256} className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.max_participants} onChange={e => setEditForm(f => ({ ...f, max_participants: parseInt(e.target.value) || 16 }))} />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Inscripción $</label>
-                <input type="number" min={0} step={0.01} className="w-full px-3 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white" value={editForm.entry_fee} onChange={e => setEditForm(f => ({ ...f, entry_fee: parseFloat(e.target.value) || 0 }))} />
+                <input type="number" min={0} step={0.01} className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card" value={editForm.entry_fee} onChange={e => setEditForm(f => ({ ...f, entry_fee: parseFloat(e.target.value) || 0 }))} />
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Descripción</label>
-              <textarea rows={3} className="w-full px-4 py-2.5 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-[#0a0a0a] bg-white resize-none" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} placeholder="Información adicional…" maxLength={1000} />
+              <textarea rows={3} className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card resize-none" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} placeholder="Información adicional…" maxLength={1000} />
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setEditOpen(false)} className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors">Cancelar</button>
-              <button onClick={() => void saveEdit()} disabled={editLoading || editForm.name.trim().length < 3} className="flex-1 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full py-2.5 text-sm font-bold transition-colors disabled:opacity-50">
+              <button onClick={() => setEditOpen(false)} className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors">Cancelar</button>
+              <button onClick={() => void saveEdit()} disabled={editLoading || editForm.name.trim().length < 3} className="flex-1 bg-foreground hover:bg-foreground/90 text-white rounded-full py-2.5 text-sm font-bold transition-colors disabled:opacity-50">
                 {editLoading ? "Guardando…" : "Guardar"}
               </button>
             </div>

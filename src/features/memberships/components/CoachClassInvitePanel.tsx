@@ -128,12 +128,12 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex flex-col gap-4">
+    <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
       <div>
         <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">
           Invitaciones
         </p>
-        <h3 className="text-sm font-black text-[#0a0a0a] mt-0.5">
+        <h3 className="text-sm font-black text-foreground mt-0.5">
           Invitar estudiantes a mi clase
         </h3>
         <p className="text-xs text-zinc-500 mt-1">
@@ -148,7 +148,7 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
         className={`flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5 border transition-colors self-start ${
           open
             ? "bg-[#16a34a] text-white border-[#16a34a]"
-            : "border-[#e5e5e5] text-zinc-500 hover:border-[#16a34a] hover:text-[#16a34a]"
+            : "border-border text-zinc-500 hover:border-[#16a34a] hover:text-[#16a34a]"
         }`}
       >
         <Link2 className="size-3.5" />
@@ -156,14 +156,14 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
       </button>
 
       {open && (
-        <div className="rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-4 flex flex-col gap-3">
+        <div className="rounded-xl border border-border bg-muted p-4 flex flex-col gap-3">
 
           {/* Generated */}
           {state.status === "generated" && (
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 bg-[#f5f5f5] rounded-xl px-3 py-2.5 border border-[#e5e5e5]">
+              <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2.5 border border-border">
                 <Link2 className="size-4 text-zinc-400 shrink-0" />
-                <span className="text-xs text-[#0a0a0a] font-mono truncate flex-1 select-all">
+                <span className="text-xs text-foreground font-mono truncate flex-1 select-all">
                   {state.url}
                 </span>
                 <button
@@ -210,7 +210,7 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
                     value={sport}
                     onChange={(e) => setSport(e.target.value as SportValue)}
                     disabled={isLoading}
-                    className="w-full appearance-none border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
+                    className="w-full appearance-none border border-border rounded-lg px-3 py-2 text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
                   >
                     {SPORT_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -244,7 +244,7 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
                         value={maxUses}
                         onChange={(e) => setMaxUses(e.target.value)}
                         disabled={isLoading}
-                        className="w-full appearance-none border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
+                        className="w-full appearance-none border border-border rounded-lg px-3 py-2 text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
                       >
                         {MAX_USES_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -263,7 +263,7 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
                         value={expiresDays}
                         onChange={(e) => setExpireDays(e.target.value)}
                         disabled={isLoading}
-                        className="w-full appearance-none border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-[#0a0a0a] bg-white focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
+                        className="w-full appearance-none border border-border rounded-lg px-3 py-2 text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-[#16a34a] disabled:opacity-60 pr-7"
                       >
                         {EXPIRES_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -278,7 +278,7 @@ export function CoachClassInvitePanel({ coachUserId, clubId }: CoachClassInviteP
               <button
                 onClick={handleGenerate}
                 disabled={isLoading}
-                className="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
+                className="flex items-center justify-center gap-2 w-full bg-foreground hover:bg-[#1a1a1a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full px-6 py-3 transition-colors"
               >
                 {isLoading ? (
                   <>

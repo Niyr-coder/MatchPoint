@@ -6,11 +6,11 @@ interface DashboardHeadingProps {
 
 export function DashboardHeading({ label, title, subtitle }: DashboardHeadingProps) {
   return (
-    <div className="pb-6 mb-2 border-b border-border">
+    <div className="pb-3 mb-1 border-b border-border">
       <p className="label-green mb-1">{label}</p>
       <h1
         className="font-black text-foreground uppercase leading-[0.88] tracking-[-0.03em]"
-        style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
+        style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}
       >
         {title}
       </h1>

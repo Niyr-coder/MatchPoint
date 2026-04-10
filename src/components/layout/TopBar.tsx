@@ -30,7 +30,7 @@ export function TopBar({ sections, profile, currentRole, clubName, darkMode = fa
     <header className={`flex items-center gap-4 h-16 px-4 md:px-6 border-b shrink-0 relative z-10 backdrop-blur-sm ${
       darkMode
         ? "border-zinc-800 bg-zinc-950/90"
-        : "border-zinc-200 bg-white/80"
+        : "border-zinc-200 bg-card/80"
     }`}>
       {/* Mobile hamburger */}
       <MobileSidebar

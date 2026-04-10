@@ -37,7 +37,7 @@ function RankList({ title, icon, items, valueLabel, barColor, iconBg, iconColor 
                     {item.value} {valueLabel}
                   </span>
                 </div>
-                <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                <div className="h-1 bg-muted rounded-full overflow-hidden">
                   <div
                     className={cn("h-full rounded-full transition-all", barColor)}
                     style={{ width: `${(item.value / max) * 100}%` }}
@@ -63,7 +63,7 @@ interface Props {
 
 export function ControlTowerRankings({ topClubs, topPlayers, topTournaments }: Props) {
   return (
-    <div className="rounded-2xl bg-white overflow-hidden">
+    <div className="rounded-2xl bg-card overflow-hidden">
       <div className="px-4 py-3 border-b border-border">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Top Rankings</p>
       </div>

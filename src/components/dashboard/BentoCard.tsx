@@ -50,7 +50,7 @@ export function BentoCard({
     <div
       className={cn(
         "animate-fade-in-up relative rounded-2xl overflow-hidden flex flex-col p-6 group",
-        "min-h-[160px]",
+        "min-h-[120px]",
         VARIANT_CLASSES[variant],
         !href && className,
       )}

@@ -160,7 +160,7 @@ export default async function EmployeeClientsPage({
               >
                 {/* Name + avatar */}
                 <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-zinc-100 text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
+                  <div className="size-8 rounded-full bg-muted text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
                     {getInitials(member.fullName)}
                   </div>
                   <span className="text-sm font-medium text-foreground truncate">

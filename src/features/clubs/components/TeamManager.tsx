@@ -123,7 +123,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
       <div className="flex justify-end">
         <button
           onClick={() => setSheetOpen(true)}
-          className="bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 hover:bg-zinc-800 transition-colors"
+          className="bg-foreground text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 hover:bg-foreground/90 transition-colors"
         >
           <UserPlus className="size-3.5" />
           Agregar Miembro
@@ -132,12 +132,12 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
 
       {/* Member list */}
       {members.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3 border border-dashed border-[#e5e5e5] rounded-2xl">
+        <div className="flex flex-col items-center justify-center py-20 gap-3 border border-dashed border-border rounded-2xl">
           <Users className="size-10 text-zinc-300" />
           <p className="text-sm font-bold text-zinc-400">Sin miembros en el equipo</p>
         </div>
       ) : (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden divide-y divide-[#f0f0f0]">
+        <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-[#f0f0f0]">
           {members.map((member, i) => (
             <div
               key={member.id}
@@ -145,13 +145,13 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
               style={{ animationDelay: `${i * 0.04}s` }}
             >
               {/* Avatar */}
-              <div className="size-10 rounded-full bg-zinc-100 text-zinc-500 font-black flex items-center justify-center text-sm shrink-0">
+              <div className="size-10 rounded-full bg-muted text-zinc-500 font-black flex items-center justify-center text-sm shrink-0">
                 {getInitials(member.fullName)}
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-[#0a0a0a] truncate">
+                <p className="text-sm font-black text-foreground truncate">
                   {member.fullName ?? "Sin nombre"}
                 </p>
                 <p className="text-[11px] text-zinc-400">
@@ -168,7 +168,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
                   <select
                     value={member.role}
                     onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                    className="appearance-none border border-[#e5e5e5] rounded-xl pl-3 pr-7 py-1.5 text-[11px] font-bold text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white cursor-pointer"
+                    className="appearance-none border border-border rounded-xl pl-3 pr-7 py-1.5 text-[11px] font-bold text-foreground outline-none focus:border-foreground bg-card cursor-pointer"
                   >
                     {VALID_ROLES.map((r) => (
                       <option key={r} value={r}>
@@ -201,7 +201,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="right" className="w-full max-w-sm">
           <SheetHeader className="pb-6">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               Agregar Miembro
             </SheetTitle>
           </SheetHeader>
@@ -216,7 +216,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
                 value={newUserId}
                 onChange={(e) => setNewUserId(e.target.value)}
                 placeholder="uuid del usuario"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card"
               />
             </div>
 
@@ -228,7 +228,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as ValidRole)}
-                  className="w-full appearance-none border border-[#e5e5e5] rounded-xl px-4 pr-9 py-3 text-sm font-bold text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white cursor-pointer"
+                  className="w-full appearance-none border border-border rounded-xl px-4 pr-9 py-3 text-sm font-bold text-foreground outline-none focus:border-foreground bg-card cursor-pointer"
                 >
                   {VALID_ROLES.map((r) => (
                     <option key={r} value={r}>
@@ -247,7 +247,7 @@ export function TeamManager({ clubId, initialMembers }: TeamManagerProps) {
             <button
               onClick={handleAddMember}
               disabled={addLoading}
-              className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
+              className="bg-foreground hover:bg-foreground/90 text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
             >
               {addLoading ? "Agregando..." : "Agregar al Equipo"}
             </button>

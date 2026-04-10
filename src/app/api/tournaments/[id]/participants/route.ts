@@ -68,7 +68,9 @@ export async function POST(
     )
   }
 
-  const parsed = addParticipantSchema.safeParse(await request.json())
+  let rawBody: unknown
+  try { rawBody = await request.json() } catch { rawBody = {} }
+  const parsed = addParticipantSchema.safeParse(rawBody)
   if (!parsed.success) {
     return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
   }

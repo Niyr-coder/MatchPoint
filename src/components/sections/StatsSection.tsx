@@ -17,7 +17,7 @@ function StatItem({ icon: Icon, value, suffix, label, index }: StatItemProps) {
       className="animate-fade-in-up-16 text-center"
       style={{ animationDelay: `${index * 0.08}s` }}
     >
-      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+      <div className="w-12 h-12 rounded-full bg-card/5 flex items-center justify-center mx-auto mb-4">
         <Icon className="w-6 h-6 text-[#16a34a]" />
       </div>
       <p className="text-4xl md:text-5xl font-black text-white tracking-tight tabular-nums">

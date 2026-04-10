@@ -77,7 +77,7 @@ function StatCard({ icon, label, value, accent = false }: StatCardProps) {
     >
       <div
         className={`size-10 rounded-xl flex items-center justify-center shrink-0 ${
-          accent ? "bg-white/10" : "bg-zinc-100"
+          accent ? "bg-card/10" : "bg-muted"
         }`}
       >
         {icon}

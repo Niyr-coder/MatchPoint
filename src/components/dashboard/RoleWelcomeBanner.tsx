@@ -68,7 +68,7 @@ export function RoleWelcomeBanner({
         <div style={{ outline: `2px solid ${accentColor}40`, borderRadius: "9999px" }}>
           <Avatar className="size-16 shrink-0 ring-2 ring-zinc-200">
             <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-            <AvatarFallback className="bg-zinc-100 text-zinc-700 text-xl font-black">
+            <AvatarFallback className="bg-muted text-zinc-700 text-xl font-black">
               {initials || "U"}
             </AvatarFallback>
           </Avatar>

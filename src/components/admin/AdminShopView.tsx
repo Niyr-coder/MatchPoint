@@ -176,7 +176,7 @@ function OrdersTable({
                 <tr key={i} className="border-b border-border">
                   {Array.from({ length: 7 }).map((__, j) => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 bg-zinc-100 rounded animate-pulse w-20" />
+                      <div className="h-4 bg-muted rounded animate-pulse w-20" />
                     </td>
                   ))}
                 </tr>
@@ -190,7 +190,7 @@ function OrdersTable({
               </tr>
             ) : (
               orders.map((order) => {
-                const status = STATUS_LABELS[order.status] ?? { label: order.status, className: "bg-zinc-100 text-zinc-600" }
+                const status = STATUS_LABELS[order.status] ?? { label: order.status, className: "bg-muted text-zinc-600" }
                 return (
                   <tr key={order.id} className="border-b border-border hover:bg-secondary transition-colors">
                     <td className="px-4 py-3">
@@ -319,7 +319,7 @@ function ProductsTable({
                 <tr key={i} className="border-b border-border">
                   {Array.from({ length: 6 }).map((__, j) => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 bg-zinc-100 rounded animate-pulse w-20" />
+                      <div className="h-4 bg-muted rounded animate-pulse w-20" />
                     </td>
                   ))}
                 </tr>
@@ -352,7 +352,7 @@ function ProductsTable({
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full bg-zinc-100 text-zinc-600">
+                    <span className="text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full bg-muted text-zinc-600">
                       {product.category}
                     </span>
                   </td>
@@ -360,7 +360,7 @@ function ProductsTable({
                     <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full
                       ${product.is_active
                         ? "bg-emerald-50 text-emerald-700"
-                        : "bg-zinc-100 text-zinc-500"
+                        : "bg-muted text-zinc-500"
                       }`}>
                       {product.is_active ? "Activo" : "Inactivo"}
                     </span>

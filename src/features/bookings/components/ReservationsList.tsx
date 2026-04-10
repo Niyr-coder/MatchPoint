@@ -64,10 +64,10 @@ function ReservationCard({ reservation, showCancel, onCancel, cancellingId }: Re
   const isCancelling = cancellingId === reservation.id
 
   return (
-    <div className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3">
+    <div className="animate-fade-in-up rounded-2xl bg-card border border-border p-5 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <p className="text-sm font-black text-[#0a0a0a]">
+          <p className="text-sm font-black text-foreground">
             {reservation.courts?.name ?? "Cancha"}
           </p>
           <p className="text-[11px] text-zinc-400">
@@ -76,7 +76,7 @@ function ReservationCard({ reservation, showCancel, onCancel, cancellingId }: Re
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {reservation.courts?.sport && (
-            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
+            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-card text-foreground border-border">
               {SPORT_LABELS[reservation.courts.sport] ?? reservation.courts.sport}
             </span>
           )}
@@ -192,14 +192,14 @@ export function ReservationsList({ reservations, invites }: ReservationsListProp
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-zinc-100 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-lg text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
               activeTab === tab.key
-                ? "bg-white text-[#0a0a0a] shadow-sm"
+                ? "bg-card text-foreground shadow-sm"
                 : "text-zinc-400 hover:text-zinc-600"
             }`}
           >

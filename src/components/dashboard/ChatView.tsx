@@ -217,10 +217,10 @@ export function ChatView({ userId }: ChatViewProps) {
               <div className="flex flex-col gap-2 p-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl">
-                    <div className="size-9 rounded-full bg-zinc-100 shrink-0 animate-pulse" />
+                    <div className="size-9 rounded-full bg-muted shrink-0 animate-pulse" />
                     <div className="flex-1 space-y-1.5">
-                      <div className="h-3 bg-zinc-100 rounded-full w-3/4 animate-pulse" />
-                      <div className="h-2.5 bg-zinc-100 rounded-full w-1/2 animate-pulse" />
+                      <div className="h-3 bg-muted rounded-full w-3/4 animate-pulse" />
+                      <div className="h-2.5 bg-muted rounded-full w-1/2 animate-pulse" />
                     </div>
                   </div>
                 ))}
@@ -246,7 +246,7 @@ export function ChatView({ userId }: ChatViewProps) {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
+                      <div className="size-9 rounded-full bg-muted flex items-center justify-center shrink-0">
                         <Users className="size-4 text-zinc-400" />
                       </div>
                       <div className="min-w-0">
@@ -280,7 +280,7 @@ export function ChatView({ userId }: ChatViewProps) {
               {/* Header */}
               {activeConvData && (
                 <div className="px-4 py-3 border-b border-border flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <div className="size-8 rounded-full bg-muted flex items-center justify-center">
                     <Users className="size-4 text-zinc-400" />
                   </div>
                   <div>
@@ -316,7 +316,7 @@ export function ChatView({ userId }: ChatViewProps) {
                           className={`max-w-xs rounded-2xl px-3.5 py-2 ${
                             isOwn
                               ? "bg-foreground text-white rounded-tr-sm"
-                              : "bg-zinc-100 text-zinc-800 rounded-tl-sm"
+                              : "bg-muted text-zinc-800 rounded-tl-sm"
                           }`}
                         >
                           {!isOwn && (
@@ -358,7 +358,7 @@ export function ChatView({ userId }: ChatViewProps) {
                   onKeyDown={handleKeyDown}
                   placeholder="Escribe un mensaje..."
                   disabled={sending}
-                  className="flex-1 px-4 py-2.5 bg-zinc-100 rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-foreground focus:bg-white transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 bg-muted rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-foreground focus:bg-card transition-all disabled:opacity-50"
                 />
                 <button
                   onClick={() => void sendMessage()}

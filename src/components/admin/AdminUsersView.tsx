@@ -283,7 +283,7 @@ function MembershipsSection({ userId, clubs, onMembershipChange }: MembershipsSe
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-9 rounded-xl bg-zinc-100 animate-pulse"
+              className="h-9 rounded-xl bg-muted animate-pulse"
             />
           ))}
         </div>
@@ -439,7 +439,7 @@ function VerificationSection({ user, onVerified }: VerificationSectionProps) {
               Verificado
             </span>
           ) : (
-            <span className="text-[11px] font-bold text-zinc-400 bg-zinc-100 border border-zinc-200 rounded-full px-2 py-0.5">
+            <span className="text-[11px] font-bold text-zinc-400 bg-muted border border-zinc-200 rounded-full px-2 py-0.5">
               No verificado
             </span>
           )}
@@ -540,7 +540,7 @@ function UserDetailPanel({
           </p>
           <button
             onClick={onClose}
-            className="size-8 flex items-center justify-center rounded-full hover:bg-zinc-100 transition-colors"
+            className="size-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
           >
             <X className="size-4 text-zinc-500" />
           </button>

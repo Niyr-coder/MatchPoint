@@ -151,7 +151,7 @@ export default async function EmployeeCoachesPage({
               className="rounded-2xl bg-card border border-border p-5 flex items-center gap-3 hover:border-border/60 transition-colors"
             >
               {/* Avatar */}
-              <div className="size-12 rounded-full bg-zinc-100 text-zinc-500 font-black text-sm flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-full bg-muted text-zinc-500 font-black text-sm flex items-center justify-center shrink-0">
                 {getInitials(coach.fullName)}
               </div>
 
@@ -171,7 +171,7 @@ export default async function EmployeeCoachesPage({
 
               {/* Status */}
               {!coach.isActive && (
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-400 uppercase tracking-wide shrink-0">
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-muted text-zinc-400 uppercase tracking-wide shrink-0">
                   Inactivo
                 </span>
               )}

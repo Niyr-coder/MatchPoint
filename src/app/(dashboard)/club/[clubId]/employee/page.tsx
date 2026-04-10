@@ -103,7 +103,7 @@ export default async function EmployeeTodayPage({
                       <span className="text-xs font-black text-foreground">{time}</span>
                       <span className="text-xs text-zinc-500">{courtName}</span>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-zinc-400 bg-muted px-1.5 py-0.5 rounded-full">
                       Esperando
                     </span>
                   </div>
@@ -135,7 +135,7 @@ export default async function EmployeeTodayPage({
                 <span className="text-sm">🟢</span>
                 <span className="text-[10px] font-black text-emerald-700 uppercase tracking-wide">Abrir turno</span>
               </div>
-              <div className="flex items-center gap-1.5 rounded-xl border border-border bg-zinc-50 px-3 py-2 cursor-default">
+              <div className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-2 cursor-default">
                 <span className="text-sm">🔴</span>
                 <span className="text-[10px] font-black text-zinc-500 uppercase tracking-wide">Cerrar turno</span>
               </div>
@@ -157,7 +157,7 @@ export default async function EmployeeTodayPage({
               <span className="text-2xl font-black text-foreground">{totalReservations}</span>
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">reservas activas</span>
             </div>
-            <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary"
                 style={{ width: totalReservations > 0 ? `${Math.min(100, totalReservations * 10)}%` : "2%" }}

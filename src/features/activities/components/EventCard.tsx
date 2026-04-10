@@ -53,7 +53,7 @@ export function EventCard({
   const cardHref = href ?? `/dashboard/events/${id}`
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden flex flex-col hover:border-zinc-300 transition-all group">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden flex flex-col hover:border-zinc-300 transition-all group">
       {/* Cover image */}
       <div className="relative w-full h-44 shrink-0">
         {image_url ? (
@@ -77,7 +77,7 @@ export function EventCard({
               Gratis
             </span>
           ) : price != null ? (
-            <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-white text-[#0a0a0a] border border-[#e5e5e5] shadow-sm">
+            <span className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-card text-foreground border border-border shadow-sm">
               ${price.toFixed(2)}
             </span>
           ) : null}
@@ -105,14 +105,14 @@ export function EventCard({
             </span>
           )}
           {sport && (
-            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200">
+            <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-muted text-zinc-600 border border-zinc-200">
               {SPORT_LABELS[sport] ?? sport}
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-black text-[#0a0a0a] leading-tight line-clamp-2">{title}</h3>
+        <h3 className="text-sm font-black text-foreground leading-tight line-clamp-2">{title}</h3>
 
         {/* Description */}
         {description && (
@@ -156,7 +156,7 @@ export function EventCard({
         {/* CTA */}
         <Link
           href={cardHref}
-          className="mt-1 w-full text-center bg-[#0a0a0a] text-white text-xs font-black uppercase tracking-wide rounded-full py-2.5 hover:bg-zinc-700 transition-colors"
+          className="mt-1 w-full text-center bg-foreground text-white text-xs font-black uppercase tracking-wide rounded-full py-2.5 hover:bg-zinc-700 transition-colors"
         >
           Ver más
         </Link>

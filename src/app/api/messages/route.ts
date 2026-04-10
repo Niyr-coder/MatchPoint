@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
     return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
       {
         status: 429,
         headers: {
@@ -33,13 +33,13 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const parsed = getMessagesSchema.safeParse({ conversationId: searchParams.get("conversationId") ?? undefined })
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
   }
   const { conversationId } = parsed.data
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
 
   if (conversationId) {
     // Verify user is a member of this conversation before reading messages
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
       .maybeSingle()
 
     if (!membership) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
     }
 
     const { data, error } = await supabase
@@ -61,8 +61,8 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: true })
       .limit(50)
 
-    if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
-    return NextResponse.json({ data: data ?? [], error: null })
+    if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, data: data ?? [], error: null })
   }
 
   // Get user's conversations with participants
@@ -79,8 +79,8 @@ export async function GET(request: Request) {
     .eq("user_id", user.id)
     .order("joined_at", { ascending: false })
 
-  if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
-  return NextResponse.json({ data: data?.map((d) => d.conversation) ?? [], error: null })
+  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
+  return NextResponse.json({ success: true, data: data?.map((d) => d.conversation) ?? [], error: null })
 }
 
 export async function POST(request: Request) {
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
     return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
       {
         status: 429,
         headers: {
@@ -103,11 +103,18 @@ export async function POST(request: Request) {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
 
-  const parsed = postMessageSchema.safeParse(await request.json())
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ success: false, data: null, error: "JSON inválido" }, { status: 400 })
+  }
+
+  const parsed = postMessageSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
   }
   const { conversationId, content } = parsed.data
 
@@ -120,7 +127,7 @@ export async function POST(request: Request) {
     .maybeSingle()
 
   if (!membership) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
   }
 
   const { data, error } = await supabase
@@ -129,7 +136,7 @@ export async function POST(request: Request) {
     .select("*, sender:profiles(id, full_name, username, avatar_url)")
     .single()
 
-  if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
 
   // Update conversation updated_at
   await supabase
@@ -137,5 +144,5 @@ export async function POST(request: Request) {
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId)
 
-  return NextResponse.json({ data: data, error: null })
+  return NextResponse.json({ success: true, data, error: null })
 }

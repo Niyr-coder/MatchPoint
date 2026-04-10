@@ -166,7 +166,7 @@ export function ClubReservationsTable({
       header: "Usuario",
       render: (r) => (
         <div>
-          <p className="text-sm font-bold text-[#0a0a0a]">
+          <p className="text-sm font-bold text-foreground">
             {r.profiles?.full_name ?? "—"}
           </p>
           {r.profiles?.phone && (
@@ -179,7 +179,7 @@ export function ClubReservationsTable({
       key: "court",
       header: "Cancha",
       render: (r) => (
-        <p className="text-sm text-[#0a0a0a]">{r.courts?.name ?? "—"}</p>
+        <p className="text-sm text-foreground">{r.courts?.name ?? "—"}</p>
       ),
     },
     {
@@ -187,7 +187,7 @@ export function ClubReservationsTable({
       header: "Deporte",
       render: (r) =>
         r.courts?.sport ? (
-          <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
+          <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border bg-card text-foreground border-border">
             {r.courts.sport}
           </span>
         ) : (
@@ -198,7 +198,7 @@ export function ClubReservationsTable({
       key: "datetime",
       header: "Fecha y Hora",
       render: (r) => (
-        <p className="text-sm text-[#0a0a0a]">
+        <p className="text-sm text-foreground">
           {formatDateTime(r.date, r.start_time, r.end_time)}
         </p>
       ),

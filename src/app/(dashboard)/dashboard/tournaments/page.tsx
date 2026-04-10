@@ -12,10 +12,10 @@ const SPORT_LABEL: Record<string, string> = {
 }
 
 const STATUS_STYLES: Record<string, { label: string; classes: string }> = {
-  draft:       { label: "Borrador",   classes: "bg-zinc-100 text-zinc-400 border-zinc-200" },
+  draft:       { label: "Borrador",   classes: "bg-muted text-zinc-400 border-zinc-200" },
   open:        { label: "Abierto",    classes: "bg-success text-primary border-success-border" },
   in_progress: { label: "En curso",   classes: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed:   { label: "Completado", classes: "bg-zinc-100 text-zinc-500 border-zinc-200" },
+  completed:   { label: "Completado", classes: "bg-muted text-zinc-500 border-zinc-200" },
   cancelled:   { label: "Cancelado",  classes: "bg-red-50 text-red-600 border-red-200" },
 }
 

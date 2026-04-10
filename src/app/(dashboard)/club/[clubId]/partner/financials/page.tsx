@@ -206,7 +206,7 @@ export default async function PartnerFinancialsPage({
                         {pct}% · {fmt(amount)}
                       </span>
                     </div>
-                    <div className="h-2 rounded-full bg-zinc-100 overflow-hidden">
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full bg-foreground"
                         style={{ width: `${pct}%` }}

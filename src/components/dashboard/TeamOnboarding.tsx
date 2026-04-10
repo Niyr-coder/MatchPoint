@@ -132,7 +132,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
   if (active === null) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
-        <div className="size-14 rounded-xl bg-zinc-100 border border-border flex items-center justify-center mb-6">
+        <div className="size-14 rounded-xl bg-muted border border-border flex items-center justify-center mb-6">
           <Users className="size-7 text-zinc-400" />
         </div>
         <h1 className="text-2xl font-black tracking-tight text-foreground text-center">
@@ -162,7 +162,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
             onClick={() => setActive("join")}
             className="flex flex-col items-start rounded-2xl bg-card border border-border p-6 text-left hover:bg-secondary hover:border-border/60 transition-colors"
           >
-            <div className="size-10 rounded-xl bg-zinc-100 border border-border flex items-center justify-center mb-4">
+            <div className="size-10 rounded-xl bg-muted border border-border flex items-center justify-center mb-4">
               <LogIn className="size-5 text-zinc-500" />
             </div>
             <p className="text-sm font-black text-foreground uppercase tracking-wide">Unirse a team</p>

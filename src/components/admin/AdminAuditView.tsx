@@ -37,7 +37,7 @@ function actionColorClass(action: string): string {
   if (action.includes("updated") || action.includes("role_changed")) {
     return "bg-purple-50 text-purple-700 border-purple-100"
   }
-  return "bg-zinc-50 text-zinc-600 border-zinc-200"
+  return "bg-muted/50 text-zinc-600 border-zinc-200"
 }
 
 function ActionBadge({ action }: { action: string }) {
@@ -83,7 +83,7 @@ function DetailsCell({ details }: { details: Record<string, unknown> }) {
         )}
       </button>
       {expanded && (
-        <pre className="text-[10px] font-mono bg-zinc-50 border border-zinc-200 rounded-lg p-2 overflow-x-auto max-w-xs text-zinc-700 whitespace-pre-wrap break-all">
+        <pre className="text-[10px] font-mono bg-muted/50 border border-zinc-200 rounded-lg p-2 overflow-x-auto max-w-xs text-zinc-700 whitespace-pre-wrap break-all">
           {JSON.stringify(details, null, 2)}
         </pre>
       )}
@@ -372,7 +372,7 @@ export function AdminAuditView({ initialEntries, initialMeta }: AdminAuditViewPr
                 {Array.from({ length: 5 }).map((__, j) => (
                   <div
                     key={j}
-                    className="h-4 rounded-lg bg-zinc-100 animate-pulse"
+                    className="h-4 rounded-lg bg-muted animate-pulse"
                     style={{ animationDelay: `${(i * 5 + j) * 0.02}s` }}
                   />
                 ))}

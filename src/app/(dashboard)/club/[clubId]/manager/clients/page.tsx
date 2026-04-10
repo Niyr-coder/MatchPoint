@@ -32,7 +32,7 @@ const columns: Column<ClientEntry & { id: string }>[] = [
     header: "Nombre",
     render: (item) => (
       <div className="flex items-center gap-3">
-        <div className="size-8 rounded-full bg-zinc-100 text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
+        <div className="size-8 rounded-full bg-muted text-zinc-500 font-black text-xs flex items-center justify-center shrink-0">
           {getInitials(item.fullName)}
         </div>
         <span className="font-medium text-foreground">{item.fullName ?? "Sin nombre"}</span>

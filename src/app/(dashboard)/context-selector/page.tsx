@@ -18,7 +18,7 @@ export default async function ContextSelectorPage() {
 
   if (roles.length === 0) {
     return (
-      <div className="min-h-screen bg-secondary flex items-center justify-center p-6">
+      <div className="min-h-full bg-secondary flex items-center justify-center p-6">
         <div className="text-center">
           <p className="text-zinc-500 text-sm">No tienes acceso a ningún club.</p>
           <Link href="/dashboard" className="mt-4 inline-block text-green-600 hover:underline text-sm font-bold">

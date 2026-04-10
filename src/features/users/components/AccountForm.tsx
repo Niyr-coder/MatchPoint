@@ -314,7 +314,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
               <select
                 value={pbSkillLevel}
                 onChange={(e) => setPbSkillLevel(e.target.value as PickleballSkillLevel | "")}
-                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white appearance-none"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card appearance-none"
               >
                 <option value="">Sin especificar</option>
                 {PICKLEBALL_SKILL_LEVELS.map((level) => (
@@ -333,7 +333,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
               <select
                 value={pbDominantHand}
                 onChange={(e) => setPbDominantHand(e.target.value as DominantHand | "")}
-                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white appearance-none"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card appearance-none"
               >
                 <option value="">Sin especificar</option>
                 {DOMINANT_HANDS.map((hand) => (

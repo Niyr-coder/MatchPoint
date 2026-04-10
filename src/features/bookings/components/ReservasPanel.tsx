@@ -38,7 +38,7 @@ function formatDate(dateStr: string): string {
 export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps) {
   return (
     <div
-      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-white border border-[#e5e5e5]"
+      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-card border border-border"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
@@ -49,13 +49,13 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
           >
             <Calendar className="size-4 text-orange-500" />
           </div>
-          <h2 className="text-sm font-black uppercase tracking-tight text-[#0a0a0a]">
+          <h2 className="text-sm font-black uppercase tracking-tight text-foreground">
             Mis Reservas
           </h2>
         </div>
         <Link
           href="/dashboard/reservations/new"
-          className="text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 bg-[#0a0a0a] text-white rounded-full hover:bg-[#222] transition-colors"
+          className="text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 bg-foreground text-white rounded-full hover:bg-[#222] transition-colors"
         >
           Nueva
         </Link>
@@ -67,7 +67,7 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
           <div className="flex flex-col items-center justify-center py-10 gap-2">
             <Clock className="size-7 text-zinc-300" />
             <p className="text-xs font-bold text-zinc-400">Sin reservas próximas</p>
-            <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-[#0a0a0a] hover:underline">
+            <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-foreground hover:underline">
               Reservar una cancha →
             </Link>
           </div>
@@ -83,7 +83,7 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
                   <Clock className="size-3.5 text-orange-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[#0a0a0a] truncate">{courtName || "Cancha"}</p>
+                  <p className="text-sm font-bold text-foreground truncate">{courtName || "Cancha"}</p>
                   <p className="text-[11px] text-zinc-400 mt-0.5">
                     {r.courts?.sport ?? ""} · {formatDate(r.date)} · {r.start_time.slice(0, 5)}
                   </p>

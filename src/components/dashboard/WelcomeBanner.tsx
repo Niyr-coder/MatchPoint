@@ -49,7 +49,7 @@ export function WelcomeBanner({ profile, date, stats }: WelcomeBannerProps) {
     .join("")
 
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-[#0a0a0a] border border-zinc-800 shadow-none">
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-5 md:p-6 bg-[#0a0a0a] border border-zinc-800 shadow-none">
       {/* Ambient green glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(22,163,74,0.06),transparent_50%)] pointer-events-none" />
 

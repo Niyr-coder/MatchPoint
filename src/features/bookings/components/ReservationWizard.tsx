@@ -290,7 +290,7 @@ function StepDateTime({
                     onClick={() => onSlotSelect(slot)}
                     className={`px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wide transition-colors ${
                       !slot.available
-                        ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200"
+                        ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                         : isSelected
                         ? "bg-foreground text-white border border-foreground"
                         : "bg-card text-foreground border border-border hover:border-foreground hover:text-foreground"
@@ -464,7 +464,7 @@ export function ReservationWizard() {
   const canGoBack = step > 0 && !submitting
 
   return (
-    <div className="flex flex-col gap-8 max-w-2xl">
+    <div className="flex flex-col gap-8 max-w-4xl">
       {/* Progress */}
       <ProgressIndicator currentStep={step} />
 

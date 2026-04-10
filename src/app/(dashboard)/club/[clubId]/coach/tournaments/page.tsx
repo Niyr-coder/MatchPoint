@@ -145,7 +145,7 @@ export default async function CoachTournamentsPage({
               className="rounded-2xl bg-card border border-border p-4 flex items-center justify-between gap-4 hover:border-border/60 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0">
+                <div className="size-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
                   <Trophy className="size-4 text-zinc-500" />
                 </div>
                 <div className="min-w-0">

@@ -84,14 +84,14 @@ export function ClubSettingsForm({ club, clubId }: ClubSettingsFormProps) {
   }
 
   const inputClass =
-    "border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white w-full"
+    "border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/8 bg-card w-full"
 
   const labelClass = "text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400"
 
   return (
     <div className="flex flex-col gap-8">
       {/* General info */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
           Información General
         </p>
@@ -190,7 +190,7 @@ export function ClubSettingsForm({ club, clubId }: ClubSettingsFormProps) {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors"
+            className="bg-foreground hover:bg-foreground/90 text-white rounded-full px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors"
           >
             {loading ? "Guardando..." : "Guardar Cambios"}
           </button>
@@ -198,11 +198,11 @@ export function ClubSettingsForm({ club, clubId }: ClubSettingsFormProps) {
       </div>
 
       {/* Danger zone */}
-      <div className="rounded-2xl bg-white border border-red-200 p-6">
+      <div className="rounded-2xl bg-card border border-red-200 p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 mb-1">
           Zona Peligrosa
         </p>
-        <p className="text-sm font-black text-[#0a0a0a] mb-1">Desactivar Club</p>
+        <p className="text-sm font-black text-foreground mb-1">Desactivar Club</p>
         <p className="text-sm text-zinc-500 mb-4">
           Al desactivar el club, todos los miembros perderán acceso. Esta acción puede revertirse
           contactando a soporte.

@@ -41,13 +41,13 @@ function Avatar({ entry }: { entry: RankingEntry }) {
         alt={entry.fullName}
         width={36}
         height={36}
-        className="size-9 rounded-full object-cover border border-[#e5e5e5]"
+        className="size-9 rounded-full object-cover border border-border"
       />
     )
   }
   return (
-    <div className="size-9 rounded-full bg-[#f5f5f5] border border-[#e5e5e5] flex items-center justify-center">
-      <span className="text-[11px] font-black text-[#0a0a0a]">
+    <div className="size-9 rounded-full bg-muted border border-border flex items-center justify-center">
+      <span className="text-[11px] font-black text-foreground">
         {getInitials(entry.fullName)}
       </span>
     </div>
@@ -61,8 +61,8 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
       href={`/dashboard/players/${entry.userId}`}
       className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border transition-shadow ${
         isFirst
-          ? "bg-[#f5f5f5] border-[#e5e5e5]"
-          : "bg-white border-[#e5e5e5]"
+          ? "bg-muted border-border"
+          : "bg-card border-border"
       }`}
       style={{ animationDelay: `${(entry.position - 1) * 0.06}s` }}
     >
@@ -74,15 +74,15 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
           width={isFirst ? 64 : 48}
           height={isFirst ? 64 : 48}
           className={`rounded-full object-cover border-2 ${
-            isFirst ? "size-16 border-[#0a0a0a]" : "size-12 border-[#e5e5e5]"
+            isFirst ? "size-16 border-foreground" : "size-12 border-border"
           }`}
         />
       ) : (
         <div
           className={`rounded-full flex items-center justify-center border-2 ${
             isFirst
-              ? "size-16 bg-[#0a0a0a] border-[#0a0a0a]"
-              : "size-12 bg-[#f4f4f5] border-[#e5e5e5]"
+              ? "size-16 bg-foreground border-foreground"
+              : "size-12 bg-[#f4f4f5] border-border"
           }`}
         >
           <span
@@ -95,12 +95,12 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
         </div>
       )}
       <div className="text-center">
-        <p className="text-sm font-black text-[#0a0a0a] leading-tight">
+        <p className="text-sm font-black text-foreground leading-tight">
           {entry.fullName}
         </p>
         <p
           className={`text-[11px] font-black mt-0.5 ${
-            isFirst ? "text-[#0a0a0a]" : "text-zinc-400"
+            isFirst ? "text-foreground" : "text-zinc-400"
           }`}
         >
           {entry.score} pts
@@ -119,7 +119,7 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
   return (
     <Link
       href={`/dashboard/players/${entry.userId}`}
-      className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-[#f0f0f0] last:border-0 hover:bg-[#fafafa] transition-colors -mx-5 px-5"
+      className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-border last:border-0 hover:bg-muted transition-colors -mx-5 px-5"
       style={{ animationDelay: `${index * 0.02}s` }}
     >
       <span className="text-[11px] font-black text-zinc-400 w-6 text-right shrink-0">
@@ -127,14 +127,14 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
       </span>
       <Avatar entry={entry} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-black text-[#0a0a0a] truncate">
+        <p className="text-sm font-black text-foreground truncate">
           {entry.fullName}
         </p>
         <p className="text-[11px] text-zinc-400">
           {entry.wins}V · {entry.losses}D
         </p>
       </div>
-      <span className="text-[11px] font-black text-[#0a0a0a] shrink-0">
+      <span className="text-[11px] font-black text-foreground shrink-0">
         {entry.score} pts
       </span>
     </Link>
@@ -170,7 +170,7 @@ function RankingList({ entries }: { entries: RankingEntry[] }) {
 
       {/* Rest */}
       {rest.length > 0 && (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] px-5">
+        <div className="rounded-2xl bg-card border border-border px-5">
           {rest.map((entry, i) => (
             <RankingRow key={entry.userId} entry={entry} index={i} />
           ))}
@@ -199,8 +199,8 @@ export function RankingView({ all, bySport }: RankingViewProps) {
               onClick={() => setActiveSport(sport.value)}
               className={
                 activeSport === sport.value
-                  ? "bg-[#0a0a0a] text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
-                  : "border border-[#e5e5e5] text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-[#0a0a0a] transition-colors"
+                  ? "bg-foreground text-white rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] transition-colors"
+                  : "border border-border text-zinc-500 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] hover:border-foreground transition-colors"
               }
             >
               {sport.label}
