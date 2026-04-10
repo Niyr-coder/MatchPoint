@@ -5,6 +5,7 @@ import { StatCard } from "@/components/shared/StatCard"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { UserCheck, Users } from "lucide-react"
+import { InviteTogglePanel } from "@/features/memberships/components/InviteTogglePanel"
 
 interface CoachRow {
   id: string
@@ -58,13 +59,13 @@ export default async function ManagerCoachesPage({
       .order("joined_at", { ascending: false }),
     supabase
       .from("coach_students")
-      .select("coach_id")
+      .select("coach_user_id")
       .eq("club_id", clubId),
   ])
 
   const studentCountMap = new Map<string, number>()
   for (const row of (studentsResult.data ?? [])) {
-    const key = (row as { coach_id: string }).coach_id
+    const key = (row as { coach_user_id: string }).coach_user_id
     studentCountMap.set(key, (studentCountMap.get(key) ?? 0) + 1)
   }
 
@@ -134,6 +135,15 @@ export default async function ManagerCoachesPage({
           ))}
         </div>
       )}
+
+      <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Invitaciones</p>
+          <h3 className="text-sm font-black text-foreground mt-0.5">Invitar entrenadores al club</h3>
+          <p className="text-xs text-zinc-500 mt-1">Comparte este link para que entrenadores se unan al club.</p>
+        </div>
+        <InviteTogglePanel entityType="club" entityId={clubId} label="Generar link para entrenador" />
+      </div>
     </div>
   )
 }
