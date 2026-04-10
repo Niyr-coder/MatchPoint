@@ -185,13 +185,24 @@ export async function POST(
   try {
     await handler(service, invite, user.id)
   } catch (err) {
-    // The join failed — the RPC already incremented uses_count but the user
-    // was not actually enrolled. Log with detail so ops can investigate.
     const message = err instanceof Error ? err.message : String(err)
     console.error(
       `[POST /api/invites/redeem] join handler failed (entity_type=${invite.entity_type}, entity_id=${invite.entity_id}, userId=${user.id}):`,
       message
     )
+
+    // Compensate: roll back the uses_count increment so the slot is not
+    // permanently consumed when the user never actually joined.
+    const { error: rollbackError } = await service.rpc("rollback_invite_use", {
+      p_invite_id: invite.id,
+    })
+    if (rollbackError) {
+      console.error(
+        "[POST /api/invites/redeem] rollback_invite_use failed — uses_count may be inconsistent:",
+        rollbackError.message
+      )
+    }
+
     return NextResponse.json(
       { success: false, data: null, error: "No se pudo completar la unión a la entidad" },
       { status: 500 }
