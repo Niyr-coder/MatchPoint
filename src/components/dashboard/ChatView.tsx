@@ -201,12 +201,12 @@ export function ChatView({ userId }: ChatViewProps) {
       />
 
       <div
-        className="flex gap-0 border border-[#e5e5e5] rounded-2xl overflow-hidden bg-white"
+        className="flex gap-0 border border-border rounded-2xl overflow-hidden bg-card"
         style={{ minHeight: "520px" }}
       >
         {/* Conversation list */}
-        <div className="w-72 shrink-0 border-r border-[#e5e5e5] flex flex-col">
-          <div className="p-4 border-b border-[#e5e5e5]">
+        <div className="w-72 shrink-0 border-r border-border flex flex-col">
+          <div className="p-4 border-b border-border">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
               Conversaciones
             </p>
@@ -241,8 +241,8 @@ export function ChatView({ userId }: ChatViewProps) {
                   <button
                     key={conv.id}
                     onClick={() => setActiveConv(conv.id)}
-                    className={`w-full p-4 text-left border-b border-[#f0f0f0] transition-colors ${
-                      isActive ? "bg-zinc-50" : "hover:bg-zinc-50"
+                    className={`w-full p-4 text-left border-b border-border-subtle transition-colors ${
+                      isActive ? "bg-secondary" : "hover:bg-secondary"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export function ChatView({ userId }: ChatViewProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {!activeConv ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
-              <div className="size-14 rounded-2xl bg-zinc-50 flex items-center justify-center">
+              <div className="size-14 rounded-2xl bg-secondary flex items-center justify-center">
                 <MessageSquare className="size-7 text-zinc-300" />
               </div>
               <p className="text-sm font-bold text-zinc-400">Selecciona una conversación</p>
@@ -279,7 +279,7 @@ export function ChatView({ userId }: ChatViewProps) {
             <>
               {/* Header */}
               {activeConvData && (
-                <div className="px-4 py-3 border-b border-[#e5e5e5] flex items-center gap-3">
+                <div className="px-4 py-3 border-b border-border flex items-center gap-3">
                   <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center">
                     <Users className="size-4 text-zinc-400" />
                   </div>
@@ -315,7 +315,7 @@ export function ChatView({ userId }: ChatViewProps) {
                         <div
                           className={`max-w-xs rounded-2xl px-3.5 py-2 ${
                             isOwn
-                              ? "bg-[#0a0a0a] text-white rounded-tr-sm"
+                              ? "bg-foreground text-white rounded-tr-sm"
                               : "bg-zinc-100 text-zinc-800 rounded-tl-sm"
                           }`}
                         >
@@ -351,19 +351,19 @@ export function ChatView({ userId }: ChatViewProps) {
               )}
 
               {/* Input */}
-              <div className="p-4 border-t border-[#e5e5e5] flex gap-2">
+              <div className="p-4 border-t border-border flex gap-2">
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Escribe un mensaje..."
                   disabled={sending}
-                  className="flex-1 px-4 py-2.5 bg-zinc-100 rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:bg-white transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 bg-zinc-100 rounded-xl text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-foreground focus:bg-white transition-all disabled:opacity-50"
                 />
                 <button
                   onClick={() => void sendMessage()}
                   disabled={!input.trim() || sending}
-                  className="size-10 rounded-xl bg-[#0a0a0a] text-white flex items-center justify-center hover:bg-[#222222] transition-colors disabled:opacity-40 shrink-0"
+                  className="size-10 rounded-xl bg-foreground text-white flex items-center justify-center hover:bg-foreground/90 transition-colors disabled:opacity-40 shrink-0"
                   aria-label="Enviar mensaje"
                 >
                   <Send className="size-4" />

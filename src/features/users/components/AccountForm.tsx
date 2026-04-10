@@ -154,7 +154,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
   return (
     <div className="flex flex-col gap-6">
       {/* Personal info form */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-5">
           Información Personal
         </p>
@@ -166,7 +166,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
             </div>
           )}
           {successMsg && (
-            <div className="rounded-xl bg-[#f0fdf4] border border-[#bbf7d0] px-4 py-2.5 flex items-center gap-2 text-sm text-[#16a34a]">
+            <div className="rounded-xl bg-success border border-success-border px-4 py-2.5 flex items-center gap-2 text-sm text-primary">
               <Check className="size-3.5 shrink-0" />
               {successMsg}
             </div>
@@ -182,7 +182,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => handleChange("first_name", e.target.value)}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
               {errors.first_name && (
                 <p className="text-[11px] text-red-500">{errors.first_name}</p>
@@ -198,7 +198,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => handleChange("last_name", e.target.value)}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
               {errors.last_name && (
                 <p className="text-[11px] text-red-500">{errors.last_name}</p>
@@ -215,7 +215,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                   type="text"
                   value={profile.username ? `@${profile.username}` : "—"}
                   readOnly
-                  className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm bg-zinc-50 text-zinc-400 w-full cursor-not-allowed"
+                  className="border border-border rounded-xl px-4 py-3 text-sm bg-secondary text-zinc-400 w-full cursor-not-allowed"
                 />
               </div>
               <p className="text-[10px] text-zinc-400">El nombre de usuario no se puede cambiar por ahora</p>
@@ -232,7 +232,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                 value={formData.phone}
                 onChange={(e) => handleChange("phone", e.target.value.replace(/\D/g, ""))}
                 placeholder="0999999999"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
               {errors.phone && (
                 <p className="text-[11px] text-red-500">{errors.phone}</p>
@@ -256,8 +256,8 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                       onClick={() => toggleSport(sport)}
                       className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
                         active
-                          ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                          : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                          ? "bg-foreground text-white border-foreground"
+                          : "bg-card text-zinc-600 border-border hover:border-zinc-300"
                       }`}
                     >
                       {sport}
@@ -273,7 +273,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-colors disabled:opacity-50"
+              className="bg-foreground hover:bg-foreground/90 text-white rounded-full px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-colors disabled:opacity-50"
             >
               {submitting && <Loader2 className="size-3.5 animate-spin" />}
               Guardar cambios
@@ -283,11 +283,11 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
       </div>
 
       {/* Pickleball profile */}
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
+      <div className="rounded-2xl bg-card border border-border p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
           Pickleball
         </p>
-        <p className="text-lg font-black text-[#0a0a0a] mb-5">Perfil de Pickleball</p>
+        <p className="text-lg font-black text-foreground mb-5">Perfil de Pickleball</p>
 
         <form onSubmit={handlePickleballSubmit} className="flex flex-col gap-4">
           {pbServerError && (
@@ -296,7 +296,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
             </div>
           )}
           {pbSuccessMsg && (
-            <div className="rounded-xl bg-[#f0fdf4] border border-[#bbf7d0] px-4 py-2.5 flex items-center gap-2 text-sm text-[#16a34a]">
+            <div className="rounded-xl bg-success border border-success-border px-4 py-2.5 flex items-center gap-2 text-sm text-primary">
               <Check className="size-3.5 shrink-0" />
               {pbSuccessMsg}
             </div>
@@ -314,7 +314,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
               <select
                 value={pbSkillLevel}
                 onChange={(e) => setPbSkillLevel(e.target.value as PickleballSkillLevel | "")}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white appearance-none"
               >
                 <option value="">Sin especificar</option>
                 {PICKLEBALL_SKILL_LEVELS.map((level) => (
@@ -333,7 +333,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
               <select
                 value={pbDominantHand}
                 onChange={(e) => setPbDominantHand(e.target.value as DominantHand | "")}
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white appearance-none"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white appearance-none"
               >
                 <option value="">Sin especificar</option>
                 {DOMINANT_HANDS.map((hand) => (
@@ -360,8 +360,8 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
                     onClick={() => setPbPlayStyle(active ? "" : style)}
                     className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
                       active
-                        ? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
-                        : "bg-white text-zinc-600 border-[#e5e5e5] hover:border-zinc-300"
+                        ? "bg-foreground text-white border-foreground"
+                        : "bg-card text-zinc-600 border-border hover:border-zinc-300"
                     }`}
                   >
                     {PICKLEBALL_PLAY_STYLE_LABELS[style]}
@@ -375,7 +375,7 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
             <button
               type="submit"
               disabled={pbSubmitting}
-              className="bg-[#16a34a] hover:bg-[#15803d] text-white rounded-full px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-colors disabled:opacity-50"
+              className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-colors disabled:opacity-50"
             >
               {pbSubmitting && <Loader2 className="size-3.5 animate-spin" />}
               Guardar perfil de Pickleball
@@ -385,16 +385,16 @@ export function AccountForm({ profile, email, pickleballProfile = null }: Accoun
       </div>
 
       {/* Danger zone */}
-      <div className="rounded-2xl bg-white border border-red-200 p-6">
+      <div className="rounded-2xl bg-card border border-red-200 p-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 mb-1">
           Zona de peligro
         </p>
-        <p className="text-lg font-black text-[#0a0a0a] mb-4">Acciones de cuenta</p>
+        <p className="text-lg font-black text-foreground mb-4">Acciones de cuenta</p>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <a
             href="/auth/signout"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-[#e5e5e5] text-[11px] font-black uppercase tracking-[0.15em] text-zinc-700 hover:bg-zinc-50 transition-colors"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-border text-[11px] font-black uppercase tracking-[0.15em] text-zinc-700 hover:bg-secondary transition-colors"
           >
             Cerrar sesión
           </a>

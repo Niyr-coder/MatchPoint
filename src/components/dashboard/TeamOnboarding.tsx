@@ -132,10 +132,10 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
   if (active === null) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
-        <div className="size-14 rounded-xl bg-zinc-100 border border-[#e5e5e5] flex items-center justify-center mb-6">
+        <div className="size-14 rounded-xl bg-zinc-100 border border-border flex items-center justify-center mb-6">
           <Users className="size-7 text-zinc-400" />
         </div>
-        <h1 className="text-2xl font-black tracking-tight text-[#0a0a0a] text-center">
+        <h1 className="text-2xl font-black tracking-tight text-foreground text-center">
           Mi Team
         </h1>
         <p className="mt-2 text-sm text-zinc-400 text-center max-w-sm leading-relaxed">
@@ -146,12 +146,12 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
           {/* Create card */}
           <button
             onClick={() => setActive("create")}
-            className="flex flex-col items-start rounded-2xl bg-white border border-[#e5e5e5] p-6 text-left hover:bg-zinc-50 hover:border-[#d0d0d0] transition-colors"
+            className="flex flex-col items-start rounded-2xl bg-card border border-border p-6 text-left hover:bg-secondary hover:border-border/60 transition-colors"
           >
-            <div className="size-10 rounded-xl bg-[#0a0a0a] flex items-center justify-center mb-4">
+            <div className="size-10 rounded-xl bg-foreground flex items-center justify-center mb-4">
               <PlusCircle className="size-5 text-white" />
             </div>
-            <p className="text-sm font-black text-[#0a0a0a] uppercase tracking-wide">Crear team</p>
+            <p className="text-sm font-black text-foreground uppercase tracking-wide">Crear team</p>
             <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
               Sé el capitán, define el deporte y comparte el código de invitación.
             </p>
@@ -160,12 +160,12 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
           {/* Join card */}
           <button
             onClick={() => setActive("join")}
-            className="flex flex-col items-start rounded-2xl bg-white border border-[#e5e5e5] p-6 text-left hover:bg-zinc-50 hover:border-[#d0d0d0] transition-colors"
+            className="flex flex-col items-start rounded-2xl bg-card border border-border p-6 text-left hover:bg-secondary hover:border-border/60 transition-colors"
           >
-            <div className="size-10 rounded-xl bg-zinc-100 border border-[#e5e5e5] flex items-center justify-center mb-4">
+            <div className="size-10 rounded-xl bg-zinc-100 border border-border flex items-center justify-center mb-4">
               <LogIn className="size-5 text-zinc-500" />
             </div>
-            <p className="text-sm font-black text-[#0a0a0a] uppercase tracking-wide">Unirse a team</p>
+            <p className="text-sm font-black text-foreground uppercase tracking-wide">Unirse a team</p>
             <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
               Ingresa el código de 8 caracteres que te compartió tu capitán.
             </p>
@@ -184,13 +184,13 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
             setCreateErrors({})
             setServerError(null)
           }}
-          className="text-[11px] font-black uppercase tracking-wide text-zinc-400 hover:text-[#0a0a0a] transition-colors mb-6"
+          className="text-[11px] font-black uppercase tracking-wide text-zinc-400 hover:text-foreground transition-colors mb-6"
         >
           ← Volver
         </button>
 
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
-          <h2 className="text-lg font-black tracking-tight text-[#0a0a0a] mb-6">
+        <div className="rounded-2xl bg-card border border-border p-6">
+          <h2 className="text-lg font-black tracking-tight text-foreground mb-6">
             Crear un team
           </h2>
 
@@ -207,7 +207,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
                 }
                 placeholder="Los Cóndores"
                 maxLength={60}
-                className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10"
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-foreground/10"
               />
               {createErrors.name && (
                 <p className="mt-1 text-xs font-semibold text-red-500">{createErrors.name}</p>
@@ -223,7 +223,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
                 onChange={(e) =>
                   setCreateForm((prev) => ({ ...prev, sport: e.target.value }))
                 }
-                className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10 bg-white"
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 bg-card"
               >
                 <option value="" disabled>
                   Selecciona un deporte
@@ -251,7 +251,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
                 placeholder="Una breve descripción del equipo..."
                 rows={3}
                 maxLength={200}
-                className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm text-[#0a0a0a] placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10 resize-none"
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-foreground/10 resize-none"
               />
             </div>
 
@@ -262,7 +262,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#0a0a0a] text-white rounded-full px-4 py-3 text-[11px] font-black uppercase tracking-wide disabled:opacity-50 hover:bg-zinc-800 transition-colors"
+              className="w-full bg-foreground text-white rounded-full px-4 py-3 text-[11px] font-black uppercase tracking-wide disabled:opacity-50 hover:bg-foreground/90 transition-colors"
             >
               {isSubmitting ? "Creando..." : "Crear team"}
             </button>
@@ -281,13 +281,13 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
           setJoinError(null)
           setInviteCode("")
         }}
-        className="text-[11px] font-black uppercase tracking-wide text-zinc-400 hover:text-[#0a0a0a] transition-colors mb-6"
+        className="text-[11px] font-black uppercase tracking-wide text-zinc-400 hover:text-foreground transition-colors mb-6"
       >
         ← Volver
       </button>
 
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6">
-        <h2 className="text-lg font-black tracking-tight text-[#0a0a0a] mb-2">
+      <div className="rounded-2xl bg-card border border-border p-6">
+        <h2 className="text-lg font-black tracking-tight text-foreground mb-2">
           Unirse a un team
         </h2>
         <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
@@ -308,7 +308,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
               }}
               placeholder="ABCD1234"
               maxLength={8}
-              className="w-full border border-[#e5e5e5] rounded-xl px-3 py-2.5 text-sm font-black text-[#0a0a0a] placeholder:text-zinc-300 tracking-widest focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/10 uppercase"
+              className="w-full border border-border rounded-xl px-3 py-2.5 text-sm font-black text-foreground placeholder:text-zinc-300 tracking-widest focus:outline-none focus:ring-2 focus:ring-foreground/10 uppercase"
             />
             {joinError && (
               <p className="mt-1 text-xs font-semibold text-red-500">{joinError}</p>
@@ -318,7 +318,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
           <button
             type="submit"
             disabled={isSubmitting || inviteCode.length !== 8}
-            className="w-full bg-[#0a0a0a] text-white rounded-full px-4 py-3 text-[11px] font-black uppercase tracking-wide disabled:opacity-50 hover:bg-zinc-800 transition-colors"
+            className="w-full bg-foreground text-white rounded-full px-4 py-3 text-[11px] font-black uppercase tracking-wide disabled:opacity-50 hover:bg-foreground/90 transition-colors"
           >
             {isSubmitting ? "Buscando..." : "Unirme al team"}
           </button>

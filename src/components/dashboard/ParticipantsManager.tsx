@@ -38,7 +38,7 @@ const PAYMENT_META: Record<PaymentStatus, { label: string; icon: React.ElementTy
   paid:      { label: "Pagado",       icon: Check,         cls: "bg-green-100 text-green-700 border-green-200" },
   pending:   { label: "Pendiente",    icon: Clock,         cls: "bg-amber-50 text-amber-700 border-amber-200" },
   waived:    { label: "Gratis",       icon: Gift,          cls: "bg-zinc-100 text-zinc-500 border-zinc-200" },
-  refunded:  { label: "Reembolsado",  icon: AlertCircle,   cls: "bg-white text-[#0a0a0a] border-[#e5e5e5]" },
+  refunded:  { label: "Reembolsado",  icon: AlertCircle,   cls: "bg-card text-foreground border-border" },
 }
 
 const FILTER_TABS: { key: PaymentFilter; label: string }[] = [
@@ -239,7 +239,7 @@ export function ParticipantsManager({
 
   if (loading) {
     return (
-      <div className="rounded-2xl bg-white border border-[#e5e5e5] p-6 flex items-center justify-center gap-2 text-zinc-400 text-sm">
+      <div className="rounded-2xl bg-card border border-border p-6 flex items-center justify-center gap-2 text-zinc-400 text-sm">
         <RefreshCw className="size-4 animate-spin" />
         Cargando participantes…
       </div>
@@ -247,9 +247,9 @@ export function ParticipantsManager({
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-5 border-b border-[#f0f0f0] flex flex-wrap items-center gap-2">
+      <div className="p-5 border-b border-border-subtle flex flex-wrap items-center gap-2">
         <Users className="size-4 text-zinc-400 shrink-0" />
         <p className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Participantes</p>
         <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">
@@ -273,7 +273,7 @@ export function ParticipantsManager({
             </button>
             <button
               onClick={openAddSheet}
-              className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-[#0a0a0a] text-white hover:bg-[#222222] transition-colors"
+              className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-foreground text-white hover:bg-foreground/90 transition-colors"
             >
               <UserPlus className="size-3.5" />
               {isInProgress ? "Agregar tardío" : "Agregar"}
@@ -298,14 +298,14 @@ export function ParticipantsManager({
 
       {/* Payment filter tabs */}
       {entryFee > 0 && (
-        <div className="px-5 py-2.5 border-b border-[#f0f0f0] flex gap-1 overflow-x-auto">
+        <div className="px-5 py-2.5 border-b border-border-subtle flex gap-1 overflow-x-auto">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setPayFilter(tab.key)}
               className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.12em] shrink-0 transition-colors ${
                 payFilter === tab.key
-                  ? "bg-zinc-900 text-white"
+                  ? "bg-foreground text-white"
                   : "text-zinc-400 hover:text-zinc-700"
               }`}
             >
@@ -323,7 +323,7 @@ export function ParticipantsManager({
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-[#f5f5f5]">
+        <ul className="divide-y divide-border-subtle">
           {filtered.map((p, idx) => {
             const isWithdrawn = p.status === "withdrawn"
             const payMeta = PAYMENT_META[p.payment_status] ?? PAYMENT_META.pending
@@ -341,13 +341,13 @@ export function ParticipantsManager({
                 </span>
 
                 {/* Avatar */}
-                <div className="size-8 rounded-full bg-[#0a0a0a]/10 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-black text-[#0a0a0a]">{initials(p)}</span>
+                <div className="size-8 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
+                  <span className="text-xs font-black text-foreground">{initials(p)}</span>
                 </div>
 
                 {/* Name */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[#0a0a0a] truncate">{displayName(p)}</p>
+                  <p className="text-sm font-bold text-foreground truncate">{displayName(p)}</p>
                   <p className="text-[10px] text-zinc-400 truncate">
                     {isWithdrawn
                       ? "Retirado"
@@ -370,7 +370,7 @@ export function ParticipantsManager({
                           className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-all ${
                             p.payment_status === ps
                               ? PAYMENT_META[ps].cls + " opacity-100"
-                              : "bg-zinc-50 text-zinc-400 border-zinc-200 opacity-60 hover:opacity-100"
+                              : "bg-secondary text-zinc-400 border-zinc-200 opacity-60 hover:opacity-100"
                           }`}
                         >
                           {PAYMENT_META[ps].label}
@@ -411,7 +411,7 @@ export function ParticipantsManager({
       <Sheet open={addOpen} onOpenChange={setAddOpen}>
         <SheetContent side="right" className="w-full max-w-sm flex flex-col">
           <SheetHeader className="pb-4">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               {isInProgress ? "Agregar participante tardío" : "Agregar participante"}
             </SheetTitle>
           </SheetHeader>
@@ -426,7 +426,7 @@ export function ParticipantsManager({
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre o @usuario…"
                 autoFocus
-                className="w-full border border-[#e5e5e5] rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="w-full border border-border rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white"
               />
               {searchQuery && (
                 <button onClick={() => { setSearchQuery(""); setSearchResults([]) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
@@ -449,18 +449,18 @@ export function ParticipantsManager({
               ) : searchResults.length === 0 && searchQuery.trim() ? (
                 <p className="text-center text-sm text-zinc-400 py-8">Sin resultados</p>
               ) : (
-                <ul className="divide-y divide-[#f5f5f5]">
+                <ul className="divide-y divide-border-subtle">
                   {searchResults.map(u => {
                     const alreadyIn = participants.some(p => p.user_id === u.id)
                     return (
                       <li key={u.id} className="flex items-center gap-3 py-3">
-                        <div className="size-8 rounded-full bg-[#0a0a0a]/10 flex items-center justify-center shrink-0">
-                          <span className="text-xs font-black text-[#0a0a0a]">
+                        <div className="size-8 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-black text-foreground">
                             {(u.full_name ?? u.username ?? "?").charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-[#0a0a0a] truncate">{u.full_name ?? u.username ?? u.id.slice(0, 8)}</p>
+                          <p className="text-sm font-bold text-foreground truncate">{u.full_name ?? u.username ?? u.id.slice(0, 8)}</p>
                           {u.username && <p className="text-[10px] text-zinc-400">@{u.username}</p>}
                         </div>
                         {alreadyIn ? (
@@ -469,7 +469,7 @@ export function ParticipantsManager({
                           <button
                             onClick={() => void addParticipant(u.id)}
                             disabled={actionId === u.id}
-                            className="text-[10px] font-black uppercase tracking-wide text-[#0a0a0a] hover:text-[#222222] disabled:opacity-50 transition-colors"
+                            className="text-[10px] font-black uppercase tracking-wide text-foreground hover:text-foreground/80 disabled:opacity-50 transition-colors"
                           >
                             {actionId === u.id ? "Agregando…" : "Agregar"}
                           </button>
@@ -500,14 +500,14 @@ export function ParticipantsManager({
       <Sheet open={withdrawUserId !== null} onOpenChange={open => { if (!open) { setWithdrawUserId(null); setWithdrawReason("") } }}>
         <SheetContent side="bottom" className="rounded-t-2xl max-w-md mx-auto">
           <SheetHeader className="text-left pb-4">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               Retirar participante
             </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-4">
             {withdrawTarget && (
               <p className="text-sm text-zinc-500">
-                Se retirará a <span className="font-bold text-[#0a0a0a]">{displayName(withdrawTarget)}</span> del torneo. Sus partidos pendientes se convertirán en BYEs.
+                Se retirará a <span className="font-bold text-foreground">{displayName(withdrawTarget)}</span> del torneo. Sus partidos pendientes se convertirán en BYEs.
               </p>
             )}
             <div className="flex flex-col gap-1.5">
@@ -519,14 +519,14 @@ export function ParticipantsManager({
                 value={withdrawReason}
                 onChange={e => setWithdrawReason(e.target.value)}
                 placeholder="Lesión, inasistencia…"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-white"
               />
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => { setWithdrawUserId(null); setWithdrawReason("") }}
                 disabled={withdrawLoading}
-                className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>

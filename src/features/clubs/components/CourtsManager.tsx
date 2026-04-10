@@ -99,13 +99,13 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">
             Infraestructura
           </p>
-          <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-[#0a0a0a] leading-none">
+          <h1 className="text-3xl font-black uppercase tracking-[-0.03em] text-foreground leading-none">
             Canchas
           </h1>
         </div>
         <button
           onClick={openCreateSheet}
-          className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] px-4 py-2 bg-[#0a0a0a] text-white rounded-full hover:bg-[#222] transition-colors shrink-0"
+          className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] px-4 py-2 bg-foreground text-white rounded-full hover:bg-foreground/90 transition-colors shrink-0"
         >
           <Plus className="size-3.5" />
           Agregar Cancha
@@ -129,7 +129,7 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
           action={
             <button
               onClick={openCreateSheet}
-              className="text-[11px] font-black text-[#0a0a0a] hover:underline"
+              className="text-[11px] font-black text-foreground hover:underline"
             >
               Agregar cancha →
             </button>
@@ -140,7 +140,7 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
           {courts.map((court) => (
             <div
               key={court.id}
-              className="rounded-2xl bg-white border border-[#e5e5e5] p-5 flex flex-col gap-3"
+              className="rounded-2xl bg-card border border-border p-5 flex flex-col gap-3"
             >
               {/* Top row: sport badge + status */}
               <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
               </div>
 
               {/* Court name */}
-              <h3 className="text-sm font-black text-[#0a0a0a] leading-tight">
+              <h3 className="text-sm font-black text-foreground leading-tight">
                 {court.name}
               </h3>
 
@@ -165,16 +165,16 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
                   <span>Superficie: {court.surface_type}</span>
                 )}
                 <span>{court.is_indoor ? "Cubierta (Indoor)" : "Descubierta (Outdoor)"}</span>
-                <span className="font-bold text-[#0a0a0a]">
+                <span className="font-bold text-foreground">
                   ${court.price_per_hour.toFixed(2)} / hora
                 </span>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-1 border-t border-[#f0f0f0] mt-auto">
+              <div className="flex gap-2 pt-1 border-t border-border-subtle mt-auto">
                 <button
                   onClick={() => openEditSheet(court)}
-                  className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-[#e5e5e5] text-zinc-600 hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
                 >
                   <Pencil className="size-3" />
                   Editar
@@ -198,7 +198,7 @@ export function CourtsManager({ courts, clubId }: CourtsManagerProps) {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="pb-4">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               {editingCourt ? "Editar Cancha" : "Nueva Cancha"}
             </SheetTitle>
             <SheetDescription className="text-sm text-zinc-500">

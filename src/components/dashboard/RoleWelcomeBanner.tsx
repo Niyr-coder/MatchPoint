@@ -56,7 +56,7 @@ export function RoleWelcomeBanner({
   const accentColor = BANNER_BG[role]
 
   return (
-    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-white border border-[#e5e5e5] shadow-none transition-all duration-200 hover:border-[#d4d4d4]">
+    <div className="animate-fade-in-up relative rounded-2xl overflow-hidden p-6 md:p-8 bg-card border border-border shadow-none transition-all duration-200 hover:border-border/60">
       {/* Top accent stripe */}
       <div
         className="h-1.5 w-full absolute top-0 left-0 right-0"
@@ -83,7 +83,7 @@ export function RoleWelcomeBanner({
             {ROLE_LABEL[role]}
           </p>
           <h1
-            className="font-black text-zinc-900 uppercase leading-[0.9] tracking-[-0.03em] truncate"
+            className="font-black text-foreground uppercase leading-[0.9] tracking-[-0.03em] truncate"
             style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)" }}
           >
             Hola, {firstName}.
@@ -91,7 +91,7 @@ export function RoleWelcomeBanner({
           <p className="mt-1.5 text-zinc-400 text-sm capitalize">{date}</p>
           {clubName && (
             <div className="mt-3">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-zinc-700 border border-zinc-200">
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-foreground border border-border">
                 {clubName}
               </span>
             </div>
@@ -100,10 +100,10 @@ export function RoleWelcomeBanner({
 
         {/* Mini stats */}
         {stats.length > 0 && (
-          <div className="flex gap-6 shrink-0 sm:border-l sm:border-zinc-200 sm:pl-6">
+          <div className="flex gap-6 shrink-0 sm:border-l sm:border-border sm:pl-6">
             {stats.map(({ label, value }) => (
               <div key={label} className="text-center">
-                <p className="text-2xl font-black text-zinc-900">{value}</p>
+                <p className="text-2xl font-black text-foreground">{value}</p>
                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mt-0.5">
                   {label}
                 </p>

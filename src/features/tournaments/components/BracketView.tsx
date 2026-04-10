@@ -118,9 +118,9 @@ export function BracketView({
   if (tournamentStatus === "draft") return null
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-5 border-b border-[#f0f0f0] flex items-center gap-2 flex-wrap">
+      <div className="p-5 border-b border-border-subtle flex items-center gap-2 flex-wrap">
         <Shuffle className="size-4 text-zinc-400" />
         <p className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">
           {isRoundRobin ? "Fixture" : "Cuadro de juego"}
@@ -140,7 +140,7 @@ export function BracketView({
           <button
             onClick={() => void generate()}
             disabled={generating}
-            className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-[#0a0a0a] text-white hover:bg-[#222222] disabled:opacity-50 transition-colors"
+            className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-foreground text-white hover:bg-foreground/90 disabled:opacity-50 transition-colors"
           >
             {generating ? <RefreshCw className="size-3.5 animate-spin" /> : <Shuffle className="size-3.5" />}
             {matches.length > 0 ? "Regenerar sorteo" : "Generar sorteo"}
@@ -168,21 +168,21 @@ export function BracketView({
         </div>
       ) : isRoundRobin ? (
         /* Round Robin — flat match list */
-        <div className="divide-y divide-[#f5f5f5]">
+        <div className="divide-y divide-border-subtle">
           {matches.map((m) => (
             <div
               key={m.id}
-              className={`flex items-center gap-3 px-5 py-3 ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:bg-zinc-50" : ""}`}
+              className={`flex items-center gap-3 px-5 py-3 ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:bg-secondary" : ""}`}
               onClick={() => { if (canEditMatch && m.status !== "bye") openScoreSheet(m) }}
             >
               <span className="text-[10px] font-black text-zinc-300 w-4 shrink-0">
                 {m.match_number}
               </span>
-              <span className={`flex-1 text-sm font-bold truncate ${m.winner?.id === m.player1?.id ? "text-green-600" : "text-[#0a0a0a]"}`}>
+              <span className={`flex-1 text-sm font-bold truncate ${m.winner?.id === m.player1?.id ? "text-green-600" : "text-foreground"}`}>
                 {playerName(m.player1)}
               </span>
               <span className="text-[10px] font-black text-zinc-300 px-2">vs</span>
-              <span className={`flex-1 text-sm font-bold truncate text-right ${m.winner?.id === m.player2?.id ? "text-green-600" : "text-[#0a0a0a]"}`}>
+              <span className={`flex-1 text-sm font-bold truncate text-right ${m.winner?.id === m.player2?.id ? "text-green-600" : "text-foreground"}`}>
                 {playerName(m.player2)}
               </span>
               {m.score && (
@@ -218,28 +218,28 @@ export function BracketView({
                   {rMatches.map((m) => (
                     <div
                       key={m.id}
-                      className={`w-44 rounded-xl border overflow-hidden ${m.status === "bye" ? "opacity-40" : ""} ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:border-[#0a0a0a]/40" : ""}`}
+                      className={`w-44 rounded-xl border overflow-hidden ${m.status === "bye" ? "opacity-40" : ""} ${canEditMatch && m.status !== "bye" && m.status !== "completed" ? "cursor-pointer hover:border-foreground/40" : ""}`}
                       onClick={() => { if (canEditMatch && m.status !== "bye" && m.status !== "completed") openScoreSheet(m) }}
                     >
-                      <div className={`flex items-center gap-2 px-3 py-2 border-b ${m.winner?.id === m.player1?.id ? "bg-green-50" : "bg-white"}`}>
+                      <div className={`flex items-center gap-2 px-3 py-2 border-b ${m.winner?.id === m.player1?.id ? "bg-green-50" : "bg-card"}`}>
                         {m.winner?.id === m.player1?.id && <Trophy className="size-3 text-amber-400 shrink-0" />}
-                        <span className={`text-xs font-bold truncate flex-1 ${m.player1 ? "text-[#0a0a0a]" : "text-zinc-300"}`}>
+                        <span className={`text-xs font-bold truncate flex-1 ${m.player1 ? "text-foreground" : "text-zinc-300"}`}>
                           {playerName(m.player1)}
                         </span>
                       </div>
-                      <div className={`flex items-center gap-2 px-3 py-2 ${m.winner?.id === m.player2?.id ? "bg-green-50" : "bg-white"}`}>
+                      <div className={`flex items-center gap-2 px-3 py-2 ${m.winner?.id === m.player2?.id ? "bg-green-50" : "bg-card"}`}>
                         {m.winner?.id === m.player2?.id && <Trophy className="size-3 text-amber-400 shrink-0" />}
-                        <span className={`text-xs font-bold truncate flex-1 ${m.player2 ? "text-[#0a0a0a]" : "text-zinc-300"}`}>
+                        <span className={`text-xs font-bold truncate flex-1 ${m.player2 ? "text-foreground" : "text-zinc-300"}`}>
                           {m.status === "bye" ? "BYE" : playerName(m.player2)}
                         </span>
                       </div>
                       {m.score && (
-                        <div className="px-3 py-1 bg-zinc-50 border-t">
+                        <div className="px-3 py-1 bg-secondary border-t">
                           <span className="text-[10px] font-mono text-zinc-400">{m.score}</span>
                         </div>
                       )}
                       {canEditMatch && m.status !== "bye" && m.status !== "completed" && (
-                        <div className="px-3 py-1.5 bg-zinc-50 border-t flex items-center gap-1 text-[10px] text-zinc-400">
+                        <div className="px-3 py-1.5 bg-secondary border-t flex items-center gap-1 text-[10px] text-zinc-400">
                           <Pencil className="size-2.5" />
                           Registrar resultado
                         </div>
@@ -257,7 +257,7 @@ export function BracketView({
       <Sheet open={scoreMatch !== null} onOpenChange={open => { if (!open) setScoreMatch(null) }}>
         <SheetContent side="bottom" className="rounded-t-2xl max-w-md mx-auto">
           <SheetHeader className="text-left pb-4">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               Registrar resultado
             </SheetTitle>
           </SheetHeader>
@@ -273,7 +273,7 @@ export function BracketView({
                   value={scoreInput}
                   onChange={e => setScoreInput(e.target.value)}
                   placeholder="Ej: 6-3 6-4"
-                  className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                  className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
                 />
               </div>
 
@@ -293,7 +293,7 @@ export function BracketView({
                         className={`flex-1 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${
                           selected
                             ? "bg-green-50 border-green-400 text-green-700"
-                            : "bg-white border-[#e5e5e5] text-zinc-600 hover:border-zinc-400"
+                            : "bg-card border-border text-zinc-600 hover:border-zinc-400"
                         }`}
                       >
                         {playerName(player)}
@@ -311,14 +311,14 @@ export function BracketView({
                 <button
                   onClick={() => setScoreMatch(null)}
                   disabled={scoreLoading}
-                  className="flex-1 border border-[#e5e5e5] rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                  className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors disabled:opacity-50"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={() => void submitScore()}
                   disabled={scoreLoading || !winnerId}
-                  className="flex-1 bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-foreground hover:bg-foreground/90 text-white rounded-full py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                 >
                   {scoreLoading && <RefreshCw className="size-3.5 animate-spin" />}
                   Guardar

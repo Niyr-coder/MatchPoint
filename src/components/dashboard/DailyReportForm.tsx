@@ -24,7 +24,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
 
   if (submitState === "success") {
     return (
-      <div className="border border-[#e5e5e5] rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
+      <div className="border border-border rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
         <div className="size-10 rounded-xl bg-green-100 flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -48,12 +48,12 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border border-[#e5e5e5] rounded-2xl p-6 flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="border border-border rounded-2xl p-6 flex flex-col gap-5">
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16a34a] mb-1">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">
           Reporte del turno
         </p>
-        <h2 className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+        <h2 className="text-base font-black uppercase tracking-tight text-foreground">
           Novedades del turno
         </h2>
         <p className="text-xs text-zinc-400 mt-1">
@@ -75,7 +75,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Describe los eventos relevantes del día: clientes especiales, problemas con canchas, comentarios del equipo..."
           rows={4}
-          className="w-full rounded-xl border border-[#e5e5e5] px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-[#0a0a0a]/20 focus:border-[#0a0a0a] resize-none transition-colors"
+          className="w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground placeholder:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground resize-none transition-colors"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
         <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
           Incidencias
         </p>
-        <div className="border border-[#e5e5e5] rounded-xl p-4 flex flex-col items-center gap-2 text-center">
+        <div className="border border-border rounded-xl p-4 flex flex-col items-center gap-2 text-center">
           <p className="text-xs text-zinc-400">Sin incidencias registradas</p>
           <p className="text-[10px] text-zinc-300">
             Las incidencias se podrán agregar en próximas versiones
@@ -93,7 +93,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
       </div>
 
       {/* Submit */}
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#e5e5e5]">
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-border">
         {submitState === "error" && (
           <p className="text-xs text-red-500 font-medium">
             Error al cerrar turno. Intenta de nuevo.
@@ -102,7 +102,7 @@ export function DailyReportForm({ clubId: _clubId }: DailyReportFormProps) {
         <button
           type="submit"
           disabled={submitState === "submitting"}
-          className="text-[11px] font-black uppercase tracking-[0.15em] px-5 py-2.5 rounded-full bg-[#0a0a0a] text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
+          className="text-[11px] font-black uppercase tracking-[0.15em] px-5 py-2.5 rounded-full bg-foreground text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
         >
           {submitState === "submitting" ? "Cerrando turno..." : "Cerrar turno"}
         </button>

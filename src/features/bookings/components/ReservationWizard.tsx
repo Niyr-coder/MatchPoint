@@ -54,9 +54,9 @@ function ProgressIndicator({ currentStep }: { currentStep: number }) {
               <div
                 className={`size-8 rounded-full flex items-center justify-center text-[11px] font-black transition-colors ${
                   isDone
-                    ? "bg-[#0a0a0a] text-white"
+                    ? "bg-foreground text-white"
                     : isActive
-                    ? "bg-[#0a0a0a] text-white"
+                    ? "bg-foreground text-white"
                     : "bg-zinc-200 text-zinc-400"
                 }`}
               >
@@ -68,7 +68,7 @@ function ProgressIndicator({ currentStep }: { currentStep: number }) {
               </div>
               <span
                 className={`text-[9px] font-black uppercase tracking-wide ${
-                  isActive ? "text-[#0a0a0a]" : isDone ? "text-[#0a0a0a]" : "text-zinc-400"
+                  isActive ? "text-foreground" : isDone ? "text-foreground" : "text-zinc-400"
                 }`}
               >
                 {step.label}
@@ -77,7 +77,7 @@ function ProgressIndicator({ currentStep }: { currentStep: number }) {
             {i < STEPS.length - 1 && (
               <div
                 className={`h-px w-12 mx-1 mb-4 transition-colors ${
-                  i < currentStep ? "bg-[#0a0a0a]" : "bg-zinc-200"
+                  i < currentStep ? "bg-foreground" : "bg-zinc-200"
                 }`}
               />
             )}
@@ -125,10 +125,10 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
         <button
           key={club.id}
           onClick={() => onSelect(club)}
-          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#0a0a0a] transition-all"
+          className="animate-fade-in-up rounded-2xl bg-card border border-border p-4 text-left hover:border-foreground transition-all"
           style={{ animationDelay: `${i * 0.04}s` }}
         >
-          <p className="text-sm font-black text-[#0a0a0a]">{club.name}</p>
+          <p className="text-sm font-black text-foreground">{club.name}</p>
           {club.city && (
             <p className="text-[11px] text-zinc-400 mt-0.5">{club.city}</p>
           )}
@@ -137,7 +137,7 @@ function StepClub({ onSelect }: { onSelect: (club: ClubWithSports) => void }) {
               {club.sports.map((s) => (
                 <span
                   key={s}
-                  className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-zinc-50 text-zinc-500 border-zinc-200"
+                  className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-secondary text-zinc-500 border-zinc-200"
                 >
                   {SPORT_LABELS[s] ?? s}
                 </span>
@@ -193,19 +193,19 @@ function StepCourt({
         <button
           key={court.id}
           onClick={() => onSelect(court)}
-          className="animate-fade-in-up rounded-2xl bg-white border border-[#e5e5e5] p-4 text-left hover:border-[#0a0a0a] transition-all"
+          className="animate-fade-in-up rounded-2xl bg-card border border-border p-4 text-left hover:border-foreground transition-all"
           style={{ animationDelay: `${i * 0.04}s` }}
         >
           <div className="flex items-start justify-between">
-            <p className="text-sm font-black text-[#0a0a0a]">{court.name}</p>
-            <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-white text-[#0a0a0a] border-[#e5e5e5]">
+            <p className="text-sm font-black text-foreground">{court.name}</p>
+            <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full border bg-card text-foreground border-border">
               {SPORT_LABELS[court.sport] ?? court.sport}
             </span>
           </div>
           {court.surface_type && (
             <p className="text-[11px] text-zinc-400 mt-1">{court.surface_type}</p>
           )}
-          <p className="text-sm font-bold text-[#0a0a0a] mt-2">
+          <p className="text-sm font-bold text-foreground mt-2">
             ${court.price_per_hour.toFixed(2)}
             <span className="text-[11px] font-normal text-zinc-400">/hora</span>
           </p>
@@ -257,7 +257,7 @@ function StepDateTime({
           min={today}
           value={date}
           onChange={(e) => handleDateChange(e.target.value)}
-          className="border border-[#e5e5e5] rounded-xl px-4 py-2.5 text-sm text-[#0a0a0a] outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+          className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
         />
       </div>
 
@@ -292,8 +292,8 @@ function StepDateTime({
                       !slot.available
                         ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200"
                         : isSelected
-                        ? "bg-[#0a0a0a] text-white border border-[#0a0a0a]"
-                        : "bg-white text-[#0a0a0a] border border-[#e5e5e5] hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+                        ? "bg-foreground text-white border border-foreground"
+                        : "bg-card text-foreground border border-border hover:border-foreground hover:text-foreground"
                     }`}
                   >
                     {slot.startTime.slice(0, 5)} – {slot.endTime.slice(0, 5)}
@@ -325,21 +325,21 @@ function StepConfirm({
 }) {
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-2xl bg-zinc-50 border border-[#e5e5e5] p-5 flex flex-col gap-3">
+      <div className="rounded-2xl bg-secondary border border-border p-5 flex flex-col gap-3">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
           Resumen de la reserva
         </p>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <span className="text-zinc-400">Club</span>
-          <span className="font-bold text-[#0a0a0a]">{state.club?.name}</span>
+          <span className="font-bold text-foreground">{state.club?.name}</span>
           <span className="text-zinc-400">Cancha</span>
-          <span className="font-bold text-[#0a0a0a]">{state.court?.name}</span>
+          <span className="font-bold text-foreground">{state.court?.name}</span>
           <span className="text-zinc-400">Deporte</span>
-          <span className="font-bold text-[#0a0a0a]">
+          <span className="font-bold text-foreground">
             {state.court ? (SPORT_LABELS[state.court.sport] ?? state.court.sport) : "—"}
           </span>
           <span className="text-zinc-400">Fecha</span>
-          <span className="font-bold text-[#0a0a0a]">
+          <span className="font-bold text-foreground">
             {state.date
               ? new Date(state.date + "T12:00:00").toLocaleDateString("es-EC", {
                   weekday: "long",
@@ -349,13 +349,13 @@ function StepConfirm({
               : "—"}
           </span>
           <span className="text-zinc-400">Horario</span>
-          <span className="font-bold text-[#0a0a0a]">
+          <span className="font-bold text-foreground">
             {state.slot
               ? `${state.slot.startTime.slice(0, 5)} – ${state.slot.endTime.slice(0, 5)}`
               : "—"}
           </span>
           <span className="text-zinc-400">Precio</span>
-          <span className="font-bold text-[#0a0a0a]">
+          <span className="font-bold text-foreground">
             ${state.court?.price_per_hour.toFixed(2)}
           </span>
         </div>
@@ -371,7 +371,7 @@ function StepConfirm({
           maxLength={500}
           rows={3}
           placeholder="Indicaciones especiales, número de jugadores, etc."
-          className="w-full border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder:text-zinc-400 outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white resize-none"
+          className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-zinc-400 outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card resize-none"
         />
       </div>
 
@@ -384,7 +384,7 @@ function StepConfirm({
       <button
         onClick={onSubmit}
         disabled={submitting}
-        className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-6 py-3 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+        className="bg-foreground hover:bg-foreground/90 text-white rounded-full px-6 py-3 text-[11px] font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
       >
         {submitting && <Loader2 className="size-3.5 animate-spin" />}
         Confirmar reserva

@@ -94,7 +94,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
       <div className="flex justify-end">
         <button
           onClick={() => setSheetOpen(true)}
-          className="bg-[#0a0a0a] text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 hover:bg-zinc-800 transition-colors"
+          className="bg-foreground text-white rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] flex items-center gap-2 hover:bg-foreground/90 transition-colors"
         >
           <Wallet className="size-3.5" />
           Registrar Movimiento
@@ -103,15 +103,15 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
 
       {/* Entries list */}
       {entries.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3 border border-dashed border-[#e5e5e5] rounded-2xl">
+        <div className="flex flex-col items-center justify-center py-20 gap-3 border border-dashed border-border rounded-2xl">
           <Wallet className="size-10 text-zinc-300" />
           <p className="text-sm font-bold text-zinc-400">Sin movimientos hoy</p>
           <p className="text-xs text-zinc-300">Registra el primer movimiento del día</p>
         </div>
       ) : (
-        <div className="rounded-2xl bg-white border border-[#e5e5e5] overflow-hidden">
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
           {/* Header */}
-          <div className="grid grid-cols-4 border-b border-[#e5e5e5] px-5 py-3 bg-zinc-50/60">
+          <div className="grid grid-cols-4 border-b border-border px-5 py-3 bg-secondary/60">
             {["Hora", "Tipo", "Concepto / Método", "Monto"].map((h) => (
               <div
                 key={h}
@@ -123,7 +123,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
           </div>
 
           {/* Rows */}
-          <div className="divide-y divide-[#f0f0f0]">
+          <div className="divide-y divide-border-subtle">
             {entries.map((entry, i) => (
               <div
                 key={entry.id}
@@ -138,14 +138,14 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                   />
                 </div>
                 <div>
-                  <p className="text-sm text-[#0a0a0a] font-medium">{entry.concept}</p>
+                  <p className="text-sm text-foreground font-medium">{entry.concept}</p>
                   <p className="text-[11px] text-zinc-400">
                     {PAYMENT_LABELS[entry.payment_method as PaymentMethod] ?? entry.payment_method}
                   </p>
                 </div>
                 <span
                   className={`text-sm font-black ${
-                    entry.type === "income" ? "text-[#16a34a]" : "text-red-500"
+                    entry.type === "income" ? "text-primary" : "text-red-500"
                   }`}
                 >
                   {entry.type === "expense" ? "-" : "+"}
@@ -161,7 +161,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
       <Sheet open={sheetOpen} onOpenChange={(o) => { setSheetOpen(o); if (!o) resetForm() }}>
         <SheetContent side="right" className="w-full max-w-sm">
           <SheetHeader className="pb-6">
-            <SheetTitle className="text-base font-black uppercase tracking-tight text-[#0a0a0a]">
+            <SheetTitle className="text-base font-black uppercase tracking-tight text-foreground">
               Registrar Movimiento
             </SheetTitle>
           </SheetHeader>
@@ -173,8 +173,8 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                 onClick={() => setType("income")}
                 className={`flex-1 rounded-full py-2 text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
                   type === "income"
-                    ? "bg-[#16a34a] text-white"
-                    : "border border-[#e5e5e5] text-zinc-500 hover:border-zinc-300"
+                    ? "bg-primary text-white"
+                    : "border border-border text-zinc-500 hover:border-zinc-300"
                 }`}
               >
                 Ingreso
@@ -184,7 +184,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                 className={`flex-1 rounded-full py-2 text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${
                   type === "expense"
                     ? "bg-red-500 text-white"
-                    : "border border-[#e5e5e5] text-zinc-500 hover:border-zinc-300"
+                    : "border border-border text-zinc-500 hover:border-zinc-300"
                 }`}
               >
                 Gasto
@@ -203,7 +203,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
             </div>
 
@@ -217,7 +217,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                 value={concept}
                 onChange={(e) => setConcept(e.target.value)}
                 placeholder="Ej: Reserva cancha 2"
-                className="border border-[#e5e5e5] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/8 bg-white"
+                className="border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               />
             </div>
 
@@ -230,7 +230,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                  className="w-full appearance-none border border-[#e5e5e5] rounded-xl px-4 pr-9 py-3 text-sm font-bold text-[#0a0a0a] outline-none focus:border-[#0a0a0a] bg-white cursor-pointer"
+                  className="w-full appearance-none border border-border rounded-xl px-4 pr-9 py-3 text-sm font-bold text-foreground outline-none focus:border-foreground bg-card cursor-pointer"
                 >
                   {Object.entries(PAYMENT_LABELS).map(([val, label]) => (
                     <option key={val} value={val}>
@@ -249,7 +249,7 @@ export function CashRegisterManager({ clubId, initialEntries }: CashRegisterMana
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-[#0a0a0a] hover:bg-[#222222] text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
+              className="bg-foreground hover:bg-foreground/90 text-white rounded-full px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] disabled:opacity-50 transition-colors mt-2"
             >
               {loading ? "Registrando..." : "Registrar"}
             </button>
