@@ -52,6 +52,7 @@ export interface EventFormState {
   organizer_name: string
   organizer_contact: string
   tags: string[]
+  publishImmediately: boolean
 }
 
 export const EMPTY_EVENT_FORM: EventFormState = {
@@ -76,6 +77,7 @@ export const EMPTY_EVENT_FORM: EventFormState = {
   organizer_name: "",
   organizer_contact: "",
   tags: [],
+  publishImmediately: false,
 }
 
 interface ClubOption {
@@ -91,6 +93,7 @@ interface EventFormProps {
   error: string | null
   onSubmit: (form: EventFormState) => Promise<void>
   onCancel: () => void
+  isAdmin?: boolean
 }
 
 type SetField = <K extends keyof EventFormState>(key: K, value: EventFormState[K]) => void
@@ -493,6 +496,61 @@ function Step2({
   )
 }
 
+// ── AdminEventOptions ──────────────────────────────────────────────────────────
+
+function AdminEventOptions({ form, set }: { form: EventFormState; set: SetField }) {
+  const isMatchPoint = form.organizer_name === "MatchPoint"
+  return (
+    <div className="flex flex-col gap-3 pt-1 border-t border-border">
+      <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400 pt-1">Opciones de administrador</p>
+      <button
+        type="button"
+        onClick={() => {
+          if (isMatchPoint) {
+            set("organizer_name", "")
+            set("organizer_contact", "")
+          } else {
+            set("organizer_name", "MatchPoint")
+            set("organizer_contact", "info@matchpoint.top")
+          }
+        }}
+        className={[
+          "flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-bold transition-all text-left",
+          isMatchPoint
+            ? "bg-foreground text-white border-foreground"
+            : "border-border text-zinc-600 hover:border-zinc-400",
+        ].join(" ")}
+      >
+        <span>🏆</span>
+        <div>
+          <p className="text-xs font-black">MatchPoint organizador oficial</p>
+          <p className={`text-[10px] font-normal ${isMatchPoint ? "text-white/70" : "text-zinc-400"}`}>
+            {isMatchPoint ? "Activo — aparecerá como auspiciante oficial" : "Aparecerá como organizador y auspiciante oficial"}
+          </p>
+        </div>
+      </button>
+      <button
+        type="button"
+        onClick={() => set("publishImmediately", !form.publishImmediately)}
+        className={[
+          "flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-bold transition-all text-left",
+          form.publishImmediately
+            ? "bg-foreground text-white border-foreground"
+            : "border-border text-zinc-600 hover:border-zinc-400",
+        ].join(" ")}
+      >
+        <span>🚀</span>
+        <div>
+          <p className="text-xs font-black">Publicar y abrir registro al guardar</p>
+          <p className={`text-[10px] font-normal ${form.publishImmediately ? "text-white/70" : "text-zinc-400"}`}>
+            {form.publishImmediately ? "El evento se publicará inmediatamente" : "Por defecto se guarda como borrador"}
+          </p>
+        </div>
+      </button>
+    </div>
+  )
+}
+
 // ── Step 3: Detalles ───────────────────────────────────────────────────────────
 
 function Step3({ form, set, clubs }: { form: EventFormState; set: SetField; clubs: ClubOption[] }) {
@@ -613,7 +671,7 @@ function Step3({ form, set, clubs }: { form: EventFormState; set: SetField; club
 
 // ── Step 4: Extras ─────────────────────────────────────────────────────────────
 
-function Step4({ form, set }: { form: EventFormState; set: SetField }) {
+function Step4({ form, set, isAdmin }: { form: EventFormState; set: SetField; isAdmin?: boolean }) {
   return (
     <div className="flex flex-col gap-5">
       <p className="text-xs text-zinc-400 -mt-1">Todo lo de esta sección es opcional.</p>
@@ -671,6 +729,8 @@ function Step4({ form, set }: { form: EventFormState; set: SetField }) {
         <TagInput tags={form.tags} onChange={(tags) => set("tags", tags)} />
         <p className="text-[10px] text-zinc-400">Máximo 10 etiquetas</p>
       </div>
+
+      {isAdmin && <AdminEventOptions form={form} set={set} />}
     </div>
   )
 }
@@ -685,6 +745,7 @@ export function EventForm({
   error,
   onSubmit,
   onCancel,
+  isAdmin,
 }: EventFormProps) {
   const [form, setForm] = useState<EventFormState>(initial)
   const [province, setProvince] = useState<string>(() => findProvinceByCity(initial.city))
@@ -726,7 +787,7 @@ export function EventForm({
           />
         )}
         {step === 3 && <Step3 form={form} set={set} clubs={clubs} />}
-        {step === 4 && <Step4 form={form} set={set} />}
+        {step === 4 && <Step4 form={form} set={set} isAdmin={isAdmin} />}
       </div>
 
       {stepErrors.length > 0 && (

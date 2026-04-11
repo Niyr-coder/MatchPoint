@@ -68,5 +68,6 @@ export function eventToForm(event: EventWithClub): EventFormState {
     organizer_name:        event.organizer_name ?? "",
     organizer_contact:     event.organizer_contact ?? "",
     tags:                  event.tags ?? [],
+    publishImmediately:    false,
   }
 }

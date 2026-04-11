@@ -55,6 +55,7 @@ function buildPayload({ form, clubId }: BuildPayloadOptions): Record<string, unk
     organizer_name:        form.organizer_name || undefined,
     organizer_contact:     form.organizer_contact || undefined,
     tags:                  form.tags.length > 0 ? form.tags : undefined,
+    ...(form.publishImmediately ? { status: "published" } : {}),
   }
 }
 

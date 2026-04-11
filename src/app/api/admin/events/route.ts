@@ -45,6 +45,7 @@ const adminCreateEventSchema = z.object({
   tags: z.array(z.string().max(50)).max(10).default([]),
   organizer_name: z.string().max(200).nullish(),
   organizer_contact: z.string().max(200).nullish(),
+  status: z.enum(["draft", "published"]).default("draft"),
 })
 
 // ──────────────────────────────────────────────────────────

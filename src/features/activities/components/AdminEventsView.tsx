@@ -320,6 +320,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
           error={mutations.modalError}
           onSubmit={handleModalSubmit}
           onCancel={closeModal}
+          isAdmin
         />
       )}
     </>

@@ -168,7 +168,7 @@ export async function createEvent(
       ...input,
       tags: input.tags ?? [],
       price: input.price ?? 0,
-      status: "draft",
+      status: (input as { status?: string }).status === "published" ? "published" : "draft",
       created_by: userId,
       created_at: now,
       updated_at: now,
