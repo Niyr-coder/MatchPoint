@@ -84,7 +84,7 @@ export function ControlTowerActivityFeed({ initialFeed }: Props) {
         { event: "INSERT", schema: "public", table: "audit_log" },
         (payload: RealtimePostgresInsertPayload<Record<string, unknown>>) => {
           const newEntry = payload.new as unknown as ActivityFeedEntry
-          setFeed((prev) => [newEntry, ...prev].slice(0, 40))
+          setFeed((prev) => [newEntry, ...prev].slice(0, 10))
           flashNew([newEntry.id])
         }
       )
@@ -103,7 +103,7 @@ export function ControlTowerActivityFeed({ initialFeed }: Props) {
           const incoming = data.filter((e) => !existingIds.has(e.id))
           if (incoming.length === 0) return prev
           flashNew(incoming.map((e) => e.id))
-          return data
+          return data.slice(0, 10)
         })
       } catch { /* silent */ }
     }, 30000)
