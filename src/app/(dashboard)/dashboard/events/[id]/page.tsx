@@ -142,7 +142,7 @@ export default async function EventDetailPage({
   const daysLeft    = event.registration_deadline ? daysUntil(event.registration_deadline) : null
 
   return (
-    <div className="flex flex-col gap-0 max-w-2xl">
+    <div className="flex flex-col gap-0 max-w-3xl mx-auto w-full">
 
       {/* Back link */}
       <Link
