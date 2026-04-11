@@ -24,12 +24,12 @@ export function HeroSection() {
 
       {/* Copy — bottom-left */}
       <div className="relative z-20 container mx-auto px-6 sm:px-8 pb-16 md:pb-24">
-        {/* Label */}
+        {/* Label — white with green dot accent for max visibility on dark photo bg */}
         <p
-          className="animate-fade-in label-green"
+          className="animate-fade-in text-xs font-black uppercase tracking-[0.2em] text-white/80 block mb-4"
           style={{ animationDelay: "0.1s" }}
         >
-          LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
+          <span className="text-primary">●</span>{" "}LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
         </p>
 
         {/* Headline — two separate phrases, period in emerald signals full stop */}

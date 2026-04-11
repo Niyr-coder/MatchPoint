@@ -16,13 +16,13 @@ function StatItem({ icon: Icon, value, suffix, label, index }: StatItemProps) {
   return (
     <ScrollReveal delay={index * 0.08}>
       <div className="text-center">
-        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
           <Icon className="w-6 h-6 text-primary" />
         </div>
-        <p className="text-4xl md:text-5xl font-black text-white tracking-tight tabular-nums">
+        <p className="text-4xl md:text-5xl font-black text-foreground tracking-tight tabular-nums">
           <AnimatedCounter value={value} suffix={suffix} />
         </p>
-        <p className="text-sm font-semibold text-white/40 uppercase tracking-widest mt-2">
+        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mt-2">
           {label}
         </p>
       </div>
@@ -39,12 +39,12 @@ const STATS_WITH_ICONS = [
 
 export function StatsSection() {
   return (
-    <section id="stats" className="section-dark py-24 border-t border-white/5">
+    <section id="stats" className="bg-card py-24 border-t border-border">
       <div className="container mx-auto px-6 sm:px-8">
         <ScrollReveal className="mb-16">
           <p className="label-green">Comunidad</p>
           <h2
-            className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em]"
+            className="font-black text-foreground uppercase leading-[0.88] tracking-[-0.03em]"
             style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)" }}
           >
             NÚMEROS QUE HABLAN.
