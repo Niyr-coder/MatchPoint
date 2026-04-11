@@ -78,6 +78,15 @@ export interface MatchResult {
   opponent_id: string | null
 }
 
+export interface PickleballPublicProfile {
+  singles_rating: number | null
+  doubles_rating: number | null
+  skill_level: "beginner" | "intermediate" | "advanced" | "pro" | null
+  dominant_hand: string | null
+  play_style: string | null
+  years_playing: number | null
+}
+
 export interface PublicPlayerProfile {
   rating: number
   ranking_position: number | null
@@ -88,12 +97,13 @@ export interface PublicPlayerProfile {
   recentMatches: MatchResult[]
   clubs: Array<{ id: string; name: string; sport: string[] }>
   sports: Array<{ sport: string; count: number }>
+  pickleballProfile: PickleballPublicProfile | null
 }
 
 export async function getPublicPlayerProfile(userId: string): Promise<PublicPlayerProfile> {
   const supabase = createServiceClient()
 
-  const [profileRes, matchesRes, clubMembershipsRes, reservationsRes] = await Promise.all([
+  const [profileRes, matchesRes, clubMembershipsRes, reservationsRes, pickleballRes] = await Promise.all([
     supabase
       .from('profiles')
       .select('rating, ranking_position, matches_played, matches_won, current_streak')
@@ -120,6 +130,12 @@ export async function getPublicPlayerProfile(userId: string): Promise<PublicPlay
       .eq('user_id', userId)
       .neq('status', 'cancelled')
       .limit(100),
+
+    supabase
+      .from('pickleball_profiles')
+      .select('singles_rating, doubles_rating, skill_level, dominant_hand, play_style, years_playing')
+      .eq('user_id', userId)
+      .maybeSingle(),
   ])
 
   const profile = profileRes.data
@@ -163,5 +179,6 @@ export async function getPublicPlayerProfile(userId: string): Promise<PublicPlay
     recentMatches: (matchesRes.data ?? []) as MatchResult[],
     clubs,
     sports,
+    pickleballProfile: (pickleballRes.data as PickleballPublicProfile | null) ?? null,
   }
 }

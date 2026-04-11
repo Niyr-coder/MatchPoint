@@ -2,29 +2,15 @@ import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { getPublicPlayerProfile } from "@/features/users/queries"
 import { StatCard } from "@/components/shared/StatCard"
+import { PlayerHeroSection } from "@/features/users/components/PlayerHeroSection"
+import { RecentMatchesList } from "@/features/users/components/RecentMatchesList"
+import { PickleballRatingWidget } from "@/features/users/components/PickleballRatingWidget"
 import { ArrowLeft, Trophy, Target, TrendingUp, Swords } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Profile } from "@/types"
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0] ?? "")
-    .join("")
-    .toUpperCase()
-}
-
-function formatJoinDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-EC", {
-    month: "long",
-    year: "numeric",
-  })
-}
 
 const SPORT_LABELS: Record<string, string> = {
   futbol: "Fútbol",
@@ -69,46 +55,13 @@ export default async function PlayerProfilePage({
         Ranking
       </Link>
 
-      {/* Profile hero */}
-      <div className="flex flex-col items-center gap-4 py-8 border-b border-border">
-        <div className="size-20 rounded-full bg-foreground flex items-center justify-center shrink-0 overflow-hidden">
-          {profile.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={displayName}
-              width={80}
-              height={80}
-              className="size-20 object-cover"
-            />
-          ) : (
-            <span className="text-2xl font-black text-white">
-              {getInitials(displayName)}
-            </span>
-          )}
-        </div>
-
-        <div className="text-center">
-          <h1 className="text-2xl font-black text-foreground">{displayName}</h1>
-          {profile.username && (
-            <p className="text-sm text-zinc-500 mt-0.5">@{profile.username}</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 text-[11px] text-zinc-400">
-          {profile.city && <span>{profile.city}</span>}
-          {profile.city && <span>·</span>}
-          <span>Miembro desde {formatJoinDate(profile.created_at)}</span>
-        </div>
-
-        {stats.ranking_position && (
-          <div className="flex items-center gap-1.5 bg-secondary text-foreground rounded-full px-4 py-1.5">
-            <Trophy className="size-3.5" />
-            <span className="text-[11px] font-black">
-              #{stats.ranking_position} en el ranking
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Hero */}
+      <PlayerHeroSection
+        profile={profile}
+        displayName={displayName}
+        rating={stats.rating}
+        rankingPosition={stats.ranking_position}
+      />
 
       {/* Stats */}
       <section>
@@ -116,32 +69,25 @@ export default async function PlayerProfilePage({
           Estadísticas
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard
-            label="Partidos"
-            value={stats.matches_played}
-            icon={Swords}
-            variant="default"
-          />
-          <StatCard
-            label="Victorias"
-            value={stats.matches_won}
-            icon={Trophy}
-            variant="accent"
-          />
-          <StatCard
-            label="% Victorias"
-            value={`${stats.win_rate}%`}
-            icon={Target}
-            variant="success"
-          />
-          <StatCard
-            label="Racha actual"
-            value={stats.current_streak}
-            icon={TrendingUp}
-            variant="warning"
-          />
+          <StatCard label="Partidos" value={stats.matches_played} icon={Swords} variant="default" />
+          <StatCard label="Victorias" value={stats.matches_won} icon={Trophy} variant="accent" />
+          <StatCard label="% Victorias" value={`${stats.win_rate}%`} icon={Target} variant="success" />
+          <StatCard label="Racha actual" value={stats.current_streak} icon={TrendingUp} variant="warning" />
         </div>
       </section>
+
+      {/* Pickleball rating (only if profile exists) */}
+      {stats.pickleballProfile && (
+        <section>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3">
+            Pickleball
+          </p>
+          <PickleballRatingWidget profile={stats.pickleballProfile} />
+        </section>
+      )}
+
+      {/* Match history */}
+      <RecentMatchesList matches={stats.recentMatches} />
 
       {/* Sports */}
       {stats.sports.length > 0 && (
