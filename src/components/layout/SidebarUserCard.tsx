@@ -36,14 +36,14 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
     || "Usuario"
 
   return (
-    <div ref={containerRef} className="relative border-t border-zinc-800/80 p-2.5">
+    <div ref={containerRef} className="relative border-t border-border p-2.5">
       {open && (
-        <div className="absolute bottom-full left-2.5 right-2.5 mb-1.5 bg-zinc-900 border border-zinc-700/80 rounded-xl overflow-hidden shadow-xl z-50">
+        <div className="absolute bottom-full left-2.5 right-2.5 mb-1.5 bg-card border border-border rounded-xl overflow-hidden shadow-lg z-50">
           {/* User info header in dropdown */}
-          <div className="px-3 py-2.5 border-b border-zinc-800">
-            <p className="text-[11px] font-black text-white truncate">{displayName}</p>
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-[11px] font-black text-foreground truncate">{displayName}</p>
             {profile.username && (
-              <p className="text-[10px] text-zinc-500 truncate">@{profile.username}</p>
+              <p className="text-[10px] text-muted-foreground truncate">@{profile.username}</p>
             )}
           </div>
           {/* Actions */}
@@ -51,7 +51,7 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
             <Link
               href="/dashboard/profile"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors duration-100"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-100"
             >
               <User className="size-3.5 shrink-0" />
               Mi perfil
@@ -59,16 +59,16 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
             <Link
               href="/dashboard/account"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors duration-100"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-100"
             >
               <Settings className="size-3.5 shrink-0" />
               Configuración
             </Link>
-            <div className="my-1 border-t border-zinc-800" />
+            <div className="my-1 border-t border-border" />
             <form action="/auth/signout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-zinc-500 hover:text-red-400 hover:bg-red-950/40 transition-colors duration-100"
+                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[12px] font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-100"
               >
                 <LogOut className="size-3.5 shrink-0" />
                 Cerrar sesión
@@ -80,19 +80,19 @@ export function SidebarUserCard({ profile, currentRole }: SidebarUserCardProps) 
 
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg hover:bg-zinc-800/50 transition-colors duration-150 text-left"
+        className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg hover:bg-muted transition-colors duration-150 text-left"
       >
         <Avatar className="size-7 shrink-0">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={displayName} />
-          <AvatarFallback className="bg-zinc-800 text-zinc-300 text-[10px] font-black">
+          <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-black">
             {initials || "U"}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-[12px] font-bold text-white truncate leading-none">{displayName}</p>
+          <p className="text-[12px] font-bold text-foreground truncate leading-none">{displayName}</p>
           <RoleBadge role={currentRole} size="sm" className="mt-1" />
         </div>
-        <ChevronsUpDown className="size-3.5 text-zinc-600 shrink-0" />
+        <ChevronsUpDown className="size-3.5 text-muted-foreground/50 shrink-0" />
       </button>
     </div>
   )

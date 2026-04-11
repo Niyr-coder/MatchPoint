@@ -35,17 +35,17 @@ export function SidebarItem({ item, isActive, onItemClick }: SidebarItemProps) {
       className={cn(
         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all duration-150",
         isActive
-          ? "bg-zinc-800 text-white font-bold"
-          : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 font-medium"
+          ? "bg-primary/8 text-foreground font-bold"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted font-medium"
       )}
     >
       {isActive && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-[18px] w-[3px] bg-green-500 rounded-r-full" />
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-[18px] w-[3px] bg-primary rounded-r-full" />
       )}
       <Icon
         className={cn(
           "size-[15px] shrink-0 transition-colors duration-150",
-          isActive ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"
+          isActive ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground"
         )}
       />
       <span className="truncate leading-none">{item.label}</span>

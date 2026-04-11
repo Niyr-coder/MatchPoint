@@ -24,23 +24,23 @@ interface SidebarProps {
 
 export function Sidebar({ sections, profile, currentRole, clubName }: SidebarProps) {
   return (
-    <aside className="hidden lg:flex flex-col w-60 shrink-0 bg-zinc-950 border-r border-zinc-800/80">
+    <aside className="hidden lg:flex flex-col w-60 shrink-0 bg-card border-r border-border">
       {/* Logo header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/80 shrink-0">
+      <div className="h-14 px-4 flex items-center justify-between border-b border-border shrink-0">
         <Link href="/" className="flex items-center gap-2.5 min-w-0">
-          <div className="size-7 rounded-lg bg-green-600 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(22,163,74,0.4)]">
+          <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-black tracking-tighter">M</span>
           </div>
           <div className="min-w-0">
-            <p className="text-white font-black text-[13px] tracking-[-0.02em] uppercase leading-none">
+            <p className="text-foreground font-black text-[13px] tracking-[-0.02em] uppercase leading-none">
               MATCHPOINT
             </p>
             {clubName ? (
-              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-green-500 truncate mt-0.5">
+              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary truncate mt-0.5">
                 {clubName}
               </p>
             ) : (
-              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-600 mt-0.5">
+              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
                 {ROLE_LABELS[currentRole] ?? currentRole}
               </p>
             )}

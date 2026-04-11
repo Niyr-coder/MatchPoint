@@ -22,23 +22,23 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-zinc-500 hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+        className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
         aria-label="Abrir menú"
       >
         <Menu className="size-5" />
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-zinc-950 border-r border-zinc-800">
+        <SheetContent side="left" className="w-64 p-0 bg-card border-r border-border">
           <SheetHeader className="sr-only">
             <SheetTitle>Menú de navegación</SheetTitle>
           </SheetHeader>
 
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="h-14 px-4 flex items-center border-b border-zinc-800/80 shrink-0">
+            <div className="h-14 px-4 flex items-center border-b border-border shrink-0">
               <Link href="/" className="flex items-center gap-2.5 min-w-0">
-                <div className="size-7 rounded-lg bg-green-600 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(22,163,74,0.4)]">
+                <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(22,163,74,0.4)]">
                   <span className="text-white text-xs font-black tracking-tighter">M</span>
                 </div>
                 <div className="min-w-0">
@@ -46,7 +46,7 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
                     MATCHPOINT
                   </p>
                   {clubName && (
-                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-green-500 truncate mt-0.5">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary truncate mt-0.5">
                       {clubName}
                     </p>
                   )}

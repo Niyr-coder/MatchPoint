@@ -9,11 +9,6 @@ interface SidebarNavProps {
   onItemClick?: () => void
 }
 
-/** Returns the href of the best-matching nav item for the current pathname.
- *  "Best" = longest href that is an exact match or a proper prefix of pathname.
- *  This prevents parent items (e.g. /dashboard) from staying active while a
- *  child item (e.g. /dashboard/chat) is the real active page.
- */
 function findActiveHref(sections: NavSection[], pathname: string): string | null {
   let bestHref: string | null = null
   let bestLen = -1
@@ -43,7 +38,7 @@ export function SidebarNav({ sections, onItemClick }: SidebarNavProps) {
         <div key={i} className={i > 0 ? "mt-5" : ""}>
           {section.title && (
             <div className="px-3 pb-1.5">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-600">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted-foreground/50">
                 {section.title}
               </p>
             </div>
