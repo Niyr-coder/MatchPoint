@@ -10,7 +10,7 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Pickleball", href: "#deportes" },
   { label: "Cómo funciona", href: "#como-funciona" },
   { label: "Comunidad", href: "#comunidad" },
-  { label: "Únete", href: "#waitlist" },
+  { label: "Para Clubes", href: "#clubes" },
 ]
 
 // Landing-page display metadata that extends SportConfig with visual fields.
@@ -90,6 +90,7 @@ export const TESTIMONIALS: Testimonial[] = [
   { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
   { quote: "Encontré rivales de mi nivel en días. Antes tardaba semanas buscando en grupos de WhatsApp.", name: "María L.", sport: "Pickleball", city: "Guayaquil", emoji: "🏓" },
   { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Pickleball", city: "Cuenca", emoji: "🏓" },
+  { quote: "Antes gestionábamos las reservas por teléfono. Ahora el 80% llegan solos por la app.", name: "Club Arrayanes", sport: "Club · Quito", city: "Ecuador", emoji: "🏟️" },
 ]
 
 export const PARTNER_CLUBS: string[] = [
@@ -129,21 +130,19 @@ export const ECUADOR_PROVINCES = Object.keys(ECUADOR_CITIES_BY_PROVINCE)
 
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
-    title: "Producto",
+    title: "Plataforma",
     links: [
-      { label: "Características", href: "#features" },
       { label: "Pickleball", href: "#deportes" },
-      { label: "Precios", href: "#" },
-      { label: "App Móvil", href: "#" },
+      { label: "Cómo funciona", href: "#como-funciona" },
+      { label: "Para Clubes", href: "#clubes" },
+      { label: "Únete Gratis", href: "/login" },
     ],
   },
   {
-    title: "Empresa",
+    title: "Comunidad",
     links: [
-      { label: "Sobre Nosotros", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Prensa", href: "#" },
+      { label: "Comunidad", href: "#comunidad" },
+      { label: "Torneos", href: "#deportes" },
     ],
   },
   {
@@ -151,7 +150,6 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Privacidad", href: "#" },
       { label: "Términos", href: "#" },
-      { label: "Cookies", href: "#" },
     ],
   },
 ]

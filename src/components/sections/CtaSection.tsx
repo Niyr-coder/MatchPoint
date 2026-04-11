@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowRight } from "lucide-react"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
 
 export function CtaSection() {
   return (
@@ -9,8 +10,8 @@ export function CtaSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(22,163,74,0.15),transparent_60%)] pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-6 sm:px-8 text-center max-w-4xl">
-        <div className="animate-fade-in-up">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#16a34a] block mb-6 text-center">
+        <ScrollReveal>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary block mb-6 text-center">
             Únete — Acceso Anticipado
           </p>
 
@@ -26,47 +27,47 @@ export function CtaSection() {
             <br />
             <span className="text-white font-semibold">Después, será de pago.</span>
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div
-          className="animate-fade-in-up-16 flex justify-center"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <a
-            href="/login"
-            className="btn-pill bg-card text-foreground px-12 py-4 text-base"
-          >
-            Únete Gratis <ArrowRight className="w-5 h-5" />
-          </a>
-        </div>
+        <ScrollReveal delay={0.2}>
+          <div className="flex justify-center">
+            <a
+              href="/login"
+              className="btn-pill bg-card text-foreground px-12 py-4 text-base inline-flex items-center gap-2"
+            >
+              Únete Gratis <ArrowRight className="w-5 h-5" />
+            </a>
+          </div>
+        </ScrollReveal>
 
         {/* Cupos bar */}
-        <div className="mt-8 flex flex-col items-center gap-2">
-          <div className="w-48 h-1.5 rounded-full bg-card/10 overflow-hidden">
-            <div className="h-full bg-[#16a34a] rounded-full" style={{ width: "74%" }} />
+        <ScrollReveal delay={0.3}>
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <div className="w-48 h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full bg-primary rounded-full" style={{ width: "74%" }} />
+            </div>
+            <span className="text-xs text-white/40 font-semibold tracking-wider">370 / 500 CUPOS TOMADOS</span>
           </div>
-          <span className="text-xs text-white/40 font-semibold tracking-wider">370 / 500 CUPOS TOMADOS</span>
-        </div>
+        </ScrollReveal>
 
         {/* Social proof */}
-        <div
-          className="animate-fade-in flex items-center justify-center gap-3 mt-10"
-          style={{ animationDelay: "0.4s" }}
-        >
-          <div className="flex -space-x-2">
-            {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
-              <div
-                key={i}
-                className="w-8 h-8 rounded-full bg-card/10 border-2 border-foreground flex items-center justify-center text-sm"
-              >
-                {emoji}
-              </div>
-            ))}
+        <ScrollReveal delay={0.4} variant="fade-in">
+          <div className="flex items-center justify-center gap-3 mt-10">
+            <div className="flex -space-x-2">
+              {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full bg-white/10 border-2 border-card flex items-center justify-center text-sm"
+                >
+                  {emoji}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-white/40">
+              <span className="text-white font-semibold">+500</span> deportistas ya registrados
+            </p>
           </div>
-          <p className="text-xs text-white/40">
-            <span className="text-white font-semibold">+500</span> deportistas ya registrados
-          </p>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   )

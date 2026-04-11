@@ -6,7 +6,7 @@ export function SocialProofBar() {
     <section className="bg-card py-5 border-y border-border overflow-hidden">
       <div className="flex items-center gap-16 animate-marquee whitespace-nowrap">
         {doubled.map((club, i) => (
-          <span key={i} className="text-xs font-black uppercase tracking-[0.2em] text-[#d4d4d4] flex-shrink-0">
+          <span key={i} className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/40 flex-shrink-0">
             {club}
           </span>
         ))}

@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { ArrowRight, ChevronDown } from "lucide-react"
+import { ArrowRight, ChevronDown, Building2 } from "lucide-react"
 
 export function HeroSection() {
   return (
@@ -22,7 +22,7 @@ export function HeroSection() {
       <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_50%,rgba(22,163,74,0.15),transparent_70%)] z-10 pointer-events-none" />
 
-      {/* Copy — bottom-left like PICKLEZONE */}
+      {/* Copy — bottom-left */}
       <div className="relative z-20 container mx-auto px-6 sm:px-8 pb-16 md:pb-24">
         {/* Label */}
         <p
@@ -49,22 +49,23 @@ export function HeroSection() {
           <span className="text-white">Pickleball.</span>
         </p>
 
-        {/* CTAs */}
+        {/* CTAs — dual audience */}
         <div
           className="animate-fade-in-up flex flex-wrap gap-4"
           style={{ animationDelay: "0.4s" }}
         >
           <a
-            href="#waitlist"
-            className="btn-pill bg-card text-foreground px-10 py-3.5"
+            href="/login"
+            className="btn-pill bg-card text-foreground px-10 py-3.5 inline-flex items-center gap-2"
           >
-            Únete Gratis <ArrowRight className="w-4 h-4" />
+            Empieza a Jugar <ArrowRight className="w-4 h-4" />
           </a>
           <a
-            href="#como-funciona"
-            className="btn-pill border border-white/30 text-white hover:bg-card hover:text-foreground px-8 py-3.5"
+            href="#clubes"
+            className="btn-pill border border-white/30 text-white hover:bg-card hover:text-foreground px-8 py-3.5 inline-flex items-center gap-2"
           >
-            Mira cómo funciona
+            <Building2 className="w-4 h-4" />
+            Registra tu Club
           </a>
         </div>
 
@@ -76,7 +77,7 @@ export function HeroSection() {
             ))}
           </div>
           <p className="text-xs text-white/50">
-            <span className="text-white font-semibold">+2,000</span> jugadores ya en la plataforma
+            <span className="text-white font-semibold">+500</span> deportistas ya en la plataforma
           </p>
         </div>
       </div>

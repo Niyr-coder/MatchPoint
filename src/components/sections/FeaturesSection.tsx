@@ -1,6 +1,7 @@
 "use client"
 
 import { Search, Calendar, TrendingUp, ArrowRight, type LucideIcon } from "lucide-react"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
 
 interface StepProps {
   number: string
@@ -12,21 +13,20 @@ interface StepProps {
 
 function Step({ number, icon: Icon, title, desc, index }: StepProps) {
   return (
-    <div
-      className="animate-fade-in-up text-left"
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      <div className="flex items-center gap-4 mb-6">
-        <span className="text-6xl font-black text-white/10 leading-none select-none">
-          {number}
-        </span>
-        <div className="w-12 h-12 rounded-full bg-[#16a34a]/10 flex items-center justify-center shrink-0">
-          <Icon className="w-6 h-6 text-[#16a34a]" />
+    <ScrollReveal delay={index * 0.1}>
+      <div className="text-left">
+        <div className="flex items-center gap-4 mb-6">
+          <span className="text-6xl font-black text-white/10 leading-none select-none">
+            {number}
+          </span>
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <Icon className="w-6 h-6 text-primary" />
+          </div>
         </div>
+        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-3">{title}</h3>
+        <p className="text-white/50 font-medium leading-relaxed">{desc}</p>
       </div>
-      <h3 className="text-xl font-black text-white uppercase tracking-tight mb-3">{title}</h3>
-      <p className="text-white/50 font-medium leading-relaxed">{desc}</p>
-    </div>
+    </ScrollReveal>
   )
 }
 
@@ -55,7 +55,7 @@ export function FeaturesSection() {
   return (
     <section id="como-funciona" className="section-dark py-24 border-t border-white/5">
       <div className="container mx-auto px-6 sm:px-8">
-        <div className="animate-fade-in-up-16">
+        <ScrollReveal>
           <p className="label-green">Cómo funciona</p>
           <h2
             className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-16"
@@ -63,7 +63,7 @@ export function FeaturesSection() {
           >
             DE CERO A CANCHA<br />EN 60 SEGUNDOS.
           </h2>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {STEPS.map((step, i) => (
@@ -71,11 +71,13 @@ export function FeaturesSection() {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <a href="/login" className="btn-pill bg-[#16a34a] text-white px-10 py-3.5 inline-flex items-center gap-2">
-            Empieza Ahora <ArrowRight className="w-4 h-4" />
-          </a>
-        </div>
+        <ScrollReveal delay={0.3}>
+          <div className="mt-16 text-center">
+            <a href="/login" className="btn-pill bg-primary text-white px-10 py-3.5 inline-flex items-center gap-2">
+              Empieza Ahora <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   )
