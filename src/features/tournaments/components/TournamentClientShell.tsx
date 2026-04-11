@@ -8,10 +8,11 @@ import { ParticipantsManager } from "@/components/dashboard/ParticipantsManager"
 import { BracketView } from "@/features/tournaments/components/BracketView"
 import { TournamentFeedbackForm } from "@/features/tournaments/components/TournamentFeedbackForm"
 import { TournamentFeedbackList } from "@/features/tournaments/components/TournamentFeedbackList"
+import { TournamentAnalytics } from "@/features/tournaments/components/TournamentAnalytics"
 import { CheckCircle } from "lucide-react"
 import type { TournamentStatus } from "@/features/tournaments/types"
 
-type Tab = "participants" | "bracket" | "manage" | "feedback"
+type Tab = "participants" | "bracket" | "manage" | "feedback" | "stats"
 
 interface TabDef {
   key: Tab
@@ -53,6 +54,7 @@ export function TournamentClientShell({
     ...(showBracket ? [{ key: "bracket" as Tab, label: "Bracket" }] : []),
     ...(isCreator ? [{ key: "manage" as Tab, label: "Gestión" }] : []),
     ...(showFeedback ? [{ key: "feedback" as Tab, label: "Valoraciones" }] : []),
+    ...(isCreator ? [{ key: "stats" as Tab, label: "Estadísticas" }] : []),
   ]
 
   const [activeTab, setActiveTab] = useState<Tab>("participants")
@@ -162,6 +164,11 @@ export function TournamentClientShell({
           )}
           <TournamentFeedbackList tournamentId={tournamentId} />
         </div>
+      )}
+
+      {/* Tab: Estadísticas (creator only) */}
+      {isCreator && activeTab === "stats" && (
+        <TournamentAnalytics tournamentId={tournamentId} />
       )}
     </div>
   )

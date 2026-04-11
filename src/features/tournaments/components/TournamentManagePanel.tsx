@@ -6,6 +6,7 @@ import { Settings, Play, CheckCircle, XCircle, Pencil } from "lucide-react"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { InviteLinkGenerator } from "@/features/memberships/components/InviteLinkGenerator"
+import { TournamentDescriptionBuilder } from "@/features/tournaments/components/TournamentDescriptionBuilder"
 
 interface StatusAction {
   from: string
@@ -280,7 +281,11 @@ export function TournamentManagePanel({
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">Descripción</label>
-              <textarea rows={3} className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card resize-none" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} placeholder="Información adicional…" maxLength={1000} />
+              <TournamentDescriptionBuilder
+                onSelect={text => setEditForm(f => ({ ...f, description: text }))}
+              />
+              <textarea rows={4} className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:border-foreground bg-card resize-none" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} placeholder="Información adicional…" maxLength={1000} />
+              <p className="text-[10px] text-zinc-400 text-right">{editForm.description.length}/1000</p>
             </div>
             <div className="flex gap-3 pt-2">
               <button onClick={() => setEditOpen(false)} className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors">Cancelar</button>
