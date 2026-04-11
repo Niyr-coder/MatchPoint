@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Copy, Check, Crown, UserMinus, LogOut, Pencil, X } from "lucide-react"
+import { Copy, Check, UserMinus, LogOut, Pencil, X } from "lucide-react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
-
-const SPORT_LABELS: Record<string, string> = {
-  futbol: "Fútbol",
-  padel: "Pádel",
-  tenis: "Tenis",
-  pickleball: "Pickleball",
-}
+import { SPORT_LABELS } from "@/lib/sports/config"
 
 interface TeamMember {
   id: string
@@ -174,7 +169,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
     }
   }
 
-  const sportLabel = SPORT_LABELS[localTeam.sport] ?? localTeam.sport
+  const sportLabel = SPORT_LABELS[localTeam.sport as keyof typeof SPORT_LABELS] ?? localTeam.sport
 
   return (
     <div className="space-y-6">
@@ -299,14 +294,23 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                 key={m.id}
                 className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-muted/50 transition-colors"
               >
-                <MemberAvatar member={m} />
+                <Link
+                  href={`/dashboard/players/${m.user_id}`}
+                  tabIndex={-1}
+                  className="shrink-0"
+                >
+                  <MemberAvatar member={m} />
+                </Link>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-foreground truncate">
+                  <Link
+                    href={`/dashboard/players/${m.user_id}`}
+                    className="text-sm font-bold text-foreground truncate hover:underline underline-offset-2 block"
+                  >
                     {memberName}
                     {isCurrentUser && (
                       <span className="ml-1.5 text-[10px] font-black text-zinc-300">(tú)</span>
                     )}
-                  </p>
+                  </Link>
                   <span
                     className={cn(
                       "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",

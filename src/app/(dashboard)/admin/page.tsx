@@ -3,7 +3,7 @@ import { getAdminControlTowerData } from "@/lib/admin/queries"
 import { ControlTowerKPIs } from "@/components/admin/ControlTowerKPIs"
 import { ControlTowerActivityFeed } from "@/components/admin/ControlTowerActivityFeed"
 import { ControlTowerGrowthCharts } from "@/components/admin/ControlTowerGrowthCharts"
-import { ControlTowerSystemHealth } from "@/components/admin/ControlTowerSystemHealth"
+import { ControlTowerAlerts } from "@/components/admin/ControlTowerAlerts"
 import { ControlTowerRankings } from "@/components/admin/ControlTowerRankings"
 import { ControlTowerRevenue } from "@/components/admin/ControlTowerRevenue"
 import { ControlTowerQuickActions } from "@/components/admin/ControlTowerQuickActions"
@@ -47,9 +47,9 @@ export default async function AdminDashboardPage() {
           <ControlTowerGrowthCharts growthData={data.growthData} />
         </div>
 
-        {/* System Health */}
+        {/* Alertas inteligentes */}
         <div className="lg:col-span-4 flex flex-col">
-          <ControlTowerSystemHealth health={data.systemHealth} />
+          <ControlTowerAlerts alerts={data.alerts} health={data.systemHealth} />
         </div>
       </div>
 

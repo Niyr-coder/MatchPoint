@@ -16,9 +16,9 @@ import {
 type ChartTab = "users" | "matches" | "revenue"
 
 interface GrowthData {
-  usersByMonth: Array<{ month: string; users: number }>
-  matchesByMonth: Array<{ month: string; matches: number }>
-  revenueByMonth: Array<{ month: string; revenue: number }>
+  usersByMonth: Array<{ month: string; users: number; prevUsers: number }>
+  matchesByMonth: Array<{ month: string; matches: number; prevMatches: number }>
+  revenueByMonth: Array<{ month: string; revenue: number; prevRevenue: number }>
 }
 
 const TABS: Array<{ key: ChartTab; label: string; stroke: string; fill: string }> = [
@@ -27,24 +27,38 @@ const TABS: Array<{ key: ChartTab; label: string; stroke: string; fill: string }
   { key: "revenue", label: "Revenue",  stroke: "#f59e0b", fill: "#f59e0b" },
 ]
 
+const fmt = (value: number, isRevenue: boolean) =>
+  isRevenue ? `$${Number(value).toFixed(0)}` : String(value)
+
 const CustomTooltip = ({
   active,
   payload,
   label,
 }: {
   active?: boolean
-  payload?: Array<{ value: number; name: string }>
+  payload?: Array<{ value: number; name: string; color: string }>
   label?: string
 }) => {
   if (!active || !payload?.length) return null
-  const item = payload[0]
-  const isRevenue = item.name === "revenue"
+  const isRevenue = payload[0]?.name === "revenue" || payload[0]?.name === "prevRevenue"
   return (
-    <div className="bg-card border border-border rounded-xl px-3 py-2 shadow-lg">
+    <div className="bg-card border border-border rounded-xl px-3 py-2 shadow-lg space-y-1">
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{label}</p>
-      <p className="text-sm font-black text-foreground">
-        {isRevenue ? `$${Number(item.value).toFixed(0)}` : item.value}
-      </p>
+      {payload.map((item) => {
+        const isPrev = item.name.startsWith("prev")
+        return (
+          <div key={item.name} className="flex items-center gap-1.5">
+            <span
+              className="inline-block size-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-[10px] text-zinc-500">{isPrev ? "Período ant." : "Actual"}</span>
+            <span className="text-xs font-black text-foreground ml-auto pl-3">
+              {fmt(item.value, isRevenue)}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -68,6 +82,7 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
         : growthData.revenueByMonth
 
   const dataKey = activeTab
+  const prevDataKey = activeTab === "users" ? "prevUsers" : activeTab === "matches" ? "prevMatches" : "prevRevenue"
 
   return (
     <div className="rounded-2xl bg-card border border-border flex flex-col overflow-hidden h-full">
@@ -99,6 +114,7 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
               <XAxis dataKey="month" tick={{ fill: "#a1a1aa", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#a1a1aa", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${v}`} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
+              <Bar dataKey={prevDataKey} fill={tab.fill} fillOpacity={0.25} radius={[4, 4, 0, 0]} maxBarSize={40} />
               <Bar dataKey={dataKey} fill={tab.fill} radius={[4, 4, 0, 0]} maxBarSize={40} />
             </BarChart>
           ) : (
@@ -113,6 +129,17 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
               <XAxis dataKey="month" tick={{ fill: "#a1a1aa", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#a1a1aa", fontSize: 10 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey={prevDataKey}
+                stroke={tab.stroke}
+                strokeOpacity={0.35}
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                fill="none"
+                dot={false}
+                activeDot={false}
+              />
               <Area
                 type="monotone"
                 dataKey={dataKey}

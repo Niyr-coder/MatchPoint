@@ -6,17 +6,12 @@ import { Plus, Pencil, XCircle, X } from "lucide-react"
 import { StatCard } from "@/components/shared/StatCard"
 import { Trophy, Users, CalendarCheck } from "lucide-react"
 import type { TournamentAdmin } from "@/lib/admin/queries"
+import { VISIBLE_SPORT_OPTIONS, PRIMARY_SPORT } from "@/lib/sports/config"
+import type { SportId } from "@/lib/sports/config"
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-const SPORTS = [
-  { value: "futbol",      label: "Fútbol" },
-  { value: "padel",       label: "Pádel" },
-  { value: "tenis",       label: "Tenis" },
-  { value: "pickleball",  label: "Pickleball" },
-] as const
-
-type SportValue = typeof SPORTS[number]["value"]
+type SportValue = SportId
 
 const STATUS_LABELS: Record<string, string> = {
   open:        "Abierto",
@@ -89,7 +84,7 @@ interface TournamentFormState {
 const EMPTY_FORM: TournamentFormState = {
   name: "",
   clubId: "",
-  sport: "padel",
+  sport: PRIMARY_SPORT,
   modality: "",
   maxParticipants: "16",
   entryFee: "0",
@@ -248,7 +243,7 @@ function TournamentModal({
                 onChange={(e) => set("sport", e.target.value as SportValue)}
                 className="border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
               >
-                {SPORTS.map((s) => (
+                {VISIBLE_SPORT_OPTIONS.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>

@@ -2,13 +2,7 @@
 
 import { useState } from "react"
 import { Users, PlusCircle, LogIn } from "lucide-react"
-
-const SPORTS = [
-  { value: "futbol", label: "Fútbol" },
-  { value: "padel", label: "Pádel" },
-  { value: "tenis", label: "Tenis" },
-  { value: "pickleball", label: "Pickleball" },
-]
+import { VISIBLE_SPORT_OPTIONS, PRIMARY_SPORT, SINGLE_SPORT_MODE } from "@/lib/sports/config"
 
 interface TeamMember {
   id: string
@@ -53,10 +47,10 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
-  // Create form state
+  // Create form state — pre-select the primary sport in single-sport mode
   const [createForm, setCreateForm] = useState<CreateFormState>({
     name: "",
-    sport: "",
+    sport: SINGLE_SPORT_MODE ? PRIMARY_SPORT : "",
     description: "",
   })
   const [createErrors, setCreateErrors] = useState<CreateFormErrors>({})
@@ -69,6 +63,7 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
     const errors: CreateFormErrors = {}
     if (!createForm.name.trim()) errors.name = "El nombre es obligatorio."
     if (!createForm.sport) errors.sport = "Selecciona un deporte."
+    // In single-sport mode the field is pre-filled — no way to leave it blank
     setCreateErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -214,30 +209,33 @@ export function TeamOnboarding({ onJoined }: TeamOnboardingProps) {
               )}
             </div>
 
-            <div>
-              <label className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 block mb-1.5">
-                Deporte <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={createForm.sport}
-                onChange={(e) =>
-                  setCreateForm((prev) => ({ ...prev, sport: e.target.value }))
-                }
-                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 bg-card"
-              >
-                <option value="" disabled>
-                  Selecciona un deporte
-                </option>
-                {SPORTS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
+            {/* Sport selector — hidden when only one sport is available */}
+            {!SINGLE_SPORT_MODE && (
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 block mb-1.5">
+                  Deporte <span className="text-red-400">*</span>
+                </label>
+                <select
+                  value={createForm.sport}
+                  onChange={(e) =>
+                    setCreateForm((prev) => ({ ...prev, sport: e.target.value }))
+                  }
+                  className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 bg-card"
+                >
+                  <option value="" disabled>
+                    Selecciona un deporte
                   </option>
-                ))}
-              </select>
-              {createErrors.sport && (
-                <p className="mt-1 text-xs font-semibold text-red-500">{createErrors.sport}</p>
-              )}
-            </div>
+                  {VISIBLE_SPORT_OPTIONS.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                {createErrors.sport && (
+                  <p className="mt-1 text-xs font-semibold text-red-500">{createErrors.sport}</p>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 block mb-1.5">

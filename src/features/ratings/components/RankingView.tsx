@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trophy } from "lucide-react"
+import { Trophy, ChevronDown, Info } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { VISIBLE_SPORT_OPTIONS, SINGLE_SPORT_MODE } from "@/lib/sports/config"
@@ -180,6 +180,64 @@ function RankingList({ entries }: { entries: RankingEntry[] }) {
   )
 }
 
+function RankingInfoPanel() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <Info className="size-4 text-primary shrink-0" />
+          <span className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground">
+            ¿Cómo funciona el ranking?
+          </span>
+        </div>
+        <ChevronDown
+          className={`size-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="px-5 pb-5 border-t border-border">
+          <ul className="mt-4 space-y-3">
+            {[
+              {
+                title: "Inscríbete en un torneo",
+                desc: "Desde el momento en que te registras ya apareces en el ranking con 0 puntos.",
+              },
+              {
+                title: "Gana puntos jugando",
+                desc: "Cada victoria en partido oficial suma puntos. El sistema pondera la dificultad del rival.",
+              },
+              {
+                title: "Ranking en tiempo real",
+                desc: "La clasificación se actualiza automáticamente en cuanto se registra el resultado de un partido.",
+              },
+              {
+                title: "Posición global",
+                desc: "Se calcula sumando todos tus puntos acumulados en torneos MATCHPOINT.",
+              },
+            ].map((item) => (
+              <li key={item.title} className="flex gap-3">
+                <span className="mt-0.5 size-1.5 rounded-full bg-primary shrink-0 mt-[7px]" />
+                <div>
+                  <p className="text-[11px] font-black text-foreground uppercase tracking-wide">
+                    {item.title}
+                  </p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function RankingView({ all, bySport }: RankingViewProps) {
   const [activeSport, setActiveSport] = useState("")
 
@@ -208,6 +266,8 @@ export function RankingView({ all, bySport }: RankingViewProps) {
           ))}
         </div>
       )}
+
+      <RankingInfoPanel />
 
       <RankingList entries={currentEntries} />
     </div>

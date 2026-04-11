@@ -656,6 +656,27 @@ export interface ControlTowerKPIs {
   revenueLastMonth: number
   newUsersThisMonth: number
   totalTournaments: number
+  // WoW (week-over-week) comparisons
+  usersThisWeek: number
+  usersLastWeek: number
+  matchesThisWeek: number
+  matchesLastWeek: number
+  revenueThisWeek: number
+  revenueLastWeek: number
+  // Extra KPIs
+  conversionRate: number      // % of users with ≥1 reservation
+  pipelineNext7Days: number   // confirmed reservations in next 7 days
+}
+
+export type AlertSeverity = "critical" | "warn" | "info"
+
+export interface SmartAlert {
+  id: string
+  severity: AlertSeverity
+  title: string
+  description: string
+  actionHref?: string
+  actionLabel?: string
 }
 
 export interface ActivityFeedEntry {
@@ -684,11 +705,12 @@ export interface ControlTowerData {
   kpis: ControlTowerKPIs
   activityFeed: ActivityFeedEntry[]
   growthData: {
-    usersByMonth: Array<{ month: string; users: number }>
-    matchesByMonth: Array<{ month: string; matches: number }>
-    revenueByMonth: Array<{ month: string; revenue: number }>
+    usersByMonth: Array<{ month: string; users: number; prevUsers: number }>
+    matchesByMonth: Array<{ month: string; matches: number; prevMatches: number }>
+    revenueByMonth: Array<{ month: string; revenue: number; prevRevenue: number }>
   }
   systemHealth: SystemHealthData
+  alerts: SmartAlert[]
   topClubs: ControlTowerRanking[]
   topPlayers: ControlTowerRanking[]
   topTournaments: ControlTowerRanking[]
@@ -710,6 +732,8 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
   const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
   const firstLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
   const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7)
+  const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(now.getDate() - 14)
+  const next7Days = new Date(now); next7Days.setDate(now.getDate() + 7)
   const monthStart6 = new Date(now.getFullYear(), now.getMonth() - 5, 1)
 
   const [
@@ -730,6 +754,15 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     clubsNamesRes,
     sixMonthUsersRes,
     sixMonthReservationsRes,
+    // WoW + extra KPI queries
+    twoWeekUsersRes,
+    twoWeekReservationsRes,
+    pipelineRes,
+    usersWithReservationsRes,
+    // Smart alert queries
+    openTournamentsRes,
+    pendingOldRequestsRes,
+    clubsWithRecentReservationsRes,
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("clubs").select("id", { count: "exact", head: true }).eq("is_active", true),
@@ -793,6 +826,46 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
       .select("created_at, total_price, club_id")
       .gte("created_at", monthStart6.toISOString())
       .neq("status", "cancelled"),
+    // Last 2 weeks of user registrations (for WoW)
+    supabase
+      .from("profiles")
+      .select("created_at")
+      .gte("created_at", twoWeeksAgo.toISOString()),
+    // Last 2 weeks of reservations (for WoW revenue + match count)
+    supabase
+      .from("reservations")
+      .select("created_at, total_price")
+      .gte("created_at", twoWeeksAgo.toISOString())
+      .neq("status", "cancelled"),
+    // Pipeline: confirmed reservations in next 7 days
+    supabase
+      .from("reservations")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "confirmed")
+      .gte("date", todayStr)
+      .lte("date", next7Days.toISOString().split("T")[0]),
+    // Distinct users who have made ≥1 reservation (for conversion rate)
+    supabase
+      .from("reservations")
+      .select("user_id")
+      .neq("status", "cancelled"),
+    // Open tournaments for alert analysis
+    supabase
+      .from("tournaments")
+      .select("id, name, max_participants")
+      .eq("status", "open"),
+    // Pending club requests older than 3 days
+    supabase
+      .from("club_requests")
+      .select("id, club_name, created_at")
+      .eq("status", "pending")
+      .lte("created_at", new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString()),
+    // Clubs with a reservation in the last 7 days (to find clubs without activity)
+    supabase
+      .from("reservations")
+      .select("club_id")
+      .gte("created_at", weekAgo.toISOString())
+      .neq("status", "cancelled"),
   ])
 
   // ---- Revenue calculations
@@ -816,8 +889,40 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     (u) => new Date(u.created_at) >= weekAgo
   ).length
 
+  // ---- WoW calculations
+  const twoWeekUsers = twoWeekUsersRes.data ?? []
+  const usersThisWeek = twoWeekUsers.filter((u) => new Date(u.created_at) >= weekAgo).length
+  const usersLastWeek = twoWeekUsers.filter((u) => {
+    const d = new Date(u.created_at)
+    return d >= twoWeeksAgo && d < weekAgo
+  }).length
+
+  const twoWeekRes = twoWeekReservationsRes.data ?? []
+  const matchesThisWeek = twoWeekRes.filter((r) => new Date(r.created_at) >= weekAgo).length
+  const matchesLastWeek = twoWeekRes.filter((r) => {
+    const d = new Date(r.created_at)
+    return d >= twoWeeksAgo && d < weekAgo
+  }).length
+  const revenueThisWeek = twoWeekRes
+    .filter((r) => new Date(r.created_at) >= weekAgo)
+    .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+  const revenueLastWeek = twoWeekRes
+    .filter((r) => {
+      const d = new Date(r.created_at)
+      return d >= twoWeeksAgo && d < weekAgo
+    })
+    .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+
+  // ---- Conversion rate: % of users with ≥1 reservation
+  const usersWithReservations = usersWithReservationsRes.data ?? []
+  const distinctUsersWithRes = new Set(usersWithReservations.map((r) => r.user_id)).size
+  const totalUserCount = usersCountRes.count ?? 0
+  const conversionRate = totalUserCount > 0
+    ? Math.round((distinctUsersWithRes / totalUserCount) * 100)
+    : 0
+
   const kpis: ControlTowerKPIs = {
-    totalUsers: usersCountRes.count ?? 0,
+    totalUsers: totalUserCount,
     activePlayersThisWeek,
     totalClubs: clubsCountRes.count ?? 0,
     activeMatchesToday: activeMatchesRes.count ?? 0,
@@ -826,6 +931,99 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     revenueLastMonth,
     newUsersThisMonth: newUsersMonthRes.count ?? 0,
     totalTournaments: tournamentsCountRes.count ?? 0,
+    usersThisWeek,
+    usersLastWeek,
+    matchesThisWeek,
+    matchesLastWeek,
+    revenueThisWeek,
+    revenueLastWeek,
+    conversionRate,
+    pipelineNext7Days: pipelineRes.count ?? 0,
+  }
+
+  // ---- Smart Alerts
+  const alerts: SmartAlert[] = []
+
+  // Alert: open tournaments with <25% capacity filled
+  const openTournaments = openTournamentsRes.data ?? []
+  if (openTournaments.length > 0) {
+    const participantCountsByTournament = await supabase
+      .from("tournament_participants")
+      .select("tournament_id")
+      .in("tournament_id", openTournaments.map((t) => t.id))
+    const pCounts: Record<string, number> = {}
+    for (const p of participantCountsByTournament.data ?? []) {
+      pCounts[p.tournament_id] = (pCounts[p.tournament_id] ?? 0) + 1
+    }
+    for (const t of openTournaments) {
+      const count = pCounts[t.id] ?? 0
+      const max = t.max_participants ?? 16
+      if (count < max * 0.25) {
+        alerts.push({
+          id: `tournament-low-${t.id}`,
+          severity: "warn",
+          title: `Torneo con baja inscripción`,
+          description: `"${t.name}" tiene solo ${count}/${max} inscripciones (${Math.round((count / max) * 100)}% del cupo).`,
+          actionHref: "/admin/tournaments",
+          actionLabel: "Ver torneos",
+        })
+      }
+    }
+  }
+
+  // Alert: pending club requests older than 3 days
+  const oldRequests = pendingOldRequestsRes.data ?? []
+  if (oldRequests.length > 0) {
+    alerts.push({
+      id: "old-club-requests",
+      severity: "warn",
+      title: `${oldRequests.length} solicitud${oldRequests.length > 1 ? "es" : ""} pendiente${oldRequests.length > 1 ? "s" : ""} +3 días`,
+      description: `Hay solicitudes de club sin revisar hace más de 3 días.`,
+      actionHref: "/admin/moderation",
+      actionLabel: "Revisar",
+    })
+  }
+
+  // Alert: revenue drop >20% WoW
+  if (revenueLastWeek > 0) {
+    const revDrop = ((revenueThisWeek - revenueLastWeek) / revenueLastWeek) * 100
+    if (revDrop < -20) {
+      alerts.push({
+        id: "revenue-drop",
+        severity: "critical",
+        title: `Revenue semanal cayó ${Math.abs(Math.round(revDrop))}%`,
+        description: `Esta semana: $${revenueThisWeek.toFixed(0)} vs semana pasada: $${revenueLastWeek.toFixed(0)}.`,
+        actionHref: "/admin/financials",
+        actionLabel: "Ver financiero",
+      })
+    }
+  }
+
+  // Alert: clubs with no reservations in last 7 days
+  const activeClubIds = new Set((clubsWithRecentReservationsRes.data ?? []).map((r) => r.club_id))
+  const inactiveClubCount = Math.max(0, (clubsCountRes.count ?? 0) - activeClubIds.size)
+  if (inactiveClubCount > 0) {
+    alerts.push({
+      id: "clubs-no-activity",
+      severity: "info",
+      title: `${inactiveClubCount} club${inactiveClubCount > 1 ? "s" : ""} sin reservas esta semana`,
+      description: `Estos clubs activos no han tenido reservas en los últimos 7 días.`,
+      actionHref: "/admin/clubs",
+      actionLabel: "Ver clubs",
+    })
+  }
+
+  // Alert: unusual cancellations (>5 today)
+  const cancelledToday = cancelledTodayRes.count ?? 0
+  if (cancelledToday > 5) {
+    alerts.push({
+      id: "high-cancellations",
+      severity: "critical",
+      title: `${cancelledToday} cancelaciones hoy`,
+      description: `Número de cancelaciones inusualmente alto para un solo día.`,
+      actionHref: "/admin/reservations",
+      actionLabel: "Ver reservas",
+    })
   }
 
   // ---- Activity feed
@@ -847,26 +1045,43 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
   const userRows6 = sixMonthUsersRes.data ?? []
   const resRows6 = sixMonthReservationsRes.data ?? []
 
-  const usersByMonth = months6.map((m) => {
+  const usersByMonth = months6.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
     const users = userRows6.filter((u) => {
       const d = new Date(u.created_at); return d >= m && d < next
     }).length
-    return { month: ctMonthLabel(m), users }
+    // prevUsers = same month 1 year ago (use position i-1 as proxy when no year-ago data)
+    const prevMonth = months6[i - 1]
+    const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
+    const prevUsers = prevMonth && prevNext
+      ? userRows6.filter((u) => { const d = new Date(u.created_at); return d >= prevMonth && d < prevNext }).length
+      : 0
+    return { month: ctMonthLabel(m), users, prevUsers }
   })
-  const matchesByMonth = months6.map((m) => {
+  const matchesByMonth = months6.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
     const matches = resRows6.filter((r) => {
       const d = new Date(r.created_at); return d >= m && d < next
     }).length
-    return { month: ctMonthLabel(m), matches }
+    const prevMonth = months6[i - 1]
+    const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
+    const prevMatches = prevMonth && prevNext
+      ? resRows6.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext }).length
+      : 0
+    return { month: ctMonthLabel(m), matches, prevMatches }
   })
-  const revenueByMonth = months6.map((m) => {
+  const revenueByMonth = months6.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
     const revenue = resRows6
       .filter((r) => { const d = new Date(r.created_at); return d >= m && d < next })
       .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
-    return { month: ctMonthLabel(m), revenue }
+    const prevMonth = months6[i - 1]
+    const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
+    const prevRevenue = prevMonth && prevNext
+      ? resRows6.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext })
+          .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
+      : 0
+    return { month: ctMonthLabel(m), revenue, prevRevenue }
   })
 
   // ---- System health
@@ -926,6 +1141,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     activityFeed,
     growthData: { usersByMonth, matchesByMonth, revenueByMonth },
     systemHealth,
+    alerts,
     topClubs,
     topPlayers,
     topTournaments,

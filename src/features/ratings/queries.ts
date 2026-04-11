@@ -12,30 +12,31 @@ export async function getRankingBySport(
     // Users with no ranking entry show score/wins/losses = 0.
     // When a sport filter is set, only users with a ranking entry for that sport appear.
     if (sport) {
-      const { data, error } = await supabase
-        .from("rankings")
-        .select("user_id, score, wins, losses, profiles!rankings_user_profile_fk(full_name, avatar_url)")
-        .eq("sport", sport)
-        .order("score", { ascending: false })
-        .order("wins", { ascending: false })
-        .limit(limit)
+      // Uses get_sport_ranking_with_enrolled so players enrolled in tournaments
+      // appear even before they have played any match (score=0 until first game).
+      const { data, error } = await supabase.rpc("get_sport_ranking_with_enrolled", {
+        p_sport: sport,
+        p_limit: limit,
+      })
 
       if (error || !data) return []
 
-      return data.map((row, index) => {
-        const profile = (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles) as
-          | { full_name: string | null; avatar_url: string | null }
-          | null
-        return {
-          position: index + 1,
-          userId: row.user_id as string,
-          fullName: profile?.full_name ?? "Jugador",
-          avatarUrl: profile?.avatar_url ?? null,
-          score: row.score,
-          wins: row.wins,
-          losses: row.losses,
-        }
-      })
+      return (data as Array<{
+        user_id: string
+        full_name: string | null
+        avatar_url: string | null
+        score: number
+        wins: number
+        losses: number
+      }>).map((row, index) => ({
+        position: index + 1,
+        userId: row.user_id,
+        fullName: row.full_name ?? "Jugador",
+        avatarUrl: row.avatar_url ?? null,
+        score: row.score,
+        wins: row.wins,
+        losses: row.losses,
+      }))
     }
 
     // No sport filter: aggregate all sports per user via SQL GROUP BY (Q5)
