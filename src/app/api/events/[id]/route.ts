@@ -10,7 +10,7 @@ import {
 } from "@/features/activities/queries"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
-import type { EventWithRegistration } from "@/features/activities/queries"
+import type { EventWithClub } from "@/features/activities/queries"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for event updates
@@ -96,7 +96,7 @@ async function canEditEvent(
 export async function GET(
   _request: NextRequest,
   context: RouteContext
-): Promise<NextResponse<ApiResponse<EventWithRegistration>>> {
+): Promise<NextResponse<ApiResponse<EventWithClub>>> {
   const { id } = await context.params
 
   try {
@@ -138,7 +138,7 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   context: RouteContext
-): Promise<NextResponse<ApiResponse<EventWithRegistration>>> {
+): Promise<NextResponse<ApiResponse<EventWithClub>>> {
   const authResult = await authorize()
   if (!authResult.ok) {
     return NextResponse.json(
@@ -200,7 +200,7 @@ export async function PUT(
     const updated = await updateEvent(id, parsed.data)
     return NextResponse.json({
       success: true,
-      data: { ...updated, registration_count: existing.registration_count, is_registered: false },
+      data: { ...updated, club_name: existing.club_name, registration_count: existing.registration_count, is_registered: false },
       error: null,
     })
   } catch (err) {

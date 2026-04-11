@@ -1,7 +1,7 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import type {
   Event,
-  EventWithCount,
+  EventWithClub,
   EventRegistration,
   EventRegistrationWithProfile,
   CreateEventInput,
@@ -12,8 +12,6 @@ import type {
 export type {
   Event,
   EventWithClub,
-  EventWithCount,
-  EventWithRegistration,
   EventRegistration,
   EventRegistrationWithProfile,
   CreateEventInput,
@@ -79,7 +77,7 @@ export async function getAllEvents(
 // Single event
 // ──────────────────────────────────────────────────────────
 
-export async function getEventById(id: string): Promise<EventWithCount | null> {
+export async function getEventById(id: string): Promise<EventWithClub | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -97,6 +95,7 @@ export async function getEventById(id: string): Promise<EventWithCount | null> {
 
   return {
     ...rest,
+    club_name: null,
     registration_count:
       Array.isArray(event_registrations) && event_registrations.length > 0
         ? Number(event_registrations[0].count)

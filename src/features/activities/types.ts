@@ -54,45 +54,10 @@ export interface EventWithClub extends EventRow {
 }
 
 // ──────────────────────────────────────────────────────────
-// Event — application-level shape (from lib/events/queries.ts)
+// Event — alias for EventRow (single source of truth)
 // ──────────────────────────────────────────────────────────
 
-export interface Event {
-  id: string
-  title: string
-  description: string | null
-  sport: SportType | null
-  location: string | null
-  city: string | null
-  start_date: string
-  end_date: string | null
-  image_url: string | null
-  is_featured: boolean
-  created_by: string | null
-  created_at: string
-  // New columns from migration 030
-  club_id: string | null
-  event_type: EventType
-  status: EventStatus
-  max_capacity: number | null
-  price: number
-  is_free: boolean
-  visibility: EventVisibility
-  registration_deadline: string | null
-  min_participants: number | null
-  tags: string[]
-  updated_at: string | null
-  organizer_name: string | null
-  organizer_contact: string | null
-}
-
-export interface EventWithCount extends Event {
-  registration_count: number
-}
-
-export interface EventWithRegistration extends EventWithCount {
-  is_registered: boolean
-}
+export type Event = EventRow
 
 export interface EventRegistration {
   id: string
