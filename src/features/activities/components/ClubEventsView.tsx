@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Pencil, Eye, EyeOff, XCircle, Users, Link2 } from "lucide-react"
 import { StatCard } from "@/components/shared/StatCard"
@@ -70,16 +70,20 @@ function AttendeesModal({ eventTitle, eventId, onClose }: AttendeesModalProps) {
   const [attendees, setAttendees] = useState<AttendeeRow[] | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
 
-  // Fetch on mount
-  if (attendees === null && fetchError === null) {
+  useEffect(() => {
+    let cancelled = false
     fetch(`/api/events/${eventId}/attendees`)
       .then((r) => r.json())
       .then((json: { data?: AttendeeRow[]; error?: string }) => {
+        if (cancelled) return
         if (json.error) setFetchError(json.error)
         else setAttendees(json.data ?? [])
       })
-      .catch(() => setFetchError("Error al cargar asistentes"))
-  }
+      .catch(() => {
+        if (!cancelled) setFetchError("Error al cargar asistentes")
+      })
+    return () => { cancelled = true }
+  }, [eventId])
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
