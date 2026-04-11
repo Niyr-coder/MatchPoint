@@ -69,7 +69,10 @@ async function fetchEvents(
 
   const { data, error, count } = await query
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    console.error("[events/page] Supabase error:", error)
+    throw new Error(error.message)
+  }
 
   const events: EventWithClub[] = (data ?? []).map(mapEventRow)
 
