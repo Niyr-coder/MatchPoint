@@ -261,12 +261,12 @@ export async function registerForEventAtomic(
   eventId: string,
   userId: string
 ): Promise<{ id: string }> {
-  const supabase = createServiceClient()
+  const supabase = await createClient()
   const { data, error } = await supabase.rpc("register_for_event", {
     p_event_id: eventId,
     p_user_id: userId,
   })
-  if (error) throw error
+  if (error) throw new Error(error.message)
   return { id: data as string }
 }
 

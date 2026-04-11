@@ -13,15 +13,20 @@ DECLARE
   v_max_capacity    INTEGER;
   v_current_count   INTEGER;
   v_registration_id UUID;
+  v_status          TEXT;
 BEGIN
   -- Lock the event row to prevent concurrent capacity reads
-  SELECT max_capacity INTO v_max_capacity
+  SELECT max_capacity, status INTO v_max_capacity, v_status
   FROM public.events
   WHERE id = p_event_id
   FOR UPDATE;
 
   IF NOT FOUND THEN
     RAISE EXCEPTION 'EVENT_NOT_FOUND';
+  END IF;
+
+  IF v_status IS DISTINCT FROM 'published' THEN
+    RAISE EXCEPTION 'EVENT_NOT_PUBLISHED';
   END IF;
 
   IF v_max_capacity IS NOT NULL THEN

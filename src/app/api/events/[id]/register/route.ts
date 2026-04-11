@@ -67,6 +67,12 @@ export async function POST(
       )
     } catch (err) {
       const msg = err instanceof Error ? err.message : ""
+      if (msg.includes("EVENT_NOT_PUBLISHED")) {
+        return NextResponse.json(
+          { success: false, data: null, error: "El evento no está disponible para registro" },
+          { status: 409 }
+        )
+      }
       if (msg.includes("EVENT_FULL")) {
         return NextResponse.json(
           { success: false, data: null, error: "El evento está lleno" },
