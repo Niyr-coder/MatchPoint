@@ -270,6 +270,15 @@ function Step1({ form, set }: { form: EventFormState; set: SetField }) {
             )
           })}
         </div>
+        {/* Description of selected type */}
+        {(() => {
+          const cfg = EVENT_TYPE_CONFIG[form.event_type]
+          return (
+            <p className={`text-xs px-3 py-2 rounded-lg border ${cfg.bg} ${cfg.border} ${cfg.color} transition-all`}>
+              <span className="font-bold">{cfg.label}:</span>{" "}{cfg.description}
+            </p>
+          )
+        })()}
       </div>
 
       {!SINGLE_SPORT_MODE && (
