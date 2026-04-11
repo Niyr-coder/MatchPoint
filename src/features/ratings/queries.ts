@@ -23,6 +23,7 @@ export async function getRankingBySport(
 
       return (data as Array<{
         user_id: string
+        username: string | null
         full_name: string | null
         avatar_url: string | null
         score: number
@@ -31,6 +32,7 @@ export async function getRankingBySport(
       }>).map((row, index) => ({
         position: index + 1,
         userId: row.user_id,
+        username: row.username ?? null,
         fullName: row.full_name ?? "Jugador",
         avatarUrl: row.avatar_url ?? null,
         score: row.score,
@@ -45,6 +47,7 @@ export async function getRankingBySport(
 
     return (data as Array<{
       user_id: string
+      username: string | null
       full_name: string | null
       avatar_url: string | null
       score: number
@@ -53,6 +56,7 @@ export async function getRankingBySport(
     }>).map((row, index) => ({
       position: index + 1,
       userId: row.user_id,
+      username: row.username ?? null,
       fullName: row.full_name ?? "Jugador",
       avatarUrl: row.avatar_url ?? null,
       score: row.score,

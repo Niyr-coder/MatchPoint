@@ -8,7 +8,7 @@ export default async function RankingPage() {
   await authorizeOrRedirect()
 
   const [all, ...sportResults] = await Promise.all([
-    getRankingBySport(undefined, 50),
+    getRankingBySport(undefined, 200),
     ...VISIBLE_SPORT_IDS.map((sport) => getRankingBySport(sport, 50)),
   ])
 

@@ -58,7 +58,7 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
   const isFirst = entry.position === 1
   return (
     <Link
-      href={`/dashboard/players/${entry.userId}`}
+      href={`/dashboard/players/${entry.username ?? entry.userId}`}
       className={`animate-fade-in-up rounded-2xl p-5 flex flex-col items-center gap-3 border transition-shadow ${
         isFirst
           ? "bg-muted border-border"
@@ -118,7 +118,7 @@ function TopThreeCard({ entry }: { entry: RankingEntry }) {
 function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
   return (
     <Link
-      href={`/dashboard/players/${entry.userId}`}
+      href={`/dashboard/players/${entry.username ?? entry.userId}`}
       className="animate-fade-in-up-8 flex items-center gap-4 py-3 border-b border-border last:border-0 hover:bg-muted transition-colors -mx-5 px-5"
       style={{ animationDelay: `${index * 0.02}s` }}
     >

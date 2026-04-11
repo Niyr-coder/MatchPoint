@@ -1,6 +1,7 @@
 export interface RankingEntry {
   position: number
   userId: string
+  username: string | null
   fullName: string
   avatarUrl: string | null
   score: number

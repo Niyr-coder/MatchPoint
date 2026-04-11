@@ -295,7 +295,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                 className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-muted/50 transition-colors"
               >
                 <Link
-                  href={`/dashboard/players/${m.user_id}`}
+                  href={`/dashboard/players/${m.profile.username ?? m.user_id}`}
                   tabIndex={-1}
                   className="shrink-0"
                 >
@@ -303,7 +303,7 @@ export function TeamView({ team, currentUserId, onLeft }: TeamViewProps) {
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
-                    href={`/dashboard/players/${m.user_id}`}
+                    href={`/dashboard/players/${m.profile.username ?? m.user_id}`}
                     className="text-sm font-bold text-foreground truncate hover:underline underline-offset-2 block"
                   >
                     {memberName}
