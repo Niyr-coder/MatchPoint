@@ -63,23 +63,6 @@ export function ClubsSection() {
         </div>
 
         <ScrollReveal delay={0.3}>
-          {/* Club testimonial */}
-          <div className="p-8 rounded-2xl border border-primary/20 bg-primary/5 mb-10 max-w-2xl">
-            <p className="text-2xl text-primary/30 font-black leading-none mb-3 select-none">&quot;</p>
-            <p className="text-white/80 font-medium leading-relaxed mb-5">
-              &quot;Antes gestionábamos las reservas por teléfono y WhatsApp. Ahora el 80% llegan solos por la app. No volvemos atrás.&quot;
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-xs font-black text-primary">
-                AC
-              </div>
-              <div>
-                <p className="text-sm font-black text-white uppercase tracking-tight">Club Arrayanes</p>
-                <p className="text-xs text-white/40">Quito, Ecuador</p>
-              </div>
-            </div>
-          </div>
-
           <a
             href="/login"
             className="btn-pill bg-primary text-white px-10 py-3.5 inline-flex items-center gap-2"

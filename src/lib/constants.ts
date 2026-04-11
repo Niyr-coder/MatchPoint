@@ -90,7 +90,6 @@ export const TESTIMONIALS: Testimonial[] = [
   { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
   { quote: "Encontré rivales de mi nivel en días. Antes tardaba semanas buscando en grupos de WhatsApp.", name: "María L.", sport: "Pickleball", city: "Guayaquil", emoji: "🏓" },
   { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Pickleball", city: "Cuenca", emoji: "🏓" },
-  { quote: "Antes gestionábamos las reservas por teléfono. Ahora el 80% llegan solos por la app.", name: "Club Arrayanes", sport: "Club · Quito", city: "Ecuador", emoji: "🏟️" },
 ]
 
 export const PARTNER_CLUBS: string[] = [

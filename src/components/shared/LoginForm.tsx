@@ -49,7 +49,7 @@ export function LoginForm() {
         <h1 className="font-black text-foreground text-3xl tracking-tight leading-tight mb-2">
           Empieza a jugar
         </h1>
-        <p className="text-[#737373] text-sm">
+        <p className="text-muted-foreground text-sm">
           Accede o crea tu cuenta en un solo clic.
         </p>
       </div>
@@ -61,7 +61,7 @@ export function LoginForm() {
         className="flex items-center gap-3 w-full border border-border bg-card hover:bg-secondary rounded-xl px-4 py-4 text-sm font-semibold text-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
       >
         {isLoading ? (
-          <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-[#737373]" />
+          <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-muted-foreground" />
         ) : (
           <GoogleIcon />
         )}
@@ -69,13 +69,13 @@ export function LoginForm() {
       </button>
 
       {/* Terms */}
-      <p className="text-xs text-[#c0c0c0] leading-relaxed">
+      <p className="text-xs text-muted-foreground/70 leading-relaxed">
         Al continuar aceptas nuestros{" "}
-        <a href="#" className="underline hover:text-[#737373] transition-colors">
+        <a href="#" className="underline hover:text-muted-foreground transition-colors">
           Términos de Servicio
         </a>{" "}
         y{" "}
-        <a href="#" className="underline hover:text-[#737373] transition-colors">
+        <a href="#" className="underline hover:text-muted-foreground transition-colors">
           Política de Privacidad
         </a>
         . Si no tienes cuenta, se creará una automáticamente.

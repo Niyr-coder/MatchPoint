@@ -32,12 +32,17 @@ export function HeroSection() {
           LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
         </p>
 
-        {/* Headline */}
+        {/* Headline — two separate phrases, period in emerald signals full stop */}
         <h1
-          className="animate-fade-in-up-16 font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-8"
+          className="animate-fade-in-up-16 font-black text-white uppercase tracking-[-0.03em] mb-8"
           style={{ fontSize: "clamp(3.5rem, 10vw, 9rem)", animationDelay: "0.15s" }}
         >
-          JUEGA MÁS.<br />JUEGA MEJOR.
+          <span className="block leading-[0.92] mb-3">
+            JUEGA MÁS<span className="text-primary">.</span>
+          </span>
+          <span className="block leading-[0.92]">
+            JUEGA MEJOR<span className="text-primary">.</span>
+          </span>
         </h1>
 
         {/* Subheading */}
