@@ -4,6 +4,8 @@ import { ControlTowerKPIs } from "@/components/admin/ControlTowerKPIs"
 import { ControlTowerActivityFeed } from "@/components/admin/ControlTowerActivityFeed"
 import { ControlTowerGrowthCharts } from "@/components/admin/ControlTowerGrowthCharts"
 import { ControlTowerAlerts } from "@/components/admin/ControlTowerAlerts"
+import { ControlTowerPendingRequests } from "@/components/admin/ControlTowerPendingRequests"
+import { ControlTowerTournamentPipeline } from "@/components/admin/ControlTowerTournamentPipeline"
 import { ControlTowerRankings } from "@/components/admin/ControlTowerRankings"
 import { ControlTowerRevenue } from "@/components/admin/ControlTowerRevenue"
 import { ControlTowerQuickActions } from "@/components/admin/ControlTowerQuickActions"
@@ -53,7 +55,17 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Row 3: Rankings + Revenue */}
+      {/* Row 3: Pending Requests + Tournament Pipeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div className="lg:col-span-4 flex flex-col" style={{ minHeight: 320 }}>
+          <ControlTowerPendingRequests requests={data.pendingRequests} />
+        </div>
+        <div className="lg:col-span-8 flex flex-col" style={{ minHeight: 320 }}>
+          <ControlTowerTournamentPipeline tournaments={data.activeTournaments} />
+        </div>
+      </div>
+
+      {/* Row 4: Rankings + Revenue */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-7">
           <ControlTowerRankings
@@ -67,7 +79,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Row 4: Quick Actions */}
+      {/* Row 5: Quick Actions */}
       <ControlTowerQuickActions />
     </div>
   )

@@ -701,6 +701,26 @@ export interface ControlTowerRanking {
   secondary?: string
 }
 
+export interface PendingClubRequest {
+  id: string
+  name: string
+  city: string
+  sports: string[]
+  created_at: string
+  user_id: string
+}
+
+export interface ActiveTournament {
+  id: string
+  name: string
+  sport: string
+  status: string
+  enrolled: number
+  capacity: number
+  startDate: string | null
+  clubName: string | null
+}
+
 export interface ControlTowerData {
   kpis: ControlTowerKPIs
   activityFeed: ActivityFeedEntry[]
@@ -711,6 +731,8 @@ export interface ControlTowerData {
   }
   systemHealth: SystemHealthData
   alerts: SmartAlert[]
+  pendingRequests: PendingClubRequest[]
+  activeTournaments: ActiveTournament[]
   topClubs: ControlTowerRanking[]
   topPlayers: ControlTowerRanking[]
   topTournaments: ControlTowerRanking[]
@@ -763,6 +785,8 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     openTournamentsRes,
     pendingOldRequestsRes,
     clubsWithRecentReservationsRes,
+    pendingRequestsListRes,
+    activeTournamentsRes,
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("clubs").select("id", { count: "exact", head: true }).eq("is_active", true),
@@ -866,6 +890,20 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
       .select("club_id")
       .gte("created_at", weekAgo.toISOString())
       .neq("status", "cancelled"),
+    // Pending club requests list (for dashboard panel)
+    supabase
+      .from("club_requests")
+      .select("id, user_id, name, city, sports, created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(10),
+    // Active tournaments with enrollment counts
+    supabase
+      .from("tournaments")
+      .select("id, name, sport, status, max_participants, start_date, clubs(name), tournament_participants(id)")
+      .in("status", ["open", "in_progress"])
+      .order("start_date", { ascending: true })
+      .limit(10),
   ])
 
   // ---- Revenue calculations
@@ -1135,12 +1173,42 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     .slice(0, 6)
   const avgPerMatch = reservationRows.length > 0 ? totalRevenue / reservationRows.length : 0
 
+  // ---- Pending requests list
+  const pendingRequests: PendingClubRequest[] = (pendingRequestsListRes.data ?? []).map((r) => ({
+    id: r.id as string,
+    user_id: r.user_id as string,
+    name: r.name as string,
+    city: r.city as string,
+    sports: (r.sports as string[]) ?? [],
+    created_at: r.created_at as string,
+  }))
+
+  // ---- Active tournaments with enrollment
+  const activeTournaments: ActiveTournament[] = (activeTournamentsRes.data ?? []).map((t) => {
+    const participants = Array.isArray(t.tournament_participants) ? t.tournament_participants.length : 0
+    const clubRaw = t.clubs
+    const club = (Array.isArray(clubRaw) ? clubRaw[0] : clubRaw) as { name: string } | null | undefined
+    return {
+      id: t.id as string,
+      name: t.name as string,
+      sport: t.sport as string,
+      status: t.status as string,
+      enrolled: participants,
+      capacity: (t.max_participants as number) ?? 0,
+      startDate: (t.start_date as string) ?? null,
+      clubName: club?.name ?? null,
+
+    }
+  })
+
   return {
     kpis,
     activityFeed,
     growthData: { usersByMonth, matchesByMonth, revenueByMonth },
     systemHealth,
     alerts,
+    pendingRequests,
+    activeTournaments,
     topClubs,
     topPlayers,
     topTournaments,
