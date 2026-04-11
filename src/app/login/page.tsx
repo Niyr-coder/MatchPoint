@@ -39,7 +39,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        {/* Bottom — headline + social proof */}
+        {/* Bottom — headline + benefits + social proof */}
         <div className="relative z-20 p-12 xl:p-16">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-4">
             LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
@@ -51,6 +51,24 @@ export default function LoginPage() {
             <span className="block mb-2">JUEGA MÁS<span className="text-primary">.</span></span>
             <span className="block">JUEGA MEJOR<span className="text-primary">.</span></span>
           </h2>
+
+          {/* Benefits list */}
+          <ul className="space-y-4 mb-10">
+            {[
+              { icon: "🏓", title: "Rivals de tu nivel", desc: "El sistema te conecta con jugadores que te van a exigir — ni muy fácil, ni imposible." },
+              { icon: "⚡", title: "Reserva en 30 segundos", desc: "Sin llamadas, sin WhatsApps, sin esperas. Elige cancha, elige horario, listo." },
+              { icon: "📈", title: "Tu ranking sube con cada partido", desc: "Cada punto que juegas cuenta. La comunidad ve tu progreso." },
+              { icon: "🏆", title: "Acceso a torneos locales", desc: "Compite en tu ciudad. Desde amateurs hasta ligas organizadas." },
+            ].map((b) => (
+              <li key={b.title} className="flex gap-3 items-start">
+                <span className="text-lg leading-none mt-0.5 flex-shrink-0">{b.icon}</span>
+                <div>
+                  <p className="text-white text-sm font-bold leading-snug">{b.title}</p>
+                  <p className="text-white/45 text-xs leading-relaxed mt-0.5">{b.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
 
           {/* Social proof */}
           <div className="flex items-center gap-3">
@@ -65,7 +83,7 @@ export default function LoginPage() {
               ))}
             </div>
             <p className="text-xs text-white/50">
-              <span className="text-white font-semibold">+500</span> deportistas ya registrados
+              <span className="text-white font-semibold">+500</span> deportistas ya dentro
             </p>
           </div>
         </div>
