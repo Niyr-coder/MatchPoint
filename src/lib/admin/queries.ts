@@ -741,6 +741,7 @@ export interface ControlTowerData {
   }
   systemHealth: SystemHealthData
   alerts: SmartAlert[]
+  maintenanceMode: boolean
   recentSignups: RecentSignup[]
   pendingRequests: PendingClubRequest[]
   activeTournaments: ActiveTournament[]
@@ -796,6 +797,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     openTournamentsRes,
     pendingOldRequestsRes,
     clubsWithRecentReservationsRes,
+    maintenanceModeRes,
     recentSignupsRes,
     pendingRequestsListRes,
     activeTournamentsRes,
@@ -902,6 +904,8 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
       .select("club_id")
       .gte("created_at", weekAgo.toISOString())
       .neq("status", "cancelled"),
+    // Maintenance mode setting
+    supabase.from("platform_settings").select("value").eq("key", "maintenance_mode").maybeSingle(),
     // Recent signups (for dashboard panel)
     supabase
       .from("profiles")
@@ -1191,6 +1195,9 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     .slice(0, 6)
   const avgPerMatch = reservationRows.length > 0 ? totalRevenue / reservationRows.length : 0
 
+  // ---- Maintenance mode
+  const maintenanceMode = maintenanceModeRes.data?.value === true || maintenanceModeRes.data?.value === "true"
+
   // ---- Recent signups
   const recentSignups: RecentSignup[] = (recentSignupsRes.data ?? []).map((u) => ({
     id: u.id as string,
@@ -1236,6 +1243,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     growthData: { usersByMonth, matchesByMonth, revenueByMonth },
     systemHealth,
     alerts,
+    maintenanceMode,
     recentSignups,
     pendingRequests,
     activeTournaments,

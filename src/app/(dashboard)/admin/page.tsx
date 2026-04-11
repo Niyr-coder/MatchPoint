@@ -8,6 +8,8 @@ import { ControlTowerAlerts } from "@/components/admin/ControlTowerAlerts"
 import { ControlTowerPendingRequests } from "@/components/admin/ControlTowerPendingRequests"
 import { ControlTowerTournamentPipeline } from "@/components/admin/ControlTowerTournamentPipeline"
 import { ControlTowerRecentSignups } from "@/components/admin/ControlTowerRecentSignups"
+import { ControlTowerBroadcast } from "@/components/admin/ControlTowerBroadcast"
+import { ControlTowerSystemControls } from "@/components/admin/ControlTowerSystemControls"
 import { ControlTowerRankings } from "@/components/admin/ControlTowerRankings"
 import { ControlTowerRevenue } from "@/components/admin/ControlTowerRevenue"
 import { ControlTowerQuickActions } from "@/components/admin/ControlTowerQuickActions"
@@ -82,8 +84,21 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Row 5: Quick Actions */}
-      <ControlTowerQuickActions />
+      {/* Row 5: Broadcast + System Controls + Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div className="lg:col-span-5 flex flex-col">
+          <ControlTowerBroadcast />
+        </div>
+        <div className="lg:col-span-3 flex flex-col">
+          <ControlTowerSystemControls
+            maintenanceMode={data.maintenanceMode}
+            kpis={data.kpis}
+          />
+        </div>
+        <div className="lg:col-span-4 flex flex-col">
+          <ControlTowerQuickActions />
+        </div>
+      </div>
     </div>
   )
 }
