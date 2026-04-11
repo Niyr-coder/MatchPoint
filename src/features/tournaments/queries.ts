@@ -135,6 +135,40 @@ export async function joinTournament(
   return data as TournamentParticipant
 }
 
+export interface ParticipantPreview {
+  user_id: string
+  full_name: string | null
+  avatar_url: string | null
+}
+
+export async function getTournamentParticipantsPreview(
+  tournamentId: string,
+  limit = 10
+): Promise<{ participants: ParticipantPreview[]; total: number }> {
+  const supabase = await createClient()
+
+  const { data, error, count } = await supabase
+    .from("tournament_participants")
+    .select("user_id, profiles(full_name, avatar_url)", { count: "exact" })
+    .eq("tournament_id", tournamentId)
+    .neq("status", "withdrawn")
+    .order("registered_at")
+    .limit(limit)
+
+  if (error) throw new Error(error.message)
+
+  const participants = (data ?? []).map((row) => {
+    const profile = (row.profiles as unknown) as { full_name: string | null; avatar_url: string | null } | null
+    return {
+      user_id: row.user_id as string,
+      full_name: profile?.full_name ?? null,
+      avatar_url: profile?.avatar_url ?? null,
+    }
+  })
+
+  return { participants, total: count ?? 0 }
+}
+
 export async function isUserInTournament(
   tournamentId: string,
   userId: string

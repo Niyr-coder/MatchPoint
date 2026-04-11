@@ -6,10 +6,12 @@ import { TournamentManagePanel } from "./TournamentManagePanel"
 import { JoinTournamentButton } from "./JoinTournamentButton"
 import { ParticipantsManager } from "@/components/dashboard/ParticipantsManager"
 import { BracketView } from "@/features/tournaments/components/BracketView"
+import { TournamentFeedbackForm } from "@/features/tournaments/components/TournamentFeedbackForm"
+import { TournamentFeedbackList } from "@/features/tournaments/components/TournamentFeedbackList"
 import { CheckCircle } from "lucide-react"
 import type { TournamentStatus } from "@/features/tournaments/types"
 
-type Tab = "participants" | "bracket" | "manage"
+type Tab = "participants" | "bracket" | "manage" | "feedback"
 
 interface TabDef {
   key: Tab
@@ -25,6 +27,7 @@ interface Props {
   entryFee: number
   modality?: string | null
   bracketLocked: boolean
+  isParticipant?: boolean
 }
 
 export function TournamentClientShell({
@@ -36,16 +39,20 @@ export function TournamentClientShell({
   entryFee,
   modality,
   bracketLocked,
+  isParticipant,
 }: Props) {
   const router = useRouter()
   const [refreshKey, setRefreshKey] = useState(0)
 
   const showBracket = currentStatus !== "draft"
 
+  const showFeedback = currentStatus === "completed" && (isParticipant || alreadyJoined || isCreator)
+
   const tabs: TabDef[] = [
     { key: "participants", label: "Participantes" },
     ...(showBracket ? [{ key: "bracket" as Tab, label: "Bracket" }] : []),
     ...(isCreator ? [{ key: "manage" as Tab, label: "Gestión" }] : []),
+    ...(showFeedback ? [{ key: "feedback" as Tab, label: "Valoraciones" }] : []),
   ]
 
   const [activeTab, setActiveTab] = useState<Tab>("participants")
@@ -145,6 +152,16 @@ export function TournamentClientShell({
           modality={modality}
           onRefresh={refresh}
         />
+      )}
+
+      {/* Tab: Valoraciones */}
+      {showFeedback && activeTab === "feedback" && (
+        <div className="flex flex-col gap-4">
+          {(alreadyJoined || isParticipant) && !isCreator && (
+            <TournamentFeedbackForm tournamentId={tournamentId} />
+          )}
+          <TournamentFeedbackList tournamentId={tournamentId} />
+        </div>
       )}
     </div>
   )

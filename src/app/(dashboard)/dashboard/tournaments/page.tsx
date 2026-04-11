@@ -81,6 +81,9 @@ export default async function TournamentsPage() {
                       <span>{t.max_participants ? `${t.max_participants} cupos` : "Sin límite"}</span>
                     </div>
                   </div>
+                  <div className="flex items-center justify-end pt-2 border-t border-border">
+                    <span className="text-[11px] font-black text-foreground uppercase tracking-wide">Ver Detalles →</span>
+                  </div>
                 </Link>
               )
             })}
@@ -142,6 +145,9 @@ export default async function TournamentsPage() {
                     <span className="text-[11px] font-black text-foreground">
                       {t.entry_fee > 0 ? `$${t.entry_fee}` : "Gratis"}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-end pt-2 border-t border-border">
+                    <span className="text-[11px] font-black text-foreground uppercase tracking-wide">Ver Detalles →</span>
                   </div>
                 </Link>
               )

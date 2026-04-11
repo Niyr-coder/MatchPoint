@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Settings, Play, CheckCircle, XCircle, Pencil } from "lucide-react"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { InviteLinkGenerator } from "@/features/memberships/components/InviteLinkGenerator"
 
 interface StatusAction {
   from: string
@@ -186,6 +187,17 @@ export function TournamentManagePanel({
           <p className="text-xs text-zinc-400 text-center -mt-2">{nextAction.description}</p>
         </>
       )})()}
+
+      {currentStatus === "open" && (
+        <div className="border-t border-border pt-3 flex flex-col gap-2">
+          <p className="text-[10px] font-black uppercase tracking-wide text-zinc-400">Link de invitación</p>
+          <InviteLinkGenerator
+            entityType="tournament"
+            entityId={tournamentId}
+            label="Generar link de torneo"
+          />
+        </div>
+      )}
 
       {CANCEL_ALLOWED.includes(currentStatus) && (
         <div className="border-t border-border pt-3">

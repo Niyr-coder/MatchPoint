@@ -1,9 +1,13 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
-import { getTournamentById, isUserInTournament } from "@/features/tournaments/queries"
+import { getTournamentById, isUserInTournament, getTournamentParticipantsPreview } from "@/features/tournaments/queries"
 import { notFound } from "next/navigation"
-import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft } from "lucide-react"
+import { Trophy, Calendar, Clock, DollarSign, MapPin, ArrowLeft, Users } from "lucide-react"
 import Link from "next/link"
 import { TournamentClientShell } from "./TournamentClientShell"
+import { TournamentPrizesSection } from "@/features/tournaments/components/TournamentPrizesSection"
+import { TournamentSponsorsSection } from "@/features/tournaments/components/TournamentSponsorsSection"
+import { TournamentParticipantsPreview } from "@/features/tournaments/components/TournamentParticipantsPreview"
+import type { TournamentExtras } from "@/features/tournaments/types"
 
 const SPORT_LABEL: Record<string, string> = {
   futbol: "Fútbol",
@@ -13,20 +17,18 @@ const SPORT_LABEL: Record<string, string> = {
 }
 
 const STATUS_DOT: Record<string, { label: string; dot: string; badge: string }> = {
-  open:        { label: "Abierto",    dot: "bg-green-500",  badge: "bg-success text-primary border-success-border" },
-  in_progress: { label: "En curso",   dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed:   { label: "Completado", dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
-  draft:       { label: "Borrador",   dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
-  cancelled:   { label: "Cancelado",  dot: "bg-red-500",    badge: "bg-red-50 text-red-600 border-red-200" },
+  open:        { label: "Inscripciones abiertas", dot: "bg-green-500",  badge: "bg-success text-primary border-success-border" },
+  in_progress: { label: "En curso",              dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-200" },
+  completed:   { label: "Finalizado",             dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
+  draft:       { label: "Borrador",               dot: "bg-zinc-400",   badge: "bg-muted text-zinc-500 border-zinc-200" },
+  cancelled:   { label: "Cancelado",              dot: "bg-red-500",    badge: "bg-red-50 text-red-600 border-red-200" },
 }
 
-const EXTRAS_META: Record<string, { emoji: string; label: string }> = {
-  sorteos:      { emoji: "🎰", label: "Sorteos" },
-  premios:      { emoji: "🏆", label: "Premios" },
-  streaming:    { emoji: "📺", label: "Streaming" },
-  fotografia:   { emoji: "📸", label: "Fotografía" },
-  arbitro:      { emoji: "🦺", label: "Árbitro oficial" },
-  patrocinador: { emoji: "🤝", label: "Patrocinador" },
+const EXTRAS_PILLS: Record<string, { emoji: string; label: string }> = {
+  sorteos:   { emoji: "🎰", label: "Sorteos" },
+  streaming: { emoji: "📺", label: "Streaming" },
+  fotografia:{ emoji: "📸", label: "Fotografía" },
+  arbitro:   { emoji: "🦺", label: "Árbitro oficial" },
 }
 
 export default async function TournamentDetailPage({
@@ -37,9 +39,10 @@ export default async function TournamentDetailPage({
   const ctx = await authorizeOrRedirect()
   const { id } = await params
 
-  const [tournament, alreadyJoined] = await Promise.all([
+  const [tournament, alreadyJoined, { participants, total }] = await Promise.all([
     getTournamentById(id),
     isUserInTournament(id, ctx.userId),
+    getTournamentParticipantsPreview(id, 10),
   ])
 
   if (!tournament) notFound()
@@ -48,38 +51,40 @@ export default async function TournamentDetailPage({
     modality?: string | null
     start_time?: string | null
     is_official?: boolean
-    extras?: Record<string, { enabled?: boolean; detail?: string; name?: string }>
+    extras?: TournamentExtras
   }
 
   const st = STATUS_DOT[t.status] ?? STATUS_DOT.open
   const isCreator = t.created_by === ctx.userId
   const canJoin = t.status === "open" && !isCreator && !alreadyJoined
+  const extras = t.extras ?? {}
 
-  const enabledExtras = t.extras
-    ? Object.entries(t.extras).filter(([, v]) => v?.enabled)
-    : []
+  // Pills: only sorteos, streaming, fotografia, arbitro (premios & patrocinador get their own sections)
+  const pillExtras = Object.entries(extras).filter(
+    ([key, v]) => v?.enabled && key in EXTRAS_PILLS
+  )
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-6">
+    <div className="max-w-3xl mx-auto flex flex-col gap-5">
       {/* Back */}
       <Link
         href="/dashboard/tournaments"
-        className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-400 hover:text-zinc-600"
+        className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-400 hover:text-zinc-600 w-fit"
       >
         <ArrowLeft className="size-3" />
-        Volver a torneos
+        Torneos
       </Link>
 
-      {/* Hero — default card style, no color */}
+      {/* Hero */}
       <div className="rounded-2xl bg-card border border-border p-6 md:p-8">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="size-12 rounded-xl bg-muted flex items-center justify-center">
-            <Trophy className="size-6 text-zinc-400" />
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div className="size-12 rounded-xl bg-foreground/5 border border-border flex items-center justify-center">
+            <Trophy className="size-6 text-foreground" />
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             {t.is_official && (
               <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                OFICIAL
+                OFICIAL MATCHPOINT
               </span>
             )}
             <span className={`text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full border flex items-center gap-1.5 ${st.badge}`}>
@@ -88,10 +93,12 @@ export default async function TournamentDetailPage({
             </span>
           </div>
         </div>
-        <h1 className="text-2xl font-black text-foreground uppercase leading-tight tracking-[-0.02em] mb-3">
+
+        <h1 className="text-2xl md:text-3xl font-black text-foreground uppercase leading-tight tracking-[-0.02em] mb-3">
           {t.name}
         </h1>
-        <div className="flex items-center gap-2 flex-wrap">
+
+        <div className="flex items-center gap-2 flex-wrap mb-4">
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-muted text-zinc-600">
             {SPORT_LABEL[t.sport] ?? t.sport}
           </span>
@@ -100,16 +107,28 @@ export default async function TournamentDetailPage({
               {t.modality}
             </span>
           )}
+          {pillExtras.map(([key]) => {
+            const meta = EXTRAS_PILLS[key]
+            return (
+              <span key={key} className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-muted text-zinc-600 flex items-center gap-1">
+                <span>{meta.emoji}</span>
+                {meta.label}
+              </span>
+            )
+          })}
         </div>
+
         {t.description && (
-          <p className="text-sm text-zinc-500 leading-relaxed mt-3">{t.description}</p>
+          <p className="text-sm text-zinc-600 leading-relaxed border-t border-border pt-4">
+            {t.description}
+          </p>
         )}
       </div>
 
       {/* Info grid */}
       <div className="rounded-2xl bg-card border border-border divide-y divide-border-subtle">
         <div className="grid grid-cols-2 divide-x divide-border-subtle">
-          <div className="p-5 flex items-center gap-2">
+          <div className="p-5 flex items-center gap-3">
             <Calendar className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Fecha</p>
@@ -120,7 +139,7 @@ export default async function TournamentDetailPage({
               </p>
             </div>
           </div>
-          <div className="p-5 flex items-center gap-2">
+          <div className="p-5 flex items-center gap-3">
             <Clock className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Hora</p>
@@ -129,7 +148,7 @@ export default async function TournamentDetailPage({
           </div>
         </div>
         <div className="grid grid-cols-2 divide-x divide-border-subtle">
-          <div className="p-5 flex items-center gap-2">
+          <div className="p-5 flex items-center gap-3">
             <DollarSign className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Inscripción</p>
@@ -138,7 +157,7 @@ export default async function TournamentDetailPage({
               </p>
             </div>
           </div>
-          <div className="p-5 flex items-center gap-2">
+          <div className="p-5 flex items-center gap-3">
             <MapPin className="size-4 text-zinc-400 shrink-0" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Club sede</p>
@@ -148,30 +167,39 @@ export default async function TournamentDetailPage({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Extras */}
-      {enabledExtras.length > 0 && (
-        <div className="rounded-2xl bg-card border border-border p-5">
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-3">Incluye</p>
-          <div className="flex flex-wrap gap-2">
-            {enabledExtras.map(([key, val]) => {
-              const meta = EXTRAS_META[key]
-              const label = val.name ?? meta?.label ?? key
-              const emoji = meta?.emoji ?? "✅"
-              return (
-                <span key={key} className="text-xs font-bold px-3 py-1.5 rounded-full bg-muted text-zinc-700 flex items-center gap-1.5">
-                  <span>{emoji}</span>
-                  {label}
-                  {val.detail && <span className="text-zinc-400 font-normal">· {val.detail}</span>}
-                </span>
-              )
-            })}
+        <div className="p-5 flex items-center gap-3">
+          <Users className="size-4 text-zinc-400 shrink-0" />
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">Cupos</p>
+              <p className="text-xs font-black text-foreground">{total} / {t.max_participants}</p>
+            </div>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-foreground rounded-full"
+                style={{ width: `${Math.min(100, Math.round((total / t.max_participants) * 100))}%` }}
+              />
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Participants preview */}
+      {total > 0 && (
+        <TournamentParticipantsPreview
+          participants={participants}
+          totalCount={total}
+          maxParticipants={t.max_participants}
+        />
       )}
 
-      {/* All interactive/mutable parts — synced via shared refreshKey */}
+      {/* Prizes section */}
+      <TournamentPrizesSection extras={extras} />
+
+      {/* Sponsors section */}
+      <TournamentSponsorsSection extras={extras} />
+
+      {/* Interactive shell */}
       <TournamentClientShell
         tournamentId={id}
         currentStatus={t.status}
@@ -181,6 +209,7 @@ export default async function TournamentDetailPage({
         entryFee={t.entry_fee}
         modality={t.modality}
         bracketLocked={t.bracket_locked ?? false}
+        isParticipant={alreadyJoined}
       />
     </div>
   )

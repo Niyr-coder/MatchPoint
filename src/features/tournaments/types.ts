@@ -4,6 +4,29 @@ export type TournamentStatus = "draft" | "open" | "in_progress" | "completed" | 
 export type ParticipantStatus = "registered" | "confirmed" | "eliminated" | "winner" | "withdrawn"
 export type PaymentStatus = "pending" | "paid" | "waived" | "refunded"
 
+// ── Extras sub-types ───────────────────────────────────────────────────────────
+
+export interface PrizeItem {
+  place: string   // "1er lugar", "2do lugar", etc.
+  prize: string   // "$200", "Trofeo + medalla", etc.
+}
+
+export interface SponsorItem {
+  name: string
+  logo_url?: string
+}
+
+export interface TournamentExtras {
+  sorteos?: { enabled: boolean; detail?: string }
+  premios?: { enabled: boolean; detail?: string; items?: PrizeItem[] }
+  streaming?: { enabled: boolean }
+  fotografia?: { enabled: boolean }
+  arbitro?: { enabled: boolean }
+  patrocinador?: { enabled: boolean; name?: string; sponsors?: SponsorItem[] }
+}
+
+// ── Core entities ──────────────────────────────────────────────────────────────
+
 export interface Tournament {
   id: string
   club_id: string | null
@@ -24,7 +47,7 @@ export interface Tournament {
   modality?: string | null
   start_time?: string | null
   is_official?: boolean
-  extras?: Record<string, { enabled?: boolean; detail?: string; name?: string }>
+  extras?: TournamentExtras
 }
 
 export interface TournamentParticipant {
@@ -41,13 +64,14 @@ export interface TournamentParticipant {
   confirmed_at?: string | null
 }
 
-export interface TournamentExtras {
-  sorteos?: { enabled: boolean; detail?: string }
-  premios?: { enabled: boolean; detail?: string }
-  streaming?: { enabled: boolean }
-  fotografia?: { enabled: boolean }
-  arbitro?: { enabled: boolean }
-  patrocinador?: { enabled: boolean; name?: string }
+export interface TournamentFeedback {
+  id: string
+  tournament_id: string
+  user_id: string
+  rating: number
+  comment: string | null
+  created_at: string
+  profiles?: { username: string; full_name: string | null }
 }
 
 export interface CreateTournamentInput {
