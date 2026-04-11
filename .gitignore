@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 SUPABASE\ API
 supabase/.temp/
+
+# git worktrees
+.worktrees/
+.superpowers/
