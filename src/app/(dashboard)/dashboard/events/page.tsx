@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
@@ -7,6 +8,7 @@ import { EventCard } from "@/features/activities/components/EventCard"
 import { EventsFilters } from "@/features/activities/components/EventsFilters"
 import { CalendarDays } from "lucide-react"
 import type { EventWithClub } from "@/features/activities/types"
+import { mapEventRow } from "@/features/activities/utils"
 
 const PAGE_SIZE = 12
 
@@ -69,35 +71,7 @@ async function fetchEvents(
 
   if (error) throw new Error(error.message)
 
-  const events: EventWithClub[] = (data ?? []).map((row: Record<string, unknown>) => ({
-    id:                    row.id as string,
-    title:                 row.title as string,
-    description:           row.description as string | null,
-    sport:                 row.sport as string | null,
-    event_type:            row.event_type as EventWithClub["event_type"],
-    status:                row.status as EventWithClub["status"],
-    club_id:               row.club_id as string | null,
-    club_name:             (row.clubs as { name: string } | null)?.name ?? null,
-    city:                  row.city as string | null,
-    location:              row.location as string | null,
-    start_date:            row.start_date as string,
-    end_date:              row.end_date as string | null,
-    image_url:             row.image_url as string | null,
-    is_free:               row.is_free as boolean,
-    price:                 row.price as number | null,
-    max_capacity:          row.max_capacity as number | null,
-    min_participants:      row.min_participants as number | null,
-    visibility:            row.visibility as EventWithClub["visibility"],
-    registration_deadline: row.registration_deadline as string | null,
-    tags:                  row.tags as string[] | null,
-    organizer_name:        row.organizer_name as string | null,
-    organizer_contact:     row.organizer_contact as string | null,
-    is_featured:           false,
-    created_by:            null,
-    created_at:            row.created_at as string,
-    updated_at:            null,
-    registration_count:    (row.event_registrations as { count: number }[])?.[0]?.count ?? 0,
-  }))
+  const events: EventWithClub[] = (data ?? []).map(mapEventRow)
 
   return { events, total: count ?? 0 }
 }
@@ -136,7 +110,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           { key: "all",  label: "Todos" },
           { key: "mine", label: "Mis registraciones" },
         ].map(({ key, label }) => (
-          <a
+          <Link
             key={key}
             href={buildHref({ tab: key, page: "0" })}
             className={`px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors border-b-2 -mb-px ${
@@ -146,7 +120,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             }`}
           >
             {label}
-          </a>
+          </Link>
         ))}
       </div>
 
@@ -201,20 +175,20 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {total > PAGE_SIZE && (
         <div className="flex justify-center gap-2">
           {page > 0 && (
-            <a
+            <Link
               href={buildHref({ page: String(page - 1) })}
               className="border border-border rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors"
             >
               Anterior
-            </a>
+            </Link>
           )}
           {(page + 1) * PAGE_SIZE < total && (
-            <a
+            <Link
               href={buildHref({ page: String(page + 1) })}
               className="bg-foreground text-white rounded-full px-5 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors"
             >
               Siguiente
-            </a>
+            </Link>
           )}
         </div>
       )}

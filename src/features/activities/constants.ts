@@ -36,7 +36,7 @@ export const EVENT_TYPES = Object.entries(EVENT_TYPE_CONFIG).map(([value, cfg]) 
 }))
 
 export const EVENT_VISIBILITIES = [
-  { value: "public",       label: "Público" },
-  { value: "members_only", label: "Solo miembros" },
-  { value: "private",      label: "Privado" },
+  { value: "public",      label: "Público" },
+  { value: "club_only",   label: "Solo miembros del club" },
+  { value: "invite_only", label: "Solo por invitación" },
 ] as const

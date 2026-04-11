@@ -17,7 +17,7 @@ export type EventType =
 
 export type EventStatus = "draft" | "published" | "cancelled" | "completed"
 
-export type EventVisibility = "public" | "members_only" | "invite_only" | "club_only" | "private"
+export type EventVisibility = "public" | "club_only" | "invite_only"
 
 export interface EventRow {
   id: string

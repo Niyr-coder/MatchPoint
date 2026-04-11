@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
-import { createClient } from "@/lib/supabase/server"
 import {
   getEventById,
   getUserEventRegistration,
-  registerForEvent,
+  registerForEventAtomic,
   unregisterFromEvent,
 } from "@/features/activities/queries"
 import type { ApiResponse } from "@/types"
-import type { EventRegistration } from "@/features/activities/queries"
 
 interface RouteContext {
   params: Promise<{ id: string }>
@@ -21,7 +19,7 @@ interface RouteContext {
 export async function POST(
   _request: NextRequest,
   context: RouteContext
-): Promise<NextResponse<ApiResponse<EventRegistration>>> {
+): Promise<NextResponse<ApiResponse<{ id: string }>>> {
   const authResult = await authorize()
   if (!authResult.ok) {
     return NextResponse.json(
@@ -61,43 +59,45 @@ export async function POST(
       }
     }
 
-    // Check capacity — use count query instead of fetching all registrations
-    if (event.max_capacity !== null) {
-      const supabase = await createClient()
-      const { count, error: countErr } = await supabase
-        .from("event_registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("event_id", eventId)
-
-      if (countErr) {
+    try {
+      const registration = await registerForEventAtomic(eventId, userId)
+      return NextResponse.json(
+        { success: true, data: registration, error: null },
+        { status: 201 }
+      )
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : ""
+      if (msg.includes("EVENT_NOT_PUBLISHED")) {
         return NextResponse.json(
-          { success: false, data: null, error: "Error al verificar capacidad" },
-          { status: 500 }
+          { success: false, data: null, error: "El evento no está disponible para registro" },
+          { status: 409 }
         )
       }
-
-      if (count !== null && count >= event.max_capacity) {
+      if (msg.includes("EVENT_FULL")) {
         return NextResponse.json(
           { success: false, data: null, error: "El evento está lleno" },
           { status: 409 }
         )
       }
-    }
-
-    // Check if already registered
-    const existing = await getUserEventRegistration(eventId, userId)
-    if (existing) {
+      if (msg.includes("EVENT_NOT_FOUND")) {
+        return NextResponse.json(
+          { success: false, data: null, error: "Evento no encontrado" },
+          { status: 404 }
+        )
+      }
+      // Unique constraint violation = already registered
+      if (msg.includes("23505") || msg.includes("unique")) {
+        return NextResponse.json(
+          { success: false, data: null, error: "Ya estás registrado en este evento" },
+          { status: 409 }
+        )
+      }
+      console.error(`[POST /api/events/${eventId}/register]`, msg)
       return NextResponse.json(
-        { success: false, data: null, error: "Ya estás registrado en este evento" },
-        { status: 409 }
+        { success: false, data: null, error: "Error al registrarse en el evento" },
+        { status: 500 }
       )
     }
-
-    const registration = await registerForEvent(eventId, userId)
-    return NextResponse.json(
-      { success: true, data: registration, error: null },
-      { status: 201 }
-    )
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[POST /api/events/${eventId}/register]`, message)

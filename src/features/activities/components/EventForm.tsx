@@ -112,10 +112,40 @@ const TYPE_EMOJI: Record<string, string> = {
 const STEP_LABELS = ["Básicos", "Fecha & lugar", "Detalles", "Extras"] as const
 const TOTAL_STEPS = STEP_LABELS.length
 
-function canGoNext(step: number, form: EventFormState): boolean {
-  if (step === 1) return form.title.trim().length >= 3
-  if (step === 2) return !!form.start_date
-  return true
+function getStepErrors(step: number, form: EventFormState, mode: "create" | "edit"): string[] {
+  const errors: string[] = []
+  if (step === 1) {
+    if (form.title.trim().length < 3) errors.push("El nombre debe tener al menos 3 caracteres")
+  }
+  if (step === 2) {
+    if (!form.start_date) {
+      errors.push("La fecha de inicio es requerida")
+    } else {
+      if (mode === "create") {
+        const today = new Date().toISOString().split("T")[0]
+        if (form.start_date < today) errors.push("La fecha de inicio debe ser hoy o en el futuro")
+      }
+      if (form.end_date && form.end_date < form.start_date) {
+        errors.push("La fecha de fin debe ser posterior a la de inicio")
+      }
+      if (form.registration_deadline && form.registration_deadline >= form.start_date) {
+        errors.push("El límite de registro debe ser anterior a la fecha de inicio")
+      }
+    }
+  }
+  if (step === 3) {
+    if (!form.is_free && (!form.price || parseFloat(form.price) <= 0)) {
+      errors.push("El precio es requerido para eventos de pago")
+    }
+    if (form.max_capacity && parseInt(form.max_capacity) <= 0) {
+      errors.push("La capacidad máxima debe ser mayor a 0")
+    }
+  }
+  return errors
+}
+
+function canGoNext(step: number, form: EventFormState, mode: "create" | "edit"): boolean {
+  return getStepErrors(step, form, mode).length === 0
 }
 
 // ── TagInput ───────────────────────────────────────────────────────────────────
@@ -229,7 +259,8 @@ function StepIndicator({ current }: { current: number }) {
 
 // ── Step 1: Básicos ────────────────────────────────────────────────────────────
 
-function Step1({ form, set }: { form: EventFormState; set: SetField }) {
+function Step1({ form, set, errors = [] }: { form: EventFormState; set: SetField; errors?: string[] }) {
+  const titleInvalid = errors.some((e) => e.includes("nombre"))
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
@@ -242,7 +273,8 @@ function Step1({ form, set }: { form: EventFormState; set: SetField }) {
           minLength={3}
           maxLength={120}
           placeholder="Clínica de Pádel para principiantes…"
-          className={inputCls}
+          data-invalid={titleInvalid}
+          className={`${inputCls} data-[invalid=true]:border-red-400`}
         />
       </div>
 
@@ -314,14 +346,17 @@ function Step2({
   set,
   province,
   setProvince,
+  errors = [],
 }: {
   form: EventFormState
   set: SetField
   province: string
   setProvince: (p: string) => void
+  errors?: string[]
 }) {
   const [showEndDate, setShowEndDate] = useState(!!form.end_date)
   const cities = province ? (ECUADOR_CITIES_BY_PROVINCE[province] ?? []) : []
+  const startDateInvalid = errors.some((e) => e.includes("inicio"))
 
   return (
     <div className="flex flex-col gap-5">
@@ -353,7 +388,8 @@ function Step2({
             type="date"
             value={form.start_date}
             onChange={(e) => set("start_date", e.target.value)}
-            className={inputCls}
+            data-invalid={startDateInvalid}
+            className={`${inputCls} data-[invalid=true]:border-red-400`}
           />
           <input
             type="time"
@@ -653,6 +689,7 @@ export function EventForm({
   const [form, setForm] = useState<EventFormState>(initial)
   const [province, setProvince] = useState<string>(() => findProvinceByCity(initial.city))
   const [step, setStep] = useState(1)
+  const [stepErrors, setStepErrors] = useState<string[]>([])
 
   function set<K extends keyof EventFormState>(key: K, value: EventFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -661,7 +698,13 @@ export function EventForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (step < TOTAL_STEPS) {
-      if (canGoNext(step, form)) setStep(step + 1)
+      const errors = getStepErrors(step, form, mode)
+      if (errors.length > 0) {
+        setStepErrors(errors)
+        return
+      }
+      setStepErrors([])
+      setStep(step + 1)
     } else {
       void onSubmit(form)
     }
@@ -672,18 +715,30 @@ export function EventForm({
       <StepIndicator current={step} />
 
       <div>
-        {step === 1 && <Step1 form={form} set={set} />}
+        {step === 1 && <Step1 form={form} set={set} errors={stepErrors} />}
         {step === 2 && (
           <Step2
             form={form}
             set={set}
             province={province}
             setProvince={setProvince}
+            errors={stepErrors}
           />
         )}
         {step === 3 && <Step3 form={form} set={set} clubs={clubs} />}
         {step === 4 && <Step4 form={form} set={set} />}
       </div>
+
+      {stepErrors.length > 0 && (
+        <ul className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex flex-col gap-1">
+          {stepErrors.map((e) => (
+            <li key={e} className="text-sm text-red-600 flex items-start gap-1.5">
+              <span className="mt-0.5 shrink-0">•</span>
+              <span>{e}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {error && (
         <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
@@ -694,7 +749,7 @@ export function EventForm({
       <div className="flex gap-3 pt-1">
         <button
           type="button"
-          onClick={step === 1 ? onCancel : () => setStep(step - 1)}
+          onClick={step === 1 ? onCancel : () => { setStepErrors([]); setStep(step - 1) }}
           disabled={loading}
           className="flex-1 border border-border rounded-full py-2.5 text-sm font-bold text-zinc-600 hover:bg-muted/50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
         >
@@ -710,7 +765,7 @@ export function EventForm({
 
         <button
           type="submit"
-          disabled={loading || (step < TOTAL_STEPS && !canGoNext(step, form))}
+          disabled={loading}
           className="flex-1 bg-foreground text-white rounded-full py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-1"
         >
           {step < TOTAL_STEPS ? (
