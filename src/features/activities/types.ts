@@ -12,6 +12,7 @@ export type EventType =
   | "exhibition"
   | "masterclass"
   | "quedada"
+  | "ranking"
   | "other"
 
 export type EventStatus = "draft" | "published" | "cancelled" | "completed"

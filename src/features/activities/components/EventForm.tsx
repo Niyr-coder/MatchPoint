@@ -105,6 +105,7 @@ const TYPE_EMOJI: Record<string, string> = {
   exhibition: "🏆",
   masterclass: "👑",
   quedada: "🤝",
+  ranking: "🏅",
   other: "⚡",
 }
 

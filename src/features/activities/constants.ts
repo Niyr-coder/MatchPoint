@@ -12,7 +12,8 @@ export const EVENT_TYPE_CONFIG: Record<
   exhibition:  { label: "Exhibición",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200" },
   masterclass: { label: "Masterclass", color: "text-indigo-700", bg: "bg-indigo-50", border: "border-indigo-200" },
   quedada:     { label: "Quedada",     color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200" },
-  other:       { label: "Otro",        color: "text-zinc-600",   bg: "bg-zinc-100",  border: "border-zinc-200" },
+  ranking:     { label: "Ranking",     color: "text-cyan-700",   bg: "bg-cyan-50",   border: "border-cyan-200"  },
+  other:       { label: "Otro",        color: "text-zinc-600",   bg: "bg-zinc-100",  border: "border-zinc-200"  },
 }
 
 export const EVENT_STATUS_CONFIG: Record<
