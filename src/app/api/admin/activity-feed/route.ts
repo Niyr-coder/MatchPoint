@@ -14,7 +14,7 @@ export async function GET() {
       .from("audit_log")
       .select("id, action, entity_type, details, created_at")
       .order("created_at", { ascending: false })
-      .limit(40)
+      .limit(10)
 
     if (error) throw error
     return NextResponse.json({ success: true, data: data ?? [], error: null })

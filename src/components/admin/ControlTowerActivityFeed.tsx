@@ -97,13 +97,14 @@ export function ControlTowerActivityFeed({ initialFeed }: Props) {
       try {
         const res = await fetch("/api/admin/activity-feed")
         if (!res.ok) return
-        const data = await res.json() as ActivityFeedEntry[]
+        const json = await res.json() as { success: boolean; data: ActivityFeedEntry[] | null }
+        const entries = Array.isArray(json.data) ? json.data : []
         setFeed((prev) => {
           const existingIds = new Set(prev.map((e) => e.id))
-          const incoming = data.filter((e) => !existingIds.has(e.id))
+          const incoming = entries.filter((e) => !existingIds.has(e.id))
           if (incoming.length === 0) return prev
           flashNew(incoming.map((e) => e.id))
-          return data.slice(0, 10)
+          return entries.slice(0, 10)
         })
       } catch { /* silent */ }
     }, 30000)
