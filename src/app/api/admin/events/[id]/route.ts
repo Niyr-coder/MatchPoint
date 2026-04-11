@@ -19,6 +19,7 @@ const EVENT_TYPES = [
   "exhibition",
   "masterclass",
   "quedada",
+  "ranking",
   "other",
 ] as const
 
