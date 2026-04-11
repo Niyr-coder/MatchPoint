@@ -11,6 +11,7 @@ import { EVENT_TYPE_CONFIG, EVENT_STATUS_CONFIG, SPORT_LABELS } from "@/features
 import { CalendarDays, CheckCircle, Globe } from "lucide-react"
 import type { EventWithClub, EventType, EventStatus } from "@/features/activities/types"
 import type { EventFormState } from "@/features/activities/components/EventForm"
+import { eventToForm } from "@/features/activities/utils"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -20,36 +21,6 @@ function formatDate(dateStr: string): string {
     month: "short",
     year: "numeric",
   })
-}
-
-function eventToForm(event: EventWithClub): EventFormState {
-  return {
-    title:                 event.title,
-    description:           event.description ?? "",
-    event_type:            event.event_type ?? "social",
-    sport:                 event.sport ?? "",
-    club_id:               event.club_id ?? "",
-    city:                  event.city ?? "",
-    location:              event.location ?? "",
-    start_date:            event.start_date.split("T")[0] ?? "",
-    start_time:            event.start_date.includes("T")
-      ? event.start_date.split("T")[1]?.slice(0, 5) ?? "09:00"
-      : "09:00",
-    end_date:              event.end_date?.split("T")[0] ?? "",
-    end_time:              event.end_date?.includes("T")
-      ? event.end_date.split("T")[1]?.slice(0, 5) ?? ""
-      : "",
-    image_url:             event.image_url ?? "",
-    max_capacity:          event.max_capacity != null ? String(event.max_capacity) : "",
-    is_free:               event.is_free,
-    price:                 event.price != null ? String(event.price) : "",
-    visibility:            event.visibility,
-    registration_deadline: event.registration_deadline?.split("T")[0] ?? "",
-    min_participants:      event.min_participants != null ? String(event.min_participants) : "",
-    organizer_name:        event.organizer_name ?? "",
-    organizer_contact:     event.organizer_contact ?? "",
-    tags:                  event.tags ?? [],
-  }
 }
 
 // ── ClubFilterBar ──────────────────────────────────────────────────────────────
