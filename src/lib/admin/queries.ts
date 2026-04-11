@@ -734,7 +734,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
   const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7)
   const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(now.getDate() - 14)
   const next7Days = new Date(now); next7Days.setDate(now.getDate() + 7)
-  const monthStart6 = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+  const monthStart12 = new Date(now.getFullYear(), now.getMonth() - 11, 1)
 
   const [
     usersCountRes,
@@ -820,11 +820,11 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     supabase
       .from("profiles")
       .select("created_at")
-      .gte("created_at", monthStart6.toISOString()),
+      .gte("created_at", monthStart12.toISOString()),
     supabase
       .from("reservations")
       .select("created_at, total_price, club_id")
-      .gte("created_at", monthStart6.toISOString())
+      .gte("created_at", monthStart12.toISOString())
       .neq("status", "cancelled"),
     // Last 2 weeks of user registrations (for WoW)
     supabase
@@ -1039,46 +1039,45 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
   function ctMonthLabel(d: Date) {
     return d.toLocaleDateString("es-EC", { month: "short", year: "2-digit" })
   }
-  const months6 = Array.from({ length: 6 }, (_, i) =>
-    new Date(now.getFullYear(), now.getMonth() - 5 + i, 1)
+  const months12 = Array.from({ length: 12 }, (_, i) =>
+    new Date(now.getFullYear(), now.getMonth() - 11 + i, 1)
   )
-  const userRows6 = sixMonthUsersRes.data ?? []
-  const resRows6 = sixMonthReservationsRes.data ?? []
+  const userRows12 = sixMonthUsersRes.data ?? []
+  const resRows12 = sixMonthReservationsRes.data ?? []
 
-  const usersByMonth = months6.map((m, i) => {
+  const usersByMonth = months12.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
-    const users = userRows6.filter((u) => {
+    const users = userRows12.filter((u) => {
       const d = new Date(u.created_at); return d >= m && d < next
     }).length
-    // prevUsers = same month 1 year ago (use position i-1 as proxy when no year-ago data)
-    const prevMonth = months6[i - 1]
+    const prevMonth = months12[i - 1]
     const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
     const prevUsers = prevMonth && prevNext
-      ? userRows6.filter((u) => { const d = new Date(u.created_at); return d >= prevMonth && d < prevNext }).length
+      ? userRows12.filter((u) => { const d = new Date(u.created_at); return d >= prevMonth && d < prevNext }).length
       : 0
     return { month: ctMonthLabel(m), users, prevUsers }
   })
-  const matchesByMonth = months6.map((m, i) => {
+  const matchesByMonth = months12.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
-    const matches = resRows6.filter((r) => {
+    const matches = resRows12.filter((r) => {
       const d = new Date(r.created_at); return d >= m && d < next
     }).length
-    const prevMonth = months6[i - 1]
+    const prevMonth = months12[i - 1]
     const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
     const prevMatches = prevMonth && prevNext
-      ? resRows6.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext }).length
+      ? resRows12.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext }).length
       : 0
     return { month: ctMonthLabel(m), matches, prevMatches }
   })
-  const revenueByMonth = months6.map((m, i) => {
+  const revenueByMonth = months12.map((m, i) => {
     const next = new Date(m.getFullYear(), m.getMonth() + 1, 1)
-    const revenue = resRows6
+    const revenue = resRows12
       .filter((r) => { const d = new Date(r.created_at); return d >= m && d < next })
       .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
-    const prevMonth = months6[i - 1]
+    const prevMonth = months12[i - 1]
     const prevNext = prevMonth ? new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1) : null
     const prevRevenue = prevMonth && prevNext
-      ? resRows6.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext })
+      ? resRows12.filter((r) => { const d = new Date(r.created_at); return d >= prevMonth && d < prevNext })
           .reduce((s, r) => s + (Number(r.total_price) || 0), 0)
       : 0
     return { month: ctMonthLabel(m), revenue, prevRevenue }

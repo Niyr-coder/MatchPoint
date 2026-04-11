@@ -1,18 +1,19 @@
+import Link from "next/link"
 import type { ControlTowerKPIs } from "@/lib/admin/queries"
 import { Users, Building2, Trophy, DollarSign, TrendingUp, Zap, Target, CalendarCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type Accent = "green" | "blue" | "amber" | "red" | "purple" | "cyan" | "teal" | "orange"
 
-const ACCENT: Record<Accent, { icon: string; iconBg: string; badge: string; label: string }> = {
-  green:  { icon: "text-emerald-600", iconBg: "bg-emerald-50",  badge: "text-emerald-700 bg-emerald-50 border-emerald-200",  label: "text-emerald-600" },
-  blue:   { icon: "text-foreground",  iconBg: "bg-secondary",   badge: "text-foreground bg-secondary border-border",          label: "text-foreground" },
-  cyan:   { icon: "text-cyan-600",    iconBg: "bg-cyan-50",     badge: "text-cyan-700 bg-cyan-50 border-cyan-200",            label: "text-cyan-600" },
-  amber:  { icon: "text-amber-600",   iconBg: "bg-amber-50",    badge: "text-amber-700 bg-amber-50 border-amber-200",         label: "text-amber-600" },
-  red:    { icon: "text-red-600",     iconBg: "bg-red-50",      badge: "text-red-700 bg-red-50 border-red-200",               label: "text-red-600" },
-  purple: { icon: "text-violet-600",  iconBg: "bg-violet-50",   badge: "text-violet-700 bg-violet-50 border-violet-200",      label: "text-violet-600" },
-  teal:   { icon: "text-teal-600",    iconBg: "bg-teal-50",     badge: "text-teal-700 bg-teal-50 border-teal-200",            label: "text-teal-600" },
-  orange: { icon: "text-orange-600",  iconBg: "bg-orange-50",   badge: "text-orange-700 bg-orange-50 border-orange-200",      label: "text-orange-600" },
+const ACCENT: Record<Accent, { icon: string; iconBg: string; badge: string; label: string; hover: string }> = {
+  green:  { icon: "text-emerald-600", iconBg: "bg-emerald-50",  badge: "text-emerald-700 bg-emerald-50 border-emerald-200",  label: "text-emerald-600", hover: "hover:border-emerald-200" },
+  blue:   { icon: "text-foreground",  iconBg: "bg-secondary",   badge: "text-foreground bg-secondary border-border",          label: "text-foreground",  hover: "hover:border-zinc-300" },
+  cyan:   { icon: "text-cyan-600",    iconBg: "bg-cyan-50",     badge: "text-cyan-700 bg-cyan-50 border-cyan-200",            label: "text-cyan-600",    hover: "hover:border-cyan-200" },
+  amber:  { icon: "text-amber-600",   iconBg: "bg-amber-50",    badge: "text-amber-700 bg-amber-50 border-amber-200",         label: "text-amber-600",   hover: "hover:border-amber-200" },
+  red:    { icon: "text-red-600",     iconBg: "bg-red-50",      badge: "text-red-700 bg-red-50 border-red-200",               label: "text-red-600",     hover: "hover:border-red-200" },
+  purple: { icon: "text-violet-600",  iconBg: "bg-violet-50",   badge: "text-violet-700 bg-violet-50 border-violet-200",      label: "text-violet-600",  hover: "hover:border-violet-200" },
+  teal:   { icon: "text-teal-600",    iconBg: "bg-teal-50",     badge: "text-teal-700 bg-teal-50 border-teal-200",            label: "text-teal-600",    hover: "hover:border-teal-200" },
+  orange: { icon: "text-orange-600",  iconBg: "bg-orange-50",   badge: "text-orange-700 bg-orange-50 border-orange-200",      label: "text-orange-600",  hover: "hover:border-orange-200" },
 }
 
 function wow(current: number, prev: number): { pct: number; up: boolean } | null {
@@ -28,12 +29,13 @@ interface KPICardProps {
   sub: string
   trend?: { value: string; up: boolean } | null
   accent?: Accent
+  href?: string
 }
 
-function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardProps) {
+function KPICard({ icon, label, value, sub, trend, accent = "green", href }: KPICardProps) {
   const a = ACCENT[accent]
-  return (
-    <div className="relative overflow-hidden rounded-2xl bg-card p-5 flex flex-col gap-4 min-h-[130px]">
+  const inner = (
+    <>
       <div className="flex items-start justify-between">
         <div className={cn("size-8 rounded-xl flex items-center justify-center shrink-0", a.iconBg, a.icon)}>
           {icon}
@@ -49,8 +51,23 @@ function KPICard({ icon, label, value, sub, trend, accent = "green" }: KPICardPr
         <p className={cn("text-[10px] font-black uppercase tracking-[0.16em] mt-1.5 truncate", a.label)}>{label}</p>
         <p className="text-[10px] text-zinc-400 mt-0.5 truncate">{sub}</p>
       </div>
-    </div>
+    </>
   )
+
+  const base = cn(
+    "relative overflow-hidden rounded-2xl bg-card p-5 flex flex-col gap-4 min-h-[130px] border border-transparent transition-all duration-150",
+    href && cn("cursor-pointer", a.hover)
+  )
+
+  if (href) {
+    return (
+      <Link href={href} className={base}>
+        {inner}
+      </Link>
+    )
+  }
+
+  return <div className={base}>{inner}</div>
 }
 
 interface Props {
@@ -74,6 +91,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         sub={`+${kpis.newUsersThisMonth} este mes`}
         trend={userWow ? { value: `${userWow.pct}% vs sem`, up: userWow.up } : null}
         accent="green"
+        href="/admin/users"
       />
       <KPICard
         icon={<Zap className="size-4" />}
@@ -82,6 +100,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         sub="Registros esta semana"
         trend={userWow ? { value: `${userWow.pct}%`, up: userWow.up } : null}
         accent="cyan"
+        href="/admin/users"
       />
       <KPICard
         icon={<Building2 className="size-4" />}
@@ -89,6 +108,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         value={kpis.totalClubs.toLocaleString()}
         sub="Verificados activos"
         accent="amber"
+        href="/admin/clubs"
       />
       <KPICard
         icon={<CalendarCheck className="size-4" />}
@@ -97,6 +117,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         sub="Reservas confirmadas"
         trend={matchWow ? { value: `${matchWow.pct}% vs sem`, up: matchWow.up } : null}
         accent="purple"
+        href="/admin/reservations"
       />
       <KPICard
         icon={<DollarSign className="size-4" />}
@@ -105,6 +126,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         sub={`$${kpis.revenueThisMonth.toFixed(0)} este mes`}
         trend={revGrowthPct !== 0 ? { value: `${Math.abs(revGrowthPct)}% MoM`, up: revGrowthPct >= 0 } : revWow ? { value: `${revWow.pct}% WoW`, up: revWow.up } : null}
         accent="green"
+        href="/admin/reservations"
       />
       <KPICard
         icon={<Trophy className="size-4" />}
@@ -112,6 +134,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         value={kpis.totalTournaments.toLocaleString()}
         sub="Total registrados"
         accent="red"
+        href="/admin/tournaments"
       />
       <KPICard
         icon={<Target className="size-4" />}
@@ -119,6 +142,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         value={`${kpis.conversionRate}%`}
         sub="Usuarios con reservas"
         accent="teal"
+        href="/admin/users"
       />
       <KPICard
         icon={<TrendingUp className="size-4" />}
@@ -126,6 +150,7 @@ export function ControlTowerKPIs({ kpis }: Props) {
         value={kpis.pipelineNext7Days.toLocaleString()}
         sub="Reservas próximos 7 días"
         accent="orange"
+        href="/admin/reservations"
       />
     </div>
   )

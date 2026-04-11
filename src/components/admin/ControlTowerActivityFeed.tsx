@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { ActivityFeedEntry } from "@/lib/admin/queries"
+import { createClient } from "@/lib/supabase/client"
+import type { RealtimePostgresInsertPayload } from "@supabase/supabase-js"
 import { cn } from "@/lib/utils"
 
 const ACTION_LABELS: Record<string, { label: string; dot: string }> = {
@@ -57,34 +59,76 @@ export function ControlTowerActivityFeed({ initialFeed }: Props) {
   const [feed, setFeed] = useState<ActivityFeedEntry[]>(initialFeed)
   const [newIds, setNewIds] = useState<Set<string>>(new Set())
   const [pulse, setPulse] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [realtimeActive, setRealtimeActive] = useState(false)
+  const newIdsRef = useRef<Set<string>>(new Set())
+
+  const flashNew = (ids: string[]) => {
+    const next = new Set(ids)
+    newIdsRef.current = next
+    setNewIds(next)
+    setPulse(true)
+    setTimeout(() => {
+      newIdsRef.current = new Set()
+      setNewIds(new Set())
+      setPulse(false)
+    }, 3000)
+  }
 
   useEffect(() => {
-    intervalRef.current = setInterval(async () => {
+    const supabase = createClient()
+
+    const channel = supabase
+      .channel("admin-audit-log-rt")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "audit_log" },
+        (payload: RealtimePostgresInsertPayload<Record<string, unknown>>) => {
+          const newEntry = payload.new as unknown as ActivityFeedEntry
+          setFeed((prev) => [newEntry, ...prev].slice(0, 40))
+          flashNew([newEntry.id])
+        }
+      )
+      .subscribe((status: string) => {
+        if (status === "SUBSCRIBED") setRealtimeActive(true)
+      })
+
+    // Polling fallback (30s) for cases where realtime is not available
+    const interval = setInterval(async () => {
       try {
         const res = await fetch("/api/admin/activity-feed")
         if (!res.ok) return
         const data = await res.json() as ActivityFeedEntry[]
-        const existingIds = new Set(feed.map((e) => e.id))
-        const incoming = data.filter((e) => !existingIds.has(e.id))
-        if (incoming.length > 0) {
-          setFeed(data)
-          setNewIds(new Set(incoming.map((e) => e.id)))
-          setPulse(true)
-          setTimeout(() => { setNewIds(new Set()); setPulse(false) }, 3000)
-        }
+        setFeed((prev) => {
+          const existingIds = new Set(prev.map((e) => e.id))
+          const incoming = data.filter((e) => !existingIds.has(e.id))
+          if (incoming.length === 0) return prev
+          flashNew(incoming.map((e) => e.id))
+          return data
+        })
       } catch { /* silent */ }
-    }, 15000)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [feed])
+    }, 30000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(interval)
+    }
+  }, [])
 
   return (
     <div className="rounded-2xl bg-card flex flex-col overflow-hidden h-full border border-border">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Actividad</p>
         <div className="flex items-center gap-1.5">
-          <span className={cn("size-1.5 rounded-full", pulse ? "bg-emerald-400" : "bg-emerald-500")} />
-          <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">LIVE</span>
+          <span className={cn(
+            "size-1.5 rounded-full transition-colors",
+            realtimeActive ? (pulse ? "bg-emerald-400 animate-pulse" : "bg-emerald-500") : "bg-zinc-300"
+          )} />
+          <span className={cn(
+            "text-[10px] font-black uppercase tracking-wider",
+            realtimeActive ? "text-emerald-600" : "text-zinc-400"
+          )}>
+            {realtimeActive ? "LIVE" : "SYNC"}
+          </span>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto py-2 space-y-0.5 px-2">

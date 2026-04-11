@@ -14,6 +14,7 @@ import {
 } from "recharts"
 
 type ChartTab = "users" | "matches" | "revenue"
+type Period = "3M" | "6M" | "1A"
 
 interface GrowthData {
   usersByMonth: Array<{ month: string; users: number; prevUsers: number }>
@@ -25,6 +26,12 @@ const TABS: Array<{ key: ChartTab; label: string; stroke: string; fill: string }
   { key: "users",   label: "Usuarios", stroke: "#16a34a", fill: "#16a34a" },
   { key: "matches", label: "Matches",  stroke: "#0ea5e9", fill: "#0ea5e9" },
   { key: "revenue", label: "Revenue",  stroke: "#f59e0b", fill: "#f59e0b" },
+]
+
+const PERIODS: Array<{ key: Period; label: string; months: number }> = [
+  { key: "3M", label: "3M",  months: 3 },
+  { key: "6M", label: "6M",  months: 6 },
+  { key: "1A", label: "1A",  months: 12 },
 ]
 
 const fmt = (value: number, isRevenue: boolean) =>
@@ -69,17 +76,22 @@ interface Props {
 
 export function ControlTowerGrowthCharts({ growthData }: Props) {
   const [activeTab, setActiveTab] = useState<ChartTab>("users")
+  const [period, setPeriod] = useState<Period>("6M")
 
   const tab = TABS.find((t) => t.key === activeTab)!
+  const months = PERIODS.find((p) => p.key === period)!.months
 
   type ChartPoint = { month: string; [key: string]: number | string }
 
-  const data: ChartPoint[] =
+  const allData: ChartPoint[] =
     activeTab === "users"
       ? growthData.usersByMonth
       : activeTab === "matches"
         ? growthData.matchesByMonth
         : growthData.revenueByMonth
+
+  // Slice to selected period (last N months)
+  const data = allData.slice(-months)
 
   const dataKey = activeTab
   const prevDataKey = activeTab === "users" ? "prevUsers" : activeTab === "matches" ? "prevMatches" : "prevRevenue"
@@ -88,22 +100,41 @@ export function ControlTowerGrowthCharts({ growthData }: Props) {
     <div className="rounded-2xl bg-card border border-border flex flex-col overflow-hidden h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
-          Crecimiento · 6 meses
+          Crecimiento
         </p>
-        <div className="flex gap-1">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg transition-all ${
-                activeTab === t.key
-                  ? "bg-secondary text-foreground"
-                  : "text-zinc-400 hover:text-zinc-600"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          {/* Period selector */}
+          <div className="flex gap-0.5 bg-muted rounded-lg p-0.5">
+            {PERIODS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md transition-all ${
+                  period === p.key
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-600"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          {/* Chart type tabs */}
+          <div className="flex gap-1">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg transition-all ${
+                  activeTab === t.key
+                    ? "bg-secondary text-foreground"
+                    : "text-zinc-400 hover:text-zinc-600"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <div className="flex-1 p-4 min-h-[220px]">
