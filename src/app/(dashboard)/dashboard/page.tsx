@@ -1,11 +1,10 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner"
+import { QuickActionsPanel } from "@/components/dashboard/QuickActionsPanel"
 import { ReservasPanel } from "@/features/bookings/components/ReservasPanel"
-import { CanchasMapPanel } from "@/features/clubs/components/CanchasMapPanel"
 import { TorneosPanel } from "@/features/tournaments/components/TorneosPanel"
 import { PickleballRatingWidget } from "@/features/users/components/PickleballRatingWidget"
 import { getUpcomingReservations, getReservationInvites } from "@/features/bookings/queries"
-import { getCourts } from "@/features/clubs/queries/courts"
 import { getOpenTournaments } from "@/features/tournaments/queries"
 import { getPlayerStats } from "@/features/users/queries"
 import { createClient } from "@/lib/supabase/server"
@@ -23,11 +22,10 @@ export default async function UserDashboardPage() {
 
   const supabase = await createClient()
 
-  const [reservations, invites, courts, tournaments, stats, pickleballRes] =
+  const [reservations, invites, tournaments, stats, pickleballRes] =
     await Promise.all([
       getUpcomingReservations(userId),
       getReservationInvites(userId),
-      getCourts(),
       getOpenTournaments(),
       getPlayerStats(userId),
       supabase
@@ -50,7 +48,7 @@ export default async function UserDashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ReservasPanel reservations={reservations} inviteCount={invites.length} />
-        <CanchasMapPanel courts={courts} />
+        <QuickActionsPanel />
       </div>
 
       <TorneosPanel tournaments={tournaments} />
