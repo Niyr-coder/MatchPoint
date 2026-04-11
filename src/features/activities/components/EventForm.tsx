@@ -133,6 +133,14 @@ function getStepErrors(step: number, form: EventFormState, mode: "create" | "edi
       }
     }
   }
+  if (step === 3) {
+    if (!form.is_free && (!form.price || parseFloat(form.price) <= 0)) {
+      errors.push("El precio es requerido para eventos de pago")
+    }
+    if (form.max_capacity && parseInt(form.max_capacity) <= 0) {
+      errors.push("La capacidad máxima debe ser mayor a 0")
+    }
+  }
   return errors
 }
 
@@ -251,7 +259,8 @@ function StepIndicator({ current }: { current: number }) {
 
 // ── Step 1: Básicos ────────────────────────────────────────────────────────────
 
-function Step1({ form, set }: { form: EventFormState; set: SetField }) {
+function Step1({ form, set, errors = [] }: { form: EventFormState; set: SetField; errors?: string[] }) {
+  const titleInvalid = errors.some((e) => e.includes("nombre"))
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
@@ -264,7 +273,8 @@ function Step1({ form, set }: { form: EventFormState; set: SetField }) {
           minLength={3}
           maxLength={120}
           placeholder="Clínica de Pádel para principiantes…"
-          className={inputCls}
+          data-invalid={titleInvalid}
+          className={`${inputCls} data-[invalid=true]:border-red-400`}
         />
       </div>
 
@@ -336,14 +346,17 @@ function Step2({
   set,
   province,
   setProvince,
+  errors = [],
 }: {
   form: EventFormState
   set: SetField
   province: string
   setProvince: (p: string) => void
+  errors?: string[]
 }) {
   const [showEndDate, setShowEndDate] = useState(!!form.end_date)
   const cities = province ? (ECUADOR_CITIES_BY_PROVINCE[province] ?? []) : []
+  const startDateInvalid = errors.some((e) => e.includes("inicio"))
 
   return (
     <div className="flex flex-col gap-5">
@@ -375,7 +388,8 @@ function Step2({
             type="date"
             value={form.start_date}
             onChange={(e) => set("start_date", e.target.value)}
-            className={inputCls}
+            data-invalid={startDateInvalid}
+            className={`${inputCls} data-[invalid=true]:border-red-400`}
           />
           <input
             type="time"
@@ -701,13 +715,14 @@ export function EventForm({
       <StepIndicator current={step} />
 
       <div>
-        {step === 1 && <Step1 form={form} set={set} />}
+        {step === 1 && <Step1 form={form} set={set} errors={stepErrors} />}
         {step === 2 && (
           <Step2
             form={form}
             set={set}
             province={province}
             setProvince={setProvince}
+            errors={stepErrors}
           />
         )}
         {step === 3 && <Step3 form={form} set={set} clubs={clubs} />}
