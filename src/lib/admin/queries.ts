@@ -701,6 +701,16 @@ export interface ControlTowerRanking {
   secondary?: string
 }
 
+export interface RecentSignup {
+  id: string
+  full_name: string | null
+  username: string | null
+  avatar_url: string | null
+  is_verified: boolean
+  account_origin: string | null
+  created_at: string
+}
+
 export interface PendingClubRequest {
   id: string
   name: string
@@ -731,6 +741,7 @@ export interface ControlTowerData {
   }
   systemHealth: SystemHealthData
   alerts: SmartAlert[]
+  recentSignups: RecentSignup[]
   pendingRequests: PendingClubRequest[]
   activeTournaments: ActiveTournament[]
   topClubs: ControlTowerRanking[]
@@ -785,6 +796,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     openTournamentsRes,
     pendingOldRequestsRes,
     clubsWithRecentReservationsRes,
+    recentSignupsRes,
     pendingRequestsListRes,
     activeTournamentsRes,
   ] = await Promise.all([
@@ -890,6 +902,12 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
       .select("club_id")
       .gte("created_at", weekAgo.toISOString())
       .neq("status", "cancelled"),
+    // Recent signups (for dashboard panel)
+    supabase
+      .from("profiles")
+      .select("id, full_name, username, avatar_url, is_verified, account_origin, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10),
     // Pending club requests list (for dashboard panel)
     supabase
       .from("club_requests")
@@ -1173,6 +1191,17 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     .slice(0, 6)
   const avgPerMatch = reservationRows.length > 0 ? totalRevenue / reservationRows.length : 0
 
+  // ---- Recent signups
+  const recentSignups: RecentSignup[] = (recentSignupsRes.data ?? []).map((u) => ({
+    id: u.id as string,
+    full_name: (u.full_name as string | null) ?? null,
+    username: (u.username as string | null) ?? null,
+    avatar_url: (u.avatar_url as string | null) ?? null,
+    is_verified: Boolean(u.is_verified),
+    account_origin: (u.account_origin as string | null) ?? null,
+    created_at: u.created_at as string,
+  }))
+
   // ---- Pending requests list
   const pendingRequests: PendingClubRequest[] = (pendingRequestsListRes.data ?? []).map((r) => ({
     id: r.id as string,
@@ -1207,6 +1236,7 @@ export async function getAdminControlTowerData(): Promise<ControlTowerData> {
     growthData: { usersByMonth, matchesByMonth, revenueByMonth },
     systemHealth,
     alerts,
+    recentSignups,
     pendingRequests,
     activeTournaments,
     topClubs,
