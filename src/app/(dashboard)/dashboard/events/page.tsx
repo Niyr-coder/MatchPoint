@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
@@ -136,7 +137,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           { key: "all",  label: "Todos" },
           { key: "mine", label: "Mis registraciones" },
         ].map(({ key, label }) => (
-          <a
+          <Link
             key={key}
             href={buildHref({ tab: key, page: "0" })}
             className={`px-4 py-2.5 text-sm font-black uppercase tracking-wide transition-colors border-b-2 -mb-px ${
@@ -146,7 +147,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             }`}
           >
             {label}
-          </a>
+          </Link>
         ))}
       </div>
 
@@ -201,20 +202,20 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {total > PAGE_SIZE && (
         <div className="flex justify-center gap-2">
           {page > 0 && (
-            <a
+            <Link
               href={buildHref({ page: String(page - 1) })}
               className="border border-border rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-secondary transition-colors"
             >
               Anterior
-            </a>
+            </Link>
           )}
           {(page + 1) * PAGE_SIZE < total && (
-            <a
+            <Link
               href={buildHref({ page: String(page + 1) })}
               className="bg-foreground text-white rounded-full px-5 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors"
             >
               Siguiente
-            </a>
+            </Link>
           )}
         </div>
       )}
