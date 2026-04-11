@@ -257,6 +257,19 @@ export async function registerForEvent(
   return data as EventRegistration
 }
 
+export async function registerForEventAtomic(
+  eventId: string,
+  userId: string
+): Promise<{ id: string }> {
+  const supabase = createServiceClient()
+  const { data, error } = await supabase.rpc("register_for_event", {
+    p_event_id: eventId,
+    p_user_id: userId,
+  })
+  if (error) throw error
+  return { id: data as string }
+}
+
 export async function unregisterFromEvent(
   eventId: string,
   userId: string
