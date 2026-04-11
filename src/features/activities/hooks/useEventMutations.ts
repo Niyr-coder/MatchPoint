@@ -38,7 +38,7 @@ function buildPayload({ form, clubId }: BuildPayloadOptions): Record<string, unk
     event_type:            form.event_type,
     sport:                 form.sport || undefined,
     // clubId (from props) takes precedence; fall back to form.club_id for admin
-    club_id:               clubId ?? form.club_id ?? undefined,
+    club_id:               clubId ?? (form.club_id || undefined),
     city:                  form.city || undefined,
     location:              form.location || undefined,
     start_date:            startIso,
