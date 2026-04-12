@@ -11,7 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
-import type { AdminOrder, AdminProduct, AdminShopData, AdminShopStats } from "@/app/api/admin/shop/route"
+import type { AdminOrder, AdminProduct, AdminPendingProduct, AdminShopData, AdminShopStats } from "@/app/api/admin/shop/route"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -32,10 +32,11 @@ function formatCurrency(amount: number): string {
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  pending: { label: "Pendiente", className: "bg-amber-50 text-amber-700" },
-  confirmed: { label: "Confirmado", className: "bg-success text-primary" },
-  delivered: { label: "Entregado", className: "bg-emerald-50 text-emerald-700" },
-  cancelled: { label: "Cancelado", className: "bg-red-50 text-red-700" },
+  pending:       { label: "Pendiente",   className: "bg-amber-50 text-amber-700" },
+  pending_proof: { label: "Comprobante", className: "bg-yellow-50 text-yellow-700" },
+  confirmed:     { label: "Confirmado",  className: "bg-success text-primary" },
+  delivered:     { label: "Entregado",   className: "bg-emerald-50 text-emerald-700" },
+  cancelled:     { label: "Cancelado",   className: "bg-red-50 text-red-700" },
 }
 
 // ── stats cards ────────────────────────────────────────────────────────────────
@@ -163,7 +164,7 @@ function OrdersTable({
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
-              {["Usuario", "Producto", "Cant.", "Total", "Estado", "Club", "Fecha"].map((h) => (
+              {["Usuario", "Producto", "Cant.", "Total", "Estado", "Comprobante", "Club", "Fecha"].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
                   {h}
                 </th>
@@ -183,7 +184,7 @@ function OrdersTable({
               ))
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center">
+                <td colSpan={8} className="px-4 py-10 text-center">
                   <ShoppingBag className="size-8 text-zinc-300 mx-auto mb-2" />
                   <p className="text-sm font-bold text-zinc-500">No hay órdenes con estos filtros.</p>
                 </td>
@@ -210,6 +211,14 @@ function OrdersTable({
                       <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full ${status.className}`}>
                         {status.label}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {order.proof_url ? (
+                        <a href={order.proof_url} target="_blank" rel="noopener noreferrer"
+                           className="text-xs text-blue-600 underline">Ver</a>
+                      ) : (
+                        <span className="text-xs text-zinc-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <p className="text-sm text-zinc-500">{order.club_name ?? "—"}</p>
@@ -407,7 +416,7 @@ interface AdminShopViewProps {
   clubs: { id: string; name: string }[]
 }
 
-type Tab = "orders" | "products"
+type Tab = "orders" | "products" | "pending"
 
 export function AdminShopView({ clubs }: AdminShopViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>("orders")
@@ -426,6 +435,12 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
   const [productsPage, setProductsPage] = useState(1)
   const [productsClubFilter, setProductsClubFilter] = useState("")
   const [productsLoading, productsTransition] = useTransition()
+
+  // Pending products state
+  const [pendingProducts, setPendingProducts] = useState<AdminPendingProduct[]>([])
+  const [pendingTotal, setPendingTotal] = useState(0)
+  const [pendingLoading, pendingTransition] = useTransition()
+  const [approving, setApproving] = useState<string | null>(null)
 
   // Shared stats
   const [stats, setStats] = useState<AdminShopStats>({
@@ -483,6 +498,32 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
     [productsTransition]
   )
 
+  const fetchPending = useCallback(() => {
+    pendingTransition(async () => {
+      try {
+        const res = await fetch("/api/admin/shop?type=pending")
+        const json = await res.json()
+        if (json.success && json.data) {
+          setPendingProducts(json.data.pendingProducts ?? [])
+          setPendingTotal(json.data.meta?.total ?? 0)
+        }
+      } catch {
+        // errors silently ignored
+      }
+    })
+  }, [pendingTransition])
+
+  async function handleApproval(productId: string, action: "approve" | "reject") {
+    setApproving(productId)
+    await fetch(`/api/shop/products/${productId}/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    })
+    setApproving(null)
+    fetchPending()
+  }
+
   // Initial load
   useEffect(() => {
     fetchOrders(1, "", "")
@@ -521,6 +562,9 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
     if (tab === "products" && products.length === 0) {
       fetchProducts(1, "")
     }
+    if (tab === "pending" && pendingProducts.length === 0) {
+      fetchPending()
+    }
   }
 
   return (
@@ -532,6 +576,7 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
         {[
           { id: "orders" as Tab, label: "Órdenes", icon: ShoppingBag },
           { id: "products" as Tab, label: "Productos", icon: Package },
+          { id: "pending" as Tab, label: `Pendientes${pendingTotal > 0 ? ` (${pendingTotal})` : ""}`, icon: Clock },
         ].map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -580,6 +625,85 @@ export function AdminShopView({ clubs }: AdminShopViewProps) {
           onClubFilter={handleProductsClub}
           clubFilter={productsClubFilter}
         />
+      )}
+
+      {activeTab === "pending" && (
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  {["Nombre", "Club", "Precio", "Categoría", "Enviado por", "Fecha", ""].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pendingLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i} className="border-b border-border">
+                      {Array.from({ length: 7 }).map((__, j) => (
+                        <td key={j} className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded animate-pulse w-20" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : pendingProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-10 text-center">
+                      <CheckCircle2 className="size-8 text-zinc-300 mx-auto mb-2" />
+                      <p className="text-sm font-bold text-zinc-500">No hay productos pendientes.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  pendingProducts.map((p) => (
+                    <tr key={p.id} className="border-b border-border hover:bg-secondary transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-bold text-foreground">{p.name}</p>
+                        {p.description && (
+                          <p className="text-[10px] text-zinc-400 truncate max-w-[200px]">{p.description}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-zinc-600">{p.club_name}</td>
+                      <td className="px-4 py-3 text-sm font-black text-foreground">{formatCurrency(p.price)}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full bg-muted text-zinc-600">
+                          {p.category}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-zinc-600">{p.submitter_name}</p>
+                        <p className="text-[10px] text-zinc-400">{p.submitter_email}</p>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-zinc-500">{formatDate(p.created_at)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => handleApproval(p.id, "approve")}
+                            disabled={approving === p.id}
+                            className="text-xs bg-emerald-600 text-white rounded px-2 py-1 hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                          >
+                            {approving === p.id ? "..." : "Aprobar"}
+                          </button>
+                          <button
+                            onClick={() => handleApproval(p.id, "reject")}
+                            disabled={approving === p.id}
+                            className="text-xs border border-red-200 text-red-600 rounded px-2 py-1 hover:bg-red-50 transition-colors disabled:opacity-50"
+                          >
+                            {approving === p.id ? "..." : "Rechazar"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   )

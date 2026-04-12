@@ -13,9 +13,23 @@ export type AdminOrder = {
   quantity: number
   unit_price: number
   total: number
-  status: "pending" | "confirmed" | "delivered" | "cancelled"
+  status: "pending" | "pending_proof" | "confirmed" | "delivered" | "cancelled"
+  proof_url: string | null
   club_id: string | null
   club_name: string | null
+  created_at: string
+}
+
+export type AdminPendingProduct = {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  stock: number
+  category: string
+  club_name: string
+  submitter_name: string
+  submitter_email: string
   created_at: string
 }
 
@@ -41,6 +55,7 @@ export type AdminShopStats = {
 export type AdminShopData = {
   orders?: AdminOrder[]
   products?: AdminProduct[]
+  pendingProducts?: AdminPendingProduct[]
   stats: AdminShopStats
   meta: { total: number; page: number; limit: number }
 }
@@ -138,11 +153,58 @@ export async function GET(
       })
     }
 
+    if (type === "pending") {
+      const { data: pendingData, count: pendingCount, error: pendingError } = await supabase
+        .from("products")
+        .select(
+          `id, name, description, price, stock, category, created_at,
+           clubs!inner(name),
+           profiles!created_by(full_name, email)`,
+          { count: "exact" }
+        )
+        .eq("approval_status", "pending_approval")
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (pendingError) throw new Error(pendingError.message)
+
+      type PendingRow = {
+        id: string; name: string; description: string | null; price: number
+        stock: number; category: string; created_at: string
+        clubs: { name: string } | null
+        profiles: { full_name: string | null; email: string } | null
+      }
+      const pendingProducts: AdminPendingProduct[] = ((pendingData ?? []) as unknown as PendingRow[]).map(
+        (row) => ({
+          id: row.id,
+          name: row.name,
+          description: row.description,
+          price: Number(row.price),
+          stock: row.stock,
+          category: row.category,
+          club_name: row.clubs?.name ?? "—",
+          submitter_name: row.profiles?.full_name ?? "—",
+          submitter_email: row.profiles?.email ?? "—",
+          created_at: row.created_at,
+        })
+      )
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          pendingProducts,
+          stats,
+          meta: { total: pendingCount ?? 0, page, limit },
+        },
+        error: null,
+      })
+    }
+
     // Default: orders
     let query = supabase
       .from("orders")
       .select(
-        `id, total, status, club_id, created_at,
+        `id, total, status, proof_url, club_id, created_at,
          profiles(full_name, email),
          clubs(name),
          order_items(quantity, unit_price, product_name)`,
@@ -158,8 +220,8 @@ export async function GET(
     if (error) throw new Error(error.message)
 
     type OrderRow = {
-      id: string; total: number; status: "pending" | "confirmed" | "delivered" | "cancelled"
-      club_id: string | null; created_at: string
+      id: string; total: number; status: "pending" | "pending_proof" | "confirmed" | "delivered" | "cancelled"
+      proof_url: string | null; club_id: string | null; created_at: string
       profiles: { full_name: string | null; email: string } | null
       clubs: { name: string } | null
       order_items: { quantity: number; unit_price: number; product_name: string }[]
@@ -175,6 +237,7 @@ export async function GET(
           unit_price: Number(firstItem?.unit_price ?? 0),
           total: Number(row.total),
           status: row.status,
+          proof_url: row.proof_url,
           club_id: row.club_id,
           club_name: row.clubs?.name ?? null,
           created_at: row.created_at,

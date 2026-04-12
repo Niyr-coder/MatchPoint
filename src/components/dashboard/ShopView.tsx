@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { UserOrdersView } from "@/components/dashboard/shop/UserOrdersView"
 
 type ProductCategory = "equipment" | "membership" | "class" | "other"
 
@@ -64,6 +65,7 @@ function formatPrice(price: number): string {
 
 export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<"catalog" | "orders">("catalog")
   const [products, setProducts] = useState<Product[]>([])
   const [activeCategory, setActiveCategory] = useState("")
   const [loading, setLoading] = useState(true)
@@ -179,6 +181,30 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
           </button>
         }
       />
+
+      {/* Tab bar */}
+      <div className="flex border-b border-zinc-200">
+        {(["catalog", "orders"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab
+                ? "border-zinc-900 text-zinc-900"
+                : "border-transparent text-zinc-500 hover:text-zinc-700"
+            }`}
+          >
+            {tab === "catalog" ? "Catálogo" : "Mis Pedidos"}
+          </button>
+        ))}
+      </div>
+
+      {/* Orders tab */}
+      {activeTab === "orders" && <UserOrdersView />}
+
+      {/* Catalog tab content */}
+      {activeTab === "catalog" && (
+      <>
 
       {/* Success banner */}
       {orderSuccess && (
@@ -319,6 +345,9 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
             )
           })}
         </div>
+      )}
+
+      </> /* end catalog tab */
       )}
 
       {/* Cart drawer overlay */}
