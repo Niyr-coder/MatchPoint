@@ -4,6 +4,7 @@ export type NotificationType =
   | 'team_invite'
   | 'system'
   | 'announcement'
+  | 'event_created'
 
 export interface Notification {
   id: string

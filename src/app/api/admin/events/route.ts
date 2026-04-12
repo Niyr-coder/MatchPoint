@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { getAllEventsAdmin, createEvent } from "@/features/activities/queries"
 import { logAdminAction } from "@/lib/audit/log"
+import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { Event, EventFilters } from "@/features/activities/queries"
@@ -160,6 +161,15 @@ export async function POST(
       actorId: authResult.context.userId,
       details: { title: event.title, club_id: event.club_id },
     })
+
+    if ((event as { status?: string }).status === "published") {
+      void broadcastNotificationToAll({
+        type: "event_created",
+        title: `Nuevo evento: ${event.title}`,
+        body: `${event.city} · ${new Date(event.start_date).toLocaleDateString("es-EC", { day: "numeric", month: "long" })}`,
+        metadata: { link: `/dashboard/events/${event.id}` },
+      })
+    }
 
     return NextResponse.json(
       { success: true, data: event, error: null },

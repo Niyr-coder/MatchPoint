@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Bell, Building2, XCircle, Users, CheckCheck } from "lucide-react"
+import { Bell, Building2, XCircle, Users, CheckCheck, CalendarDays } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type NotificationType =
@@ -9,6 +9,8 @@ type NotificationType =
   | "club_request_rejected"
   | "team_invite"
   | "system"
+  | "event_created"
+  | "announcement"
 
 interface Notification {
   id: string
@@ -17,6 +19,7 @@ interface Notification {
   body: string
   read: boolean
   created_at: string
+  metadata?: Record<string, unknown>
 }
 
 function getTypeIcon(type: NotificationType) {
@@ -27,6 +30,8 @@ function getTypeIcon(type: NotificationType) {
       return { Icon: XCircle, colorClass: "text-zinc-400" }
     case "team_invite":
       return { Icon: Users, colorClass: "text-zinc-500" }
+    case "event_created":
+      return { Icon: CalendarDays, colorClass: "text-blue-500" }
     default:
       return { Icon: Bell, colorClass: "text-zinc-400" }
   }
@@ -154,14 +159,9 @@ export function NotificationsBell() {
             ) : (
               notifications.map((n) => {
                 const { Icon, colorClass } = getTypeIcon(n.type)
-                return (
-                  <div
-                    key={n.id}
-                    className={cn(
-                      "flex items-start gap-3 px-4 py-3 border-b border-border-subtle last:border-0 transition-colors",
-                      !n.read ? "bg-secondary/50" : "hover:bg-muted"
-                    )}
-                  >
+                const link = typeof n.metadata?.link === "string" ? n.metadata.link : null
+                const inner = (
+                  <>
                     <div
                       className={cn(
                         "size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
@@ -184,6 +184,25 @@ export function NotificationsBell() {
                         {formatRelativeTime(n.created_at)}
                       </p>
                     </div>
+                  </>
+                )
+                const itemClass = cn(
+                  "flex items-start gap-3 px-4 py-3 border-b border-border-subtle last:border-0 transition-colors",
+                  !n.read ? "bg-secondary/50" : "hover:bg-muted",
+                  link && "cursor-pointer hover:bg-muted"
+                )
+                return link ? (
+                  <a
+                    key={n.id}
+                    href={link}
+                    onClick={() => setIsOpen(false)}
+                    className={itemClass}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div key={n.id} className={itemClass}>
+                    {inner}
                   </div>
                 )
               })

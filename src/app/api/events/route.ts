@@ -10,6 +10,7 @@ import {
 } from "@/features/activities/queries"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { SPORT_IDS } from "@/lib/sports/config"
+import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import type { ApiResponse } from "@/types"
 import type { Event, EventFilters } from "@/features/activities/queries"
 
@@ -236,6 +237,17 @@ export async function POST(
 
   try {
     const event = await createEvent(parsed.data, userId)
+
+    // Only notify for published events (status = published); skip drafts
+    if ((event as { status?: string }).status === "published") {
+      void broadcastNotificationToAll({
+        type: "event_created",
+        title: `Nuevo evento: ${event.title}`,
+        body: `${event.city} · ${new Date(event.start_date).toLocaleDateString("es-EC", { day: "numeric", month: "long" })}`,
+        metadata: { link: `/dashboard/events/${event.id}` },
+      })
+    }
+
     return NextResponse.json(
       { success: true, data: event, error: null },
       { status: 201 }
