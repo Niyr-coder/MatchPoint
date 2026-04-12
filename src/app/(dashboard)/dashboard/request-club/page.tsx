@@ -144,24 +144,24 @@ export default async function RequestClubPage() {
   const latestRejected = existingRequests.find((r) => r.status === "rejected") ?? null
 
   // Resolve the owner's club URL for the "Iniciar setup" button.
-  // The owner/page.tsx already redirects to /setup when courts count is 0,
-  // so linking to /owner is sufficient — the redirect chain handles the rest.
+  // Query clubs.created_by directly — simpler and doesn't rely on club_members structure.
+  // owner/page.tsx already redirects to /setup when courts count is 0.
   let approvedClubUrl: string | null = null
   if (approvedRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const service = createServiceClient()
-      const { data: membership } = await service
-        .from("club_members")
-        .select("club_id")
-        .eq("user_id", user.id)
-        .eq("role", "owner")
-        .order("joined_at", { ascending: false })
+      const { data: club } = await service
+        .from("clubs")
+        .select("id")
+        .eq("created_by", user.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle()
 
-      if (membership) {
-        approvedClubUrl = `/club/${membership.club_id}/owner`
+      if (club) {
+        approvedClubUrl = `/club/${club.id}/owner`
       }
     }
   }
