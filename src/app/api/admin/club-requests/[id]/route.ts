@@ -226,7 +226,7 @@ export async function PATCH(
         type: "club_request_approved",
         title: "¡Tu solicitud de club fue aprobada! 🎉",
         body: `Tu solicitud para crear "${req.name}" ha sido aprobada. Ya puedes administrar tu club desde el panel de Owner.`,
-        metadata: { club_id: newClub.id, club_name: req.name },
+        metadata: { club_id: newClub.id, club_name: req.name, link: `/club/${newClub.id}/owner/setup` },
       })
     } catch (notifErr) {
       console.error(`[PATCH /api/admin/club-requests/${id}] notification insert failed (approve)`, notifErr)

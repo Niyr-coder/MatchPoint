@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation"
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
+import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { ClubRequestForm } from "@/features/clubs/components/ClubRequestForm"
 import { Building2, Clock } from "lucide-react"
@@ -130,6 +132,36 @@ export default async function RequestClubPage() {
   const approvedRequest = existingRequests.find((r) => r.status === "approved") ?? null
   // Most recent rejected (so user can resubmit with context)
   const latestRejected = existingRequests.find((r) => r.status === "rejected") ?? null
+
+  // Auto-redirect approved owners to setup (if club not configured) or to their panel
+  if (approvedRequest) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const service = createServiceClient()
+      const { data: membership } = await service
+        .from("club_members")
+        .select("club_id")
+        .eq("user_id", user.id)
+        .eq("role", "owner")
+        .order("joined_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (membership) {
+        const { count: courtsCount } = await service
+          .from("courts")
+          .select("*", { count: "exact", head: true })
+          .eq("club_id", membership.club_id)
+          .eq("is_active", true)
+
+        const dest =
+          (courtsCount ?? 0) === 0
+            ? `/club/${membership.club_id}/owner/setup`
+            : `/club/${membership.club_id}/owner`
+        redirect(dest)
+      }
+    }
+  }
 
   // If pending or approved — show status card, no form
   const displayRequest = pendingRequest ?? approvedRequest

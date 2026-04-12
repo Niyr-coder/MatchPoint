@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     ((profile as Profile & { global_role: AppRole }).global_role) ?? "user"
 
   const roles = await getUserRoles(user.id)
-  const destination = getPostLoginDestination(profile as Profile, globalRole, roles)
+  const destination = await getPostLoginDestination(profile as Profile, globalRole, roles, supabase)
 
   // Respect explicit `next` param only for safe same-origin paths.
   // Reject protocol-relative URLs (//evil.com) and anything with a colon (javascript:, data:).
