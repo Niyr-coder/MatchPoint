@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { RoleWelcomeBanner } from "@/components/dashboard/RoleWelcomeBanner"
 import { BentoCard } from "@/components/dashboard/BentoCard"
@@ -47,6 +48,9 @@ export default async function OwnerDashboardPage({
       .gte("start_time", weekStart.toISOString())
       .neq("status", "cancelled"),
   ])
+
+  // Owners with no courts haven't configured their club yet — send them to setup.
+  if ((courtsRes.count ?? 0) === 0) redirect(`/club/${clubId}/owner/setup`)
 
   // Build week bars from real data
   const countByDate = new Map<string, number>()
