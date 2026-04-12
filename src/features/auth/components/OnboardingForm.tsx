@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation"
 import { Loader2, CheckCircle, XCircle } from "lucide-react"
 import {
   onboardingSchema,
-  PICKLEBALL_SKILL_LEVELS,
-  PICKLEBALL_SKILL_LEVEL_LABELS,
+  DOMINANT_HANDS,
+  DOMINANT_HAND_LABELS,
   PICKLEBALL_PLAY_STYLE_LABELS,
 } from "@/lib/validations"
 import { SPORT_IDS, SPORT_CONFIG, PRIMARY_SPORT } from "@/lib/sports/config"
 import type { SportId } from "@/types"
-import type { PickleballSkillLevel, PickleballPlayStyle } from "@/lib/validations"
+import type { DominantHand, PickleballPlayStyle } from "@/lib/validations"
 import { ECUADOR_CITIES_BY_PROVINCE, ECUADOR_PROVINCES } from "@/lib/constants"
 
 type Status = "idle" | "loading" | "success" | "error"
@@ -51,7 +51,7 @@ export function OnboardingForm() {
 
   // Sport selection — Pickleball-First MVP
   const [preferredSport, setPreferredSport] = useState<SportId>(PRIMARY_SPORT)
-  const [pickleballSkillLevel, setPickleballSkillLevel] = useState<PickleballSkillLevel | "">("")
+  const [pickleballDominantHand, setPickleballDominantHand] = useState<DominantHand | "">("")
   const [pickleballPlayStyle, setPickleballPlayStyle] = useState<PickleballPlayStyle | "">("")
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -123,8 +123,8 @@ export function OnboardingForm() {
       phone,
       date_of_birth: buildDob(),
       preferred_sport: preferredSport,
-      ...(preferredSport === "pickleball" && pickleballSkillLevel
-        ? { pickleball_skill_level: pickleballSkillLevel }
+      ...(preferredSport === "pickleball" && pickleballDominantHand
+        ? { pickleball_dominant_hand: pickleballDominantHand }
         : {}),
       ...(preferredSport === "pickleball" && pickleballPlayStyle
         ? { pickleball_play_style: pickleballPlayStyle }
@@ -415,24 +415,30 @@ export function OnboardingForm() {
               Perfil de Pickleball
             </p>
 
-            {/* Skill level */}
+            {/* Dominant hand */}
             <div>
-              <label htmlFor="pickleball_skill_level" className="block text-xs font-semibold text-foreground mb-1.5">
-                ¿Cuál es tu nivel?
-              </label>
-              <select
-                id="pickleball_skill_level"
-                value={pickleballSkillLevel}
-                onChange={(e) => setPickleballSkillLevel(e.target.value as PickleballSkillLevel | "")}
-                className={selectClass()}
-              >
-                <option value="">Selecciona tu nivel (opcional)</option>
-                {PICKLEBALL_SKILL_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {PICKLEBALL_SKILL_LEVEL_LABELS[level]}
-                  </option>
-                ))}
-              </select>
+              <span className="block text-xs font-semibold text-foreground mb-2">
+                Mano hábil
+              </span>
+              <div className="flex gap-2">
+                {DOMINANT_HANDS.map((hand) => {
+                  const active = pickleballDominantHand === hand
+                  return (
+                    <button
+                      key={hand}
+                      type="button"
+                      onClick={() => setPickleballDominantHand(active ? "" : hand)}
+                      className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
+                        active
+                          ? "bg-foreground text-white border-foreground"
+                          : "bg-card text-zinc-600 border-border hover:border-zinc-300"
+                      }`}
+                    >
+                      {DOMINANT_HAND_LABELS[hand]}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Play style */}
@@ -447,9 +453,7 @@ export function OnboardingForm() {
                     <button
                       key={style}
                       type="button"
-                      onClick={() =>
-                        setPickleballPlayStyle(active ? "" : style)
-                      }
+                      onClick={() => setPickleballPlayStyle(active ? "" : style)}
                       className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
                         active
                           ? "bg-[#16a34a] text-white border-[#16a34a]"

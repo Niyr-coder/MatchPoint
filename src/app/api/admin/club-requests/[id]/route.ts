@@ -225,7 +225,7 @@ export async function PATCH(
         user_id: req.user_id,
         type: "club_request_approved",
         title: "¡Tu solicitud de club fue aprobada! 🎉",
-        body: `Tu solicitud para crear "${req.name}" ha sido aprobada. Ya puedes administrar tu club desde el panel de Owner.`,
+        body: `Tu solicitud para crear "${req.name}" ha sido aprobada. Haz clic aquí para configurar tus canchas y comenzar a recibir reservas.`,
         metadata: { club_id: newClub.id, club_name: req.name, link: `/club/${newClub.id}/owner/setup` },
       })
     } catch (notifErr) {

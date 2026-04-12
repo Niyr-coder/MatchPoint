@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
-import { PICKLEBALL_SKILL_LEVELS, PICKLEBALL_PLAY_STYLES } from "@/features/users/constants"
+import { DOMINANT_HANDS, PICKLEBALL_PLAY_STYLES } from "@/features/users/constants"
 
 export const onboardingSchema = z.object({
   username: z
@@ -47,7 +47,7 @@ export const onboardingSchema = z.object({
     }, "Debes tener al menos 14 años"),
   // Sport selection — optional fields added for Pickleball-First MVP
   preferred_sport: z.enum(SPORT_IDS).optional().default("pickleball"),
-  pickleball_skill_level: z.enum(PICKLEBALL_SKILL_LEVELS).optional(),
+  pickleball_dominant_hand: z.enum(DOMINANT_HANDS).optional(),
   pickleball_play_style: z.enum(PICKLEBALL_PLAY_STYLES).optional(),
 })
 

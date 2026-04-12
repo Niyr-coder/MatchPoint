@@ -124,7 +124,7 @@ function InfoBanner() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function RequestClubPage() {
-  await authorizeOrRedirect()
+  const authContext = await authorizeOrRedirect()
 
   // Fetch the user's existing club requests directly via Supabase client
   // (RLS ensures the user can only see their own requests)
@@ -144,25 +144,21 @@ export default async function RequestClubPage() {
   const latestRejected = existingRequests.find((r) => r.status === "rejected") ?? null
 
   // Resolve the owner's club URL for the "Iniciar setup" button.
-  // Query clubs.created_by directly — simpler and doesn't rely on club_members structure.
-  // owner/page.tsx already redirects to /setup when courts count is 0.
+  // Use userId from auth context directly — avoids a redundant getUser() call.
   let approvedClubUrl: string | null = null
   if (approvedRequest) {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const service = createServiceClient()
-      const { data: club } = await service
-        .from("clubs")
-        .select("id")
-        .eq("created_by", user.id)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle()
+    const service = createServiceClient()
+    const { data: club } = await service
+      .from("clubs")
+      .select("id")
+      .eq("created_by", authContext.userId)
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-      if (club) {
-        approvedClubUrl = `/club/${club.id}/owner`
-      }
+    if (club) {
+      approvedClubUrl = `/club/${club.id}/owner/setup`
     }
   }
 
