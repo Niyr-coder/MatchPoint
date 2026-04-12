@@ -11,8 +11,23 @@ if (!SUPABASE_URL) throw new Error("Missing env var: NEXT_PUBLIC_SUPABASE_URL")
 if (!SUPABASE_ANON_KEY) throw new Error("Missing env var: NEXT_PUBLIC_SUPABASE_ANON_KEY")
 if (!SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing env var: SUPABASE_SERVICE_ROLE_KEY")
 
+// Resolve cookie domain with same logic as the browser client so all auth
+// cookies (session + PKCE verifier) share the same domain and are accessible
+// across www and apex (e.g. www.matchpoint.top and matchpoint.top).
+function getCookieDomain(): string | undefined {
+  if (process.env.COOKIE_DOMAIN) return process.env.COOKIE_DOMAIN
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    const { hostname } = new URL(process.env.NEXT_PUBLIC_SITE_URL)
+    if (hostname !== "localhost" && !hostname.startsWith("127.")) {
+      return hostname
+    }
+  }
+  return undefined
+}
+
 export async function createClient() {
   const cookieStore = await cookies()
+  const cookieDomain = getCookieDomain()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,9 +43,7 @@ export async function createClient() {
               cookieStore.set(name, value, {
                 ...options,
                 maxAge: 60 * 60 * 24 * 365,
-                ...(process.env.COOKIE_DOMAIN
-                  ? { domain: process.env.COOKIE_DOMAIN }
-                  : {}),
+                ...(cookieDomain ? { domain: cookieDomain } : {}),
               })
             )
           } catch {
