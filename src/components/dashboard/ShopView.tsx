@@ -167,18 +167,27 @@ export function ShopView({ userId: _userId, clubId }: ShopViewProps) {
         title="Tienda"
         description="Equipamiento, membresías y clases de tu club"
         action={
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative flex items-center gap-2 px-4 py-2.5 bg-foreground text-white text-sm font-bold rounded-xl hover:bg-foreground/90 transition-colors"
-          >
-            <ShoppingCart className="size-4" />
-            <span>Carrito</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 size-5 bg-foreground text-white text-[10px] font-black rounded-full flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/dashboard/shop/sell")}
+              className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 text-zinc-700 text-sm font-bold rounded-xl hover:bg-zinc-50 transition-colors"
+            >
+              <Plus className="size-4" />
+              <span>Vender</span>
+            </button>
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative flex items-center gap-2 px-4 py-2.5 bg-foreground text-white text-sm font-bold rounded-xl hover:bg-foreground/90 transition-colors"
+            >
+              <ShoppingCart className="size-4" />
+              <span>Carrito</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 size-5 bg-foreground text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         }
       />
 
