@@ -399,7 +399,7 @@ export function OnboardingForm() {
               Mano hábil
             </span>
             <div className="flex gap-2">
-              {DOMINANT_HANDS.map((hand) => {
+              {(["right", "left"] as const).map((hand) => {
                 const active = pickleballDominantHand === hand
                 return (
                   <button
