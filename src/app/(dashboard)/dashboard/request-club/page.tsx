@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import Link from "next/link"
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/server"
@@ -30,7 +30,7 @@ function formatDate(dateStr: string): string {
 
 // ── Subcomponents ─────────────────────────────────────────────────────────────
 
-function PendingRequestCard({ request }: { request: ClubRequest }) {
+function PendingRequestCard({ request, clubUrl }: { request: ClubRequest; clubUrl?: string | null }) {
   return (
     <div className="rounded-2xl bg-card border border-border p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
@@ -84,9 +84,19 @@ function PendingRequestCard({ request }: { request: ClubRequest }) {
         )}
 
         {request.status === "approved" && (
-          <p className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-xl px-4 py-3 mt-1">
-            Tu club ha sido creado y ya tienes acceso como Owner. Dirígete a la sección de Clubs para comenzar a configurarlo.
-          </p>
+          <div className="flex flex-col gap-3 bg-green-50 border border-green-100 rounded-xl px-4 py-3 mt-1">
+            <p className="text-sm text-green-700">
+              ¡Tu club <span className="font-bold">{request.name}</span> ha sido creado y ya tienes acceso como Owner.
+            </p>
+            {clubUrl && (
+              <Link
+                href={clubUrl}
+                className="self-start inline-flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-black px-4 py-2.5 transition-colors"
+              >
+                Iniciar setup →
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -133,7 +143,10 @@ export default async function RequestClubPage() {
   // Most recent rejected (so user can resubmit with context)
   const latestRejected = existingRequests.find((r) => r.status === "rejected") ?? null
 
-  // Auto-redirect approved owners to setup (if club not configured) or to their panel
+  // Resolve the owner's club URL for the "Iniciar setup" button.
+  // The owner/page.tsx already redirects to /setup when courts count is 0,
+  // so linking to /owner is sufficient — the redirect chain handles the rest.
+  let approvedClubUrl: string | null = null
   if (approvedRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
@@ -148,17 +161,7 @@ export default async function RequestClubPage() {
         .maybeSingle()
 
       if (membership) {
-        const { count: courtsCount } = await service
-          .from("courts")
-          .select("*", { count: "exact", head: true })
-          .eq("club_id", membership.club_id)
-          .eq("is_active", true)
-
-        const dest =
-          (courtsCount ?? 0) === 0
-            ? `/club/${membership.club_id}/owner/setup`
-            : `/club/${membership.club_id}/owner`
-        redirect(dest)
+        approvedClubUrl = `/club/${membership.club_id}/owner`
       }
     }
   }
@@ -177,7 +180,7 @@ export default async function RequestClubPage() {
       <InfoBanner />
 
       {displayRequest ? (
-        <PendingRequestCard request={displayRequest} />
+        <PendingRequestCard request={displayRequest} clubUrl={approvedClubUrl} />
       ) : (
         <>
           {/* Show context about a previous rejection */}
