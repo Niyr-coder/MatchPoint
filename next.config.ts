@@ -37,6 +37,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // Canonicalize www → apex in production so the PKCE code verifier cookie
+    // is always set on the same domain as the OAuth callback.
+    // Without this, a user landing on www.matchpoint.top sets the verifier
+    // cookie on www, but Supabase redirects back to matchpoint.top, causing
+    // "PKCE code verifier not found in storage".
+    if (process.env.VERCEL_ENV !== "production") return []
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.matchpoint.top" }],
+        destination: "https://matchpoint.top/:path*",
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

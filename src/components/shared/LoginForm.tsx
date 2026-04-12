@@ -33,10 +33,15 @@ export function LoginForm() {
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     const supabase = createClient()
+    // Use NEXT_PUBLIC_SITE_URL when set (production canonical domain) so the
+    // callback URL always matches what's configured in Supabase's redirect
+    // allow-list and matches the domain where the code verifier cookie was set.
+    // Falls back to window.location.origin for local dev.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: `${siteUrl}/api/auth/callback`,
       },
     })
     // Browser redirects — no need to reset loading state
