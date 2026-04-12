@@ -2,6 +2,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
+import { broadcastNotificationToAll } from "@/features/notifications/utils"
 
 const orderItemSchema = z.object({
   product_id: z.string().uuid("product_id inválido"),
@@ -20,7 +21,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("orders")
-    .select("*, items:order_items(*)")
+    .select("id, total, status, proof_url, created_at, items:order_items(product_name, quantity, unit_price)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(20)
@@ -103,5 +104,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: null, error: "No se pudo crear la orden" }, { status: 500 })
   }
 
-  return NextResponse.json({ data: { orderId: (data as { order_id: string }).order_id }, error: null })
+  const rpcResult = data as { order_id: string }
+
+  // Fire-and-forget notification to club staff
+  broadcastNotificationToAll({
+    type: "new_order",
+    title: "Nuevo pedido recibido",
+    body: "Un cliente ha realizado un pedido. Espera el comprobante de pago.",
+    metadata: { order_id: rpcResult.order_id },
+  }).catch(console.error)
+
+  return NextResponse.json({ data: { orderId: rpcResult.order_id }, error: null })
 }
