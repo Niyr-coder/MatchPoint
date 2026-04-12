@@ -7,11 +7,9 @@ import {
   onboardingSchema,
   DOMINANT_HANDS,
   DOMINANT_HAND_LABELS,
-  PICKLEBALL_PLAY_STYLE_LABELS,
 } from "@/lib/validations"
-import { SPORT_IDS, SPORT_CONFIG, PRIMARY_SPORT } from "@/lib/sports/config"
-import type { SportId } from "@/types"
-import type { DominantHand, PickleballPlayStyle } from "@/lib/validations"
+import { SPORT_CONFIG, PRIMARY_SPORT } from "@/lib/sports/config"
+import type { DominantHand } from "@/lib/validations"
 import { ECUADOR_CITIES_BY_PROVINCE, ECUADOR_PROVINCES } from "@/lib/constants"
 
 type Status = "idle" | "loading" | "success" | "error"
@@ -49,10 +47,7 @@ export function OnboardingForm() {
   const [dobMonth, setDobMonth] = useState("")
   const [dobYear, setDobYear] = useState("")
 
-  // Sport selection — Pickleball-First MVP
-  const [preferredSport, setPreferredSport] = useState<SportId>(PRIMARY_SPORT)
   const [pickleballDominantHand, setPickleballDominantHand] = useState<DominantHand | "">("")
-  const [pickleballPlayStyle, setPickleballPlayStyle] = useState<PickleballPlayStyle | "">("")
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<Status>("idle")
@@ -98,8 +93,12 @@ export function OnboardingForm() {
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Strip non-numeric characters on input
     setPhone(e.target.value.replace(/\D/g, ""))
+  }
+
+  const capitalizeFirst = (value: string): string => {
+    if (!value) return value
+    return value.charAt(0).toUpperCase() + value.slice(1)
   }
 
   const buildDob = (): string => {
@@ -122,13 +121,8 @@ export function OnboardingForm() {
       city,
       phone,
       date_of_birth: buildDob(),
-      preferred_sport: preferredSport,
-      ...(preferredSport === "pickleball" && pickleballDominantHand
-        ? { pickleball_dominant_hand: pickleballDominantHand }
-        : {}),
-      ...(preferredSport === "pickleball" && pickleballPlayStyle
-        ? { pickleball_play_style: pickleballPlayStyle }
-        : {}),
+      preferred_sport: PRIMARY_SPORT,
+      ...(pickleballDominantHand ? { pickleball_dominant_hand: pickleballDominantHand } : {}),
     }
 
     const parsed = onboardingSchema.safeParse(payload)
@@ -234,7 +228,7 @@ export function OnboardingForm() {
             id="first_name"
             type="text"
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(e) => setFirstName(capitalizeFirst(e.target.value))}
             placeholder="Juan"
             autoComplete="given-name"
             className={inputClass(fieldErrors.first_name)}
@@ -251,7 +245,7 @@ export function OnboardingForm() {
             id="last_name"
             type="text"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            onChange={(e) => setLastName(capitalizeFirst(e.target.value))}
             placeholder="Pérez"
             autoComplete="family-name"
             className={inputClass(fieldErrors.last_name)}
@@ -380,94 +374,51 @@ export function OnboardingForm() {
       <div className="pt-2 border-t border-border">
         <p className="text-xs font-semibold text-foreground mb-3">Tu deporte principal</p>
 
-        {/* Sport selector — pill buttons */}
+        {/* Pickleball — único deporte disponible en MVP */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {SPORT_IDS.map((sportId) => {
-            const cfg = SPORT_CONFIG[sportId]
-            const active = preferredSport === sportId
+          {(() => {
+            const cfg = SPORT_CONFIG[PRIMARY_SPORT]
             return (
-              <button
-                key={sportId}
-                type="button"
-                onClick={() => setPreferredSport(sportId)}
-                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border transition-colors ${
-                  active
-                    ? "bg-foreground text-white border-foreground"
-                    : "bg-card text-zinc-600 border-border hover:border-zinc-300"
-                }`}
-              >
+              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.1em] border bg-foreground text-white border-foreground">
                 <span>{cfg.emoji}</span>
                 <span>{cfg.label}</span>
-                {cfg.isPrimary && !active && (
-                  <span className="ml-1 text-[9px] font-black text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] rounded-full px-1.5 py-0.5 uppercase tracking-wider">
-                    Nuevo
-                  </span>
-                )}
-              </button>
+              </span>
             )
-          })}
+          })()}
         </div>
 
-        {/* Pickleball extra fields — shown only when pickleball is selected */}
-        {preferredSport === "pickleball" && (
-          <div className="space-y-3 rounded-xl border border-border bg-muted p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
-              Perfil de Pickleball
-            </p>
+        {/* Pickleball profile fields */}
+        <div className="space-y-3 rounded-xl border border-border bg-muted p-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+            Perfil de Pickleball
+          </p>
 
-            {/* Dominant hand */}
-            <div>
-              <span className="block text-xs font-semibold text-foreground mb-2">
-                Mano hábil
-              </span>
-              <div className="flex gap-2">
-                {DOMINANT_HANDS.map((hand) => {
-                  const active = pickleballDominantHand === hand
-                  return (
-                    <button
-                      key={hand}
-                      type="button"
-                      onClick={() => setPickleballDominantHand(active ? "" : hand)}
-                      className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
-                        active
-                          ? "bg-foreground text-white border-foreground"
-                          : "bg-card text-zinc-600 border-border hover:border-zinc-300"
-                      }`}
-                    >
-                      {DOMINANT_HAND_LABELS[hand]}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Play style */}
-            <div>
-              <span className="block text-xs font-semibold text-foreground mb-2">
-                ¿Cómo prefieres jugar?
-              </span>
-              <div className="flex gap-2">
-                {(["singles", "doubles", "both"] as const).map((style) => {
-                  const active = pickleballPlayStyle === style
-                  return (
-                    <button
-                      key={style}
-                      type="button"
-                      onClick={() => setPickleballPlayStyle(active ? "" : style)}
-                      className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
-                        active
-                          ? "bg-[#16a34a] text-white border-[#16a34a]"
-                          : "bg-card text-zinc-600 border-border hover:border-zinc-300"
-                      }`}
-                    >
-                      {PICKLEBALL_PLAY_STYLE_LABELS[style]}
-                    </button>
-                  )
-                })}
-              </div>
+          {/* Dominant hand */}
+          <div>
+            <span className="block text-xs font-semibold text-foreground mb-2">
+              Mano hábil
+            </span>
+            <div className="flex gap-2">
+              {DOMINANT_HANDS.map((hand) => {
+                const active = pickleballDominantHand === hand
+                return (
+                  <button
+                    key={hand}
+                    type="button"
+                    onClick={() => setPickleballDominantHand(active ? "" : hand)}
+                    className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.08em] border transition-colors ${
+                      active
+                        ? "bg-foreground text-white border-foreground"
+                        : "bg-card text-zinc-600 border-border hover:border-zinc-300"
+                    }`}
+                  >
+                    {DOMINANT_HAND_LABELS[hand]}
+                  </button>
+                )
+              })}
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Global error */}

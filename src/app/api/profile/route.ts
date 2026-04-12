@@ -120,20 +120,15 @@ export async function PATCH(
       )
     }
 
-    // If the user selected pickleball and provided hand/play-style, upsert the pickleball profile
-    const { pickleball_dominant_hand, pickleball_play_style } = onboardingParsed.data
-    if (pickleball_dominant_hand !== undefined || pickleball_play_style !== undefined) {
-      const pickleballUpdate: Record<string, unknown> = {
-        user_id: user.id,
-        updated_at: new Date().toISOString(),
-      }
-      if (pickleball_dominant_hand !== undefined) pickleballUpdate.dominant_hand = pickleball_dominant_hand
-      if (pickleball_play_style !== undefined) pickleballUpdate.play_style = pickleball_play_style
-
-      // Upsert — safe to ignore failure here; profile data is non-critical
+    // If the user provided a dominant hand, upsert the pickleball profile
+    const { pickleball_dominant_hand } = onboardingParsed.data
+    if (pickleball_dominant_hand !== undefined) {
       await supabase
         .from("pickleball_profiles")
-        .upsert(pickleballUpdate, { onConflict: "user_id" })
+        .upsert(
+          { user_id: user.id, dominant_hand: pickleball_dominant_hand, updated_at: new Date().toISOString() },
+          { onConflict: "user_id" }
+        )
     }
 
     return NextResponse.json({ success: true, data: null, error: null })
