@@ -24,6 +24,7 @@ const TABS: { id: Tab; label: string; icon: typeof Megaphone }[] = [
 
 export function AdminChatShell({ userId, clubs }: AdminChatShellProps) {
   const [activeTab, setActiveTab] = useState<Tab>("announcements")
+  const [selectedClubId, setSelectedClubId] = useState<string | null>(clubs[0]?.id ?? null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,7 +55,30 @@ export function AdminChatShell({ userId, clubs }: AdminChatShellProps) {
         <AnnouncementCenter clubs={clubs} />
       )}
       {activeTab === "chat" && (
-        <ChatView userId={userId} />
+        <div className="flex flex-col gap-3">
+          {/* Club selector */}
+          {clubs.length > 1 && (
+            <div className="flex items-center gap-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400">
+                Club
+              </label>
+              <select
+                value={selectedClubId ?? ""}
+                onChange={(e) => setSelectedClubId(e.target.value || null)}
+                className="text-xs font-bold bg-muted border-0 rounded-lg px-3 py-1.5 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-foreground"
+              >
+                {clubs.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <ChatView
+            userId={userId}
+            clubId={selectedClubId}
+            canBroadcast={true}
+          />
+        </div>
       )}
     </div>
   )

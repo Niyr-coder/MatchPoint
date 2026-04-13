@@ -1,8 +1,7 @@
-import type { SportCategory, Feature, Stat, NavLink, FooterColumn, Testimonial } from "@/types"
+import type { SportCategory, NavLink, FooterColumn, Testimonial } from "@/types"
 import { VISIBLE_SPORT_IDS, SPORT_CONFIG } from "@/lib/sports/config"
 
 export const SITE_NAME = "MATCHPOINT"
-export const SITE_TAGLINE = "DOMINA TU JUEGO"
 export const SITE_DESCRIPTION =
   "La plataforma #1 de Pickleball en Ecuador. Encuentra canchas, rivales y torneos cerca de ti."
 
@@ -40,51 +39,6 @@ export const SPORTS: SportCategory[] = VISIBLE_SPORT_IDS.map((id) => {
   }
 })
 
-export const FEATURES: Feature[] = [
-  {
-    icon: "MapPin",
-    title: "Canchas Cerca de Ti",
-    description:
-      "Localiza y reserva instalaciones deportivas en tu ciudad en segundos. Sin llamadas, sin esperas.",
-  },
-  {
-    icon: "Users",
-    title: "Encuentra Rivales",
-    description:
-      "Conecta con jugadores de tu nivel. Sistema de matchmaking inteligente para partidos justos y emocionantes.",
-  },
-  {
-    icon: "Trophy",
-    title: "Torneos & Ligas",
-    description:
-      "Participa en competiciones organizadas. Desde torneos amateurs hasta ligas profesionales locales.",
-  },
-  {
-    icon: "BarChart2",
-    title: "Tus Estadísticas",
-    description:
-      "Rastrea tu progreso, historial de partidos y evolución de rendimiento en tiempo real.",
-  },
-  {
-    icon: "Bell",
-    title: "Notificaciones Inteligentes",
-    description:
-      "Alertas de partidos disponibles, canchas libres y rivales de tu nivel cuando quieres jugar.",
-  },
-  {
-    icon: "Shield",
-    title: "Pagos Seguros",
-    description:
-      "Reservas y pagos protegidos dentro de la app. Sin efectivo, sin complicaciones.",
-  },
-]
-
-export const STATS: Stat[] = [
-  { value: 5000, suffix: "+", label: "Jugadores Activos" },
-  { value: 50, suffix: "+", label: "Torneos Jugados" },
-  { value: 200, suffix: "+", label: "Canchas Disponibles" },
-  { value: 15, suffix: "+", label: "Ciudades en Ecuador" },
-]
 
 export const TESTIMONIALS: Testimonial[] = [
   { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },

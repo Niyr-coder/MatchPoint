@@ -1,38 +1,17 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Send, MessageSquare, Users } from "lucide-react"
+import { Send, MessageSquare, Users, Plus, Megaphone, X } from "lucide-react"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { createClient } from "@/lib/supabase/client"
-
-interface MessageSender {
-  id: string
-  full_name: string
-  username: string
-  avatar_url: string | null
-}
-
-interface Message {
-  id: string
-  content: string
-  sender: MessageSender
-  created_at: string
-}
-
-interface ConversationParticipant {
-  user: MessageSender
-}
-
-interface Conversation {
-  id: string
-  type: string
-  title: string | null
-  updated_at: string
-  participants: ConversationParticipant[]
-}
+import type { Message, Conversation } from "@/features/chat/types"
+import { NewConversationDrawer } from "@/components/dashboard/chat/NewConversationDrawer"
+import { BroadcastForm } from "@/components/dashboard/chat/BroadcastForm"
 
 interface ChatViewProps {
   userId: string
+  clubId?: string | null
+  canBroadcast?: boolean
 }
 
 function getConversationName(conv: Conversation, currentUserId: string): string {
@@ -44,36 +23,49 @@ function getConversationName(conv: Conversation, currentUserId: string): string 
   return others.length > 0 ? others.join(", ") : "Conversación"
 }
 
-export function ChatView({ userId }: ChatViewProps) {
+export function ChatView({ userId, clubId, canBroadcast = false }: ChatViewProps) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConv, setActiveConv] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [loadingConvs, setLoadingConvs] = useState(true)
+  const [showBroadcast, setShowBroadcast] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const realtimeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const supabase = createClient()
 
   // ── fetch helpers ──────────────────────────────────────────────────────────
 
   const fetchConversations = useCallback(async () => {
     try {
-      const r = await fetch("/api/messages")
+      const r = await fetch("/api/conversations")
+      if (!r.ok) {
+        const d = (await r.json()) as { error?: string }
+        throw new Error(d.error ?? `Error ${r.status}`)
+      }
       const d = (await r.json()) as { data?: Conversation[] }
       setConversations(d.data ?? [])
-    } catch {
-      // keep stale list on error
+      setFetchError(null)
+    } catch (err) {
+      console.error("[ChatView] fetchConversations:", err)
+      setFetchError(err instanceof Error ? err.message : "Error al cargar conversaciones")
     }
   }, [])
 
   const fetchMessages = useCallback(async (convId: string) => {
     try {
-      const r = await fetch(`/api/messages?conversationId=${convId}`)
+      const r = await fetch(`/api/conversations?conversationId=${convId}`)
+      if (!r.ok) {
+        const d = (await r.json()) as { error?: string }
+        throw new Error(d.error ?? `Error ${r.status}`)
+      }
       const d = (await r.json()) as { data?: Message[] }
       setMessages(d.data ?? [])
-    } catch {
-      // keep stale messages on error
+    } catch (err) {
+      console.error("[ChatView] fetchMessages:", err)
     }
   }, [])
 
@@ -116,7 +108,6 @@ export function ChatView({ userId }: ChatViewProps) {
     setMessages([])
     void fetchMessages(activeConv)
 
-    // Subscribe to new messages in this conversation — replaces 5s polling (F1)
     const channel = supabase
       .channel(`messages-conv-${activeConv}`)
       .on(
@@ -128,15 +119,22 @@ export function ChatView({ userId }: ChatViewProps) {
           filter: `conversation_id=eq.${activeConv}`,
         },
         () => {
-          // Reload with full sender info (Realtime payload lacks JOIN data)
-          void fetchMessages(activeConv)
-          // Keep conversation list order up-to-date
-          void fetchConversations()
+          // Debounce to avoid burst re-fetches
+          if (realtimeDebounceRef.current) {
+            clearTimeout(realtimeDebounceRef.current)
+          }
+          realtimeDebounceRef.current = setTimeout(() => {
+            void fetchMessages(activeConv)
+            void fetchConversations()
+          }, 200)
         }
       )
       .subscribe()
 
     return () => {
+      if (realtimeDebounceRef.current) {
+        clearTimeout(realtimeDebounceRef.current)
+      }
       void supabase.removeChannel(channel)
     }
   }, [activeConv, fetchMessages, fetchConversations, supabase])
@@ -157,6 +155,15 @@ export function ChatView({ userId }: ChatViewProps) {
     const tempContent = input
     setInput("")
 
+    // Optimistic UI: append temp message immediately
+    const tempMsg: Message = {
+      id: `temp-${Date.now()}`,
+      content: tempContent,
+      sender: { id: userId, full_name: "Tú", username: "", avatar_url: null },
+      created_at: new Date().toISOString(),
+    }
+    setMessages((prev) => [...prev, tempMsg])
+
     try {
       const res = await fetch("/api/messages", {
         method: "POST",
@@ -169,10 +176,11 @@ export function ChatView({ userId }: ChatViewProps) {
         throw new Error(data.error ?? "Error al enviar el mensaje")
       }
 
-      // Realtime will fire and reload messages automatically.
-      // Refresh conversation list order immediately so the updated_at is current.
+      // Realtime will fire and reload messages, replacing the temp message.
       void fetchConversations()
     } catch (err) {
+      // Remove optimistic message and restore input on failure
+      setMessages((prev) => prev.filter((m) => m.id !== tempMsg.id))
       setInput(tempContent)
       setSendError(err instanceof Error ? err.message : "Error al enviar el mensaje")
       setTimeout(() => setSendError(null), 4000)
@@ -188,6 +196,11 @@ export function ChatView({ userId }: ChatViewProps) {
     }
   }
 
+  const handleConversationCreated = (convId: string) => {
+    void fetchConversations()
+    setActiveConv(convId)
+  }
+
   const activeConvData = conversations.find((c) => c.id === activeConv)
 
   // ── render ─────────────────────────────────────────────────────────────────
@@ -198,7 +211,43 @@ export function ChatView({ userId }: ChatViewProps) {
         label="MENSAJES"
         title="Chat"
         description="Comunicación con tu club"
+        action={
+          canBroadcast && clubId ? (
+            <button
+              onClick={() => setShowBroadcast((prev) => !prev)}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-white text-xs font-bold uppercase tracking-[0.1em] hover:bg-foreground/90 transition-colors"
+            >
+              <Megaphone className="size-3.5" />
+              Anuncio
+            </button>
+          ) : undefined
+        }
       />
+
+      {/* Broadcast panel */}
+      {showBroadcast && clubId && (
+        <div className="border border-border rounded-2xl bg-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+              Nuevo anuncio
+            </p>
+            <button
+              onClick={() => setShowBroadcast(false)}
+              className="size-6 rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
+              aria-label="Cerrar"
+            >
+              <X className="size-3.5 text-zinc-400" />
+            </button>
+          </div>
+          <BroadcastForm
+            clubId={clubId}
+            onSuccess={() => {
+              setShowBroadcast(false)
+              void fetchConversations()
+            }}
+          />
+        </div>
+      )}
 
       <div
         className="flex gap-0 border border-border rounded-2xl overflow-hidden bg-card"
@@ -206,14 +255,32 @@ export function ChatView({ userId }: ChatViewProps) {
       >
         {/* Conversation list */}
         <div className="w-72 shrink-0 border-r border-border flex flex-col">
-          <div className="p-4 border-b border-border">
+          <div className="p-4 border-b border-border flex items-center justify-between gap-2">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
               Conversaciones
             </p>
+            {clubId && (
+              <NewConversationDrawer
+                clubId={clubId}
+                currentUserId={userId}
+                onConversationCreated={handleConversationCreated}
+              >
+                <span
+                  className="size-6 rounded-lg flex items-center justify-center bg-foreground text-white hover:bg-foreground/90 transition-colors cursor-pointer"
+                  title="Nuevo chat"
+                >
+                  <Plus className="size-3.5" />
+                </span>
+              </NewConversationDrawer>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {loadingConvs ? (
+            {fetchError ? (
+              <div className="m-3 rounded-xl bg-red-50 border border-red-200 px-3 py-2.5">
+                <p className="text-xs text-red-600">{fetchError}</p>
+              </div>
+            ) : loadingConvs ? (
               <div className="flex flex-col gap-2 p-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl">
@@ -230,7 +297,9 @@ export function ChatView({ userId }: ChatViewProps) {
                 <MessageSquare className="size-8 text-zinc-200" />
                 <p className="text-xs font-bold text-zinc-400">Sin conversaciones</p>
                 <p className="text-[10px] text-zinc-300 leading-relaxed">
-                  Los administradores de tu club pueden iniciarte una conversación
+                  {clubId
+                    ? "Inicia una conversación con un miembro de tu club usando el botón de arriba"
+                    : "No tienes conversaciones activas"}
                 </p>
               </div>
             ) : (
@@ -303,11 +372,12 @@ export function ChatView({ userId }: ChatViewProps) {
                 ) : (
                   messages.map((msg) => {
                     const isOwn = msg.sender.id === userId
+                    const isTemp = msg.id.startsWith("temp-")
                     const initials = msg.sender.full_name?.[0]?.toUpperCase() ?? "?"
                     return (
                       <div
                         key={msg.id}
-                        className={`flex gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
+                        className={`flex gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"} ${isTemp ? "opacity-60" : ""}`}
                       >
                         <div className="size-7 rounded-full bg-zinc-200 shrink-0 flex items-center justify-center text-[10px] font-black text-zinc-600">
                           {initials}

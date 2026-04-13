@@ -51,7 +51,7 @@ export function TournamentFeedbackForm({ tournamentId, existingRating, existingC
           ))}
           <span className="text-sm font-black text-foreground ml-2">{rating}/5</span>
         </div>
-        {comment && <p className="text-sm text-zinc-500 italic">"{comment}"</p>}
+        {comment && <p className="text-sm text-zinc-500 italic">&quot;{comment}&quot;</p>}
         <button
           onClick={() => setSubmitted(false)}
           className="text-[11px] font-black text-zinc-400 hover:text-foreground transition-colors w-fit"

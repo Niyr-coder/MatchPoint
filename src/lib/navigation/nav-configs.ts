@@ -59,6 +59,7 @@ export function getOwnerNav(clubId: string): NavSection[] {
         { label: "Equipo", href: `${base}/team`, icon: "Users" },
         { label: "Entrenadores", href: `${base}/coaches`, icon: "UserCheck" },
         { label: "Membresías", href: `${base}/memberships`, icon: "CreditCard" },
+        { label: "Mensajes", href: `${base}/messages`, icon: "MessageSquare" },
         { label: "Reportes", href: `${base}/reports`, icon: "FileBarChart" },
         { label: "Configuración", href: `${base}/settings`, icon: "Settings" },
       ],
@@ -70,11 +71,13 @@ export function getPartnerNav(clubId: string): NavSection[] {
   const base = `/club/${clubId}/partner`
   return [
     {
+      title: "Socio",
       items: [
         { label: "Dashboard", href: base, icon: "LayoutDashboard" },
         { label: "Mi Financiero", href: `${base}/financials`, icon: "DollarSign" },
         { label: "Mis Torneos", href: `${base}/tournaments`, icon: "Trophy" },
         { label: "Reportes", href: `${base}/reports`, icon: "FileBarChart" },
+        { label: "Mensajes", href: `${base}/messages`, icon: "MessageSquare" },
       ],
     },
   ]
@@ -109,12 +112,14 @@ export function getEmployeeNav(clubId: string): NavSection[] {
   const base = `/club/${clubId}/employee`
   return [
     {
+      title: "Operaciones",
       items: [
         { label: "Hoy", href: base, icon: "Sun" },
         { label: "Reservas", href: `${base}/reservations`, icon: "Calendar" },
         { label: "Clientes", href: `${base}/clients`, icon: "Users" },
         { label: "Entrenadores", href: `${base}/coaches`, icon: "UserCheck" },
         { label: "Caja", href: `${base}/cash-register`, icon: "Wallet" },
+        { label: "Mensajes", href: `${base}/messages`, icon: "MessageSquare" },
         { label: "Reporte Diario", href: `${base}/daily-report`, icon: "FileText" },
       ],
     },
@@ -159,7 +164,7 @@ export function getUserNav(): NavSection[] {
       items: [
         { label: "Chat", href: "/dashboard/chat", icon: "MessageSquare" },
         { label: "Shop", href: "/dashboard/shop", icon: "ShoppingBag" },
-        { label: "Mi Team ❤️", href: "/dashboard/team", icon: "Users" },
+        { label: "Mi Team", href: "/dashboard/team", icon: "Users" },
         { label: "Solicitar club", href: "/dashboard/request-club", icon: "PlusCircle" },
       ],
     },

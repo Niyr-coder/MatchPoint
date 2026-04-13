@@ -61,7 +61,7 @@ export function TournamentFeedbackList({ tournamentId }: Props) {
               </p>
               <StarRow rating={f.rating} />
             </div>
-            {f.comment && <p className="text-xs text-zinc-500 italic">"{f.comment}"</p>}
+            {f.comment && <p className="text-xs text-zinc-500 italic">&quot;{f.comment}&quot;</p>}
             <p className="text-[10px] text-zinc-300">
               {new Date(f.created_at).toLocaleDateString("es-EC", { day: "numeric", month: "short", year: "numeric" })}
             </p>
