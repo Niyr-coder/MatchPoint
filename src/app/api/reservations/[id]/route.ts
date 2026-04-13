@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { cancelReservation } from "@/features/bookings/queries"
+
+const patchSchema = z.object({
+  action: z.string().refine((v) => v === "cancel", { message: "Acción no válida. Usa 'cancel'." }),
+})
 
 export async function PATCH(
   request: Request,
@@ -19,13 +24,17 @@ export async function PATCH(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 })
+    return NextResponse.json({ success: false, data: null, error: "JSON inválido" }, { status: 400 })
   }
 
-  const { action } = body as { action?: string }
+  const parsed = patchSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 422 })
+  }
+  const { action } = parsed.data
 
   if (action !== "cancel") {
-    return NextResponse.json({ success: false, error: "Acción no válida" }, { status: 422 })
+    return NextResponse.json({ success: false, data: null, error: "Acción no válida" }, { status: 422 })
   }
 
   // Ownership check: verify the reservation belongs to this user
@@ -45,7 +54,7 @@ export async function PATCH(
 
   try {
     await cancelReservation(id)
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, data: null, error: null })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al cancelar reserva"
     return NextResponse.json({ success: false, error: message }, { status: 500 })

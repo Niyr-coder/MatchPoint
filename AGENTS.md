@@ -129,8 +129,10 @@ Every protected route/action must verify in order:
 
 ### API Response Shape
 ```typescript
-{ data: T | null, error: string | null, meta?: { total, page, limit } }
+{ success: boolean, data: T | null, error: string | null }
 ```
+Canonical type: `src/types/index.ts → ApiResponse<T>`.
+Response helpers: `src/lib/api/response.ts → ok(data) / fail(error) / rateLimited(...)`.
 
 ### Role Hierarchy
 ```

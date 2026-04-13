@@ -24,7 +24,7 @@ export async function PATCH(
     const message = err instanceof z.ZodError
       ? err.issues.map((e) => e.message).join(", ")
       : "Invalid request body"
-    return NextResponse.json({ data: null, error: message }, { status: 400 })
+    return NextResponse.json({ success: false, data: null, error: message }, { status: 400 })
   }
 
   // Fetch tournament to get club_id, sport, is_official for auth + RPC
@@ -36,7 +36,7 @@ export async function PATCH(
     .single()
 
   if (tournamentError || !tournament) {
-    return NextResponse.json({ data: null, error: "Tournament not found" }, { status: 404 })
+    return NextResponse.json({ success: false, data: null, error: "Tournament not found" }, { status: 404 })
   }
 
   // Authorization: full 6-layer check via authorize()
@@ -54,7 +54,7 @@ export async function PATCH(
     const isCreator = user && tournament.created_by === user.id
 
     if (!isCreator) {
-      return NextResponse.json({ data: null, error: "Forbidden" }, { status: 403 })
+      return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
     }
   }
 
@@ -76,13 +76,13 @@ export async function PATCH(
 
     // SQLSTATE P0002 (no_data_found) — match not found in tournament
     if (rpcError.code === "P0002" || msg.includes("not found in tournament")) {
-      return NextResponse.json({ data: null, error: "Partido no encontrado" }, { status: 404 })
+      return NextResponse.json({ success: false, data: null, error: "Partido no encontrado" }, { status: 404 })
     }
 
     // SQLSTATE 23505 (unique_violation) re-used for already-scored match
     if (rpcError.code === "23505" || msg.includes("ya tiene resultado")) {
       return NextResponse.json(
-        { data: null, error: "Este partido ya tiene resultado registrado" },
+        { success: false, data: null, error: "Este partido ya tiene resultado registrado" },
         { status: 409 }
       )
     }
@@ -92,10 +92,11 @@ export async function PATCH(
       tournamentId,
       error: msg,
     })
-    return NextResponse.json({ data: null, error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ success: false, data: null, error: "Internal server error" }, { status: 500 })
   }
 
   return NextResponse.json({
+    success: true,
     data: {
       nextMatchId: rpcData?.next_match_id ?? null,
       winnerNewRating: rpcData?.winner_new_rating ?? null,

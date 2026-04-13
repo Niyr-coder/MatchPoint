@@ -105,4 +105,13 @@ export const RATE_LIMITS = {
   profileUpdate:   { limit: 20, windowMs:    60_000 } satisfies RateLimitConfig,  // 20 updates/min per IP
   clubRequests:    { limit: 3,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 3 requests/hour per user
   adminCreateUser: { limit: 20, windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 creates/hour per admin
+  // Added in Phase 3 audit (round 2)
+  shopProductCreate:  { limit: 20, windowMs:  3_600_000 } satisfies RateLimitConfig,  // 20 product creates/hour
+  tournamentCreate:   { limit: 5,  windowMs:  3_600_000 } satisfies RateLimitConfig,  // 5 tournaments/hour
+  teamCreate:         { limit: 5,  windowMs:  3_600_000 } satisfies RateLimitConfig,  // 5 teams/hour
+  teamJoin:           { limit: 10, windowMs:  3_600_000 } satisfies RateLimitConfig,  // 10 joins/hour
+  eventRegister:      { limit: 10, windowMs:  3_600_000 } satisfies RateLimitConfig,  // 10 registrations/hour
+  conversationRead:   { limit: 60, windowMs:     60_000 } satisfies RateLimitConfig,  // 60 reads/min (generous)
+  adminBulk:          { limit: 5,  windowMs:  3_600_000 } satisfies RateLimitConfig,  // 5 bulk ops/hour
+  proofUpload:        { limit: 10, windowMs:  3_600_000 } satisfies RateLimitConfig,  // 10 uploads/hour
 } as const

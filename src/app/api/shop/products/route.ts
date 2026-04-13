@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 
 const getProductsSchema = z.object({
   category: z.enum(["equipment", "membership", "class", "other"]).optional(),
@@ -44,6 +45,14 @@ const createProductSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const rl = await checkRateLimit("shopProductCreate", getClientIp(request), RATE_LIMITS.shopProductCreate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   const auth = await authorize()
   if (!auth.ok) {
     return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 401 })

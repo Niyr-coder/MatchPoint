@@ -4,6 +4,7 @@ import { getOpenTournaments, createTournament } from "@/features/tournaments/que
 import { authorize } from "@/features/auth/queries"
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 
 const createTournamentSchema = z.object({
   name: z.string().min(3).max(100),
@@ -45,6 +46,14 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rl = await checkRateLimit("tournamentCreate", getClientIp(request), RATE_LIMITS.tournamentCreate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()
