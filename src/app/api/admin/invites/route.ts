@@ -189,11 +189,13 @@ export async function POST(
 
     if (error) throw new Error(error.message)
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://matchpoint.top"
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!baseUrl) console.warn("[POST /api/admin/invites] NEXT_PUBLIC_APP_URL not set — falling back to hardcoded URL. Set this env var in production.")
+    const resolvedBaseUrl = baseUrl ?? "https://matchpoint.top"
     const created: CreatedInvite = {
       id: data.id as string,
       code: data.code as string,
-      invite_url: `${baseUrl}/invite/${data.code as string}`,
+      invite_url: `${resolvedBaseUrl}/invite/${data.code as string}`,
     }
 
     return NextResponse.json({ success: true, data: created, error: null })

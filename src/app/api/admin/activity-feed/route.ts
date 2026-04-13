@@ -18,7 +18,8 @@ export async function GET() {
 
     if (error) throw error
     return NextResponse.json({ success: true, data: data ?? [], error: null })
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/admin/activity-feed]", err)
     return NextResponse.json({ success: false, data: null, error: "Error al cargar la actividad" }, { status: 500 })
   }
 }

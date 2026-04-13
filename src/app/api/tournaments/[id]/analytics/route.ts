@@ -9,6 +9,12 @@ export async function GET(
     const { id } = await params
     const supabase = await createClient()
 
+    // Auth check — analytics contain participant data, must be authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    }
+
     // Verify tournament exists
     const { data: tournament, error: tErr } = await supabase
       .from("tournaments")

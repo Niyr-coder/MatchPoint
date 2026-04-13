@@ -24,7 +24,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     const clubs = await getClubs({ sport, province, search })
 
     return NextResponse.json({ success: true, data: clubs, error: null })
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/clubs]", err)
     return NextResponse.json(
       { success: false, data: null, error: "Error al obtener clubes" },
       { status: 500 }
