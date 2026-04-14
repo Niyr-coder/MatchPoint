@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, Building2, Layers, Clock, CheckCircle } from "lucide-react"
 import type { ClubWithSports } from "@/features/clubs/queries/clubs"
 import type { Court, TimeSlot } from "@/features/clubs/types"
@@ -397,10 +397,78 @@ function StepConfirm({
 
 export function ReservationWizard() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
   const [wizardState, setWizardState] = useState<WizardState>(INITIAL_STATE)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [prefilling, setPrefilling] = useState(false)
+
+  // If URL params are provided (from calendar quick-book flow), pre-fill and jump to confirm
+  useEffect(() => {
+    const courtId   = searchParams.get("courtId")
+    const date      = searchParams.get("date")
+    const startTime = searchParams.get("startTime")
+    const endTime   = searchParams.get("endTime")
+
+    if (!courtId || !date || !startTime || !endTime) return
+
+    setPrefilling(true)
+    fetch(`/api/courts/${courtId}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (!json.success) return
+        const court = json.data
+        const club = court.clubs
+
+        setWizardState({
+          club: club
+            ? {
+                id: club.id,
+                name: club.name,
+                slug: "",
+                description: null,
+                address: null,
+                city: null,
+                province: null,
+                phone: null,
+                logo_url: null,
+                cover_url: null,
+                is_active: true,
+                created_by: null,
+                created_at: "",
+                updated_at: "",
+                sports: [court.sport],
+              }
+            : null,
+          court: {
+            id: court.id,
+            club_id: club?.id ?? "",
+            name: court.name,
+            sport: court.sport,
+            surface_type: null,
+            is_indoor: false,
+            price_per_hour: court.price_per_hour,
+            is_active: true,
+            created_at: "",
+          },
+          date,
+          slot: { startTime, endTime, available: true },
+          notes: "",
+        })
+        setStep(3)
+      })
+      .catch(() => { /* stay at step 0 on error */ })
+      .finally(() => setPrefilling(false))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (prefilling) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="size-6 animate-spin text-zinc-400" />
+      </div>
+    )
+  }
 
   function handleSelectClub(club: ClubWithSports) {
     setWizardState({ ...INITIAL_STATE, club })
