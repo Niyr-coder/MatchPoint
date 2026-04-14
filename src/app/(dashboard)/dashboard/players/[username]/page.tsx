@@ -1,6 +1,7 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { getPublicPlayerProfile } from "@/features/users/queries"
+import { getPlayerBadges } from "@/features/badges/queries"
 import { StatCard } from "@/components/shared/StatCard"
 import { PlayerHeroSection } from "@/features/users/components/PlayerHeroSection"
 import { RecentMatchesList } from "@/features/users/components/RecentMatchesList"
@@ -37,7 +38,10 @@ export default async function PlayerProfilePage({
   if (!profileData) notFound()
 
   const profile = profileData as Profile
-  const stats = await getPublicPlayerProfile(profile.id)
+  const [stats, badges] = await Promise.all([
+    getPublicPlayerProfile(profile.id),
+    getPlayerBadges(profile.id),
+  ])
 
   const displayName =
     profile.full_name ||
@@ -61,6 +65,7 @@ export default async function PlayerProfilePage({
         displayName={displayName}
         rating={stats.rating}
         rankingPosition={stats.ranking_position}
+        badges={badges}
       />
 
       {/* Stats */}

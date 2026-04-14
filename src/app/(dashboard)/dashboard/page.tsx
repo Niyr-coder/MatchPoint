@@ -7,6 +7,8 @@ import { PickleballRatingWidget } from "@/features/users/components/PickleballRa
 import { getUpcomingReservations, getReservationInvites } from "@/features/bookings/queries"
 import { getOpenTournaments } from "@/features/tournaments/queries"
 import { getPlayerStats } from "@/features/users/queries"
+import { getPlayerBadges } from "@/features/badges/queries"
+import { MyBadgesSection } from "@/features/badges/components/MyBadgesSection"
 import { createClient } from "@/lib/supabase/server"
 import type { PickleballProfile } from "@/types"
 
@@ -22,7 +24,7 @@ export default async function UserDashboardPage() {
 
   const supabase = await createClient()
 
-  const [reservations, invites, tournaments, stats, pickleballRes] =
+  const [reservations, invites, tournaments, stats, pickleballRes, badges] =
     await Promise.all([
       getUpcomingReservations(userId),
       getReservationInvites(userId),
@@ -33,6 +35,7 @@ export default async function UserDashboardPage() {
         .select("singles_rating, doubles_rating, skill_level")
         .eq("user_id", userId)
         .maybeSingle(),
+      getPlayerBadges(userId),
     ])
 
   const pickleballProfile = (pickleballRes.data ?? null) as Pick<
@@ -45,6 +48,8 @@ export default async function UserDashboardPage() {
       <WelcomeBanner profile={ctx.profile} date={date} stats={stats} />
 
       <PickleballRatingWidget profile={pickleballProfile} />
+
+      <MyBadgesSection badges={badges} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ReservasPanel reservations={reservations} inviteCount={invites.length} />

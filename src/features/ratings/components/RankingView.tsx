@@ -5,6 +5,7 @@ import { Trophy, ChevronDown, Info } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { VISIBLE_SPORT_OPTIONS, SINGLE_SPORT_MODE } from "@/lib/sports/config"
+import { BADGE_CONFIG } from "@/features/badges/constants"
 import type { RankingEntry } from "@/features/ratings/types"
 
 const SPORTS = [
@@ -129,6 +130,10 @@ function RankingRow({ entry, index }: { entry: RankingEntry; index: number }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-black text-foreground truncate">
           {entry.fullName}
+          {entry.badges?.length > 0 && entry.badges.map((type) => {
+            const cfg = BADGE_CONFIG[type]
+            return <span key={type} title={cfg.label} className="text-xs">{cfg.emoji}</span>
+          })}
         </p>
         <p className="text-[11px] text-zinc-400">
           {entry.wins}V · {entry.losses}D
