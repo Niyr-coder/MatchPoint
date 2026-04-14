@@ -82,19 +82,23 @@ export async function PATCH(
     const courtName = (court as { name?: string } | null)?.name ?? "la cancha"
     const isConfirmed = parsed.data.status === "confirmed"
 
-    void notifyUser(reservation.user_id as string, {
-      type:  isConfirmed ? "reservation.confirmed" : "reservation.cancelled",
-      title: isConfirmed ? "Reserva confirmada" : "Reserva cancelada",
-      body:  isConfirmed
-        ? `Tu reserva en ${courtName} el ${reservation.date as string} de ${(reservation.start_time as string).slice(0, 5)} a ${(reservation.end_time as string).slice(0, 5)} fue confirmada.`
-        : `Tu reserva en ${courtName} el ${reservation.date as string} de ${(reservation.start_time as string).slice(0, 5)} a ${(reservation.end_time as string).slice(0, 5)} fue cancelada.`,
-      metadata: {
-        reservation_id: reservation.id,
-        date:           reservation.date,
-        start_time:     reservation.start_time,
-        end_time:       reservation.end_time,
+    void notifyUser(
+      reservation.user_id as string,
+      {
+        type:  isConfirmed ? "reservation.confirmed" : "reservation.cancelled",
+        title: isConfirmed ? "Reserva confirmada" : "Reserva cancelada",
+        body:  isConfirmed
+          ? `Tu reserva en ${courtName} el ${reservation.date as string} de ${(reservation.start_time as string).slice(0, 5)} a ${(reservation.end_time as string).slice(0, 5)} fue confirmada.`
+          : `Tu reserva en ${courtName} el ${reservation.date as string} de ${(reservation.start_time as string).slice(0, 5)} a ${(reservation.end_time as string).slice(0, 5)} fue cancelada.`,
+        metadata: {
+          reservation_id: reservation.id,
+          date:           reservation.date,
+          start_time:     reservation.start_time,
+          end_time:       reservation.end_time,
+        },
       },
-    })
+      isConfirmed ? "notify_user_on_confirmed" : "notify_user_on_cancelled",
+    )
 
     return NextResponse.json({ success: true, data: null, error: null })
   } catch (error: unknown) {

@@ -96,17 +96,21 @@ export async function PATCH(
     // Notify the reservation owner — fire-and-forget
     const court = Array.isArray(existing.courts) ? existing.courts[0] : existing.courts
     const courtName = (court as { name?: string } | null)?.name ?? "la cancha"
-    void notifyUser(existing.user_id as string, {
-      type:  "reservation.cancelled",
-      title: "Reserva cancelada",
-      body:  `Tu reserva en ${courtName} el ${existing.date as string} de ${(existing.start_time as string).slice(0, 5)} a ${(existing.end_time as string).slice(0, 5)} fue cancelada por el administrador.`,
-      metadata: {
-        reservation_id: id,
-        date:           existing.date,
-        start_time:     existing.start_time,
-        end_time:       existing.end_time,
+    void notifyUser(
+      existing.user_id as string,
+      {
+        type:  "reservation.cancelled",
+        title: "Reserva cancelada",
+        body:  `Tu reserva en ${courtName} el ${existing.date as string} de ${(existing.start_time as string).slice(0, 5)} a ${(existing.end_time as string).slice(0, 5)} fue cancelada por el administrador.`,
+        metadata: {
+          reservation_id: id,
+          date:           existing.date,
+          start_time:     existing.start_time,
+          end_time:       existing.end_time,
+        },
       },
-    })
+      "notify_user_on_cancelled",
+    )
 
     return NextResponse.json({ success: true, data: updated, error: null })
   } catch (err) {

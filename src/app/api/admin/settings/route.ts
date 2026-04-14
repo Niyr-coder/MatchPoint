@@ -12,16 +12,23 @@ export type PlatformSettings = {
   platform_version: string
   platform_region: string
   platform_currency: string
+  // Notification toggles
+  notify_on_new_reservation: boolean
+  notify_user_on_confirmed: boolean
+  notify_user_on_cancelled: boolean
 }
 
 // ── validation ─────────────────────────────────────────────────────────────────
 
 const patchSchema = z
   .object({
-    maintenance_mode: z.boolean().optional(),
-    platform_version: z.string().min(1).max(50).optional(),
-    platform_region: z.string().min(1).max(100).optional(),
-    platform_currency: z.string().min(1).max(10).optional(),
+    maintenance_mode:           z.boolean().optional(),
+    platform_version:           z.string().min(1).max(50).optional(),
+    platform_region:            z.string().min(1).max(100).optional(),
+    platform_currency:          z.string().min(1).max(10).optional(),
+    notify_on_new_reservation:  z.boolean().optional(),
+    notify_user_on_confirmed:   z.boolean().optional(),
+    notify_user_on_cancelled:   z.boolean().optional(),
   })
   .strict()
   .refine((obj) => Object.keys(obj).length > 0, {

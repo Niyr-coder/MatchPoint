@@ -1,5 +1,25 @@
 import { createServiceClient } from "@/lib/supabase/server"
 
+/**
+ * Reads a boolean toggle from platform_settings.
+ * Returns true (enabled) when the key is missing — safe default.
+ */
+async function isNotificationEnabled(key: string): Promise<boolean> {
+  try {
+    const supabase = createServiceClient()
+    const { data } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle()
+    if (!data) return true // default on when not yet configured
+    // value is stored as JSON string e.g. "true" / "false"
+    return data.value !== "false" && data.value !== false
+  } catch {
+    return true // fail open
+  }
+}
+
 interface NotificationPayload {
   type: string
   title: string
@@ -12,13 +32,16 @@ type BroadcastPayload = NotificationPayload
 
 /**
  * Inserts a single notification for one user.
+ * Pass settingKey to gate on a platform_settings toggle.
  * Fire-and-forget safe — errors are logged but don't throw.
  */
 export async function notifyUser(
   userId: string,
-  payload: NotificationPayload
+  payload: NotificationPayload,
+  settingKey?: string,
 ): Promise<void> {
   try {
+    if (settingKey && !(await isNotificationEnabled(settingKey))) return
     const supabase = createServiceClient()
     const { error } = await supabase.from("notifications").insert({
       user_id:  userId,
@@ -40,9 +63,11 @@ export async function notifyUser(
  */
 export async function notifyClubStaff(
   courtId: string,
-  payload: NotificationPayload
+  payload: NotificationPayload,
+  settingKey = "notify_on_new_reservation",
 ): Promise<void> {
   try {
+    if (!(await isNotificationEnabled(settingKey))) return
     const supabase = createServiceClient()
 
     // 1. Resolve the club that owns this court
@@ -92,8 +117,12 @@ export async function notifyClubStaff(
  * Notifies all platform admins (profiles.global_role = 'admin').
  * Fire-and-forget safe — errors are logged but don't throw.
  */
-export async function notifyAdmins(payload: NotificationPayload): Promise<void> {
+export async function notifyAdmins(
+  payload: NotificationPayload,
+  settingKey = "notify_on_new_reservation",
+): Promise<void> {
   try {
+    if (!(await isNotificationEnabled(settingKey))) return
     const supabase = createServiceClient()
 
     const { data: admins, error } = await supabase

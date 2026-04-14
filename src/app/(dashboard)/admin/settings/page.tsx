@@ -5,10 +5,13 @@ import { createServiceClient } from "@/lib/supabase/server"
 import type { PlatformSettings } from "@/app/api/admin/settings/route"
 
 const DEFAULT_SETTINGS: PlatformSettings = {
-  maintenance_mode: false,
-  platform_version: "1.0.0 Beta",
-  platform_region: "Ecuador",
-  platform_currency: "USD",
+  maintenance_mode:           false,
+  platform_version:           "1.0.0 Beta",
+  platform_region:            "Ecuador",
+  platform_currency:          "USD",
+  notify_on_new_reservation:  true,
+  notify_user_on_confirmed:   true,
+  notify_user_on_cancelled:   true,
 }
 
 async function loadSettings(): Promise<PlatformSettings> {
@@ -26,10 +29,13 @@ async function loadSettings(): Promise<PlatformSettings> {
     }, {})
 
     return {
-      maintenance_mode: Boolean(map.maintenance_mode ?? false),
-      platform_version: String(map.platform_version ?? DEFAULT_SETTINGS.platform_version),
-      platform_region: String(map.platform_region ?? DEFAULT_SETTINGS.platform_region),
-      platform_currency: String(map.platform_currency ?? DEFAULT_SETTINGS.platform_currency),
+      maintenance_mode:           Boolean(map.maintenance_mode          ?? false),
+      platform_version:           String( map.platform_version          ?? DEFAULT_SETTINGS.platform_version),
+      platform_region:            String( map.platform_region           ?? DEFAULT_SETTINGS.platform_region),
+      platform_currency:          String( map.platform_currency         ?? DEFAULT_SETTINGS.platform_currency),
+      notify_on_new_reservation:  map.notify_on_new_reservation  !== undefined ? Boolean(map.notify_on_new_reservation)  : true,
+      notify_user_on_confirmed:   map.notify_user_on_confirmed   !== undefined ? Boolean(map.notify_user_on_confirmed)   : true,
+      notify_user_on_cancelled:   map.notify_user_on_cancelled   !== undefined ? Boolean(map.notify_user_on_cancelled)   : true,
     }
   } catch {
     return DEFAULT_SETTINGS

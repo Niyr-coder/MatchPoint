@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { Settings, AlertTriangle, Save, ToggleLeft, ToggleRight } from "lucide-react"
+import { Settings, AlertTriangle, Save, ToggleLeft, ToggleRight, Bell } from "lucide-react"
 import type { PlatformSettings } from "@/app/api/admin/settings/route"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -270,6 +270,132 @@ function PlatformInfoForm({ initialSettings }: PlatformInfoFormProps) {
   )
 }
 
+// ── NotificationToggle ────────────────────────────────────────────────────────
+
+interface NotificationToggleProps {
+  settingKey: keyof PlatformSettings
+  label: string
+  description: string
+  initialValue: boolean
+}
+
+function NotificationToggle({ settingKey, label, description, initialValue }: NotificationToggleProps) {
+  const [isOn, setIsOn] = useState(initialValue)
+  const [isPending, startTransition] = useTransition()
+  const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null)
+
+  useAutoReset(feedback, () => setFeedback(null))
+
+  function toggle() {
+    const next = !isOn
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/admin/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [settingKey]: next }),
+        })
+        const json = await res.json()
+        if (!res.ok || !json.success) {
+          setFeedback({ type: "err", msg: json.error ?? "Error al guardar" })
+          return
+        }
+        setIsOn(next)
+        setFeedback({ type: "ok", msg: next ? "Activado" : "Desactivado" })
+      } catch {
+        setFeedback({ type: "err", msg: "Error de red" })
+      }
+    })
+  }
+
+  return (
+    <div className="flex items-center justify-between py-3 border-t border-border first:border-t-0">
+      <div className="flex-1 pr-4">
+        <p className="text-sm font-bold text-foreground">{label}</p>
+        <p className="text-xs text-zinc-400 mt-0.5">{description}</p>
+        {feedback && (
+          <p className={`text-xs font-bold mt-1 ${feedback.type === "ok" ? "text-emerald-600" : "text-red-600"}`}>
+            {feedback.msg}
+          </p>
+        )}
+      </div>
+      <button
+        onClick={toggle}
+        disabled={isPending}
+        aria-label={isOn ? `Desactivar ${label}` : `Activar ${label}`}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black border transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+        style={isOn
+          ? { background: "#0a0a0a", color: "#fff", borderColor: "#0a0a0a" }
+          : { background: "#f4f4f5", color: "#71717a", borderColor: "#e4e4e7" }
+        }
+      >
+        {isPending
+          ? <span className="size-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+          : isOn ? <ToggleRight className="size-3.5" /> : <ToggleLeft className="size-3.5" />
+        }
+        {isOn ? "ON" : "OFF"}
+      </button>
+    </div>
+  )
+}
+
+// ── NotificationSettingsPanel ─────────────────────────────────────────────────
+
+const NOTIFICATION_TOGGLES: Array<{
+  key: keyof PlatformSettings
+  label: string
+  description: string
+}> = [
+  {
+    key: "notify_on_new_reservation",
+    label: "Nueva reserva",
+    description: "Notifica a los managers, owners del club y admins cuando un usuario realiza una reserva.",
+  },
+  {
+    key: "notify_user_on_confirmed",
+    label: "Reserva confirmada",
+    description: "Notifica al usuario cuando su reserva es confirmada por un manager o admin.",
+  },
+  {
+    key: "notify_user_on_cancelled",
+    label: "Reserva cancelada",
+    description: "Notifica al usuario cuando su reserva es cancelada por un manager o admin.",
+  },
+]
+
+interface NotificationSettingsPanelProps {
+  settings: PlatformSettings
+}
+
+function NotificationSettingsPanel({ settings }: NotificationSettingsPanelProps) {
+  return (
+    <div className="rounded-2xl bg-card border border-border p-6">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Bell className="size-5 text-primary" />
+        </div>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+            Sistema de notificaciones
+          </p>
+          <p className="text-lg font-black text-foreground leading-none mt-0.5">Notificaciones</p>
+        </div>
+      </div>
+      <div className="flex flex-col">
+        {NOTIFICATION_TOGGLES.map((t) => (
+          <NotificationToggle
+            key={t.key}
+            settingKey={t.key}
+            label={t.label}
+            description={t.description}
+            initialValue={Boolean(settings[t.key] ?? true)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── main view ──────────────────────────────────────────────────────────────────
 
 interface AdminSettingsViewProps {
@@ -280,6 +406,7 @@ export function AdminSettingsView({ settings }: AdminSettingsViewProps) {
   return (
     <div className="flex flex-col gap-6">
       <MaintenanceToggle initialValue={settings.maintenance_mode ?? false} />
+      <NotificationSettingsPanel settings={settings} />
       <PlatformInfoForm initialSettings={settings} />
     </div>
   )
