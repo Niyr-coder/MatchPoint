@@ -98,6 +98,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: reservation }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear reserva"
+
+    if (message === "slot_conflict") {
+      return NextResponse.json(
+        { success: false, error: "Este horario ya fue reservado. Elige otro." },
+        { status: 409 }
+      )
+    }
+
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
