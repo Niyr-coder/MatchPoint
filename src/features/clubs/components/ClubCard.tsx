@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Building2, MapPin, Phone } from "lucide-react"
 import type { ClubWithSports } from "@/features/clubs/queries/clubs"
 
@@ -17,7 +18,8 @@ interface ClubCardProps {
 
 export function ClubCard({ club, index = 0 }: ClubCardProps) {
   return (
-    <div
+    <Link
+      href={`/dashboard/clubs/${club.slug}`}
       className="animate-fade-in-up rounded-2xl bg-card border border-border overflow-hidden flex flex-col hover:border-foreground/40 transition-colors"
       style={{ animationDelay: `${index * 0.04}s` }}
     >
@@ -72,6 +74,6 @@ export function ClubCard({ club, index = 0 }: ClubCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
