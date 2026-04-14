@@ -70,6 +70,26 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Reject past dates and past time slots for today
+  const nowUtcMinus5 = new Date(Date.now() - 5 * 60 * 60 * 1000)
+  const todayStr = nowUtcMinus5.toISOString().split("T")[0]
+  const currentMinutes = nowUtcMinus5.getUTCHours() * 60 + nowUtcMinus5.getUTCMinutes()
+  const startMinutes = timeToMinutes(parsed.data.start_time)
+
+  if (parsed.data.date < todayStr) {
+    return NextResponse.json(
+      { success: false, error: "No puedes reservar en fechas pasadas." },
+      { status: 422 }
+    )
+  }
+
+  if (parsed.data.date === todayStr && startMinutes <= currentMinutes) {
+    return NextResponse.json(
+      { success: false, error: "No puedes reservar en horarios que ya pasaron." },
+      { status: 422 }
+    )
+  }
+
   try {
     // Calculate price server-side — never trust client-provided price
     const { data: court, error: courtErr } = await supabase

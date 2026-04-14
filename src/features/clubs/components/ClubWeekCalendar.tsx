@@ -36,6 +36,10 @@ export function ClubWeekCalendar({ clubId, onSlotSelect }: ClubWeekCalendarProps
 
   const weekDates = getWeekDates(weekStart)
   const weekEnd = weekDates[6]
+  const todayStr = new Date().toISOString().split("T")[0]
+  const currentHour = new Date().getHours()
+  const currentWeekMonday = getCurrentWeekMonday()
+  const isCurrentWeek = weekStart === currentWeekMonday
 
   useEffect(() => {
     if (!weekDates.includes(selectedDate)) {
@@ -94,7 +98,8 @@ export function ClubWeekCalendar({ clubId, onSlotSelect }: ClubWeekCalendarProps
       <div className="flex items-center justify-between gap-2">
         <button
           onClick={() => setWeekStart((w) => addWeeks(w, -1))}
-          className="p-1.5 rounded-full border border-border hover:border-foreground transition-colors"
+          disabled={isCurrentWeek}
+          className="p-1.5 rounded-full border border-border hover:border-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-border"
           aria-label="Semana anterior"
         >
           <ChevronLeft className="size-4 text-zinc-500" />
@@ -113,15 +118,18 @@ export function ClubWeekCalendar({ clubId, onSlotSelect }: ClubWeekCalendarProps
         {weekDates.map((date, i) => {
           const dayNum = new Date(date + "T00:00:00").getDate()
           const isSelected = date === selectedDate
-          const today = new Date().toISOString().split("T")[0]
-          const isToday = date === today
+          const isToday = date === todayStr
+          const isPast = date < todayStr
           return (
             <button
               key={date}
-              onClick={() => setSelectedDate(date)}
+              onClick={() => !isPast && setSelectedDate(date)}
+              disabled={isPast}
               className={[
                 "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl border text-[11px] font-bold shrink-0 transition-colors",
-                isSelected
+                isPast
+                  ? "border-border text-zinc-300 cursor-not-allowed opacity-40"
+                  : isSelected
                   ? "bg-foreground text-white border-foreground"
                   : isToday
                   ? "border-foreground text-foreground"
@@ -162,9 +170,10 @@ export function ClubWeekCalendar({ clubId, onSlotSelect }: ClubWeekCalendarProps
                     </td>
                     {data.courts.map((court) => {
                       const occupied = isSlotOccupied(data.reservations, court.id, selectedDate, hour)
+                      const isPastSlot = selectedDate === todayStr && hour <= currentHour
                       return (
                         <td key={court.id} className="py-0.5 px-1 text-center align-middle">
-                          {occupied ? (
+                          {occupied || isPastSlot ? (
                             <span className="block w-full rounded-md bg-zinc-200 text-zinc-400 py-1 text-center select-none">—</span>
                           ) : (
                             <button
