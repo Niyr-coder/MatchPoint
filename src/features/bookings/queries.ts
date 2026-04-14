@@ -66,7 +66,7 @@ export async function createReservation(
     p_start_time:  input.start_time,
     p_end_time:    input.end_time,
     p_total_price: input.total_price,
-    p_notes:       input.notes,
+    p_notes:       input.notes ?? null,
   })
 
   if (error) throw new Error(error.message)

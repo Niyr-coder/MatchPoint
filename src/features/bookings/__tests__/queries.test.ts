@@ -1,14 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-const { mockRpc } = vi.hoisted(() => {
-  const mockRpc = vi.fn()
-  return { mockRpc }
-})
+const { mockRpc, mockCreateClient } = vi.hoisted(() => ({
+  mockRpc: vi.fn(),
+  mockCreateClient: vi.fn(),
+}))
 
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: vi.fn().mockResolvedValue({
-    rpc: mockRpc,
-  }),
+  createClient: mockCreateClient,
 }))
 
 import { createReservation } from "../queries"
@@ -16,6 +14,7 @@ import { createReservation } from "../queries"
 describe("createReservation", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockCreateClient.mockResolvedValue({ rpc: mockRpc })
   })
 
   it("calls reserve_slot RPC with correct params", async () => {
@@ -49,7 +48,7 @@ describe("createReservation", () => {
       p_start_time:  "10:00",
       p_end_time:    "11:00",
       p_total_price: 12,
-      p_notes:       undefined,
+      p_notes:       null,
     })
     expect(result.id).toBe("res-1")
   })
