@@ -48,6 +48,20 @@ export type AppPermission =
   | 'reviews.create'
   | 'chat.use'
 
+/**
+ * Inline to avoid a circular dependency with @/features/badges/types,
+ * which imports BadgeType from @/features/badges/constants,
+ * which in turn imports AppPermission from this file.
+ */
+export interface PlayerBadge {
+  id: string
+  badge_type: string
+  club_id: string | null
+  club_name: string | null
+  granted_by: string
+  granted_at: string
+}
+
 /** Resolved authorization context for a user in a specific club (or global) */
 export interface AuthContext {
   userId: string
@@ -58,4 +72,5 @@ export interface AuthContext {
   /** role in the current club context */
   clubRole: AppRole | null
   permissions: AppPermission[]
+  badges: PlayerBadge[]
 }

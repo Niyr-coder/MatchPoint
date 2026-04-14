@@ -137,6 +137,7 @@ export async function authorize({
         clubId,
         clubRole: "admin",
         permissions,
+        badges: [],
       },
     }
   }
@@ -173,6 +174,7 @@ export async function authorize({
       clubId,
       clubRole: clubId ? clubRole : null,
       permissions,
+      badges: [],
     },
   }
 }
