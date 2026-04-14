@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getUserReservations, createReservation, cancelReservation } from "@/features/bookings/queries"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
-import { notifyClubStaff } from "@/features/notifications/utils"
+import { notifyClubStaff, notifyAdmins } from "@/features/notifications/utils"
 import { z } from "zod"
 
 const cancelReservationSchema = z.object({
@@ -117,8 +117,8 @@ export async function POST(request: NextRequest) {
 
     const reservation = await createReservation(user.id, { ...parsed.data, total_price: serverPrice })
 
-    // Notify club owners and managers — fire-and-forget, does not block the response
-    void notifyClubStaff(parsed.data.court_id, {
+    // Notify club owners/managers and platform admins — fire-and-forget
+    const notificationPayload = {
       type:  "reservation.new",
       title: "Nueva reserva pendiente",
       body:  `Se solicitó ${court.name} para el ${parsed.data.date} de ${parsed.data.start_time.slice(0, 5)} a ${parsed.data.end_time.slice(0, 5)}.`,
@@ -130,7 +130,9 @@ export async function POST(request: NextRequest) {
         start_time:     parsed.data.start_time,
         end_time:       parsed.data.end_time,
       },
-    })
+    }
+    void notifyClubStaff(parsed.data.court_id, notificationPayload)
+    void notifyAdmins(notificationPayload)
 
     return NextResponse.json({ success: true, data: reservation }, { status: 201 })
   } catch (error: unknown) {

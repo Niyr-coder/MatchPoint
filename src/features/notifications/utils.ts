@@ -89,6 +89,41 @@ export async function notifyClubStaff(
 }
 
 /**
+ * Notifies all platform admins (profiles.global_role = 'admin').
+ * Fire-and-forget safe — errors are logged but don't throw.
+ */
+export async function notifyAdmins(payload: NotificationPayload): Promise<void> {
+  try {
+    const supabase = createServiceClient()
+
+    const { data: admins, error } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("global_role", "admin")
+
+    if (error) {
+      console.error("[notifyAdmins] fetch error:", error.message)
+      return
+    }
+
+    if (!admins || admins.length === 0) return
+
+    const rows = admins.map((a: { id: string }) => ({
+      user_id:  a.id,
+      type:     payload.type,
+      title:    payload.title,
+      body:     payload.body,
+      metadata: payload.metadata ?? {},
+    }))
+
+    const { error: insertErr } = await supabase.from("notifications").insert(rows)
+    if (insertErr) console.error("[notifyAdmins] insert error:", insertErr.message)
+  } catch (err) {
+    console.error("[notifyAdmins] unexpected error:", err)
+  }
+}
+
+/**
  * Inserts one notification row per active user.
  * Uses the service role client so RLS doesn't block the fan-out insert.
  * Fire-and-forget safe — errors are logged but don't throw.
