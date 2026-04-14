@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useRouter } from "next/navigation"
 import {
   getWeekDates,
   addWeeks,
@@ -12,6 +11,7 @@ import {
   type WeekReservation,
 } from "@/features/clubs/utils/calendar"
 import type { ClubProfileCourt } from "@/features/clubs/queries/club-profile"
+import { QuickBookModal, type QuickBookSlot } from "./QuickBookModal"
 
 interface ClubWeekCalendarProps {
   clubId: string
@@ -26,24 +26,23 @@ interface CalendarData {
 }
 
 export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
-  const router = useRouter()
   const [weekStart, setWeekStart] = useState(getCurrentWeekMonday)
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0])
   const [data, setData] = useState<CalendarData | null>(null)
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [activeSlot, setActiveSlot] = useState<QuickBookSlot | null>(null)
 
   const weekDates = getWeekDates(weekStart)
   const weekEnd = weekDates[6]
 
-  // Keep selectedDate within displayed week
   useEffect(() => {
     if (!weekDates.includes(selectedDate)) {
       setSelectedDate(weekDates[0])
     }
   }, [weekStart]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     setLoading(true)
     setFetchError(null)
     fetch(`/api/clubs/${clubId}/reservations?weekStart=${weekStart}&weekEnd=${weekEnd}`)
@@ -59,17 +58,32 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
       .finally(() => setLoading(false))
   }, [clubId, weekStart, weekEnd])
 
-  function handleSlotClick(courtId: string, date: string, hour: number) {
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  function handleSlotClick(court: ClubProfileCourt, date: string, hour: number) {
     const startTime = `${String(hour).padStart(2, "0")}:00`
-    const endTime = `${String(hour + 1).padStart(2, "0")}:00`
-    router.push(`/dashboard/reservations/new?courtId=${courtId}&date=${date}&startTime=${startTime}&endTime=${endTime}`)
+    const endTime   = `${String(hour + 1).padStart(2, "0")}:00`
+    setActiveSlot({
+      courtId:      court.id,
+      courtName:    court.name,
+      pricePerHour: court.price_per_hour,
+      date,
+      startTime,
+      endTime,
+    })
+  }
+
+  function handleBookingSuccess() {
+    setActiveSlot(null)
+    fetchData()
   }
 
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Disponibilidad</h2>
 
-      {/* Week navigation */}
       <div className="flex items-center justify-between gap-2">
         <button
           onClick={() => setWeekStart((w) => addWeeks(w, -1))}
@@ -88,7 +102,6 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
         </button>
       </div>
 
-      {/* Day selector */}
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {weekDates.map((date, i) => {
           const dayNum = new Date(date + "T00:00:00").getDate()
@@ -115,7 +128,6 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
         })}
       </div>
 
-      {/* States */}
       {loading && <div className="py-12 text-center text-xs text-zinc-400">Cargando disponibilidad…</div>}
       {fetchError && !loading && <div className="py-12 text-center text-xs text-red-400">{fetchError}</div>}
 
@@ -149,7 +161,7 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
                             <span className="block w-full rounded-md bg-zinc-200 text-zinc-400 py-1 text-center select-none">—</span>
                           ) : (
                             <button
-                              onClick={() => handleSlotClick(court.id, selectedDate, hour)}
+                              onClick={() => handleSlotClick(court, selectedDate, hour)}
                               className="w-full rounded-md bg-green-100 text-green-700 font-bold py-1 hover:bg-green-200 transition-colors"
                             >
                               Libre
@@ -164,6 +176,14 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
             </table>
           </div>
         )
+      )}
+
+      {activeSlot && (
+        <QuickBookModal
+          slot={activeSlot}
+          onClose={() => setActiveSlot(null)}
+          onSuccess={handleBookingSuccess}
+        />
       )}
     </section>
   )
