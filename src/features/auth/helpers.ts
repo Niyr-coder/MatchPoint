@@ -10,9 +10,14 @@ export async function getPostLoginDestination(
   supabase: SupabaseClient
 ): Promise<string> {
   if (globalRole === "admin") return "/admin"
-  if (roles.length === 0) return "/dashboard"
-  if (roles.length === 1) {
-    const { role, clubId } = roles[0]
+
+  // "user" role is a plain club member — no dedicated management page.
+  // Exclude them so they land on /dashboard instead of /club/[id]/user.
+  const managementRoles = roles.filter((r) => r.role !== "user")
+
+  if (managementRoles.length === 0) return "/dashboard"
+  if (managementRoles.length === 1) {
+    const { role, clubId } = managementRoles[0]
     if (role === "owner") {
       const { count } = await supabase
         .from("courts")

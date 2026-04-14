@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import Link from "next/link"
 import { joinClub } from "@/features/clubs/actions/join-club"
 
 interface JoinClubButtonProps {
@@ -16,9 +17,12 @@ export function JoinClubButton({ clubId, clubSlug, initialIsMember }: JoinClubBu
 
   if (isMember) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-sm font-bold text-zinc-400 border border-border rounded-full px-5 py-2.5 select-none">
-        Ya eres miembro ✓
-      </span>
+      <Link
+        href={`/dashboard/clubs/${clubSlug}`}
+        className="inline-flex items-center gap-1.5 text-sm font-black uppercase tracking-wide border border-border rounded-full px-5 py-2.5 hover:bg-zinc-100 transition-colors"
+      >
+        Ver club →
+      </Link>
     )
   }
 
