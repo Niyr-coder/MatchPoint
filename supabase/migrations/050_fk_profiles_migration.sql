@@ -155,9 +155,14 @@ ALTER TABLE public.tournament_participants
 -- courts.created_by
 -- Original (migration 004): REFERENCES auth.users(id)
 -- ──────────────────────────────────────────────────────────────────────────────
-ALTER TABLE public.courts
-  DROP CONSTRAINT IF EXISTS courts_created_by_fkey;
-
-ALTER TABLE public.courts
-  ADD CONSTRAINT courts_created_by_fkey
-  FOREIGN KEY (created_by) REFERENCES public.profiles(id) ON DELETE SET NULL;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'courts' AND column_name = 'created_by'
+  ) THEN
+    ALTER TABLE public.courts DROP CONSTRAINT IF EXISTS courts_created_by_fkey;
+    ALTER TABLE public.courts ADD CONSTRAINT courts_created_by_fkey
+      FOREIGN KEY (created_by) REFERENCES public.profiles(id) ON DELETE SET NULL;
+  END IF;
+END $$;
