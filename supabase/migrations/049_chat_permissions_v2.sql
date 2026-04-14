@@ -49,7 +49,7 @@ COMMENT ON COLUMN public.conversations.created_by
 
 -- ============================================================
 -- 1b. Backfill created_by for existing conversations
---     Uses the first participant (by created_at / user_id) as the creator.
+--     Uses the first participant (by joined_at / user_id) as the creator.
 --     Safe to run multiple times (WHERE created_by IS NULL is idempotent).
 -- ============================================================
 
@@ -58,7 +58,7 @@ SET    created_by = (
   SELECT cp.user_id
   FROM   public.conversation_participants cp
   WHERE  cp.conversation_id = c.id
-  ORDER  BY cp.created_at ASC NULLS LAST, cp.user_id ASC
+  ORDER  BY cp.joined_at ASC NULLS LAST, cp.user_id ASC
   LIMIT  1
 )
 WHERE c.created_by IS NULL;
