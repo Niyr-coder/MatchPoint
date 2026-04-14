@@ -21,19 +21,13 @@ async function getReservations(): Promise<ReservationAdmin[]> {
         total_price,
         notes,
         created_at,
-        profiles:user_id (
-          full_name,
-          email
-        ),
-        courts:court_id (
+        profiles(full_name, email),
+        courts!inner(
           id,
           name,
           sport,
           club_id,
-          clubs:club_id (
-            id,
-            name
-          )
+          clubs(id, name)
         )
         `
       )
@@ -41,7 +35,10 @@ async function getReservations(): Promise<ReservationAdmin[]> {
       .order("start_time", { ascending: false })
       .limit(200)
 
-    if (error) throw new Error(error.message)
+    if (error) {
+      console.error("[admin/reservations] query error:", error.message, error)
+      throw new Error(error.message)
+    }
 
     return (data ?? []).map((row) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
