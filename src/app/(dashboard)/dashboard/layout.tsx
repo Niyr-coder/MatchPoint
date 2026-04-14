@@ -15,17 +15,20 @@ export default async function UserDashboardLayout({ children }: { children: Reac
     redirect("/admin")
   }
 
-  // If user has club memberships and hasn't explicitly chosen player mode,
+  // If user has management roles and hasn't explicitly chosen player mode,
   // redirect to context selector so they land on their role dashboard.
+  // "user" role = plain club member with no management page — excluded here
+  // so they stay in the player dashboard.
   const cookieStore = await cookies()
   const playerMode = cookieStore.get("player_mode")?.value
   if (!playerMode) {
     const userRoles = await getUserRoles(ctx.userId)
-    if (userRoles.length === 1) {
-      redirect(`/club/${userRoles[0].clubId}/${userRoles[0].role}`)
+    const managementRoles = userRoles.filter((r) => r.role !== "user")
+    if (managementRoles.length === 1) {
+      redirect(`/club/${managementRoles[0].clubId}/${managementRoles[0].role}`)
     }
-    if (userRoles.length > 1) {
-      redirect("/dashboard/context-selector")
+    if (managementRoles.length > 1) {
+      redirect("/context-selector")
     }
   }
 
