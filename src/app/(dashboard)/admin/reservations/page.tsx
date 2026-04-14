@@ -3,17 +3,74 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/shared/PageHeader"
 import { AdminReservationsView } from "@/components/admin/AdminReservationsView"
 import type { ReservationAdmin } from "@/app/api/admin/reservations/route"
-import type { ApiResponse } from "@/types"
 
 async function getReservations(): Promise<ReservationAdmin[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-    const res = await fetch(`${baseUrl}/api/admin/reservations?page=1`, {
-      cache: "no-store",
+    const supabase = createServiceClient()
+
+    const { data, error } = await supabase
+      .from("reservations")
+      .select(
+        `
+        id,
+        user_id,
+        date,
+        start_time,
+        end_time,
+        status,
+        total_price,
+        notes,
+        created_at,
+        profiles:user_id (
+          full_name,
+          email
+        ),
+        courts:court_id (
+          id,
+          name,
+          sport,
+          club_id,
+          clubs:club_id (
+            id,
+            name
+          )
+        )
+        `
+      )
+      .order("date", { ascending: false })
+      .order("start_time", { ascending: false })
+      .limit(200)
+
+    if (error) throw new Error(error.message)
+
+    return (data ?? []).map((row) => {
+      const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+      const court   = Array.isArray(row.courts)   ? row.courts[0]   : row.courts
+      const club    = court
+        ? Array.isArray((court as { clubs?: unknown }).clubs)
+          ? ((court as { clubs?: unknown[] }).clubs ?? [])[0]
+          : (court as { clubs?: unknown }).clubs
+        : null
+
+      return {
+        id:          row.id as string,
+        user_id:     row.user_id as string,
+        user_name:   (profile as { full_name?: string | null } | null)?.full_name ?? null,
+        user_email:  (profile as { email?: string | null }    | null)?.email      ?? null,
+        club_id:     (club   as { id?: string }   | null)?.id   ?? null,
+        club_name:   (club   as { name?: string } | null)?.name ?? null,
+        court_id:    (court  as { id?: string }   | null)?.id   ?? "",
+        court_name:  (court  as { name?: string } | null)?.name ?? null,
+        court_sport: (court  as { sport?: string }| null)?.sport ?? null,
+        date:        row.date        as string,
+        start_time:  row.start_time  as string,
+        end_time:    row.end_time    as string,
+        status:      row.status      as "pending" | "confirmed" | "cancelled",
+        total_price: row.total_price as number,
+        notes:       row.notes       as string | null,
+        created_at:  row.created_at  as string,
+      }
     })
-    const json: ApiResponse<ReservationAdmin[]> = await res.json()
-    if (!json.success || !json.data) return []
-    return json.data
   } catch {
     return []
   }
