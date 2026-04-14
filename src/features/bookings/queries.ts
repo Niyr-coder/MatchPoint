@@ -59,14 +59,23 @@ export async function createReservation(
 ): Promise<Reservation> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from("reservations")
-    .insert({ ...input, user_id: userId })
-    .select("*, courts(name, sport, clubs(name))")
-    .single()
+  const { data, error } = await supabase.rpc("reserve_slot", {
+    p_court_id:    input.court_id,
+    p_user_id:     userId,
+    p_date:        input.date,
+    p_start_time:  input.start_time,
+    p_end_time:    input.end_time,
+    p_total_price: input.total_price,
+    p_notes:       input.notes,
+  })
 
   if (error) throw new Error(error.message)
-  return data as Reservation
+
+  // reserve_slot returns SETOF reservations — Supabase wraps it as an array
+  const reservation = Array.isArray(data) ? data[0] : data
+  if (!reservation) throw new Error("No reservation returned")
+
+  return reservation as Reservation
 }
 
 export async function cancelReservation(id: string): Promise<void> {
