@@ -1,6 +1,8 @@
 import Image from "next/image"
 import { Trophy, MapPin, Calendar, Star } from "lucide-react"
 import type { Profile } from "@/types"
+import { BADGE_CONFIG } from "@/features/badges/constants"
+import type { PlayerBadge } from "@/features/badges/types"
 
 const SPORT_LABELS: Record<string, string> = {
   futbol: "Fútbol",
@@ -39,6 +41,7 @@ interface PlayerHeroSectionProps {
   displayName: string
   rating: number
   rankingPosition: number | null
+  badges?: PlayerBadge[]
 }
 
 export function PlayerHeroSection({
@@ -46,6 +49,7 @@ export function PlayerHeroSection({
   displayName,
   rating,
   rankingPosition,
+  badges = [],
 }: PlayerHeroSectionProps) {
   const location = [profile.city, profile.province].filter(Boolean).join(", ")
   const age = profile.date_of_birth ? getAge(profile.date_of_birth) : null
@@ -79,6 +83,19 @@ export function PlayerHeroSection({
           <p className="text-sm text-zinc-500 mt-0.5">@{profile.username}</p>
         )}
       </div>
+
+      {badges.length > 0 && (
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
+          {badges.map((badge) => {
+            const cfg = BADGE_CONFIG[badge.badge_type]
+            return (
+              <span key={badge.id} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-black ${cfg.color}`} title={cfg.label}>
+                {cfg.emoji} {cfg.label}
+              </span>
+            )
+          })}
+        </div>
+      )}
 
       {/* Rating + Ranking row */}
       <div className="flex items-center gap-4">

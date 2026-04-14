@@ -52,10 +52,12 @@ export type AppPermission =
  * Inline to avoid a circular dependency with @/features/badges/types,
  * which imports BadgeType from @/features/badges/constants,
  * which in turn imports AppPermission from this file.
+ * badge_type uses an explicit literal union (not BadgeType) to stay cycle-free.
+ * Keep in sync with BADGE_TYPES in @/features/badges/constants.
  */
 export interface PlayerBadge {
   id: string
-  badge_type: string
+  badge_type: 'organizador_verificado' | 'vip' | 'arbitro' | 'embajador' | 'capitan'
   club_id: string | null
   club_name: string | null
   granted_by: string

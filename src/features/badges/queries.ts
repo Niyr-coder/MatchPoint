@@ -1,16 +1,7 @@
 // src/features/badges/queries.ts
 import { createServiceClient } from "@/lib/supabase/server"
-import type { PlayerBadge } from "@/features/badges/types"
+import type { PlayerBadge, RawBadgeRow } from "@/features/badges/types"
 import type { BadgeType } from "@/features/badges/constants"
-
-interface RawBadgeRow {
-  id: string
-  badge_type: string
-  club_id: string | null
-  granted_by: string
-  granted_at: string
-  clubs: { name: string } | null
-}
 
 export async function getPlayerBadges(userId: string): Promise<PlayerBadge[]> {
   const supabase = createServiceClient()

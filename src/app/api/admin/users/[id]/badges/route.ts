@@ -5,19 +5,10 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { BADGE_TYPES, BADGE_CONFIG } from "@/features/badges/constants"
 import type { ApiResponse } from "@/types"
-import type { PlayerBadge } from "@/features/badges/types"
+import type { PlayerBadge, RawBadgeRow } from "@/features/badges/types"
 import type { BadgeType } from "@/features/badges/constants"
 
 type RouteContext = { params: Promise<{ id: string }> }
-
-interface RawBadgeRow {
-  id: string
-  badge_type: string
-  club_id: string | null
-  granted_by: string
-  granted_at: string
-  clubs: { name: string } | null
-}
 
 export async function GET(
   _request: NextRequest,

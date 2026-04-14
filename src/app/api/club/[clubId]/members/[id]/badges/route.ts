@@ -4,19 +4,10 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { CLUB_BADGE_TYPES } from "@/features/badges/constants"
 import type { ApiResponse } from "@/types"
-import type { PlayerBadge } from "@/features/badges/types"
+import type { PlayerBadge, RawBadgeRow } from "@/features/badges/types"
 import type { BadgeType } from "@/features/badges/constants"
 
 type RouteContext = { params: Promise<{ clubId: string; id: string }> }
-
-interface RawBadgeRow {
-  id: string
-  badge_type: string
-  club_id: string | null
-  granted_by: string
-  granted_at: string
-  clubs: { name: string } | null
-}
 
 const clubBadgeEnum = z.enum(CLUB_BADGE_TYPES as [BadgeType, ...BadgeType[]])
 const grantSchema = z.object({ badge_type: clubBadgeEnum })
