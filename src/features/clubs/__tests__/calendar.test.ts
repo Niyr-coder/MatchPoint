@@ -24,6 +24,13 @@ describe("getWeekDates", () => {
       expect(curr.getTime() - prev.getTime()).toBe(86400000)
     }
   })
+
+  it("each element is a valid YYYY-MM-DD string", () => {
+    const dates = getWeekDates("2026-04-13")
+    for (const d of dates) {
+      expect(d).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    }
+  })
 })
 
 describe("addWeeks", () => {
@@ -67,7 +74,7 @@ describe("formatWeekLabel", () => {
 
   it("handles a week that spans two months", () => {
     // 2026-04-27 Monday → ends 2026-05-03 (may)
-    expect(formatWeekLabel("2026-04-27")).toBe("27 – 3 abr 2026")
+    expect(formatWeekLabel("2026-04-27")).toBe("27 – 3 may 2026")
   })
 })
 

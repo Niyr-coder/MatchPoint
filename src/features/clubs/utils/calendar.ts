@@ -34,6 +34,10 @@ export function addWeeks(weekStart: string, delta: number): string {
 /**
  * Returns the Monday of the current local week in YYYY-MM-DD.
  * Treats Sunday (getDay()===0) as the 7th day of the week (not the 1st).
+ *
+ * Uses local time for "today" (so the displayed week matches the user's calendar),
+ * but the returned string is compatible with the UTC-safe `getWeekDates` and `addWeeks`
+ * functions since those parse "YYYY-MM-DD" as "YYYY-MM-DDT00:00:00Z".
  */
 export function getCurrentWeekMonday(): string {
   const now = new Date()
@@ -55,8 +59,8 @@ export function formatWeekLabel(weekStart: string): string {
 
   const startDay = start.getUTCDate()
   const endDay = end.getUTCDate()
-  const monthAbbr = MONTHS_ES[start.getUTCMonth()]
-  const year = start.getUTCFullYear()
+  const monthAbbr = MONTHS_ES[end.getUTCMonth()]
+  const year = end.getUTCFullYear()
 
   return `${startDay} – ${endDay} ${monthAbbr} ${year}`
 }
