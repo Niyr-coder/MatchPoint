@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
+import { notifyUser } from "@/features/notifications/utils"
 import type { ApiResponse } from "@/types"
 
 const patchSchema = z.object({
@@ -56,7 +57,7 @@ export async function PATCH(
 
     const { data: existing, error: fetchError } = await supabase
       .from("reservations")
-      .select("id, status")
+      .select("id, user_id, status, date, start_time, end_time, courts(name)")
       .eq("id", id)
       .maybeSingle()
 
@@ -90,6 +91,21 @@ export async function PATCH(
       entityId: id,
       actorId: authResult.context.userId,
       details: { id, previous_status: existing.status },
+    })
+
+    // Notify the reservation owner — fire-and-forget
+    const court = Array.isArray(existing.courts) ? existing.courts[0] : existing.courts
+    const courtName = (court as { name?: string } | null)?.name ?? "la cancha"
+    void notifyUser(existing.user_id as string, {
+      type:  "reservation.cancelled",
+      title: "Reserva cancelada",
+      body:  `Tu reserva en ${courtName} el ${existing.date as string} de ${(existing.start_time as string).slice(0, 5)} a ${(existing.end_time as string).slice(0, 5)} fue cancelada por el administrador.`,
+      metadata: {
+        reservation_id: id,
+        date:           existing.date,
+        start_time:     existing.start_time,
+        end_time:       existing.end_time,
+      },
     })
 
     return NextResponse.json({ success: true, data: updated, error: null })

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getUserReservations, createReservation, cancelReservation } from "@/features/bookings/queries"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { notifyClubStaff } from "@/features/notifications/utils"
 import { z } from "zod"
 
 const cancelReservationSchema = z.object({
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     // Calculate price server-side — never trust client-provided price
     const { data: court, error: courtErr } = await supabase
       .from("courts")
-      .select("price_per_hour")
+      .select("price_per_hour, name")
       .eq("id", parsed.data.court_id)
       .single()
 
@@ -115,6 +116,22 @@ export async function POST(request: NextRequest) {
     const serverPrice = Math.round(court.price_per_hour * durationHours * 100) / 100
 
     const reservation = await createReservation(user.id, { ...parsed.data, total_price: serverPrice })
+
+    // Notify club owners and managers — fire-and-forget, does not block the response
+    void notifyClubStaff(parsed.data.court_id, {
+      type:  "reservation.new",
+      title: "Nueva reserva pendiente",
+      body:  `Se solicitó ${court.name} para el ${parsed.data.date} de ${parsed.data.start_time.slice(0, 5)} a ${parsed.data.end_time.slice(0, 5)}.`,
+      metadata: {
+        reservation_id: reservation.id,
+        court_id:       parsed.data.court_id,
+        court_name:     court.name,
+        date:           parsed.data.date,
+        start_time:     parsed.data.start_time,
+        end_time:       parsed.data.end_time,
+      },
+    })
+
     return NextResponse.json({ success: true, data: reservation }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear reserva"
