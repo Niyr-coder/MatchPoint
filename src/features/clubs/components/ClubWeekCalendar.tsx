@@ -15,6 +15,7 @@ import { QuickBookModal, type QuickBookSlot } from "./QuickBookModal"
 
 interface ClubWeekCalendarProps {
   clubId: string
+  onSlotSelect?: (court: ClubProfileCourt, date: string, startTime: string, endTime: string) => void
 }
 
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7) // 07 to 22
@@ -25,7 +26,7 @@ interface CalendarData {
   reservations: WeekReservation[]
 }
 
-export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
+export function ClubWeekCalendar({ clubId, onSlotSelect }: ClubWeekCalendarProps) {
   const [weekStart, setWeekStart] = useState(getCurrentWeekMonday)
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0])
   const [data, setData] = useState<CalendarData | null>(null)
@@ -65,6 +66,12 @@ export function ClubWeekCalendar({ clubId }: ClubWeekCalendarProps) {
   function handleSlotClick(court: ClubProfileCourt, date: string, hour: number) {
     const startTime = `${String(hour).padStart(2, "0")}:00`
     const endTime   = `${String(hour + 1).padStart(2, "0")}:00`
+
+    if (onSlotSelect) {
+      onSlotSelect(court, date, startTime, endTime)
+      return
+    }
+
     setActiveSlot({
       courtId:      court.id,
       courtName:    court.name,

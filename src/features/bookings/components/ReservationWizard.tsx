@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, Building2, Layers, Clock, CheckCircle } from "lucide-react"
 import type { ClubWithSports } from "@/features/clubs/queries/clubs"
 import type { Court, TimeSlot } from "@/features/clubs/types"
+import type { ClubProfileCourt } from "@/features/clubs/queries/club-profile"
+import { ClubWeekCalendar } from "@/features/clubs/components/ClubWeekCalendar"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -215,98 +217,6 @@ function StepCourt({
   )
 }
 
-// ─── Step 3: Date + Time ─────────────────────────────────────────────────────
-
-function StepDateTime({
-  courtId,
-  date,
-  selectedSlot,
-  onDateChange,
-  onSlotSelect,
-}: {
-  courtId: string
-  date: string
-  selectedSlot: TimeSlot | null
-  onDateChange: (d: string) => void
-  onSlotSelect: (slot: TimeSlot) => void
-}) {
-  const [slots, setSlots] = useState<TimeSlot[]>([])
-  const [loadingSlots, setLoadingSlots] = useState(false)
-
-  const today = new Date().toISOString().split("T")[0]
-
-  function handleDateChange(newDate: string) {
-    onDateChange(newDate)
-    if (!newDate) return
-    setLoadingSlots(true)
-    fetch(`/api/courts/${courtId}/availability?date=${newDate}`)
-      .then((r) => r.json())
-      .then((json) => { if (json.success) setSlots(json.data ?? []) })
-      .catch(() => setSlots([]))
-      .finally(() => setLoadingSlots(false))
-  }
-
-  return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <label className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 block mb-2">
-          Fecha
-        </label>
-        <input
-          type="date"
-          min={today}
-          value={date}
-          onChange={(e) => handleDateChange(e.target.value)}
-          className="border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-foreground/10 bg-card"
-        />
-      </div>
-
-      {date && (
-        <div>
-          <label className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 block mb-2">
-            Horario disponible
-          </label>
-
-          {loadingSlots ? (
-            <div className="flex items-center gap-2 py-4">
-              <Loader2 className="size-4 animate-spin text-zinc-400" />
-              <span className="text-sm text-zinc-400">Cargando horarios...</span>
-            </div>
-          ) : slots.length === 0 ? (
-            <p className="text-sm text-zinc-400 py-4">
-              No hay horarios disponibles para esta fecha.
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {slots.map((slot) => {
-                const isSelected =
-                  selectedSlot?.startTime === slot.startTime &&
-                  selectedSlot?.endTime === slot.endTime
-
-                return (
-                  <button
-                    key={slot.startTime}
-                    disabled={!slot.available}
-                    onClick={() => onSlotSelect(slot)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wide transition-colors ${
-                      !slot.available
-                        ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
-                        : isSelected
-                        ? "bg-foreground text-white border border-foreground"
-                        : "bg-card text-foreground border border-border hover:border-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {slot.startTime.slice(0, 5)} – {slot.endTime.slice(0, 5)}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ─── Step 4: Confirm ─────────────────────────────────────────────────────────
 
@@ -480,12 +390,25 @@ export function ReservationWizard() {
     setStep(2)
   }
 
-  function handleDateChange(date: string) {
-    setWizardState((prev) => ({ ...prev, date, slot: null }))
-  }
-
-  function handleSlotSelect(slot: TimeSlot) {
-    setWizardState((prev) => ({ ...prev, slot }))
+  function handleCalendarSlotSelect(
+    profileCourt: ClubProfileCourt,
+    date: string,
+    startTime: string,
+    endTime: string,
+  ) {
+    const court: Court = {
+      id:             profileCourt.id,
+      club_id:        wizardState.club?.id ?? "",
+      name:           profileCourt.name,
+      sport:          profileCourt.sport,
+      surface_type:   null,
+      is_indoor:      false,
+      price_per_hour: profileCourt.price_per_hour,
+      is_active:      true,
+      created_at:     "",
+    }
+    const slot: TimeSlot = { startTime, endTime, available: true }
+    setWizardState((prev) => ({ ...prev, court, date, slot }))
     setStep(3)
   }
 
@@ -547,13 +470,10 @@ export function ReservationWizard() {
           />
         )}
 
-        {step === 2 && wizardState.court && (
-          <StepDateTime
-            courtId={wizardState.court.id}
-            date={wizardState.date}
-            selectedSlot={wizardState.slot}
-            onDateChange={handleDateChange}
-            onSlotSelect={handleSlotSelect}
+        {step === 2 && wizardState.club && (
+          <ClubWeekCalendar
+            clubId={wizardState.club.id}
+            onSlotSelect={handleCalendarSlotSelect}
           />
         )}
 
