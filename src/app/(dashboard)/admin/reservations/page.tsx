@@ -8,50 +8,42 @@ async function getReservations(): Promise<ReservationAdmin[]> {
   try {
     const supabase = createServiceClient()
 
-    // profiles table has no email column — fetch emails from auth.users via admin API
-    const [reservationsResult, usersResult] = await Promise.all([
-      supabase
-        .from("reservations")
-        .select(
-          `
+    const { data, error } = await supabase
+      .from("reservations")
+      .select(
+        `
+        id,
+        user_id,
+        date,
+        start_time,
+        end_time,
+        status,
+        total_price,
+        notes,
+        created_at,
+        profiles:user_id (
+          full_name,
+          email
+        ),
+        courts:court_id (
           id,
-          user_id,
-          date,
-          start_time,
-          end_time,
-          status,
-          total_price,
-          notes,
-          created_at,
-          profiles:user_id (
-            full_name
-          ),
-          courts:court_id (
+          name,
+          sport,
+          club_id,
+          clubs:club_id (
             id,
-            name,
-            sport,
-            club_id,
-            clubs:club_id (
-              id,
-              name
-            )
+            name
           )
-          `
         )
-        .order("date", { ascending: false })
-        .order("start_time", { ascending: false })
-        .limit(200),
-      supabase.auth.admin.listUsers({ perPage: 1000 }),
-    ])
+        `
+      )
+      .order("date", { ascending: false })
+      .order("start_time", { ascending: false })
+      .limit(200)
 
-    if (reservationsResult.error) throw new Error(reservationsResult.error.message)
+    if (error) throw new Error(error.message)
 
-    // Build email lookup map from auth.users
-    const emailMap = new Map<string, string>(
-      (usersResult.data?.users ?? []).map((u) => [u.id, u.email ?? ""])
-    )
-
-    return (reservationsResult.data ?? []).map((row) => {
+    return (data ?? []).map((row) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
       const court   = Array.isArray(row.courts)   ? row.courts[0]   : row.courts
       const club    = court
@@ -64,7 +56,7 @@ async function getReservations(): Promise<ReservationAdmin[]> {
         id:          row.id as string,
         user_id:     row.user_id as string,
         user_name:   (profile as { full_name?: string | null } | null)?.full_name ?? null,
-        user_email:  emailMap.get(row.user_id as string) ?? null,
+        user_email:  (profile as { email?: string | null } | null)?.email ?? null,
         club_id:     (club   as { id?: string }   | null)?.id   ?? null,
         club_name:   (club   as { name?: string } | null)?.name ?? null,
         court_id:    (court  as { id?: string }   | null)?.id   ?? "",
