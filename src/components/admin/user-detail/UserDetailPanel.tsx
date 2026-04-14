@@ -4,6 +4,7 @@ import { X, ShieldOff, ShieldCheck } from "lucide-react"
 import { RoleBadge } from "@/components/shared/RoleBadge"
 import { MembershipsSection } from "@/components/admin/user-detail/MembershipsSection"
 import { VerificationSection } from "@/components/admin/user-detail/VerificationSection"
+import { BadgesSection } from "@/components/admin/user-detail/BadgesSection"
 import { displayName, isSuspended, initials, formatDate } from "@/components/admin/user-detail/helpers"
 import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
 import type { AppRole } from "@/types"
@@ -100,6 +101,8 @@ export function UserDetailPanel({
 
           <div className="border-t border-border" />
           <VerificationSection user={user} onVerified={onVerified} />
+          <div className="border-t border-border" />
+          <BadgesSection userId={user.id} clubs={clubs} />
           <div className="border-t border-border" />
           <MembershipsSection userId={user.id} clubs={clubs} onMembershipChange={onMembershipChange} />
         </div>
