@@ -15,6 +15,12 @@ const DYNAMICS: { value: GameDynamic; label: string; emoji: string; description:
 const MODALITIES = ["Singles", "Dobles", "Mixtos"] as const
 const MAX_PLAYERS = [4, 8, 16, 32] as const
 
+const COURT_OPTIONS = [1, 2, 3, 4, 5, 6] as const
+
+function playersPerCourt(modality: string): number {
+  return modality === "Dobles" || modality === "Mixtos" ? 4 : 2
+}
+
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-zinc-300 focus:outline-none focus:border-foreground transition-colors bg-card"
 const labelCls = "text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500"
@@ -23,7 +29,8 @@ interface WizardForm {
   name: string
   game_dynamic: GameDynamic | ""
   modality: string
-  max_participants: 4 | 8 | 16 | 32
+  court_count: number
+  max_participants: number
   start_date: string
   start_time: string
   club_id: string
@@ -78,7 +85,8 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
     name: "",
     game_dynamic: "",
     modality: "",
-    max_participants: 16,
+    court_count: 1,
+    max_participants: 4,
     start_date: "",
     start_time: "",
     club_id: clubs[0]?.id ?? "",
@@ -86,7 +94,17 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
   })
 
   function update<K extends keyof WizardForm>(key: K, value: WizardForm[K]) {
-    setForm(prev => ({ ...prev, [key]: value }))
+    setForm(prev => {
+      const next = { ...prev, [key]: value }
+      if (key === "court_count" || key === "modality") {
+        const ppc = playersPerCourt(next.modality)
+        const minMax = (next.court_count as number) * ppc
+        if (next.max_participants < minMax) {
+          next.max_participants = minMax
+        }
+      }
+      return next
+    })
   }
 
   async function handleSubmit() {
@@ -100,6 +118,7 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
           name: form.name,
           game_dynamic: form.game_dynamic,
           modality: form.modality,
+          court_count: form.court_count,
           max_participants: form.max_participants,
           start_date: form.start_date,
           start_time: form.start_time,
@@ -218,16 +237,17 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
             </div>
           </div>
 
+          {/* Court picker */}
           <div>
-            <label className={labelCls}>Máx. jugadores</label>
+            <label className={labelCls}>Canchas disponibles</label>
             <div className="mt-2 flex gap-2">
-              {MAX_PLAYERS.map(n => (
+              {COURT_OPTIONS.map(n => (
                 <button
                   key={n}
                   type="button"
-                  onClick={() => update("max_participants", n)}
+                  onClick={() => update("court_count", n)}
                   className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-black transition-colors ${
-                    form.max_participants === n
+                    form.court_count === n
                       ? "border-foreground bg-foreground text-white"
                       : "border-border hover:border-foreground/50"
                   }`}
@@ -236,6 +256,40 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
                 </button>
               ))}
             </div>
+            {form.modality && (
+              <div className="mt-2 px-3 py-2 bg-muted rounded-xl text-xs text-zinc-500 font-medium">
+                {(() => {
+                  const ppc = playersPerCourt(form.modality)
+                  const active = form.court_count * ppc
+                  const waiting = Math.max(0, form.max_participants - active)
+                  return `${form.court_count} cancha${form.court_count > 1 ? "s" : ""} × ${ppc} jugadores = ${active} activos${waiting > 0 ? ` · ${waiting} en espera` : ""}`
+                })()}
+              </div>
+            )}
+          </div>
+
+          {/* Max participants — numeric input */}
+          <div>
+            <label className={labelCls}>Máx. jugadores (total)</label>
+            <input
+              type="number"
+              className={`${inputCls} mt-2`}
+              min={form.modality ? form.court_count * playersPerCourt(form.modality) : 4}
+              max={64}
+              value={form.max_participants}
+              onChange={e => {
+                const val = Math.max(
+                  form.modality ? form.court_count * playersPerCourt(form.modality) : 4,
+                  Number(e.target.value)
+                )
+                update("max_participants", val)
+              }}
+            />
+            {form.modality && (
+              <p className="mt-1 text-[11px] text-zinc-400">
+                Mínimo: {form.court_count * playersPerCourt(form.modality)} jugadores
+              </p>
+            )}
           </div>
 
           <button
@@ -353,7 +407,9 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
               🏓 Pickleball · {form.modality} · {form.game_dynamic}
             </div>
             <div className="text-xs text-zinc-500">
-              📅 {form.start_date} {form.start_time} · 👥 máx {form.max_participants}
+              📅 {form.start_date} {form.start_time} · 👥 máx {form.max_participants} ·{" "}
+              {form.court_count} cancha{form.court_count > 1 ? "s" : ""} ·{" "}
+              {form.court_count * playersPerCourt(form.modality || "Singles")} activos
             </div>
           </div>
 
