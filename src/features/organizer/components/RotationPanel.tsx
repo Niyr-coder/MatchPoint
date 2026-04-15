@@ -169,13 +169,16 @@ export function RotationPanel({ quedadaId, dynamic, participants, modality, init
         const rep1 = match.teamA[0].user_id!
         const rep2 = match.teamB[0].user_id!
         try {
-          await fetch(`/api/quedadas/${quedadaId}/rotation/match`, {
+          const res = await fetch(`/api/quedadas/${quedadaId}/rotation/match`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ player1Id: rep1, player2Id: rep2, scoreA, scoreB }),
           })
-        } catch {
-          // Non-fatal
+          if (!res.ok) {
+            console.warn("[RotationPanel] match result not saved:", res.status)
+          }
+        } catch (err) {
+          console.warn("[RotationPanel] match result fetch failed:", err)
         }
       }
 

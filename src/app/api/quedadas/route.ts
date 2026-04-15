@@ -9,12 +9,7 @@ const createQuedadaSchema = z.object({
   name: z.string().min(3).max(100),
   game_dynamic: z.enum(["standard", "king_of_court", "popcorn", "round_robin"]),
   modality: z.string().min(1).max(50),
-  max_participants: z.union([
-    z.literal(4),
-    z.literal(8),
-    z.literal(16),
-    z.literal(32),
-  ]),
+  max_participants: z.number().int().min(4).max(64),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   start_time: z.string().regex(/^\d{2}:\d{2}$/),
   club_id: z.string().uuid().optional(),

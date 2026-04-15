@@ -99,9 +99,8 @@ export function QuedadaWizard({ clubs }: { clubs: { id: string; name: string }[]
       if (key === "court_count" || key === "modality") {
         const ppc = playersPerCourt(next.modality)
         const minMax = (next.court_count as number) * ppc
-        if (next.max_participants < minMax) {
-          next.max_participants = minMax
-        }
+        const clamped = Math.max(next.max_participants, minMax)
+        return { ...next, max_participants: clamped }
       }
       return next
     })
