@@ -200,6 +200,7 @@ export function QuedadaManagePanel({ quedada, initialParticipants }: Props) {
               dynamic={quedada.game_dynamic as "king_of_court" | "popcorn"}
               participants={participants}
               modality={quedada.modality ?? "Singles"}
+              initialCourtCount={quedada.court_count ?? 1}
             />
           )}
         </div>

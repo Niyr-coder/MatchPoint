@@ -13,7 +13,7 @@ import {
 } from "@/features/organizer/utils/rotation"
 import type { QuedadaParticipant } from "@/features/organizer/types"
 
-const COURT_OPTIONS = [1, 2, 3, 4] as const
+const COURT_OPTIONS = [1, 2, 3, 4, 5, 6] as const
 type CourtCount = (typeof COURT_OPTIONS)[number]
 
 interface Props {
@@ -21,6 +21,7 @@ interface Props {
   dynamic: "king_of_court" | "popcorn"
   participants: QuedadaParticipant[]
   modality: string
+  initialCourtCount: number
 }
 
 function displayName(p: QuedadaParticipant): string {
@@ -139,8 +140,10 @@ function PopcornPicker({ queue, slotsNeeded, onPick }: PopcornPickerProps) {
   )
 }
 
-export function RotationPanel({ quedadaId, dynamic, participants, modality }: Props) {
-  const [courtCount, setCourtCount] = useState<CourtCount>(1)
+export function RotationPanel({ quedadaId, dynamic, participants, modality, initialCourtCount }: Props) {
+  const [courtCount, setCourtCount] = useState<CourtCount>(
+    (COURT_OPTIONS.includes(initialCourtCount as CourtCount) ? initialCourtCount : 1) as CourtCount
+  )
   const [initialized, setInitialized] = useState(false)
   const [activeMatches, setActiveMatches] = useState<ActiveMatch[]>([])
   const [queue, setQueue] = useState<QuedadaParticipant[]>([])
@@ -248,6 +251,19 @@ export function RotationPanel({ quedadaId, dynamic, participants, modality }: Pr
               </button>
             ))}
           </div>
+        </div>
+        {/* Distribution preview */}
+        <div className="px-3 py-2 bg-muted rounded-xl text-xs text-zinc-500 font-medium">
+          {(() => {
+            const ppc = teamSize(modality) * 2
+            const totalPlayers = participants.length
+            const activeCourts = Math.min(courtCount, Math.floor(totalPlayers / ppc))
+            const active = activeCourts * ppc
+            const waiting = Math.max(0, totalPlayers - active)
+            return activeCourts > 0
+              ? `${activeCourts} cancha${activeCourts > 1 ? "s" : ""} × ${ppc} jugadores = ${active} activos · ${waiting} en espera`
+              : `Se necesitan al menos ${ppc} jugadores por cancha`
+          })()}
         </div>
         {participants.length < minPlayers && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 text-xs text-yellow-700">
