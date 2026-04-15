@@ -16,6 +16,15 @@ ALTER TABLE tournament_participants
   ADD COLUMN IF NOT EXISTS guest_lastname TEXT;
 
 -- 4. Identity constraint: either a registered user or a guest name must be present
-ALTER TABLE tournament_participants
-  ADD CONSTRAINT IF NOT EXISTS participant_identity_check
-    CHECK (user_id IS NOT NULL OR guest_name IS NOT NULL);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_name = 'participant_identity_check'
+      AND table_name = 'tournament_participants'
+  ) THEN
+    ALTER TABLE tournament_participants
+      ADD CONSTRAINT participant_identity_check
+        CHECK (user_id IS NOT NULL OR guest_name IS NOT NULL);
+  END IF;
+END $$;
