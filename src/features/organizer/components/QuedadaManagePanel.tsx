@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Swords, Link2, UserPlus, Trash2 } from "lucide-react"
+import { Link2, UserPlus, Trash2 } from "lucide-react"
 import { AddPlayerModal } from "@/features/organizer/components/AddPlayerModal"
-import { RotationScoreboard } from "@/features/organizer/components/RotationScoreboard"
+import { RotationPanel } from "@/features/organizer/components/RotationPanel"
+import { BracketPanel } from "@/features/organizer/components/BracketPanel"
 import type { Quedada, QuedadaParticipant } from "@/features/organizer/types"
 
 const DYNAMIC_LABELS: Record<string, string> = {
@@ -25,8 +26,6 @@ const STATUS_STYLES: Record<string, { label: string; classes: string }> = {
 const TABS = ["Jugadores", "Bracket / Resultados", "Invitación"] as const
 type Tab = (typeof TABS)[number]
 
-const USES_BRACKET = ["standard", "round_robin"]
-
 interface Props {
   quedada: Quedada
   initialParticipants: QuedadaParticipant[]
@@ -41,7 +40,6 @@ export function QuedadaManagePanel({ quedada, initialParticipants }: Props) {
   const [inviteLink] = useState(`matchpoint.top/join/${quedada.id.slice(0, 8)}`)
 
   const st = STATUS_STYLES[quedada.status] ?? STATUS_STYLES.open
-  const hasBracket = USES_BRACKET.includes(quedada.game_dynamic ?? "standard")
 
   const refreshParticipants = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${quedada.id}/participants`)
@@ -194,20 +192,14 @@ export function QuedadaManagePanel({ quedada, initialParticipants }: Props) {
       {/* TAB: Bracket / Resultados */}
       {tab === "Bracket / Resultados" && (
         <div>
-          {hasBracket ? (
-            <div className="text-center py-8 text-zinc-400 text-sm border border-dashed border-border rounded-2xl">
-              <Swords className="size-8 mx-auto mb-2 text-zinc-300" />
-              El bracket se genera al iniciar la quedada.
-              <br />
-              <span className="text-xs">
-                Usa el botón "Iniciar" cuando todos los jugadores estén listos.
-              </span>
-            </div>
+          {quedada.game_dynamic === "standard" || quedada.game_dynamic === "round_robin" ? (
+            <BracketPanel quedada={quedada} participantCount={participants.length} />
           ) : (
-            <RotationScoreboard
+            <RotationPanel
               quedadaId={quedada.id}
-              dynamic={quedada.game_dynamic ?? "king_of_court"}
+              dynamic={quedada.game_dynamic as "king_of_court" | "popcorn"}
               participants={participants}
+              modality={quedada.modality ?? "Singles"}
             />
           )}
         </div>
