@@ -93,6 +93,8 @@ export async function createTournament(
     start_time: input.start_time,
     modality: input.modality,
     is_official: input.is_official ?? false,
+    ...(input.event_type ? { event_type: input.event_type } : {}),
+    ...(input.game_dynamic ? { game_dynamic: input.game_dynamic } : {}),
     extras: input.extras ?? {},
   }
 
