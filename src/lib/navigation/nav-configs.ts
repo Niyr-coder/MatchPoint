@@ -148,7 +148,7 @@ export function getCoachNav(clubId: string): NavSection[] {
   ]
 }
 
-export function getUserNav(): NavSection[] {
+export function getUserNav(isOrganizer = false): NavSection[] {
   return [
     {
       title: "Explorar",
@@ -157,6 +157,9 @@ export function getUserNav(): NavSection[] {
         { label: "Clubes", href: "/dashboard/clubs", icon: "Building2" },
         { label: "Ranking", href: "/dashboard/ranking", icon: "Trophy" },
         { label: "Eventos", href: "/dashboard/events", icon: "CalendarDays" },
+        ...(isOrganizer
+          ? [{ label: "Mis Quedadas", href: "/dashboard/organizer", icon: "Swords" }]
+          : []),
       ],
     },
     {
