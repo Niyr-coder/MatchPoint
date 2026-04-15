@@ -3,6 +3,8 @@ import type { SportType } from "@/features/clubs/types"
 export type TournamentStatus = "draft" | "open" | "in_progress" | "completed" | "cancelled"
 export type ParticipantStatus = "registered" | "confirmed" | "eliminated" | "winner" | "withdrawn"
 export type PaymentStatus = "pending" | "paid" | "waived" | "refunded"
+export type EventType = 'tournament' | 'quedada'
+export type GameDynamic = 'standard' | 'king_of_court' | 'popcorn' | 'round_robin'
 
 // ── Extras sub-types ───────────────────────────────────────────────────────────
 
@@ -40,6 +42,8 @@ export interface Tournament {
   status: TournamentStatus
   entry_fee: number
   bracket_locked: boolean
+  event_type?: EventType
+  game_dynamic?: GameDynamic
   created_at: string
   updated_at: string
   clubs?: { name: string } | null
@@ -62,6 +66,8 @@ export interface TournamentParticipant {
   notes?: string | null
   club_id?: string | null
   confirmed_at?: string | null
+  guest_name?: string | null
+  guest_lastname?: string | null
 }
 
 export interface TournamentFeedback {
@@ -86,5 +92,7 @@ export interface CreateTournamentInput {
   start_time?: string
   modality?: string
   is_official?: boolean
+  event_type?: EventType
+  game_dynamic?: GameDynamic
   extras?: TournamentExtras
 }
