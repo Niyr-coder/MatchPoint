@@ -1,7 +1,7 @@
 import { authorizeOrRedirect } from "@/features/auth/queries"
 import { getOpenTournaments, getCreatedTournaments } from "@/features/tournaments/queries"
 import { PageHeader } from "@/components/shared/PageHeader"
-import { Trophy, Users, Plus } from "lucide-react"
+import { Trophy, Users, Plus, Swords } from "lucide-react"
 import Link from "next/link"
 
 const SPORT_LABEL: Record<string, string> = {
@@ -29,6 +29,8 @@ function formatDate(dateStr: string): string {
 
 export default async function TournamentsPage() {
   const ctx = await authorizeOrRedirect()
+  const { canOrganize } = await import("@/features/organizer/permissions")
+  const isOrganizer = await canOrganize(ctx)
 
   const [openTournaments, myTournaments] = await Promise.all([
     getOpenTournaments(),
@@ -41,13 +43,24 @@ export default async function TournamentsPage() {
         label="Competencias"
         title="Torneos"
         action={
-          <Link
-            href="/dashboard/tournaments/create"
-            className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] px-4 py-2 bg-foreground text-white rounded-full hover:bg-foreground/90 transition-colors"
-          >
-            <Plus className="size-3.5" />
-            Crear Torneo
-          </Link>
+          <div className="flex items-center gap-2">
+            {isOrganizer && (
+              <Link
+                href="/dashboard/organizer/new"
+                className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] px-4 py-2 border border-foreground text-foreground rounded-full hover:bg-foreground hover:text-white transition-colors"
+              >
+                <Swords className="size-3.5" />
+                Organizar quedada
+              </Link>
+            )}
+            <Link
+              href="/dashboard/tournaments/create"
+              className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] px-4 py-2 bg-foreground text-white rounded-full hover:bg-foreground/90 transition-colors"
+            >
+              <Plus className="size-3.5" />
+              Crear Torneo
+            </Link>
+          </div>
         }
       />
 
