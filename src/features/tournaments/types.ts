@@ -50,6 +50,7 @@ export interface Tournament {
   participant_count?: number
   modality?: string | null
   start_time?: string | null
+  court_count?: number | null
   is_official?: boolean
   extras?: TournamentExtras
 }
@@ -94,5 +95,6 @@ export interface CreateTournamentInput {
   is_official?: boolean
   event_type?: EventType
   game_dynamic?: GameDynamic
+  court_count?: number
   extras?: TournamentExtras
 }

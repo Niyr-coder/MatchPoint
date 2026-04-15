@@ -95,6 +95,7 @@ export async function createTournament(
     is_official: input.is_official ?? false,
     ...(input.event_type ? { event_type: input.event_type } : {}),
     ...(input.game_dynamic ? { game_dynamic: input.game_dynamic } : {}),
+    ...(input.court_count != null ? { court_count: input.court_count } : {}),
     extras: input.extras ?? {},
   }
 

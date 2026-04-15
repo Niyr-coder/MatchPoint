@@ -32,4 +32,5 @@ export interface CreateQuedadaInput {
   start_time: string
   club_id?: string
   is_public?: boolean
+  court_count?: number
 }

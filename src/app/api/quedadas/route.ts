@@ -19,6 +19,7 @@ const createQuedadaSchema = z.object({
   start_time: z.string().regex(/^\d{2}:\d{2}$/),
   club_id: z.string().uuid().optional(),
   is_public: z.boolean().optional(),
+  court_count: z.number().int().min(1).max(6).optional().default(1),
 })
 
 export async function GET() {
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
       club_id: d.club_id,
       event_type: "quedada",
       game_dynamic: d.game_dynamic,
+      court_count: d.court_count,
     })
     return NextResponse.json({ success: true, data: quedada, error: null }, { status: 201 })
   } catch (error: unknown) {
