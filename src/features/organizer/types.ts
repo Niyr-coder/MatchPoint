@@ -10,7 +10,8 @@ export type Quedada = Tournament & {
 }
 
 /** Participant that may be a guest (no user_id) */
-export interface QuedadaParticipant extends TournamentParticipant {
+export interface QuedadaParticipant extends Omit<TournamentParticipant, 'user_id'> {
+  user_id: string | null
   guest_name?: string | null
   guest_lastname?: string | null
   /** Joined profile data when user_id is present */
