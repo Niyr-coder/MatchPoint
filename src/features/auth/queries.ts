@@ -1,6 +1,7 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import type { AppPermission, AppRole, AuthContext } from "@/features/auth/types"
 import type { Profile } from "@/features/users/types"
+import { getPlayerBadges } from "@/features/badges/queries"
 
 // ──────────────────────────────────────────────────────────
 // Result type: every layer returns this
@@ -127,7 +128,10 @@ export async function authorize({
 
   // Admin bypasses layers 4-6 (global access)
   if (isAdmin) {
-    const permissions = await loadPermissions("admin")
+    const [permissions, badges] = await Promise.all([
+      loadPermissions("admin"),
+      getPlayerBadges(authCheck.user.id),
+    ])
     return {
       ok: true,
       context: {
@@ -137,7 +141,7 @@ export async function authorize({
         clubId,
         clubRole: "admin",
         permissions,
-        badges: [],
+        badges,
       },
     }
   }
@@ -160,7 +164,10 @@ export async function authorize({
   }
 
   // Layer 6 — specific permission?
-  const permissions = await loadPermissions(effectiveRole)
+  const [permissions, badges] = await Promise.all([
+    loadPermissions(effectiveRole),
+    getPlayerBadges(authCheck.user.id),
+  ])
   if (requiredPermission && !checkPermission(permissions, requiredPermission)) {
     return { ok: false, reason: "insufficient_permission" }
   }
@@ -174,7 +181,7 @@ export async function authorize({
       clubId,
       clubRole: clubId ? clubRole : null,
       permissions,
-      badges: [],
+      badges,
     },
   }
 }
