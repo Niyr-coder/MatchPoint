@@ -2,9 +2,17 @@ import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
 
-const addParticipantSchema = z.object({
-  userId: z.string().uuid("userId debe ser un UUID válido"),
-})
+const addParticipantSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("registered"),
+    userId: z.string().uuid("userId debe ser un UUID válido"),
+  }),
+  z.object({
+    type: z.literal("guest"),
+    guestName: z.string().min(1).max(50),
+    guestLastname: z.string().min(1).max(50),
+  }),
+])
 
 export async function GET(
   _request: Request,
@@ -27,6 +35,8 @@ export async function GET(
       notes,
       withdrawal_reason,
       registered_at,
+      guest_name,
+      guest_lastname,
       profiles!tp_user_profile_fk (
         id,
         username,
@@ -78,6 +88,23 @@ export async function POST(
 
   const service = createServiceClient()
 
+  if (body.type === "guest") {
+    // Guest players are always new — no deduplication needed
+    const { data, error } = await service
+      .from("tournament_participants")
+      .insert({
+        tournament_id: id,
+        user_id: null,
+        guest_name: body.guestName,
+        guest_lastname: body.guestLastname,
+      })
+      .select()
+      .single()
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, data }, { status: 201 })
+  }
+
+  // Registered user flow
   // Check if already participating (including withdrawn)
   const { data: existing } = await service
     .from("tournament_participants")
