@@ -128,6 +128,8 @@ export const RATE_LIMITS = {
   // Profile
   profileCheckUsername:  { limit: 20,  windowMs:    60_000 } satisfies RateLimitConfig,  // 20 validaciones/min
   profileSettings:       { limit: 10,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 10 cambios settings/hora
+  // Bracket corrections
+  bracketScoreCorrect:   { limit: 10,  windowMs:    60_000 } satisfies RateLimitConfig,  // 10 corrections/min
   // Shop
   shopProductUpdate:     { limit: 20,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 edits/hora
   shopOrderUpdate:       { limit: 20,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 actualizaciones/hora
