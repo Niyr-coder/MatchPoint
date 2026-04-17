@@ -16,7 +16,7 @@ export function formatTimeRange(startDate: string, endDate?: string | null): str
   if (!endDate) return fmt(start)
   const end = new Date(endDate)
   const diffHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
-  const durationLabel = diffHours % 1 === 0 ? `${diffHours}h` : `${diffHours}h`
+  const durationLabel = diffHours % 1 === 0 ? `${diffHours}h` : `${diffHours.toFixed(1)}h`
   return `${fmt(start)}–${fmt(end)} (${durationLabel})`
 }
 
@@ -243,7 +243,7 @@ export function EventCard({
         {showUrgency && (
           <div className="bg-[#fff7ed] border border-[#fed7aa] rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
             <span className="text-[11px] font-black text-[#c2410c]">
-              ⏰ Cierra {deadlineDays === 0 ? "hoy" : `en ${deadlineDays} día${deadlineDays !== 1 ? "s" : ""}`}
+              ⏰ Cierra {deadlineDays < 1 ? "hoy" : `en ${deadlineDays} día${deadlineDays !== 1 ? "s" : ""}`}
               {urgencyDate ? ` — ${urgencyDate}` : ""}
             </span>
           </div>
