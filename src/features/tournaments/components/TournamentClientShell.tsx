@@ -11,8 +11,9 @@ import { TournamentFeedbackList } from "@/features/tournaments/components/Tourna
 import { TournamentAnalytics } from "@/features/tournaments/components/TournamentAnalytics"
 import { CheckCircle } from "lucide-react"
 import type { TournamentStatus } from "@/features/tournaments/types"
+import { RoundRobinStandings } from "./RoundRobinStandings"
 
-type Tab = "participants" | "bracket" | "manage" | "feedback" | "stats"
+type Tab = "participants" | "bracket" | "standings" | "manage" | "feedback" | "stats"
 
 interface TabDef {
   key: Tab
@@ -49,9 +50,12 @@ export function TournamentClientShell({
 
   const showFeedback = currentStatus === "completed" && (isParticipant || alreadyJoined || isCreator)
 
+  const showStandings = showBracket && modality?.includes("Round Robin")
+
   const tabs: TabDef[] = [
     { key: "participants", label: "Participantes" },
     ...(showBracket ? [{ key: "bracket" as Tab, label: "Bracket" }] : []),
+    ...(showStandings ? [{ key: "standings" as Tab, label: "Posiciones" }] : []),
     ...(isCreator ? [{ key: "manage" as Tab, label: "Gestión" }] : []),
     ...(showFeedback ? [{ key: "feedback" as Tab, label: "Valoraciones" }] : []),
     ...(isCreator ? [{ key: "stats" as Tab, label: "Estadísticas" }] : []),
@@ -145,6 +149,11 @@ export function TournamentClientShell({
           />
         )}
       </div>
+
+      {/* Tab: Posiciones (Round Robin only) */}
+      {showStandings && activeTab === "standings" && (
+        <RoundRobinStandings tournamentId={tournamentId} />
+      )}
 
       {/* Tab: Gestión (creator only) */}
       {isCreator && (tabs.length === 1 || activeTab === "manage") && (

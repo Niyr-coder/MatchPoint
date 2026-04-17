@@ -6,6 +6,7 @@ import { Link2, UserPlus, Trash2 } from "lucide-react"
 import { AddPlayerModal } from "@/features/organizer/components/AddPlayerModal"
 import { RotationPanel } from "@/features/organizer/components/RotationPanel"
 import { BracketPanel } from "@/features/organizer/components/BracketPanel"
+import { QuedadaLeaderboard } from "@/features/organizer/components/QuedadaLeaderboard"
 import type { Quedada, QuedadaParticipant } from "@/features/organizer/types"
 
 const DYNAMIC_LABELS: Record<string, string> = {
@@ -23,7 +24,7 @@ const STATUS_STYLES: Record<string, { label: string; classes: string }> = {
   cancelled:   { label: "Cancelada",  classes: "bg-red-50 text-red-600 border-red-200" },
 }
 
-const TABS = ["Jugadores", "Bracket / Resultados", "Invitación"] as const
+const TABS = ["Jugadores", "Bracket / Resultados", "Resultados", "Invitación"] as const
 type Tab = (typeof TABS)[number]
 
 interface Props {
@@ -204,6 +205,11 @@ export function QuedadaManagePanel({ quedada, initialParticipants }: Props) {
             />
           )}
         </div>
+      )}
+
+      {/* TAB: Resultados */}
+      {tab === "Resultados" && (
+        <QuedadaLeaderboard quedadaId={quedada.id} quedadaName={quedada.name} />
       )}
 
       {/* TAB: Invitación */}

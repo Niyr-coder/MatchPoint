@@ -81,6 +81,25 @@ export interface TournamentFeedback {
   profiles?: { username: string; full_name: string | null }
 }
 
+export interface MatchStats {
+  player_id: string
+  matches_played: number
+  wins: number
+  losses: number
+  sets_for: number
+  sets_against: number
+  points_scored: number
+  points_conceded: number
+  best_streak: number
+  round_robin_points: number
+}
+
+export interface ScoreCorrectionInput {
+  new_score: string
+  new_winner_id: string
+  reason: string
+}
+
 export interface CreateTournamentInput {
   name: string
   sport: SportType
