@@ -1,4 +1,4 @@
-import type { Tournament, TournamentParticipant } from "@/features/tournaments/types"
+import type { Tournament, TournamentParticipant, MatchStats } from "@/features/tournaments/types"
 import type { GameDynamic } from "@/features/tournaments/types"
 
 export type { GameDynamic }
@@ -21,6 +21,12 @@ export interface QuedadaParticipant extends Omit<TournamentParticipant, 'user_id
     full_name: string | null
     avatar_url: string | null
   } | null
+}
+
+export interface QuedadaLeaderboardEntry extends MatchStats {
+  player_name: string
+  is_guest: boolean
+  win_pct: number
 }
 
 export interface CreateQuedadaInput {
