@@ -40,7 +40,6 @@ BEGIN
     FROM tournament_brackets
     WHERE tournament_id = p_tournament_id
       AND status = 'completed'
-      AND status <> 'bye'
       AND player1_id IS NOT NULL
       AND player2_id IS NOT NULL
       AND score IS NOT NULL
