@@ -40,6 +40,7 @@ export interface EventRow {
   visibility: EventVisibility
   registration_deadline: string | null
   tags: string[] | null
+  event_includes: string[]
   organizer_name: string | null
   organizer_contact: string | null
   created_by: string | null
@@ -93,6 +94,7 @@ export interface CreateEventInput {
   registration_deadline?: string | null
   min_participants?: number | null
   tags?: string[]
+  event_includes?: string[]
   organizer_name?: string | null
   organizer_contact?: string | null
 }

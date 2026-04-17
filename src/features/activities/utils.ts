@@ -28,6 +28,7 @@ export function mapEventRow(row: Record<string, unknown>): EventWithClub {
     visibility:            row.visibility as EventWithClub["visibility"],
     registration_deadline: row.registration_deadline as string | null,
     tags:                  row.tags as string[] | null,
+    event_includes:        (row.event_includes as string[] | null) ?? [],
     organizer_name:        row.organizer_name as string | null,
     organizer_contact:     row.organizer_contact as string | null,
     is_featured:           Boolean(row.is_featured),
@@ -68,6 +69,7 @@ export function eventToForm(event: EventWithClub): EventFormState {
     organizer_name:        event.organizer_name ?? "",
     organizer_contact:     event.organizer_contact ?? "",
     tags:                  event.tags ?? [],
+    event_includes:        event.event_includes,
     publishImmediately:    false,
   }
 }
