@@ -114,4 +114,22 @@ export const RATE_LIMITS = {
   conversationRead:   { limit: 60, windowMs:     60_000 } satisfies RateLimitConfig,  // 60 reads/min (generous)
   adminBulk:          { limit: 5,  windowMs:  3_600_000 } satisfies RateLimitConfig,  // 5 bulk ops/hour
   proofUpload:        { limit: 10, windowMs:  3_600_000 } satisfies RateLimitConfig,  // 10 uploads/hour
+  // Quedadas
+  quedadasCreate:        { limit: 10,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 10 nuevas quedadas/hora
+  quedadasMatch:         { limit: 60,  windowMs:    60_000 } satisfies RateLimitConfig,  // 60 scores/min (alta frecuencia)
+  // Notifications
+  notificationsRead:     { limit: 120, windowMs:    60_000 } satisfies RateLimitConfig,  // 120 lecturas/min (polling)
+  notificationsUpdate:   { limit: 30,  windowMs:    60_000 } satisfies RateLimitConfig,  // 30 mark-read/min
+  // Admin
+  adminSearch:           { limit: 30,  windowMs:    60_000 } satisfies RateLimitConfig,  // 30 búsquedas/min
+  adminSettings:         { limit: 10,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 10 cambios config/hora
+  // Conversations
+  conversationsMarkRead: { limit: 60,  windowMs:    60_000 } satisfies RateLimitConfig,  // 60 mark-read/min
+  // Profile
+  profileCheckUsername:  { limit: 20,  windowMs:    60_000 } satisfies RateLimitConfig,  // 20 validaciones/min
+  profileSettings:       { limit: 10,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 10 cambios settings/hora
+  // Shop
+  shopProductUpdate:     { limit: 20,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 edits/hora
+  shopOrderUpdate:       { limit: 20,  windowMs: 3_600_000 } satisfies RateLimitConfig,  // 20 actualizaciones/hora
+  shopClubRead:          { limit: 60,  windowMs:    60_000 } satisfies RateLimitConfig,  // 60 listados/min
 } as const
