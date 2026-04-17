@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 // ---------------------------------------------------------------------------
 // POST /api/conversations/[id]/read — mark a conversation as read for the caller
@@ -19,6 +20,14 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rl = await checkRateLimit("conversationsMarkRead", user.id, RATE_LIMITS.conversationsMarkRead)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   // Update last_read_at only for the participant row that belongs to this user.

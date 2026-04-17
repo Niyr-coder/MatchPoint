@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
 
 // ──────────────────────────────────────────────────────────
@@ -56,6 +57,14 @@ export async function GET(
     )
   }
 
+  const rl = await checkRateLimit("notificationsRead", user.id, RATE_LIMITS.notificationsRead)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   try {
     const { data, error } = await supabase
       .from("notifications")
@@ -101,6 +110,14 @@ export async function PATCH(
     return NextResponse.json(
       { success: false, data: null, error: "No autenticado" },
       { status: 401 }
+    )
+  }
+
+  const rlPatch = await checkRateLimit("notificationsUpdate", user.id, RATE_LIMITS.notificationsUpdate)
+  if (!rlPatch.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes" },
+      { status: 429, headers: { "Retry-After": String(rlPatch.retryAfterSeconds) } }
     )
   }
 
