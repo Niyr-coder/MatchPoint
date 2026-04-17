@@ -25,6 +25,7 @@ export interface EventFormState {
   organizer_name: string
   organizer_contact: string
   tags: string[]
+  event_includes: string[]
   publishImmediately: boolean
 }
 
@@ -50,6 +51,7 @@ export const EMPTY_EVENT_FORM: EventFormState = {
   organizer_name: "",
   organizer_contact: "",
   tags: [],
+  event_includes: [],
   publishImmediately: false,
 }
 

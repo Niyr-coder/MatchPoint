@@ -62,6 +62,17 @@ export function Step4({ form, set, isAdmin }: { form: EventFormState; set: SetFi
         <p className="text-[10px] text-zinc-400">Máximo 10 etiquetas</p>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <Label>Qué incluye (opcional)</Label>
+        <TagInput
+          tags={form.event_includes}
+          onChange={(items) => set("event_includes", items)}
+        />
+        <p className="text-[10px] text-zinc-400">
+          Ej: Raquetas prestadas, Agua incluida… Máx. 20 items
+        </p>
+      </div>
+
       {isAdmin && <AdminEventOptions form={form} set={set} />}
     </div>
   )
