@@ -30,7 +30,7 @@ export function mapEventRow(row: Record<string, unknown>): EventWithClub {
     tags:                  row.tags as string[] | null,
     organizer_name:        row.organizer_name as string | null,
     organizer_contact:     row.organizer_contact as string | null,
-    is_featured:           false,
+    is_featured:           Boolean(row.is_featured),
     created_by:            null,
     created_at:            row.created_at as string,
     updated_at:            (row.updated_at as string | null) ?? null,

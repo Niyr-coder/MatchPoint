@@ -28,9 +28,9 @@ async function fetchEvents(
 ): Promise<{ events: EventWithClub[]; total: number }> {
   const supabase = await createClient()
 
-  const page    = Math.max(0, parseInt(params.page ?? "0", 10))
-  const tab     = params.tab ?? "all"
-  const isFree  = params.is_free === "true"
+  const page   = Math.max(0, parseInt(params.page ?? "0", 10))
+  const tab    = params.tab ?? "all"
+  const isFree = params.is_free === "true"
 
   let query = supabase
     .from("events")
@@ -38,7 +38,7 @@ async function fetchEvents(
       `
       id, title, description, sport, event_type, status,
       club_id, city, location, start_date, end_date,
-      image_url, is_free, price, max_capacity, min_participants,
+      image_url, is_free, is_featured, price, max_capacity, min_participants,
       visibility, registration_deadline, tags,
       organizer_name, organizer_contact, created_at,
       clubs ( name ),
@@ -57,6 +57,8 @@ async function fetchEvents(
   if (isFree)            query = query.eq("is_free", true)
   if (params.search)     query = query.ilike("title", `%${params.search}%`)
 
+  let registeredIds = new Set<string>()
+
   if (tab === "mine") {
     const { data: regs } = await supabase
       .from("event_registrations")
@@ -64,6 +66,7 @@ async function fetchEvents(
       .eq("user_id", userId)
     const ids = (regs ?? []).map((r: { event_id: string }) => r.event_id)
     if (ids.length === 0) return { events: [], total: 0 }
+    registeredIds = new Set(ids)
     query = query.in("id", ids)
   }
 
@@ -71,7 +74,19 @@ async function fetchEvents(
 
   if (error) throw new Error(error.message)
 
-  const events: EventWithClub[] = (data ?? []).map(mapEventRow)
+  const eventRows: EventWithClub[] = (data ?? []).map(mapEventRow)
+
+  if (tab !== "mine" && eventRows.length > 0) {
+    const eventIds = eventRows.map((e) => e.id)
+    const { data: userRegs } = await supabase
+      .from("event_registrations")
+      .select("event_id")
+      .eq("user_id", userId)
+      .in("event_id", eventIds)
+    registeredIds = new Set((userRegs ?? []).map((r: { event_id: string }) => r.event_id))
+  }
+
+  const events = eventRows.map((e) => ({ ...e, is_registered: registeredIds.has(e.id) }))
 
   return { events, total: count ?? 0 }
 }
@@ -160,12 +175,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               city={event.city}
               location={event.location}
               start_date={event.start_date}
+              end_date={event.end_date}
               image_url={event.image_url}
               is_free={event.is_free}
+              is_featured={event.is_featured}
               price={event.price}
               max_capacity={event.max_capacity}
               registration_count={event.registration_count}
               club_name={event.club_name}
+              registration_deadline={event.registration_deadline}
+              visibility={event.visibility}
+              tags={event.tags}
+              organizer_name={event.organizer_name}
+              is_registered={event.is_registered}
             />
           ))}
         </div>
