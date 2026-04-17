@@ -66,7 +66,7 @@ Replace the flat text list with a styled card:
 - **Name row:** `{club_name}` bold + `Contacto: {organizer_name}` secondary.
 - **Action buttons (conditional):**
   - "📱 WhatsApp" — shown only when `organizer_contact` is non-null. `href="https://wa.me/{sanitized_number}"`.
-  - "🏢 Ver club" — shown only when `club_id` is non-null. `href="/club/{club_id}"` (links to existing club profile route).
+  - "🏢 Ver club" — **omitted for now** (no public club profile route exists yet; can be wired when that page is built).
 
 ---
 
