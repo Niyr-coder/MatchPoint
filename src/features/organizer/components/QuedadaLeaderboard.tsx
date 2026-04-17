@@ -1,8 +1,9 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useMatchStats } from "@/features/shared/hooks/useMatchStats"
 import type { QuedadaLeaderboardEntry } from "@/features/organizer/types"
+import { QuedadaShareCard } from "./QuedadaShareCard"
 
 interface Props {
   quedadaId: string
@@ -74,11 +75,36 @@ function PodiumItem({ entry, rank }: { entry: QuedadaLeaderboardEntry; rank: num
 
 export function QuedadaLeaderboard({ quedadaId, quedadaName }: Props) {
   const { stats, loading, error } = useMatchStats(quedadaId)
+  const shareCardRef = useRef<HTMLDivElement>(null)
+  const [sharing, setSharing] = useState(false)
 
   const entries = useMemo(() => buildEntries(stats), [stats])
 
   const hasCompletedMatches = stats.some((s) => s.matches_played > 0)
   const mvp = entries[0] ?? null
+
+  async function handleShare() {
+    if (!shareCardRef.current) return
+    setSharing(true)
+    try {
+      const html2canvas = (await import("html2canvas")).default
+      const canvas = await html2canvas(shareCardRef.current, {
+        width: 360,
+        height: 640,
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#000000",
+      })
+      const link = document.createElement("a")
+      link.download = "quedada-resultados.png"
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    } catch {
+      // silently fail — image generation is best-effort
+    } finally {
+      setSharing(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -111,9 +137,27 @@ export function QuedadaLeaderboard({ quedadaId, quedadaName }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xs font-black uppercase tracking-[0.15em] text-zinc-400">
-        {quedadaName} — Clasificación
-      </h2>
+      <QuedadaShareCard
+        ref={shareCardRef}
+        entries={entries}
+        quedadaName={quedadaName}
+        date={new Date().toLocaleDateString("es-EC")}
+      />
+
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-black uppercase tracking-[0.15em] text-zinc-400">
+          {quedadaName} — Clasificación
+        </h2>
+        {entries.length > 0 && (
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            className="text-xs font-bold px-4 py-1.5 rounded-full bg-black text-white border border-zinc-800 hover:bg-zinc-900 disabled:opacity-50 transition-colors"
+          >
+            {sharing ? "Generando…" : "↑ Compartir"}
+          </button>
+        )}
+      </div>
 
       {/* MVP Banner */}
       {hasCompletedMatches && mvp && (
