@@ -2,7 +2,9 @@
 
 import { useState, useTransition, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Link2, Copy, Check, Loader2, Plus, ChevronDown, X } from "lucide-react"
+import { Link2, Copy, Check, Loader2, Plus, ChevronDown, X, ChevronRight } from "lucide-react"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
@@ -482,6 +484,11 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
   const [revokeLoading, setRevokeLoading] = useState(false)
   const [revokeError, setRevokeError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  function toggleExpand(inviteId: string) {
+    setExpandedId((prev) => (prev === inviteId ? null : inviteId))
+  }
 
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -538,6 +545,20 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
   }, [pendingRevoke, router, startTransition])
 
   const columns: Column<InviteLinkAdmin>[] = [
+    {
+      key: "expand",
+      header: "",
+      render: (invite) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleExpand(invite.id) }}
+          className="flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+          aria-label={expandedId === invite.id ? "Colapsar" : "Expandir"}
+        >
+          <ChevronRight className={`size-4 transition-transform duration-200 ${expandedId === invite.id ? "rotate-90" : ""}`} />
+        </button>
+      ),
+      className: "w-6",
+    },
     {
       key: "code",
       header: "Código",
@@ -617,27 +638,76 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
       },
     },
     {
-      key: "actions",
-      header: "Acciones",
-      render: (invite) =>
-        canRevoke(invite) ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setRevokeError(null)
-              setPendingRevoke(invite)
-            }}
-            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
-          >
-            Revocar
-          </button>
-        ) : (
-          <span className="text-[11px] text-zinc-300 font-bold uppercase tracking-wide">
-            —
-          </span>
-        ),
+      key: "dots",
+      header: "",
+      render: (invite) => (
+        <AdminDotsMenu
+          items={[
+            {
+              label: "Copiar enlace",
+              onClick: async () => {
+                const url = `${BASE_URL}/invite/${invite.code}`
+                try { await navigator.clipboard.writeText(url) } catch { /* ignore */ }
+              },
+            },
+            {
+              label: "Revocar",
+              variant: "danger",
+              disabled: !canRevoke(invite),
+              onClick: () => { setRevokeError(null); setPendingRevoke(invite) },
+            },
+          ]}
+        />
+      ),
+      className: "flex justify-end",
     },
   ]
+
+  function renderExpandedRow(invite: InviteLinkAdmin) {
+    const { label, variant } = getInviteStatus(invite)
+    const inviteUrl = `${BASE_URL}/invite/${invite.code}`
+
+    const chips: string[] = []
+    chips.push(ENTITY_TYPE_LABELS[invite.entity_type] ?? invite.entity_type)
+    chips.push(`${invite.uses_count} usos${invite.max_uses !== null ? ` / ${invite.max_uses} máx` : ""}`)
+    if (invite.expires_at) chips.push(`Expira: ${formatExpiry(invite.expires_at)}`)
+
+    const avatar = (
+      <div className="w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center">
+        <Link2 className="size-5 text-teal-600" />
+      </div>
+    )
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={invite.code}
+        subtitle={invite.creator_name ?? "Sin creador"}
+        chips={chips}
+        badge={<StatusBadge label={label} variant={variant} />}
+        actions={
+          <>
+            <button
+              onClick={async () => {
+                try { await navigator.clipboard.writeText(inviteUrl) } catch { /* ignore */ }
+              }}
+              className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+            >
+              Copiar enlace
+            </button>
+            {canRevoke(invite) && (
+              <button
+                onClick={() => { setRevokeError(null); setPendingRevoke(invite) }}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Revocar
+              </button>
+            )}
+          </>
+        }
+      />
+    )
+  }
 
   return (
     <>
@@ -678,6 +748,10 @@ export function AdminInvitesView({ invites }: AdminInvitesViewProps) {
           data={filtered}
           emptyMessage="No se encontraron invite links"
           keyExtractor={(invite) => invite.id}
+          onRowClick={(invite) => toggleExpand(invite.id)}
+          expandedRowId={expandedId}
+          renderExpandedRow={renderExpandedRow}
+          gridTemplateColumns="32px 0.6fr 0.4fr 0.6fr 0.8fr 0.4fr 0.6fr 0.5fr 40px"
         />
 
         {revokeError && !pendingRevoke && (
