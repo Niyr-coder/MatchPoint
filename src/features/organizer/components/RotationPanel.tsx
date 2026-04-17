@@ -37,9 +37,10 @@ interface CourtCardProps {
   match: ActiveMatch
   onSubmit: (match: ActiveMatch, scoreA: number, scoreB: number) => Promise<void>
   submitting: boolean
+  withGuest: boolean
 }
 
-function CourtCard({ match, onSubmit, submitting }: CourtCardProps) {
+function CourtCard({ match, onSubmit, submitting, withGuest }: CourtCardProps) {
   const [scoreA, setScoreA] = useState(0)
   const [scoreB, setScoreB] = useState(0)
   const courtNum = match.courtIndex + 1
@@ -51,6 +52,11 @@ function CourtCard({ match, onSubmit, submitting }: CourtCardProps) {
           Cancha {courtNum} — En juego
         </span>
       </div>
+      {withGuest && (
+        <div className="mb-3 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-xs">
+          Partido con invitado — el resultado no afecta ratings
+        </div>
+      )}
       <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
         <div className="bg-white border border-green-200 rounded-xl p-3 text-center">
           <div className="text-[11px] font-black mb-1 truncate">{teamLabel(match.teamA)}</div>
@@ -165,21 +171,22 @@ export function RotationPanel({ quedadaId, dynamic, participants, modality, init
       setSubmittingCourt(match.courtIndex)
       const winner = determineWinner(scoreA, scoreB)
 
-      if (!hasGuest(match)) {
-        const rep1 = match.teamA[0].user_id!
-        const rep2 = match.teamB[0].user_id!
-        try {
-          const res = await fetch(`/api/quedadas/${quedadaId}/rotation/match`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ player1Id: rep1, player2Id: rep2, scoreA, scoreB }),
-          })
-          if (!res.ok) {
-            console.warn("[RotationPanel] match result not saved:", res.status)
-          }
-        } catch (err) {
-          console.warn("[RotationPanel] match result fetch failed:", err)
+      try {
+        const res = await fetch(`/api/quedadas/${quedadaId}/rotation/match`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            player1Id: match.teamA[0].user_id ?? null,
+            player2Id: match.teamB[0].user_id ?? null,
+            scoreA,
+            scoreB,
+          }),
+        })
+        if (!res.ok) {
+          console.warn("[RotationPanel] match result not saved:", res.status)
         }
+      } catch (err) {
+        console.warn("[RotationPanel] match result fetch failed:", err)
       }
 
       if (dynamic === "popcorn" && queue.length > 0) {
@@ -301,6 +308,7 @@ export function RotationPanel({ quedadaId, dynamic, participants, modality, init
             match={match}
             submitting={submittingCourt === match.courtIndex}
             onSubmit={handleSubmit}
+            withGuest={hasGuest(match)}
           />
         ))}
       {queue.length > 0 && (

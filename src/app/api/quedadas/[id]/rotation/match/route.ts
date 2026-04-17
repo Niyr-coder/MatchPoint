@@ -5,8 +5,8 @@ import { determineWinner, formatScore } from "@/features/organizer/utils/rotatio
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const rotationMatchSchema = z.object({
-  player1Id: z.string().uuid(),
-  player2Id: z.string().uuid(),
+  player1Id: z.string().uuid().nullable(),
+  player2Id: z.string().uuid().nullable(),
   scoreA: z.number().int().min(0),
   scoreB: z.number().int().min(0),
 })
@@ -56,6 +56,7 @@ export async function POST(
   const winner = determineWinner(scoreA, scoreB)
   const winnerId = winner === "A" ? player1Id : player2Id
   const loserId = winner === "A" ? player2Id : player1Id
+  const hasGuest = player1Id === null || player2Id === null
 
   const service = createServiceClient()
 
@@ -92,7 +93,7 @@ export async function POST(
 
   return NextResponse.json({
     success: true,
-    data: { matchId: data.id, winnerId, loserId },
+    data: { matchId: data.id, winnerId, loserId, hasGuest },
     error: null,
   }, { status: 201 })
 }
