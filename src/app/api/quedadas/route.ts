@@ -3,6 +3,7 @@ import { authorize } from "@/features/auth/queries"
 import { canOrganize } from "@/features/organizer/permissions"
 import { getOrganizerQuedadas } from "@/features/organizer/queries"
 import { createTournament } from "@/features/tournaments/queries"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const createQuedadaSchema = z.object({
@@ -49,6 +50,14 @@ export async function POST(request: Request) {
   const allowed = await canOrganize(ctx)
   if (!allowed) {
     return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+  }
+
+  const rl = await checkRateLimit("quedadasCreate", ctx.userId, RATE_LIMITS.quedadasCreate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas quedadas creadas. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   let body: unknown

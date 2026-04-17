@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { determineWinner, formatScore } from "@/features/organizer/utils/rotation"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const rotationMatchSchema = z.object({
   player1Id: z.string().uuid(),
@@ -30,6 +31,14 @@ export async function POST(
 
   if (!quedada || quedada.event_type !== "quedada" || quedada.created_by !== user.id) {
     return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+  }
+
+  const rl = await checkRateLimit("quedadasMatch", user.id, RATE_LIMITS.quedadasMatch)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   let raw: unknown
