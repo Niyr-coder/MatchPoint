@@ -2,11 +2,13 @@
 
 import { useState, useTransition, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { CalendarCheck, Clock, XCircle } from "lucide-react"
+import { CalendarCheck, Clock, XCircle, ChevronRight } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import type { Column } from "@/components/shared/DataTable"
 import type { ReservationAdmin } from "@/app/api/admin/reservations/route"
 
@@ -126,9 +128,14 @@ export function AdminReservationsView({
     to_date: "",
   })
 
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [pendingCancel, setPendingCancel] = useState<ReservationAdmin | null>(null)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+
+  function toggleExpand(reservationId: string) {
+    setExpandedId((prev) => (prev === reservationId ? null : reservationId))
+  }
 
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -197,6 +204,20 @@ export function AdminReservationsView({
 
   const columns: Column<ReservationAdmin>[] = [
     {
+      key: "expand",
+      header: "",
+      render: (r) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleExpand(r.id) }}
+          className="flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+          aria-label={expandedId === r.id ? "Colapsar" : "Expandir"}
+        >
+          <ChevronRight className={`size-4 transition-transform duration-200 ${expandedId === r.id ? "rotate-90" : ""}`} />
+        </button>
+      ),
+      className: "w-6",
+    },
+    {
       key: "user",
       header: "Usuario",
       render: (r) => (
@@ -256,27 +277,65 @@ export function AdminReservationsView({
       ),
     },
     {
-      key: "actions",
-      header: "Acciones",
-      render: (r) =>
-        r.status !== "cancelled" ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setCancelError(null)
-              setPendingCancel(r)
-            }}
-            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
-          >
-            Cancelar
-          </button>
-        ) : (
-          <span className="text-[11px] text-zinc-300 font-bold uppercase tracking-wide">
-            —
-          </span>
-        ),
+      key: "dots",
+      header: "",
+      render: (r) => (
+        <AdminDotsMenu
+          items={[
+            {
+              label: "Ver detalle",
+              onClick: () => toggleExpand(r.id),
+            },
+            {
+              label: "Cancelar",
+              variant: "danger",
+              disabled: r.status === "cancelled",
+              onClick: () => { setCancelError(null); setPendingCancel(r) },
+            },
+          ]}
+        />
+      ),
+      className: "flex justify-end",
     },
   ]
+
+  function renderExpandedRow(r: ReservationAdmin) {
+    const { label, variant } = STATUS_BADGE[r.status]
+
+    const chips: string[] = []
+    if (r.club_name) chips.push(r.club_name)
+    if (r.court_sport) chips.push(SPORT_LABELS[r.court_sport] ?? r.court_sport)
+    chips.push(formatDateTime(r.date, r.start_time, r.end_time))
+    chips.push(formatPrice(r.total_price))
+
+    const avatar = (
+      <div className="w-11 h-11 rounded-xl bg-zinc-200 flex items-center justify-center">
+        <CalendarCheck className="size-5 text-zinc-500" />
+      </div>
+    )
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={r.user_name ?? "Usuario desconocido"}
+        subtitle={r.user_email ?? "Sin email"}
+        chips={chips}
+        badge={<StatusBadge label={label} variant={variant} />}
+        actions={
+          <>
+            {r.status !== "cancelled" && (
+              <button
+                onClick={() => { setCancelError(null); setPendingCancel(r) }}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Cancelar reserva
+              </button>
+            )}
+          </>
+        }
+      />
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -350,6 +409,10 @@ export function AdminReservationsView({
         data={filtered}
         emptyMessage="No se encontraron reservas"
         keyExtractor={(r) => r.id}
+        onRowClick={(r) => toggleExpand(r.id)}
+        expandedRowId={expandedId}
+        renderExpandedRow={renderExpandedRow}
+        gridTemplateColumns="32px 1fr 0.7fr 0.7fr 1fr 0.5fr 0.5fr 40px"
       />
 
       {cancelError && !pendingCancel && (
