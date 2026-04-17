@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
 
 // ─── Validation schema ─────────────────────────────────────────────────────────
@@ -75,6 +76,14 @@ export async function PATCH(
     return NextResponse.json(
       { success: false, data: null, error: "No autenticado" },
       { status: 401 }
+    )
+  }
+
+  const rl = await checkRateLimit("profileSettings", user.id, RATE_LIMITS.profileSettings)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas actualizaciones. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 

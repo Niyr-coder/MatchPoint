@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
 
 const querySchema = z.object({
@@ -17,6 +18,14 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
   const { data: { user } } = await authClient.auth.getUser()
   if (!user) {
     return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rl = await checkRateLimit("profileCheckUsername", user.id, RATE_LIMITS.profileCheckUsername)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   const { searchParams } = new URL(request.url)
