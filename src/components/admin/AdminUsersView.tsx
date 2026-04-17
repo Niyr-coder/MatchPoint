@@ -2,22 +2,35 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { BadgeCheck, Plus } from "lucide-react"
+import { BadgeCheck, Plus, ChevronRight } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { RoleBadge } from "@/components/shared/RoleBadge"
 import { ConfirmDialog as SharedConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { CreateUserModal } from "@/components/admin/CreateUserModal"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import { useBulkSelection } from "@/hooks/useBulkSelection"
 import { UserBulkBar } from "@/components/admin/UserBulkBar"
-import { UserDetailPanel } from "@/components/admin/user-detail/UserDetailPanel"
 import { OriginBadge } from "@/components/admin/user-detail/OriginBadge"
 import { displayName, isSuspended, initials, formatDate } from "@/components/admin/user-detail/helpers"
 import { ROLE_LABELS } from "@/features/memberships/constants"
 import type { Column } from "@/components/shared/DataTable"
 import type { UserAdmin, ClubAdmin } from "@/lib/admin/queries"
 import type { AppRole } from "@/types"
-import type { SuspendTarget, DeleteTarget } from "@/components/admin/user-detail/UserDetailPanel"
+
+// ── types ──────────────────────────────────────────────────────────────────────
+
+interface SuspendTarget {
+  userId: string
+  action: "suspend" | "unsuspend"
+  userName: string
+}
+
+interface DeleteTarget {
+  userId: string
+  userName: string
+}
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -38,7 +51,7 @@ const FILTER_ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "partner",  label: ROLE_LABELS.partner },
 ]
 
-// ── inline confirm dialog (for single-user suspend/delete) ────────────────────
+// ── inline confirm dialog ─────────────────────────────────────────────────────
 
 interface ConfirmDialogProps {
   message: string
@@ -71,6 +84,23 @@ function ConfirmDialog({ message, confirmLabel, confirmClass, onConfirm, onCance
   )
 }
 
+// ── action button helper ──────────────────────────────────────────────────────
+
+function ActionBtn({ label, onClick, variant = "default" }: { label: string; onClick: () => void; variant?: "default" | "danger" }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors ${
+        variant === "danger"
+          ? "border-red-200 text-red-600 hover:bg-red-50"
+          : "border-border text-zinc-600 hover:bg-secondary"
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
 // ── main component ────────────────────────────────────────────────────────────
 
 interface AdminUsersViewProps {
@@ -83,10 +113,10 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
   const [, startTransition] = useTransition()
 
   const [filters, setFilters] = useState<Record<string, string>>({ search: "", role: "" })
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [changingRole, setChangingRole] = useState<Record<string, boolean>>({})
   const [roleError, setRoleError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<UserAdmin | null>(null)
 
   const [suspendTarget, setSuspendTarget] = useState<SuspendTarget | null>(null)
   const [suspendLoading, setSuspendLoading] = useState(false)
@@ -102,6 +132,10 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
 
   function handleFilterChange(key: string, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function toggleExpand(userId: string) {
+    setExpandedId((prev) => (prev === userId ? null : userId))
   }
 
   const filtered = users.filter((user) => {
@@ -172,7 +206,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
       const json = (await res.json()) as { success: boolean; error?: string | null }
       if (!json.success) { setSuspendError(json.error ?? "Error desconocido"); return }
       setSuspendTarget(null)
-      setSelectedUser(null)
+      setExpandedId(null)
       startTransition(() => router.refresh())
     } catch {
       setSuspendError("Error de conexión. Intenta de nuevo.")
@@ -194,7 +228,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
       const json = (await res.json()) as { success: boolean; error?: string | null }
       if (!json.success) { setDeleteError(json.error ?? "Error desconocido"); return }
       setDeleteTarget(null)
-      setSelectedUser(null)
+      setExpandedId(null)
       startTransition(() => router.refresh())
     } catch {
       setDeleteError("Error de conexión. Intenta de nuevo.")
@@ -203,7 +237,23 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
     }
   }
 
+  // ── columns ──────────────────────────────────────────────────────────────────
+
   const columns: Column<UserAdmin>[] = [
+    {
+      key: "expand",
+      header: "",
+      render: (user) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleExpand(user.id) }}
+          className="flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+          aria-label={expandedId === user.id ? "Colapsar" : "Expandir"}
+        >
+          <ChevronRight className={`size-4 transition-transform duration-200 ${expandedId === user.id ? "rotate-90" : ""}`} />
+        </button>
+      ),
+      className: "w-6",
+    },
     {
       key: "checkbox",
       header: "",
@@ -279,7 +329,7 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
       render: (user) => <span className="text-zinc-500 text-[11px]">{formatDate(user.created_at)}</span>,
     },
     {
-      key: "actions",
+      key: "role_select",
       header: "Rol global",
       render: (user) => (
         <select
@@ -293,7 +343,100 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
         </select>
       ),
     },
+    {
+      key: "dots",
+      header: "",
+      render: (user) => {
+        const suspended = isSuspended(user)
+        const name = displayName(user)
+        return (
+          <AdminDotsMenu
+            items={[
+              {
+                label: suspended ? "Reactivar" : "Suspender",
+                onClick: () => {
+                  setSuspendError(null)
+                  setSuspendTarget({ userId: user.id, action: suspended ? "unsuspend" : "suspend", userName: name })
+                },
+              },
+              {
+                label: "Eliminar",
+                variant: "danger",
+                onClick: () => {
+                  setDeleteError(null)
+                  setDeleteTarget({ userId: user.id, userName: name })
+                },
+              },
+            ]}
+          />
+        )
+      },
+      className: "flex justify-end",
+    },
   ]
+
+  // ── expanded row renderer ─────────────────────────────────────────────────────
+
+  function renderExpandedRow(user: UserAdmin) {
+    const name = displayName(user)
+    const suspended = isSuspended(user)
+    const userInitials = initials(name)
+
+    const chips: string[] = []
+    if (user.city) chips.push(user.city)
+    if (user.rating != null) chips.push(`★ ${Number(user.rating).toFixed(1)}`)
+    if (user.matches_played) chips.push(`${user.matches_played} partidos`)
+    if (user.global_role) chips.push(ROLE_LABELS[user.global_role as AppRole] ?? user.global_role)
+
+    const avatar = user.avatar_url ? (
+      <img src={user.avatar_url} alt={name} className="w-11 h-11 rounded-xl object-cover" />
+    ) : (
+      <div className="w-11 h-11 rounded-xl bg-zinc-200 flex items-center justify-center">
+        <span className="text-sm font-black text-zinc-600">{userInitials}</span>
+      </div>
+    )
+
+    const badge = suspended ? (
+      <span className="text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100">
+        Suspendido
+      </span>
+    ) : user.is_verified ? (
+      <BadgeCheck className="size-3.5 text-green-600" />
+    ) : undefined
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={name}
+        subtitle={user.username ? `@${user.username}` : "Sin usuario"}
+        chips={chips}
+        badge={badge}
+        actions={
+          <>
+            <ActionBtn label="Editar" onClick={() => { /* TODO: open edit modal */ }} />
+            <ActionBtn
+              label={suspended ? "Reactivar" : "Suspender"}
+              onClick={() => {
+                setSuspendError(null)
+                setSuspendTarget({ userId: user.id, action: suspended ? "unsuspend" : "suspend", userName: name })
+              }}
+            />
+            <ActionBtn label="Ver membresía" onClick={() => { /* TODO: memberships */ }} />
+            <ActionBtn
+              label="Eliminar"
+              variant="danger"
+              onClick={() => {
+                setDeleteError(null)
+                setDeleteTarget({ userId: user.id, userName: name })
+              }}
+            />
+          </>
+        }
+      />
+    )
+  }
+
+  // ── render ────────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col gap-5">
@@ -342,21 +485,17 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
 
       {bulkError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">{bulkError}</div>}
 
-      <DataTable columns={columns} data={filtered} emptyMessage="No se encontraron usuarios" onRowClick={(user) => setSelectedUser(user)} />
+      <DataTable
+        columns={columns}
+        data={filtered}
+        emptyMessage="No se encontraron usuarios"
+        onRowClick={(user) => toggleExpand(user.id)}
+        expandedRowId={expandedId}
+        renderExpandedRow={renderExpandedRow}
+        gridTemplateColumns="32px 32px 1fr 0.6fr 0.5fr 0.6fr 0.7fr 0.7fr 40px"
+      />
 
       {roleError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">{roleError}</div>}
-
-      {selectedUser && (
-        <UserDetailPanel
-          user={selectedUser}
-          clubs={clubs}
-          onClose={() => setSelectedUser(null)}
-          onSuspendRequest={(t) => { setSuspendError(null); setSuspendTarget(t) }}
-          onDeleteRequest={(t) => { setDeleteError(null); setDeleteTarget(t) }}
-          onMembershipChange={() => startTransition(() => router.refresh())}
-          onVerified={() => { setSelectedUser(null); startTransition(() => router.refresh()) }}
-        />
-      )}
 
       {showCreateModal && <CreateUserModal clubs={clubs} onClose={() => setShowCreateModal(false)} />}
 
