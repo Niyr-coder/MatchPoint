@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Pencil, XCircle, X } from "lucide-react"
+import { Plus, XCircle, X, ChevronRight } from "lucide-react"
 import { StatCard } from "@/components/shared/StatCard"
 import { Trophy, Users, CalendarCheck } from "lucide-react"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import type { TournamentAdmin } from "@/lib/admin/queries"
 import { VISIBLE_SPORT_OPTIONS, PRIMARY_SPORT } from "@/lib/sports/config"
 import type { SportId } from "@/lib/sports/config"
@@ -397,6 +399,13 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
 
+  // Expand state
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  function toggleExpand(tournamentId: string) {
+    setExpandedId((prev) => (prev === tournamentId ? null : tournamentId))
+  }
+
   // Derived stats
   const total     = tournaments.length
   const active    = tournaments.filter((t) => t.status === "open" || t.status === "in_progress").length
@@ -499,6 +508,59 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
     }
   }
 
+  // ── expanded row renderer ────────────────────────────────────────────────────
+
+  function renderTournamentExpanded(t: TournamentAdmin) {
+    const isTerminal = TERMINAL_STATUSES.has(t.status)
+
+    const chips: string[] = []
+    if (t.club_name) chips.push(t.club_name)
+    chips.push(`${t.participant_count}/${t.max_participants} participantes`)
+    if (t.entry_fee > 0) chips.push(`$${t.entry_fee.toFixed(2)} inscripción`)
+    if (t.modality) chips.push(t.modality)
+
+    const avatar = (
+      <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
+        <Trophy className="size-5 text-amber-600" />
+      </div>
+    )
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={t.name}
+        subtitle={t.club_name ?? "Sin club"}
+        chips={chips}
+        badge={<StatusBadge status={t.status} />}
+        actions={
+          <>
+            {!isTerminal && (
+              <button
+                onClick={() => openEdit(t)}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+              >
+                Editar
+              </button>
+            )}
+            <button
+              className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+            >
+              Ver bracket
+            </button>
+            {!isTerminal && (
+              <button
+                onClick={() => requestCancel(t)}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Cancelar torneo
+              </button>
+            )}
+          </>
+        }
+      />
+    )
+  }
+
   // ── initial form state ───────────────────────────────────────────────────────
 
   const modalInitial: TournamentFormState =
@@ -540,9 +602,9 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-border bg-secondary">
-              {["Nombre", "Deporte", "Club", "Estado", "Participantes", "Fecha inicio", ""].map((h) => (
-                <p key={h} className="text-[10px] font-black uppercase tracking-wide text-zinc-400 last:text-right">
+            <div className="grid grid-cols-[32px_2fr_1fr_1fr_1fr_1fr_1fr_40px] gap-3 px-5 py-3 border-b border-border bg-secondary">
+              {["", "Nombre", "Deporte", "Club", "Estado", "Participantes", "Fecha inicio", ""].map((h, i) => (
+                <p key={i} className="text-[10px] font-black uppercase tracking-wide text-zinc-400 last:text-right">
                   {h}
                 </p>
               ))}
@@ -551,52 +613,55 @@ export function AdminTournamentsView({ tournaments, clubs }: AdminTournamentsVie
             <div className="flex flex-col divide-y divide-border">
               {tournaments.map((t) => {
                 const isTerminal = TERMINAL_STATUSES.has(t.status)
+                const isExpanded = expandedId === t.id
                 return (
-                  <div
-                    key={t.id}
-                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-secondary transition-colors"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-foreground leading-tight">{t.name}</p>
-                      {t.entry_fee > 0 && (
-                        <p className="text-[10px] text-zinc-400 mt-0.5">
-                          Inscripción: ${t.entry_fee.toFixed(2)}
-                        </p>
-                      )}
-                    </div>
-                    <div><SportBadge sport={t.sport} /></div>
-                    <p className="text-xs text-zinc-600 truncate">{t.club_name ?? "—"}</p>
-                    <div><StatusBadge status={t.status} /></div>
-                    <p className="text-sm font-black text-foreground text-right">
-                      {t.participant_count}
-                      <span className="text-zinc-400 font-normal">/{t.max_participants}</span>
-                    </p>
-                    <p className="text-xs text-zinc-500 text-right">{formatDate(t.start_date)}</p>
+                  <div key={t.id}>
+                    <div
+                      className={`grid grid-cols-[32px_2fr_1fr_1fr_1fr_1fr_1fr_40px] gap-3 px-5 py-3.5 items-center cursor-pointer transition-colors ${
+                        isExpanded ? "bg-[#f8faff]" : "hover:bg-zinc-50"
+                      }`}
+                      onClick={() => toggleExpand(t.id)}
+                    >
+                      {/* Expand chevron */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleExpand(t.id) }}
+                        className="flex items-center justify-center text-zinc-400 hover:text-zinc-700"
+                        aria-label={isExpanded ? "Colapsar" : "Expandir"}
+                      >
+                        <ChevronRight className={`size-4 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+                      </button>
 
-                    {/* Row actions */}
-                    <div className="flex items-center gap-1.5 justify-end">
-                      {!isTerminal && (
-                        <button
-                          onClick={() => openEdit(t)}
-                          title="Editar"
-                          className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-500 hover:text-foreground"
-                        >
-                          <Pencil className="size-3.5" />
-                        </button>
-                      )}
-                      {!isTerminal && (
-                        <button
-                          onClick={() => requestCancel(t)}
-                          title="Cancelar torneo"
-                          className="size-7 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors text-zinc-400 hover:text-red-600"
-                        >
-                          <XCircle className="size-3.5" />
-                        </button>
-                      )}
-                      {isTerminal && (
-                        <span className="text-[10px] text-zinc-300 font-bold uppercase px-1">—</span>
-                      )}
+                      {/* Name */}
+                      <div>
+                        <p className="text-sm font-bold text-foreground leading-tight">{t.name}</p>
+                        {t.entry_fee > 0 && (
+                          <p className="text-[10px] text-zinc-400 mt-0.5">Inscripción: ${t.entry_fee.toFixed(2)}</p>
+                        )}
+                      </div>
+
+                      <div><SportBadge sport={t.sport} /></div>
+                      <p className="text-xs text-zinc-600 truncate">{t.club_name ?? "—"}</p>
+                      <div><StatusBadge status={t.status} /></div>
+                      <p className="text-sm font-black text-foreground text-right">
+                        {t.participant_count}
+                        <span className="text-zinc-400 font-normal">/{t.max_participants}</span>
+                      </p>
+                      <p className="text-xs text-zinc-500 text-right">{formatDate(t.start_date)}</p>
+
+                      {/* Dots menu */}
+                      <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+                        <AdminDotsMenu
+                          items={[
+                            { label: "Editar", disabled: isTerminal, onClick: () => openEdit(t) },
+                            { label: "Ver bracket", onClick: () => { /* TODO */ } },
+                            { label: "Cancelar", variant: "danger", disabled: isTerminal, onClick: () => requestCancel(t) },
+                          ]}
+                        />
+                      </div>
                     </div>
+
+                    {/* Expanded panel */}
+                    {isExpanded && renderTournamentExpanded(t)}
                   </div>
                 )
               })}
