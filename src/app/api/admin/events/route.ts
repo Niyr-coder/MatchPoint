@@ -45,6 +45,7 @@ const adminCreateEventSchema = z.object({
   registration_deadline: z.iso.datetime().nullish(),
   min_participants: z.number().int().positive().nullish(),
   tags: z.array(z.string().max(50)).max(10).default([]),
+  event_includes: z.array(z.string().max(200)).max(20).default([]),
   organizer_name: z.string().max(200).nullish(),
   organizer_contact: z.string().max(200).nullish(),
   status: z.enum(["draft", "published"]).default("draft"),
