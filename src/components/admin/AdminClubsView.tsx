@@ -2,11 +2,13 @@
 
 import { useState, useTransition, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, X, Plus } from "lucide-react"
+import { Loader2, X, Plus, ChevronRight } from "lucide-react"
 import { FilterBar } from "@/components/shared/FilterBar"
 import { DataTable } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import { useBulkSelection } from "@/hooks/useBulkSelection"
 import { ClubBulkBar } from "@/components/admin/ClubBulkBar"
 import { ECUADOR_PROVINCES } from "@/lib/constants"
@@ -294,8 +296,13 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
   })
 
   const [modal, setModal] = useState<ModalState>({ type: "none" })
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  function toggleExpand(clubId: string) {
+    setExpandedId((prev) => (prev === clubId ? null : clubId))
+  }
 
   // Bulk actions
   const [bulkLoading, setBulkLoading] = useState(false)
@@ -471,6 +478,20 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
 
   const columns: Column<ClubAdmin>[] = [
     {
+      key: "expand",
+      header: "",
+      render: (club) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleExpand(club.id) }}
+          className="flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+          aria-label={expandedId === club.id ? "Colapsar" : "Expandir"}
+        >
+          <ChevronRight className={`size-4 transition-transform duration-200 ${expandedId === club.id ? "rotate-90" : ""}`} />
+        </button>
+      ),
+      className: "w-6",
+    },
+    {
       key: "checkbox",
       header: "",
       render: (club) => (
@@ -489,29 +510,26 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
       key: "name",
       header: "Nombre",
       render: (club) => (
-        <span className="font-bold text-foreground">{club.name}</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="font-bold text-foreground">{club.name}</span>
+          {club.province && <span className="text-[11px] text-zinc-400">{club.province}</span>}
+        </div>
       ),
     },
     {
       key: "city",
       header: "Ciudad",
-      render: (club) => (
-        <span className="text-zinc-500">{club.city ?? "—"}</span>
-      ),
+      render: (club) => <span className="text-zinc-500">{club.city ?? "—"}</span>,
     },
     {
       key: "members_count",
       header: "Miembros",
-      render: (club) => (
-        <span className="font-semibold">{club.members_count}</span>
-      ),
+      render: (club) => <span className="font-semibold">{club.members_count}</span>,
     },
     {
       key: "courts_count",
       header: "Canchas",
-      render: (club) => (
-        <span className="font-semibold">{club.courts_count}</span>
-      ),
+      render: (club) => <span className="font-semibold">{club.courts_count}</span>,
     },
     {
       key: "is_active",
@@ -524,53 +542,88 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
       ),
     },
     {
-      key: "actions",
-      header: "Acciones",
+      key: "dots",
+      header: "",
       render: (club) => (
-        <div className="flex items-center gap-2">
-          {/* Toggle active */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setActionError(null)
-              setModal({ type: "toggle", club })
-            }}
-            className={`text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors ${
-              club.is_active
-                ? "border-red-200 text-red-600 hover:bg-red-50"
-                : "border-success-border text-primary hover:bg-success"
-            }`}
-          >
-            {club.is_active ? "Desactivar" : "Activar"}
-          </button>
-
-          {/* Edit */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setActionError(null)
-              setModal({ type: "edit", club })
-            }}
-            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
-          >
-            Editar
-          </button>
-
-          {/* Delete */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setActionError(null)
-              setModal({ type: "delete", club })
-            }}
-            className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-100 text-red-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
-          >
-            Eliminar
-          </button>
-        </div>
+        <AdminDotsMenu
+          items={[
+            {
+              label: "Editar",
+              onClick: () => { setActionError(null); setModal({ type: "edit", club }) },
+            },
+            {
+              label: club.is_active ? "Desactivar" : "Activar",
+              onClick: () => { setActionError(null); setModal({ type: "toggle", club }) },
+            },
+            {
+              label: "Eliminar",
+              variant: "danger",
+              onClick: () => { setActionError(null); setModal({ type: "delete", club }) },
+            },
+          ]}
+        />
       ),
+      className: "flex justify-end",
     },
   ]
+
+  function renderExpandedRow(club: ClubAdmin) {
+    const chips: string[] = []
+    if (club.province) chips.push(club.province)
+    if (club.members_count) chips.push(`${club.members_count} miembros`)
+    if (club.courts_count) chips.push(`${club.courts_count} canchas`)
+
+    const avatar = (
+      <div className="w-11 h-11 rounded-xl bg-zinc-200 flex items-center justify-center">
+        <span className="text-sm font-black text-zinc-600">
+          {club.name.slice(0, 2).toUpperCase()}
+        </span>
+      </div>
+    )
+
+    const badge = (
+      <StatusBadge
+        label={club.is_active ? "Activo" : "Inactivo"}
+        variant={club.is_active ? "success" : "error"}
+      />
+    )
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={club.name}
+        subtitle={club.city ? `${club.city}${club.province ? `, ${club.province}` : ""}` : "Sin ciudad"}
+        chips={chips}
+        badge={badge}
+        actions={
+          <>
+            <button
+              onClick={() => { setActionError(null); setModal({ type: "edit", club }) }}
+              className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => { setActionError(null); setModal({ type: "toggle", club }) }}
+              className={`text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors ${
+                club.is_active
+                  ? "border-red-200 text-red-600 hover:bg-red-50"
+                  : "border-success-border text-primary hover:bg-success"
+              }`}
+            >
+              {club.is_active ? "Desactivar" : "Activar"}
+            </button>
+            <button
+              onClick={() => { setActionError(null); setModal({ type: "delete", club }) }}
+              className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-100 text-red-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            >
+              Eliminar
+            </button>
+          </>
+        }
+      />
+    )
+  }
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -647,6 +700,10 @@ export function AdminClubsView({ clubs }: AdminClubsViewProps) {
         columns={columns}
         data={filtered}
         emptyMessage="No se encontraron clubs"
+        onRowClick={(club) => toggleExpand(club.id)}
+        expandedRowId={expandedId}
+        renderExpandedRow={renderExpandedRow}
+        gridTemplateColumns="32px 32px 1fr 0.7fr 0.5fr 0.5fr 0.6fr 40px"
       />
 
       {actionError && modal.type === "none" && (
