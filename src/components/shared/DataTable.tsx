@@ -13,6 +13,9 @@ interface DataTableProps<T extends { id?: string }> {
   emptyMessage?: string
   onRowClick?: (item: T) => void
   keyExtractor?: (item: T) => string
+  expandedRowId?: string | null
+  renderExpandedRow?: (item: T) => React.ReactNode
+  gridTemplateColumns?: string
 }
 
 export function DataTable<T extends { id?: string }>({
@@ -21,17 +24,25 @@ export function DataTable<T extends { id?: string }>({
   emptyMessage = "Sin datos",
   onRowClick,
   keyExtractor,
+  expandedRowId,
+  renderExpandedRow,
+  gridTemplateColumns,
 }: DataTableProps<T>) {
   const getKey = keyExtractor ?? ((item: T) => item.id ?? String(Math.random()))
+  const gridCols = gridTemplateColumns ?? `repeat(${columns.length}, minmax(0, 1fr))`
 
   return (
     <div className="rounded-2xl bg-card border border-border overflow-hidden">
       {/* Header */}
-      <div className="grid border-b border-border px-5 py-3 bg-muted"
-        style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+      <div
+        className="grid border-b border-border px-5 py-3 bg-muted"
+        style={{ gridTemplateColumns: gridCols }}
       >
         {columns.map((col) => (
-          <div key={col.key} className={`text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 ${col.className ?? ""}`}>
+          <div
+            key={col.key}
+            className={`text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 ${col.className ?? ""}`}
+          >
             {col.header}
           </div>
         ))}
@@ -44,22 +55,36 @@ export function DataTable<T extends { id?: string }>({
             <p className="text-sm font-bold text-zinc-400">{emptyMessage}</p>
           </div>
         ) : (
-          data.map((item, i) => (
-            <div
-              key={getKey(item)}
-              className={`animate-fade-in grid px-5 py-3.5 items-center ${onRowClick ? "cursor-pointer hover:bg-secondary transition-colors duration-150" : ""}`}
-              style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, animationDelay: `${i * 0.03}s` }}
-              onClick={() => onRowClick?.(item)}
-            >
-              {columns.map((col) => (
-                <div key={col.key} className={`text-sm text-foreground ${col.className ?? ""}`}>
-                  {col.render
-                    ? col.render(item)
-                    : String((item as Record<string, unknown>)[col.key] ?? "—")}
+          data.map((item, i) => {
+            const key = getKey(item)
+            const isExpanded = expandedRowId != null && expandedRowId === key
+            return (
+              <div key={key}>
+                <div
+                  className={`animate-fade-in grid px-5 py-3.5 items-center transition-colors duration-150 ${
+                    onRowClick ? "cursor-pointer hover:bg-zinc-50" : ""
+                  } ${isExpanded ? "bg-[#f8faff]" : ""}`}
+                  style={{
+                    gridTemplateColumns: gridCols,
+                    animationDelay: `${i * 0.03}s`,
+                  }}
+                  onClick={() => onRowClick?.(item)}
+                >
+                  {columns.map((col) => (
+                    <div
+                      key={col.key}
+                      className={`text-sm text-foreground ${col.className ?? ""}`}
+                    >
+                      {col.render
+                        ? col.render(item)
+                        : String((item as Record<string, unknown>)[col.key] ?? "—")}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ))
+                {isExpanded && renderExpandedRow?.(item)}
+              </div>
+            )
+          })
         )}
       </div>
     </div>
