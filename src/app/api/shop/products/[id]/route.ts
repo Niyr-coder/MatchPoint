@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const updateProductSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -48,6 +49,15 @@ export async function PUT(
   }
 
   const { userId, globalRole } = auth.context
+
+  const rl = await checkRateLimit("shopProductUpdate", userId, RATE_LIMITS.shopProductUpdate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   const { allowed } = await canManageProduct(userId, globalRole, id)
   if (!allowed) {
     return NextResponse.json({ success: false, data: null, error: "Sin permisos" }, { status: 403 })

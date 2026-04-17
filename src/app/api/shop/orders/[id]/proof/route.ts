@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const proofSchema = z.object({
   proof_url: z.string().url("Debe ser una URL válida"),
@@ -21,6 +22,15 @@ export async function PUT(
     )
   }
 
+  const { userId } = auth.context
+  const rl = await checkRateLimit("proofUpload", userId, RATE_LIMITS.proofUpload)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   const body = await request.json()
   const parsed = proofSchema.safeParse(body)
   if (!parsed.success) {
@@ -30,7 +40,6 @@ export async function PUT(
     )
   }
 
-  const { userId } = auth.context
   const supabase = await createClient()
 
   const { data: order, error: fetchError } = await supabase

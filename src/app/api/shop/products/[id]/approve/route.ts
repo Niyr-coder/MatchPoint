@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const approveSchema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -18,6 +19,15 @@ export async function POST(
     return NextResponse.json(
       { success: false, data: null, error: "Solo administradores" },
       { status: 403 }
+    )
+  }
+
+  const { userId } = auth.context
+  const rl = await checkRateLimit("adminBulk", userId, RATE_LIMITS.adminBulk)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 

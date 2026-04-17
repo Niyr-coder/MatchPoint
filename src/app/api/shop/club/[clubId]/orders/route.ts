@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 export async function GET(
   request: Request,
@@ -10,6 +11,15 @@ export async function GET(
   const auth = await authorize({ clubId, requiredRoles: ["owner", "manager"] })
   if (!auth.ok) {
     return NextResponse.json({ success: false, data: null, error: "Sin permisos" }, { status: 403 })
+  }
+
+  const { userId } = auth.context
+  const rl = await checkRateLimit("shopClubRead", userId, RATE_LIMITS.shopClubRead)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
   }
 
   const url = new URL(request.url)

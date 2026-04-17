@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const updateStatusSchema = z.object({
   status: z.enum(["confirmed", "delivered", "cancelled"]),
@@ -33,6 +34,15 @@ export async function PUT(
     )
   }
 
+  const { userId, globalRole } = auth.context
+  const rl = await checkRateLimit("shopOrderUpdate", userId, RATE_LIMITS.shopOrderUpdate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   const body = await request.json()
   const parsed = updateStatusSchema.safeParse(body)
   if (!parsed.success) {
@@ -43,7 +53,6 @@ export async function PUT(
   }
 
   const { status: newStatus } = parsed.data
-  const { userId, globalRole } = auth.context
   const supabase = createServiceClient()
 
   const { data: order, error: fetchError } = await supabase
