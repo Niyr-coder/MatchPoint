@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { getEventById, updateEvent, deleteEvent } from "@/features/activities/queries"
 import { logAdminAction } from "@/lib/audit/log"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { Event } from "@/features/activities/queries"
@@ -70,6 +71,15 @@ export async function PUT(
     return NextResponse.json(
       { success: false, data: null, error: "No autorizado" },
       { status: 403 }
+    )
+  }
+
+  const ctx = authResult.context
+  const rl = await checkRateLimit("eventsCreate", ctx.userId, RATE_LIMITS.eventsCreate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 
@@ -143,6 +153,15 @@ export async function DELETE(
     return NextResponse.json(
       { success: false, data: null, error: "No autorizado" },
       { status: 403 }
+    )
+  }
+
+  const ctx = authResult.context
+  const rl = await checkRateLimit("eventsCreate", ctx.userId, RATE_LIMITS.eventsCreate)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 

@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse, Club } from "@/types"
 
 const ECUADOR_PROVINCES = [
@@ -42,6 +43,15 @@ export async function PUT(
     return NextResponse.json(
       { success: false, data: null, error: "No autorizado" },
       { status: 403 }
+    )
+  }
+
+  const ctx = authResult.context
+  const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 
@@ -133,6 +143,15 @@ export async function DELETE(
     return NextResponse.json(
       { success: false, data: null, error: "No autorizado" },
       { status: 403 }
+    )
+  }
+
+  const ctx = authResult.context
+  const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     )
   }
 
