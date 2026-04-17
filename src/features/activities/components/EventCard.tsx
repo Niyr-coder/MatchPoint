@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { Calendar, MapPin, Users, Tag } from "lucide-react"
+import { orgInitials } from "@/features/activities/lib/helpers"
 import { EVENT_TYPE_CONFIG, SPORT_LABELS } from "@/features/activities/constants"
 import { EventCardCTA } from "@/features/activities/components/EventCardCTA"
 import type { EventType, EventVisibility } from "@/features/activities/types"
@@ -41,11 +42,6 @@ function formatDate(dateStr: string): string {
   })
 }
 
-function orgInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return (parts[0]?.[0] ?? "").toUpperCase()
-  return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase()
-}
 
 const VISIBILITY_CONFIG: Record<string, { label: string; className: string }> = {
   club_only:   { label: "🔒 Miembros",   className: "bg-[#f5f3ff] text-[#6d28d9] border-[#ddd6fe]" },
