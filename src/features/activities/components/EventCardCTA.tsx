@@ -22,7 +22,13 @@ export function EventCardCTA({ eventId, isRegistered, canRegister, isFull }: Eve
     setError(null)
     try {
       const res = await fetch(`/api/events/${eventId}/register`, { method: "POST" })
-      const json = (await res.json()) as { success: boolean; error?: string | null }
+      let json: { success: boolean; error?: string | null }
+      try {
+        json = (await res.json()) as { success: boolean; error?: string | null }
+      } catch {
+        setError("Error del servidor. Intenta de nuevo.")
+        return
+      }
       if (!json.success) {
         setError(json.error ?? "Error al registrarse")
         return
