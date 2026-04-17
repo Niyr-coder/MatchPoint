@@ -10,33 +10,18 @@ import {
 } from "@/features/activities/constants"
 import type { EventWithClub } from "@/features/activities/types"
 import { mapEventRow } from "@/features/activities/utils"
-import {
-  Calendar,
-  MapPin,
-  Users,
-  Clock,
-  UserCircle,
-  Phone,
-  Building2,
-  ArrowLeft,
-  Tag,
-} from "lucide-react"
+import { Users, Clock, ArrowLeft, Tag } from "lucide-react"
+import { orgInitials, attendeeColor } from "@/features/activities/lib/helpers"
+import { formatTimeRange } from "@/features/activities/components/EventCard"
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function formatDate(dateStr: string): string {
+function formatDateShort(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("es-EC", {
-    weekday: "long",
+    weekday: "short",
     day:     "numeric",
-    month:   "long",
+    month:   "short",
     year:    "numeric",
-  })
-}
-
-function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString("es-EC", {
-    hour:   "2-digit",
-    minute: "2-digit",
   })
 }
 
@@ -69,7 +54,7 @@ async function fetchEventDetail(
       id, title, description, sport, event_type, status,
       club_id, city, location, start_date, end_date,
       image_url, is_free, price, max_capacity, min_participants,
-      visibility, registration_deadline, tags,
+      visibility, registration_deadline, tags, event_includes,
       organizer_name, organizer_contact, created_at, updated_at,
       clubs ( name ),
       event_registrations ( count )
@@ -130,8 +115,8 @@ export default async function EventDetailPage({
 
   const { event, isRegistered, attendees } = result
 
-  const typeCfg  = event.event_type ? EVENT_TYPE_CONFIG[event.event_type] : null
-  const spotsLeft = event.max_capacity != null
+  const typeCfg    = event.event_type ? EVENT_TYPE_CONFIG[event.event_type] : null
+  const spotsLeft  = event.max_capacity != null
     ? event.max_capacity - event.registration_count
     : null
   const isFull         = spotsLeft != null && spotsLeft <= 0
@@ -140,6 +125,9 @@ export default async function EventDetailPage({
     : false
   const canRegister = event.status === "published" && !isFull && !deadlinePassed
   const daysLeft    = event.registration_deadline ? daysUntil(event.registration_deadline) : null
+
+  const showLocationChip = Boolean(event.location ?? event.city)
+  const showCapacityChip = event.max_capacity != null
 
   return (
     <div className="flex flex-col gap-0 max-w-3xl mx-auto w-full">
@@ -155,7 +143,7 @@ export default async function EventDetailPage({
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <div className="relative w-full rounded-2xl overflow-hidden bg-zinc-100"
-           style={{ height: "280px" }}>
+           style={{ height: "340px" }}>
 
         {event.image_url ? (
           <Image
@@ -217,37 +205,26 @@ export default async function EventDetailPage({
         </div>
       </div>
 
-      {/* ── Quick info ───────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        {/* Date */}
-        <div className="flex items-start gap-2.5 rounded-xl bg-card border border-border p-3.5">
-          <Calendar className="size-4 text-zinc-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs font-black text-foreground capitalize leading-tight">
-              {formatDate(event.start_date)}
-            </p>
-            <p className="text-[11px] text-zinc-400 mt-0.5">
-              {formatTime(event.start_date)}
-              {event.end_date && ` – ${formatTime(event.end_date)}`}
-            </p>
-          </div>
-        </div>
+      {/* ── Info chips ───────────────────────────────────────── */}
+      <div className="flex flex-wrap gap-2 mt-4">
+        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0] capitalize">
+          📅 {formatDateShort(event.start_date)}
+        </span>
 
-        {/* Location */}
-        {(event.location ?? event.city) ? (
-          <div className="flex items-start gap-2.5 rounded-xl bg-card border border-border p-3.5">
-            <MapPin className="size-4 text-zinc-400 shrink-0 mt-0.5" />
-            <div>
-              {event.location && (
-                <p className="text-xs font-black text-foreground leading-tight">{event.location}</p>
-              )}
-              {event.city && (
-                <p className="text-[11px] text-zinc-400 mt-0.5">{event.city}</p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl bg-card border border-border p-3.5" />
+        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]">
+          🕘 {formatTimeRange(event.start_date, event.end_date)}
+        </span>
+
+        {showLocationChip && (
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold bg-[#fdf4ff] text-[#a21caf] border-[#f5d0fe]">
+            📍 {[event.location, event.city].filter(Boolean).join(", ")}
+          </span>
+        )}
+
+        {showCapacityChip && (
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold bg-[#fff7ed] text-[#c2410c] border-[#fed7aa]">
+            👥 {isFull ? "Lleno" : `${spotsLeft} lugar${spotsLeft !== 1 ? "es" : ""} libre${spotsLeft !== 1 ? "s" : ""}`}
+          </span>
         )}
       </div>
 
@@ -261,7 +238,6 @@ export default async function EventDetailPage({
           status={event.status}
         />
 
-        {/* Context line */}
         {event.status === "published" && (
           <div className="flex items-center justify-center gap-3 flex-wrap">
             {event.max_capacity != null && (
@@ -301,6 +277,24 @@ export default async function EventDetailPage({
           <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">
             {event.description}
           </p>
+
+          {event.event_includes && event.event_includes.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[10px] font-black uppercase tracking-wide text-zinc-500 mb-2">
+                Incluye
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {event.event_includes.map((item) => (
+                  <span
+                    key={item}
+                    className="inline-flex items-center gap-1 bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0] px-2.5 py-1 rounded-md text-[11px] font-bold"
+                  >
+                    ✓ {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -323,67 +317,78 @@ export default async function EventDetailPage({
       {attendees.length > 0 && (
         <div className="mt-6">
           <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 mb-3">
-            Quiénes van
+            Quiénes van ({event.registration_count})
           </p>
-          <div className="flex items-center gap-3">
-            {/* Avatar stack */}
-            <div className="flex -space-x-2">
-              {attendees.slice(0, 7).map((a) => (
+          <div className="flex flex-col gap-0.5">
+            {attendees.slice(0, 3).map((a) => {
+              const name     = a.display_name ?? "Usuario"
+              const initials = name
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean)
+                .map((w) => w[0]?.toUpperCase() ?? "")
+                .slice(0, 2)
+                .join("")
+              const color = attendeeColor(a.user_id)
+              return (
                 <div
                   key={a.user_id}
-                  className="size-8 rounded-full bg-muted border-2 border-background flex items-center justify-center overflow-hidden shrink-0"
+                  className="flex items-center gap-2.5 py-1.5 border-b border-zinc-50"
                 >
-                  {a.avatar_url ? (
-                    <Image
-                      src={a.avatar_url}
-                      alt={a.display_name ?? ""}
-                      width={32}
-                      height={32}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <UserCircle className="size-4 text-zinc-400" />
-                  )}
+                  <div
+                    className="size-[30px] rounded-full flex items-center justify-center text-[10px] font-black shrink-0"
+                    style={{ background: color.bg, color: color.text }}
+                  >
+                    {initials}
+                  </div>
+                  <span className="text-xs font-semibold text-foreground">{name}</span>
                 </div>
-              ))}
-              {attendees.length > 7 && (
-                <div className="size-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-black text-zinc-500">
-                  +{attendees.length - 7}
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-zinc-500">
-              <span className="font-bold text-foreground">{event.registration_count}</span>{" "}
-              persona{event.registration_count !== 1 ? "s" : ""} inscrita{event.registration_count !== 1 ? "s" : ""}
-            </p>
+              )
+            })}
           </div>
+          {event.registration_count > 3 && (
+            <span className="inline-flex items-center gap-1 mt-2.5 text-[11px] font-bold text-blue-500 cursor-default">
+              Ver todos los inscritos ({event.registration_count}) →
+            </span>
+          )}
         </div>
       )}
 
       {/* ── Organizer ────────────────────────────────────────── */}
       {(event.organizer_name ?? event.club_name) && (
-        <div className="mt-6 pt-5 border-t border-border flex flex-col gap-2.5">
-          <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">
+        <div className="mt-6">
+          <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400 mb-3">
             Organiza
           </p>
-          {event.club_name && (
-            <div className="flex items-center gap-2">
-              <Building2 className="size-3.5 text-zinc-400 shrink-0" />
-              <span className="text-xs font-bold text-foreground">{event.club_name}</span>
+          <div className="bg-[#fafafa] border border-[#e5e7eb] rounded-2xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="size-[46px] rounded-xl flex items-center justify-center text-sm font-black text-white shrink-0"
+                style={{ background: "linear-gradient(135deg,#1e40af,#3b82f6)" }}
+              >
+                {orgInitials(event.club_name ?? event.organizer_name ?? "")}
+              </div>
+              <div>
+                {event.club_name && (
+                  <p className="text-[13px] font-black text-foreground leading-tight">{event.club_name}</p>
+                )}
+                {event.organizer_name && (
+                  <p className="text-[11px] text-zinc-500 mt-0.5">Contacto: {event.organizer_name}</p>
+                )}
+              </div>
             </div>
-          )}
-          {event.organizer_name && (
-            <div className="flex items-center gap-2">
-              <UserCircle className="size-3.5 text-zinc-400 shrink-0" />
-              <span className="text-xs text-zinc-600">{event.organizer_name}</span>
-            </div>
-          )}
-          {event.organizer_contact && (
-            <div className="flex items-center gap-2">
-              <Phone className="size-3.5 text-zinc-400 shrink-0" />
-              <span className="text-xs text-zinc-500">{event.organizer_contact}</span>
-            </div>
-          )}
+
+            {event.organizer_contact && (
+              <a
+                href={`https://wa.me/${event.organizer_contact.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] font-bold bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0] hover:bg-[#dcfce7] transition-colors"
+              >
+                📱 WhatsApp
+              </a>
+            )}
+          </div>
         </div>
       )}
 
