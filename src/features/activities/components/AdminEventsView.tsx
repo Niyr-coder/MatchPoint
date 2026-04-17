@@ -1,14 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Pencil, Eye, EyeOff, XCircle, Users, Trash2 } from "lucide-react"
+import { Plus, ChevronRight } from "lucide-react"
 import { useEventMutations } from "@/features/activities/hooks/useEventMutations"
 import { StatCard } from "@/components/shared/StatCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { FilterBar } from "@/components/shared/FilterBar"
+import { DataTable } from "@/components/shared/DataTable"
+import { AdminDotsMenu } from "@/components/admin/shared/AdminDotsMenu"
+import { AdminInlinePanel } from "@/components/admin/shared/AdminInlinePanel"
 import { EventFormModal, EMPTY_EVENT_FORM } from "@/features/activities/components/EventForm"
 import { EVENT_TYPE_CONFIG, EVENT_STATUS_CONFIG, SPORT_LABELS } from "@/features/activities/constants"
 import { CalendarDays, CheckCircle, Globe } from "lucide-react"
+import type { Column } from "@/components/shared/DataTable"
 import type { EventWithClub, EventType, EventStatus } from "@/features/activities/types"
 import type { EventFormState } from "@/features/activities/components/EventForm"
 import { eventToForm } from "@/features/activities/utils"
@@ -23,44 +28,9 @@ function formatDate(dateStr: string): string {
   })
 }
 
-// ── ClubFilterBar ──────────────────────────────────────────────────────────────
+// ── types ──────────────────────────────────────────────────────────────────────
 
 interface ClubOption { id: string; name: string }
-
-interface FilterBarProps {
-  filter: string
-  onFilterChange: (v: string) => void
-  clubs: ClubOption[]
-  statusFilter: string
-  onStatusFilter: (v: string) => void
-}
-
-function FilterBar({ filter, onFilterChange, clubs, statusFilter, onStatusFilter }: FilterBarProps) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      <input
-        type="text"
-        value={filter}
-        onChange={(e) => onFilterChange(e.target.value)}
-        placeholder="Buscar por título…"
-        className="border border-border rounded-full px-3 py-1.5 text-xs text-zinc-700 placeholder:text-zinc-400 outline-none focus:border-foreground bg-card"
-      />
-      <select
-        value={statusFilter}
-        onChange={(e) => onStatusFilter(e.target.value)}
-        className="border border-border rounded-full px-3 py-1.5 text-xs font-bold text-zinc-600 outline-none focus:border-foreground bg-card"
-      >
-        <option value="">Todos los estados</option>
-        <option value="draft">Borrador</option>
-        <option value="published">Publicado</option>
-        <option value="cancelled">Cancelado</option>
-        <option value="completed">Completado</option>
-      </select>
-    </div>
-  )
-}
-
-// ── AdminEventsView ────────────────────────────────────────────────────────────
 
 interface AdminEventsViewProps {
   events: EventWithClub[]
@@ -69,25 +39,48 @@ interface AdminEventsViewProps {
 
 type ModalMode = { type: "create" } | { type: "edit"; event: EventWithClub }
 
+// ── constants ─────────────────────────────────────────────────────────────────
+
+const STATUS_FILTER_OPTIONS = [
+  { value: "draft",     label: "Borrador" },
+  { value: "published", label: "Publicado" },
+  { value: "cancelled", label: "Cancelado" },
+  { value: "completed", label: "Completado" },
+]
+
+// ── main component ────────────────────────────────────────────────────────────
+
 export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
   const mutations = useEventMutations({ apiBasePath: "/api/admin/events" })
 
-  const [modal, setModal] = useState<ModalMode | null>(null)
-  const [textFilter, setTextFilter] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
+  const [modal, setModal]       = useState<ModalMode | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [filters, setFilters]   = useState<Record<string, string>>({ search: "", status: "" })
 
-  // Stats
+  // ── stats ──────────────────────────────────────────────────────────────────
+
   const total     = events.length
   const published = events.filter((e) => e.status === "published").length
   const cancelled = events.filter((e) => e.status === "cancelled").length
   const totalRegs = events.reduce((acc, e) => acc + e.registration_count, 0)
 
-  // Filtered rows
+  // ── filter ─────────────────────────────────────────────────────────────────
+
   const filtered = events.filter((e) => {
-    const matchText   = !textFilter   || e.title.toLowerCase().includes(textFilter.toLowerCase())
-    const matchStatus = !statusFilter || e.status === statusFilter
+    const matchText   = !filters.search || e.title.toLowerCase().includes(filters.search.toLowerCase())
+    const matchStatus = !filters.status || e.status === filters.status
     return matchText && matchStatus
   })
+
+  // ── handlers ───────────────────────────────────────────────────────────────
+
+  function handleFilterChange(key: string, value: string) {
+    setFilters((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function toggleExpand(eventId: string) {
+    setExpandedId((prev) => (prev === eventId ? null : eventId))
+  }
 
   function openCreate() {
     mutations.setModalError(null)
@@ -111,43 +104,200 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
     if (success) setModal(null)
   }
 
-  async function updateStatus(event: EventWithClub, newStatus: EventStatus) {
-    await mutations.updateStatus(event.id, newStatus)
+  async function handleCancelEvent(eventId: string) {
+    await mutations.updateStatus(eventId, "cancelled" as EventStatus)
   }
 
-  async function deleteEvent(event: EventWithClub) {
-    if (!confirm(`¿Eliminar definitivamente el evento "${event.title}"?`)) return
-    await mutations.deleteEvent(event.id)
+  // ── columns ────────────────────────────────────────────────────────────────
+
+  const columns: Column<EventWithClub>[] = [
+    {
+      key: "expand",
+      header: "",
+      render: (event) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleExpand(event.id) }}
+          className="flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+          aria-label={expandedId === event.id ? "Colapsar" : "Expandir"}
+        >
+          <ChevronRight
+            className={`size-4 transition-transform duration-200 ${expandedId === event.id ? "rotate-90" : ""}`}
+          />
+        </button>
+      ),
+      className: "w-6",
+    },
+    {
+      key: "title",
+      header: "Título",
+      render: (event) => (
+        <div className="flex flex-col gap-0.5">
+          <span className="font-bold text-foreground">{event.title}</span>
+          {event.club_name && (
+            <span className="text-[11px] text-zinc-400">{event.club_name}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "event_type",
+      header: "Tipo",
+      render: (event) => {
+        const cfg = EVENT_TYPE_CONFIG[event.event_type as EventType]
+        return (
+          <span
+            className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${cfg ? `${cfg.bg} ${cfg.color} ${cfg.border}` : "bg-muted text-zinc-600 border-border"}`}
+          >
+            {cfg?.label ?? event.event_type}
+          </span>
+        )
+      },
+    },
+    {
+      key: "status",
+      header: "Estado",
+      render: (event) => {
+        const cfg = EVENT_STATUS_CONFIG[event.status as EventStatus]
+        return (
+          <StatusBadge
+            label={cfg?.label ?? event.status}
+            variant={cfg?.variant ?? "neutral"}
+          />
+        )
+      },
+    },
+    {
+      key: "start_date",
+      header: "Fecha",
+      render: (event) => (
+        <span className="text-[11px] text-zinc-500">
+          {event.start_date ? formatDate(event.start_date) : "—"}
+        </span>
+      ),
+    },
+    {
+      key: "registration_count",
+      header: "Inscritos",
+      render: (event) => (
+        <span className="font-semibold">{event.registration_count}</span>
+      ),
+    },
+    {
+      key: "dots",
+      header: "",
+      render: (event) => {
+        const isTerminal = event.status === "cancelled" || event.status === "completed"
+        return (
+          <AdminDotsMenu
+            items={[
+              {
+                label: "Editar",
+                disabled: isTerminal,
+                onClick: () => openEdit(event),
+              },
+              {
+                label: "Ver inscritos",
+                onClick: () => { /* TODO: navigate to registrations */ },
+              },
+              {
+                label: "Cancelar evento",
+                variant: "danger",
+                disabled: isTerminal,
+                onClick: () => void handleCancelEvent(event.id),
+              },
+            ]}
+          />
+        )
+      },
+      className: "flex justify-end",
+    },
+  ]
+
+  // ── expanded row renderer ──────────────────────────────────────────────────
+
+  function renderExpandedRow(event: EventWithClub) {
+    const cfg        = EVENT_STATUS_CONFIG[event.status as EventStatus]
+    const isTerminal = event.status === "cancelled" || event.status === "completed"
+
+    const chips: string[] = []
+    if (event.club_name) chips.push(event.club_name)
+    if (event.sport)     chips.push(SPORT_LABELS[event.sport] ?? event.sport)
+    if (event.registration_count > 0) chips.push(`${event.registration_count} inscritos`)
+    if (event.price != null) chips.push(event.price === 0 ? "Gratis" : `$${event.price}`)
+
+    const avatar = (
+      <div className="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center">
+        <CalendarDays className="size-5 text-purple-600" />
+      </div>
+    )
+
+    const badge = cfg ? (
+      <StatusBadge label={cfg.label} variant={cfg.variant} />
+    ) : undefined
+
+    return (
+      <AdminInlinePanel
+        avatar={avatar}
+        name={event.title}
+        subtitle={event.start_date ? formatDate(event.start_date) : "Sin fecha"}
+        chips={chips}
+        badge={badge}
+        actions={
+          <>
+            {!isTerminal && (
+              <button
+                onClick={() => openEdit(event)}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+              >
+                Editar
+              </button>
+            )}
+            <button
+              className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-border text-zinc-600 hover:bg-secondary transition-colors"
+            >
+              Ver inscritos
+            </button>
+            {!isTerminal && (
+              <button
+                onClick={() => void handleCancelEvent(event.id)}
+                className="text-[11px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Cancelar evento
+              </button>
+            )}
+          </>
+        }
+      />
+    )
   }
 
-  const modalInitial: EventFormState =
-    modal?.type === "edit" ? eventToForm(modal.event) : EMPTY_EVENT_FORM
+  // ── render ─────────────────────────────────────────────────────────────────
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total eventos"  value={total}     icon={CalendarDays} variant="default" />
+        <StatCard label="Total Eventos"  value={total}     icon={CalendarDays} variant="default" />
         <StatCard label="Publicados"     value={published} icon={Globe}        variant="success" />
-        <StatCard label="Cancelados"     value={cancelled} icon={XCircle}      variant="warning" />
-        <StatCard label="Registraciones" value={totalRegs} icon={Users}        variant="accent"  />
+        <StatCard label="Cancelados"     value={cancelled} icon={CheckCircle}  variant="warning" />
+        <StatCard label="Inscripciones"  value={totalRegs} icon={CheckCircle}  variant="accent"  />
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <FilterBar
-          filter={textFilter}
-          onFilterChange={setTextFilter}
-          clubs={clubs}
-          statusFilter={statusFilter}
-          onStatusFilter={setStatusFilter}
-        />
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex-1 min-w-0">
+          <FilterBar
+            searchPlaceholder="Buscar por título…"
+            filters={[{ key: "status", label: "Todos los estados", options: STATUS_FILTER_OPTIONS }]}
+            values={filters}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-foreground text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors shrink-0"
+          className="flex items-center gap-1.5 bg-foreground text-white rounded-full px-4 py-2 text-sm font-bold hover:bg-foreground/90 transition-colors shrink-0"
         >
-          <Plus className="size-3.5" />
-          Crear evento
+          <Plus className="size-4" />Crear evento
         </button>
       </div>
 
@@ -166,147 +316,15 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
           description="No hay eventos que coincidan con los filtros seleccionados."
         />
       ) : (
-        <div className="rounded-2xl bg-card border border-border overflow-hidden">
-          {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3 border-b border-border bg-muted/50">
-            {["Título", "Tipo", "Club", "Estado", "Inscritos", "Fecha", ""].map((h) => (
-              <p
-                key={h}
-                className="text-[10px] font-black uppercase tracking-wide text-zinc-400 last:text-right"
-              >
-                {h}
-              </p>
-            ))}
-          </div>
-
-          {/* Rows */}
-          <div className="flex flex-col divide-y divide-[#f0f0f0]">
-            {filtered.map((event) => {
-              const typeCfg    = event.event_type ? EVENT_TYPE_CONFIG[event.event_type] : null
-              const statusCfg  = EVENT_STATUS_CONFIG[event.status]
-              const isTerminal = event.status === "cancelled" || event.status === "completed"
-              const isActioning = mutations.actionLoadingId === event.id
-
-              return (
-                <div
-                  key={event.id}
-                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-muted/50 transition-colors"
-                >
-                  {/* Title */}
-                  <div>
-                    <p className="text-sm font-bold text-foreground leading-tight truncate">
-                      {event.title}
-                    </p>
-                    {event.sport && (
-                      <p className="text-[10px] text-zinc-400 mt-0.5">
-                        {SPORT_LABELS[event.sport] ?? event.sport}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Type */}
-                  <div>
-                    {typeCfg ? (
-                      <span
-                        className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${typeCfg.bg} ${typeCfg.color} ${typeCfg.border}`}
-                      >
-                        {typeCfg.label}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-zinc-400">—</span>
-                    )}
-                  </div>
-
-                  {/* Club */}
-                  <p className="text-xs text-zinc-600 truncate">{event.club_name ?? "—"}</p>
-
-                  {/* Status */}
-                  <div>
-                    <StatusBadge label={statusCfg.label} variant={statusCfg.variant} />
-                  </div>
-
-                  {/* Registrations */}
-                  <p className="text-sm font-black text-foreground">
-                    {event.registration_count}
-                    {event.max_capacity != null && (
-                      <span className="text-zinc-400 font-normal">/{event.max_capacity}</span>
-                    )}
-                  </p>
-
-                  {/* Date */}
-                  <p className="text-xs text-zinc-500">{formatDate(event.start_date)}</p>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 justify-end">
-                    {!isTerminal && (
-                      <button
-                        onClick={() => openEdit(event)}
-                        title="Editar"
-                        disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
-                      >
-                        <Pencil className="size-3.5" />
-                      </button>
-                    )}
-
-                    {!isTerminal && event.status === "published" && (
-                      <button
-                        onClick={() => updateStatus(event, "draft")}
-                        title="Despublicar"
-                        disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
-                      >
-                        <EyeOff className="size-3.5" />
-                      </button>
-                    )}
-
-                    {!isTerminal && event.status !== "published" && (
-                      <button
-                        onClick={() => updateStatus(event, "published")}
-                        title="Publicar"
-                        disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-400 hover:text-foreground disabled:opacity-40"
-                      >
-                        <Eye className="size-3.5" />
-                      </button>
-                    )}
-
-                    {!isTerminal && (
-                      <button
-                        onClick={() => updateStatus(event, "cancelled")}
-                        title="Cancelar evento"
-                        disabled={isActioning}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors text-zinc-400 hover:text-red-600 disabled:opacity-40"
-                      >
-                        <XCircle className="size-3.5" />
-                      </button>
-                    )}
-
-                    {isTerminal && (
-                      <button
-                        onClick={() => updateStatus(event, "completed")}
-                        title="Marcar completado"
-                        disabled={isActioning || event.status === "completed"}
-                        className="size-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-zinc-300 hover:text-foreground disabled:opacity-40"
-                      >
-                        <CheckCircle className="size-3.5" />
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => deleteEvent(event)}
-                      title="Eliminar"
-                      disabled={isActioning}
-                      className="size-7 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors text-zinc-300 hover:text-red-600 disabled:opacity-40"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="No se encontraron eventos"
+          onRowClick={(event) => toggleExpand(event.id)}
+          expandedRowId={expandedId}
+          renderExpandedRow={renderExpandedRow}
+          gridTemplateColumns="32px 1fr 0.5fr 0.5fr 0.6fr 0.4fr 40px"
+        />
       )}
 
       {/* Event form modal */}
@@ -314,7 +332,7 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
         <EventFormModal
           title={modal.type === "create" ? "Crear evento" : "Editar evento"}
           mode={modal.type}
-          initial={modalInitial}
+          initial={modal.type === "edit" ? eventToForm(modal.event) : EMPTY_EVENT_FORM}
           clubs={clubs}
           loading={mutations.modalLoading}
           error={mutations.modalError}
@@ -323,7 +341,6 @@ export function AdminEventsView({ events, clubs }: AdminEventsViewProps) {
           isAdmin
         />
       )}
-    </>
+    </div>
   )
 }
-
