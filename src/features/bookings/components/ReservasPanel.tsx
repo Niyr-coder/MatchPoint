@@ -6,7 +6,6 @@ import type { Reservation } from "@/features/bookings/types"
 
 interface ReservasPanelProps {
   reservations: Reservation[]
-  inviteCount: number
 }
 
 type DisplayStatus = "confirmada" | "pendiente" | "cancelada"
@@ -35,7 +34,7 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString("es-EC", { weekday: "short", day: "numeric", month: "short" })
 }
 
-export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps) {
+export function ReservasPanel({ reservations }: ReservasPanelProps) {
   return (
     <div
       className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-card border border-border"
@@ -99,15 +98,9 @@ export function ReservasPanel({ reservations, inviteCount }: ReservasPanelProps)
 
       {/* Footer */}
       <div className="px-6 py-3 border-t border-zinc-50">
-        {inviteCount > 0 ? (
-          <Link href="/dashboard/reservations" className="text-[11px] font-bold text-[#16a34a] hover:underline">
-            Ver invitaciones ({inviteCount}) →
-          </Link>
-        ) : (
-          <Link href="/dashboard/reservations" className="text-[11px] font-bold text-zinc-400 hover:text-zinc-600 hover:underline">
-            Ver historial de reservas →
-          </Link>
-        )}
+        <Link href="/dashboard/reservations" className="text-[11px] font-bold text-zinc-400 hover:text-zinc-600 hover:underline">
+          Ver historial de reservas →
+        </Link>
       </div>
     </div>
   )
