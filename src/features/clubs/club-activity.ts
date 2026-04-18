@@ -41,7 +41,7 @@ export async function getClubActivity(userId: string): Promise<ActivityItem[]> {
 
   const items: ActivityItem[] = []
 
-  for (const t of (tournamentsRes.data ?? []) as Array<{
+  for (const t of (tournamentsRes.data ?? []) as unknown as Array<{
     name: string
     created_at: string
     clubs: { name: string } | null
@@ -55,7 +55,7 @@ export async function getClubActivity(userId: string): Promise<ActivityItem[]> {
     })
   }
 
-  for (const m of (membersRes.data ?? []) as Array<{
+  for (const m of (membersRes.data ?? []) as unknown as Array<{
     created_at: string
     clubs: { name: string } | null
     profiles: { full_name: string | null } | null

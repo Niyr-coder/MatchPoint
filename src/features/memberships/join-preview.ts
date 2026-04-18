@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
 import type { InviteEntityType } from "./actions"
 
@@ -84,7 +85,7 @@ async function fetchTournamentEntity(
 
   if (!data) return FALLBACK_ENTITY
 
-  const t = data as {
+  const t = data as unknown as {
     name: string
     start_date: string | null
     end_date: string | null
@@ -125,7 +126,7 @@ async function fetchReservationEntity(
 
   if (!data) return FALLBACK_ENTITY
 
-  const r = data as {
+  const r = data as unknown as {
     date: string
     start_time: string
     end_time: string
@@ -157,7 +158,7 @@ async function fetchReservationEntity(
   }
 }
 
-export async function fetchJoinPreview(code: string): Promise<JoinPreview> {
+async function fetchJoinPreviewImpl(code: string): Promise<JoinPreview> {
   const supabase = await createClient()
 
   const { data: invite } = await supabase
@@ -196,3 +197,5 @@ export async function fetchJoinPreview(code: string): Promise<JoinPreview> {
   const entity = await entityFetchers[entityType]()
   return { code, entity_type: entityType, status: "valid", entity }
 }
+
+export const fetchJoinPreview = cache(fetchJoinPreviewImpl)
