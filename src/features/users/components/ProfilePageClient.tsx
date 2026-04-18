@@ -30,7 +30,7 @@ interface Props {
 
 export function ProfilePageClient({ userId, globalRole }: Props) {
   const { data: profile } = useQuery<Profile | null>({
-    queryKey: ['profile', 'data', userId],
+    queryKey: profileKeys.data(userId),
     queryFn: () => Promise.resolve(null),
     staleTime: Infinity,
   })

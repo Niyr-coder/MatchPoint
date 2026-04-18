@@ -15,6 +15,7 @@ export const profileKeys = {
   all: () => ['profile'] as const,
   stats: (userId: string) => [...profileKeys.all(), 'stats', userId] as const,
   roles: (userId: string) => [...profileKeys.all(), 'roles', userId] as const,
+  data: (userId: string) => [...profileKeys.all(), 'data', userId] as const,
 } as const
 
 export const adminKeys = {

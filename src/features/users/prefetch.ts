@@ -9,8 +9,6 @@ export async function prefetchUserProfile(
   queryClient: QueryClient,
   userId: string
 ): Promise<void> {
-  const supabase = createServiceClient()
-
   await Promise.all([
     queryClient.prefetchQuery({
       queryKey: profileKeys.stats(userId),
@@ -21,13 +19,15 @@ export async function prefetchUserProfile(
       queryFn: () => getUserRoles(userId),
     }),
     queryClient.prefetchQuery({
-      queryKey: ['profile', 'data', userId],
+      queryKey: profileKeys.data(userId),
       queryFn: async () => {
-        const { data } = await supabase
+        const supabase = createServiceClient()
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
           .single()
+        if (error) throw new Error(error.message)
         return data
       },
     }),
