@@ -382,11 +382,12 @@ export function AdminUsersView({ users, clubs }: AdminUsersViewProps) {
     const suspended = isSuspended(user)
     const userInitials = initials(name)
 
-    const chips: string[] = []
-    if (user.city) chips.push(user.city)
-    if (user.rating != null) chips.push(`★ ${Number(user.rating).toFixed(1)}`)
-    if (user.matches_played) chips.push(`${user.matches_played} partidos`)
-    if (user.global_role) chips.push(ROLE_LABELS[user.global_role as AppRole] ?? user.global_role)
+    const chips = [
+      user.city ?? null,
+      user.rating != null ? `★ ${Number(user.rating).toFixed(1)}` : null,
+      user.matches_played ? `${user.matches_played} partidos` : null,
+      user.global_role ? (ROLE_LABELS[user.global_role as AppRole] ?? user.global_role) : null,
+    ].filter(Boolean) as string[]
 
     const avatar = user.avatar_url ? (
       <img src={user.avatar_url} alt={name} className="w-11 h-11 rounded-xl object-cover" />

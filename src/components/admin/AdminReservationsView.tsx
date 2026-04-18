@@ -302,11 +302,12 @@ export function AdminReservationsView({
   function renderExpandedRow(r: ReservationAdmin) {
     const { label, variant } = STATUS_BADGE[r.status]
 
-    const chips: string[] = []
-    if (r.club_name) chips.push(r.club_name)
-    if (r.court_sport) chips.push(SPORT_LABELS[r.court_sport] ?? r.court_sport)
-    chips.push(formatDateTime(r.date, r.start_time, r.end_time))
-    chips.push(formatPrice(r.total_price))
+    const chips = [
+      r.club_name ?? null,
+      r.court_sport ? (SPORT_LABELS[r.court_sport] ?? r.court_sport) : null,
+      formatDateTime(r.date, r.start_time, r.end_time),
+      formatPrice(r.total_price),
+    ].filter(Boolean) as string[]
 
     const avatar = (
       <div className="w-11 h-11 rounded-xl bg-zinc-200 flex items-center justify-center">
