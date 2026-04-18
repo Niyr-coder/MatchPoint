@@ -6,7 +6,7 @@ import type { Tournament } from './types'
 import type { ApiResponse } from '@/types'
 
 async function fetchOpenTournaments(): Promise<Tournament[]> {
-  const res = await fetch('/api/tournaments?status=open&limit=20')
+  const res = await fetch('/api/tournaments?limit=20')
   if (!res.ok) throw new Error('Error cargando torneos')
   const json = (await res.json()) as ApiResponse<Tournament[]>
   return json.data ?? []
@@ -36,10 +36,11 @@ export function useOpenTournaments() {
   })
 }
 
-export function useMyTournaments(userId: string) {
+export function useMyTournaments(userId: string | undefined | null) {
+  const safeId = userId ?? ''
   return useQuery({
-    queryKey: tournamentKeys.mine(userId),
-    queryFn: () => fetchMyTournaments(userId),
+    queryKey: tournamentKeys.mine(safeId),
+    queryFn: () => fetchMyTournaments(safeId),
     enabled: Boolean(userId),
   })
 }

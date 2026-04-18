@@ -1,3 +1,4 @@
+import 'server-only'
 import type { QueryClient } from '@tanstack/react-query'
 import { tournamentKeys } from '@/lib/query/keys'
 import { getOpenTournaments, getCreatedTournaments } from './queries'
@@ -10,10 +11,12 @@ export async function prefetchTournamentsList(
     queryClient.prefetchQuery({
       queryKey: tournamentKeys.open(),
       queryFn: getOpenTournaments,
+      staleTime: 60_000,
     }),
     queryClient.prefetchQuery({
       queryKey: tournamentKeys.mine(userId),
       queryFn: () => getCreatedTournaments(userId),
+      staleTime: 60_000,
     }),
   ])
 }
