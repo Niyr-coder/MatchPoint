@@ -1,9 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { JoinPreview } from "../join-preview"
+
+interface RedeemResponse {
+  success: boolean
+  error?: string
+}
 
 interface JoinPageClientProps {
   preview: JoinPreview
@@ -24,6 +29,12 @@ export function JoinPageClient({ preview, isAuthenticated }: JoinPageClientProps
   const [state, setState] = useState<State>("idle")
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
+  useEffect(() => {
+    if (state !== "success") return
+    const timer = setTimeout(() => router.push("/dashboard"), 1500)
+    return () => clearTimeout(timer)
+  }, [state, router])
+
   const { entity, status, code, entity_type } = preview
   const terminal = STATUS_MESSAGES[status]
 
@@ -35,14 +46,13 @@ export function JoinPageClient({ preview, isAuthenticated }: JoinPageClientProps
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
       })
-      const json = await res.json()
+      const json = (await res.json()) as RedeemResponse
       if (!res.ok || !json.success) {
         setErrorMsg(json.error ?? "Error al procesar la invitación.")
         setState("error")
         return
       }
       setState("success")
-      setTimeout(() => router.push("/dashboard"), 1500)
     } catch {
       setErrorMsg("Error de conexión. Intenta de nuevo.")
       setState("error")
