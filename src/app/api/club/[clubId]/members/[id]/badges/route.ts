@@ -6,6 +6,7 @@ import { CLUB_BADGE_TYPES } from "@/features/badges/constants"
 import type { ApiResponse } from "@/types"
 import type { PlayerBadge, RawBadgeRow } from "@/features/badges/types"
 import type { BadgeType } from "@/features/badges/constants"
+import { ok, fail } from "@/lib/api/response"
 
 type RouteContext = { params: Promise<{ clubId: string; id: string }> }
 
@@ -20,19 +21,19 @@ export async function POST(
 
   const authResult = await authorize({ clubId, requiredPermission: "club.edit" })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "Cuerpo inválido" }, { status: 400 })
+    return fail("Cuerpo inválido")
   }
 
   const parsed = grantSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { badge_type } = parsed.data
@@ -51,12 +52,9 @@ export async function POST(
 
   if (error) {
     if (error.code === "23505") {
-      return NextResponse.json(
-        { success: false, data: null, error: "El jugador ya tiene esta insignia en este club" },
-        { status: 409 }
-      )
+      return fail("El jugador ya tiene esta insignia en este club", 409)
     }
-    return NextResponse.json({ success: false, data: null, error: "Error al otorgar insignia" }, { status: 500 })
+    return fail("Error al otorgar insignia", 500)
   }
 
   const row = data as unknown as RawBadgeRow
@@ -69,7 +67,7 @@ export async function POST(
     granted_at: row.granted_at,
   }
 
-  return NextResponse.json({ success: true, data: badge, error: null })
+  return ok(badge)
 }
 
 export async function DELETE(
@@ -80,13 +78,13 @@ export async function DELETE(
 
   const authResult = await authorize({ clubId, requiredPermission: "club.edit" })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   const url = new URL(request.url)
   const badgeId = url.searchParams.get("badgeId")
   if (!badgeId) {
-    return NextResponse.json({ success: false, data: null, error: "badgeId requerido" }, { status: 400 })
+    return fail("badgeId requerido")
   }
 
   const supabase = createServiceClient()
@@ -100,14 +98,14 @@ export async function DELETE(
     .maybeSingle()
 
   if (!existing) {
-    return NextResponse.json({ success: false, data: null, error: "Insignia no encontrada" }, { status: 404 })
+    return fail("Insignia no encontrada", 404)
   }
 
   const { error } = await supabase.from("player_badges").delete().eq("id", badgeId)
 
   if (error) {
-    return NextResponse.json({ success: false, data: null, error: "Error al revocar insignia" }, { status: 500 })
+    return fail("Error al revocar insignia", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

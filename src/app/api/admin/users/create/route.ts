@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse, AppRole } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema
@@ -50,46 +51,31 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<CreatedUser>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const rl = await checkRateLimit("adminCreateUser", authResult.context.userId, RATE_LIMITS.adminCreateUser)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createUserSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const input: CreateUserInput = parsed.data
 
   // clubRole is required when clubId is provided
   if (input.clubId && !input.clubRole) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Se requiere clubRole cuando se especifica clubId" },
-      { status: 422 }
-    )
+    return fail("Se requiere clubRole cuando se especifica clubId", 422)
   }
 
   const actorId = authResult.context.userId
@@ -115,10 +101,7 @@ export async function POST(
       ? "Ya existe un usuario con ese email"
       : "Error al crear el usuario"
 
-    return NextResponse.json(
-      { success: false, data: null, error: clientMessage },
-      { status: 409 }
-    )
+    return fail(clientMessage, 409)
   }
 
   const newUserId = authData.user.id
@@ -186,10 +169,7 @@ export async function POST(
       clubMembershipAdded,
     }
 
-    return NextResponse.json(
-      { success: true, data: responseData, error: null },
-      { status: 201 }
-    )
+    return ok(responseData, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/admin/users/create]", message)
@@ -200,9 +180,6 @@ export async function POST(
       console.error("[POST /api/admin/users/create] cleanup deleteUser failed:", cleanupMsg)
     })
 
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al configurar el usuario creado" },
-      { status: 500 }
-    )
+    return fail("Error al configurar el usuario creado", 500)
   }
 }

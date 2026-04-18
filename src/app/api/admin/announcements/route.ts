@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ── types ──────────────────────────────────────────────────────────────────────
 
@@ -44,10 +45,7 @@ const postSchema = z
 export async function GET(): Promise<NextResponse<ApiResponse<AuditAnnouncement[]>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
@@ -61,18 +59,11 @@ export async function GET(): Promise<NextResponse<ApiResponse<AuditAnnouncement[
 
     if (error) throw new Error(error.message)
 
-    return NextResponse.json({
-      success: true,
-      data: (data ?? []) as AuditAnnouncement[],
-      error: null,
-    })
+    return ok((data ?? []) as AuditAnnouncement[])
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[announcements] GET failed:", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener anuncios" },
-      { status: 500 }
-    )
+    return fail("Error al obtener anuncios", 500)
   }
 }
 
@@ -83,37 +74,25 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<AnnouncementResult>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = postSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { title, message, target, club_id } = parsed.data
@@ -144,11 +123,7 @@ export async function POST(
     }
 
     if (recipientIds.length === 0) {
-      return NextResponse.json({
-        success: true,
-        data: { sent_to: 0 },
-        error: null,
-      })
+      return ok({ sent_to: 0 })
     }
 
     // Bulk insert notifications
@@ -179,17 +154,10 @@ export async function POST(
       },
     })
 
-    return NextResponse.json({
-      success: true,
-      data: { sent_to: recipientIds.length },
-      error: null,
-    })
+    return ok({ sent_to: recipientIds.length })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[announcements] POST failed:", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al enviar el anuncio" },
-      { status: 500 }
-    )
+    return fail("Error al enviar el anuncio", 500)
   }
 }

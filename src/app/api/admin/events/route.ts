@@ -8,6 +8,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { Event, EventFilters } from "@/features/activities/queries"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for admin event creation
@@ -61,10 +62,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<Event[]>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -103,19 +101,11 @@ export async function GET(
       details: { filters, total: result.total },
     })
 
-    return NextResponse.json({
-      success: true,
-      data: result.events,
-      error: null,
-      meta: { total: result.total, page, limit },
-    } as ApiResponse<Event[]> & { meta: unknown })
+    return ok(result.events)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/admin/events]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener los eventos" },
-      { status: 500 }
-    )
+    return fail("Error al obtener los eventos", 500)
   }
 }
 
@@ -129,37 +119,25 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<Event>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("eventsCreate", ctx.userId, RATE_LIMITS.eventsCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = adminCreateEventSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -182,16 +160,10 @@ export async function POST(
       })
     }
 
-    return NextResponse.json(
-      { success: true, data: event, error: null },
-      { status: 201 }
-    )
+    return ok(event, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/admin/events]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear el evento" },
-      { status: 500 }
-    )
+    return fail("Error al crear el evento", 500)
   }
 }

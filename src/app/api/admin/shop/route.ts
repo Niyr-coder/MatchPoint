@@ -3,6 +3,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ── types ──────────────────────────────────────────────────────────────────────
 
@@ -69,19 +70,13 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<AdminShopData>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminSearch", ctx.userId, RATE_LIMITS.adminSearch)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { searchParams } = request.nextUrl
@@ -156,11 +151,7 @@ export async function GET(
         })
       )
 
-      return NextResponse.json({
-        success: true,
-        data: { products, stats, meta: { total: count ?? 0, page, limit } },
-        error: null,
-      })
+      return ok({ products, stats, meta: { total: count ?? 0, page, limit } })
     }
 
     if (type === "pending") {
@@ -199,15 +190,7 @@ export async function GET(
         })
       )
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          pendingProducts,
-          stats,
-          meta: { total: pendingCount ?? 0, page, limit },
-        },
-        error: null,
-      })
+      return ok({ pendingProducts, stats, meta: { total: pendingCount ?? 0, page, limit }, })
     }
 
     // Default: orders
@@ -255,17 +238,10 @@ export async function GET(
       }
     )
 
-    return NextResponse.json({
-      success: true,
-      data: { orders, stats, meta: { total: count ?? 0, page, limit } },
-      error: null,
-    })
+    return ok({ orders, stats, meta: { total: count ?? 0, page, limit } })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[admin/shop] GET failed:", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener datos del shop" },
-      { status: 500 }
-    )
+    return fail("Error al obtener datos del shop", 500)
   }
 }

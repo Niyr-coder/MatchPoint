@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { pickleballProfileSchema } from "@/lib/validations"
 import type { ApiResponse, PickleballProfile } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Helper: resolve authenticated user or return 401
@@ -24,13 +25,10 @@ async function getAuthUser() {
 
 export async function GET(
   _req: NextRequest
-): Promise<NextResponse<ApiResponse<PickleballProfile>>> {
+): Promise<NextResponse<ApiResponse<PickleballProfile | null>>> {
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const supabase = createServiceClient()
@@ -41,14 +39,11 @@ export async function GET(
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el perfil de Pickleball." },
-      { status: 500 }
-    )
+    return fail("Error al obtener el perfil de Pickleball.", 500)
   }
 
   // No profile yet — return null data with success so the client can show empty state
-  return NextResponse.json({ success: true, data: data as PickleballProfile | null, error: null })
+  return ok(data as PickleballProfile | null)
 }
 
 // ──────────────────────────────────────────────────────────
@@ -64,28 +59,19 @@ export async function PUT(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = pickleballProfileSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0]?.message ?? "Datos inválidos" },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0]?.message ?? "Datos inválidos", 422)
   }
 
   const { skill_level, dominant_hand, play_style } = parsed.data
@@ -105,11 +91,8 @@ export async function PUT(
     .upsert(upsertPayload, { onConflict: "user_id" })
 
   if (upsertError) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al guardar el perfil de Pickleball." },
-      { status: 500 }
-    )
+    return fail("Error al guardar el perfil de Pickleball.", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

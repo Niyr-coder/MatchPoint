@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 interface UserProfile {
   id: string
@@ -52,18 +53,12 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<UserDetail>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de usuario requerido" },
-      { status: 400 }
-    )
+    return fail("ID de usuario requerido")
   }
 
   try {
@@ -85,10 +80,7 @@ export async function GET(
 
     if (profileRes.error) throw new Error(profileRes.error.message)
     if (!profileRes.data) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Usuario no encontrado" },
-        { status: 404 }
-      )
+      return fail("Usuario no encontrado", 404)
     }
 
     const profile: UserProfile = {
@@ -105,18 +97,11 @@ export async function GET(
       joined_at: m.joined_at,
     }))
 
-    return NextResponse.json({
-      success: true,
-      data: { profile, memberships },
-      error: null,
-    })
+    return ok({ profile, memberships })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[GET /api/admin/users/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el usuario" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el usuario", 500)
   }
 }
 
@@ -126,53 +111,35 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminCreateUser", ctx.userId, RATE_LIMITS.adminCreateUser)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de usuario requerido" },
-      { status: 400 }
-    )
+    return fail("ID de usuario requerido")
   }
 
   // Prevent acting on own account
   if (id === authResult.context.userId) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No puedes aplicar esta acción a tu propia cuenta" },
-      { status: 400 }
-    )
+    return fail("No puedes aplicar esta acción a tu propia cuenta")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { action } = parsed.data
@@ -189,18 +156,12 @@ export async function PATCH(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Usuario no encontrado" },
-        { status: 404 }
-      )
+      return fail("Usuario no encontrado", 404)
     }
 
     // Prevent acting on other admins (except verify)
     if (existing.global_role === "admin" && action !== "unsuspend" && action !== "verify") {
-      return NextResponse.json(
-        { success: false, data: null, error: "No se puede aplicar esta acción a otro administrador" },
-        { status: 400 }
-      )
+      return fail("No se puede aplicar esta acción a otro administrador")
     }
 
     if (action === "verify") {
@@ -223,7 +184,7 @@ export async function PATCH(
         actorId: authResult.context.userId,
       })
 
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     if (action === "delete") {
@@ -238,7 +199,7 @@ export async function PATCH(
         actorId: authResult.context.userId,
       })
 
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     if (action === "suspend") {
@@ -270,7 +231,7 @@ export async function PATCH(
         details: { previousRole: existing.global_role },
       })
 
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     if (action === "unsuspend") {
@@ -304,20 +265,14 @@ export async function PATCH(
         details: { restoredRole: previousRole },
       })
 
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     // Exhaustive check — should never reach here
-    return NextResponse.json(
-      { success: false, data: null, error: "Acción no reconocida" },
-      { status: 400 }
-    )
+    return fail("Acción no reconocida")
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[PATCH /api/admin/users/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al procesar la acción sobre el usuario" },
-      { status: 500 }
-    )
+    return fail("Error al procesar la acción sobre el usuario", 500)
   }
 }

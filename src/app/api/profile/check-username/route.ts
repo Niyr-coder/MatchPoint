@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const querySchema = z.object({
   username: z
@@ -17,15 +18,12 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
   const authClient = await createClient()
   const { data: { user } } = await authClient.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const rl = await checkRateLimit("profileCheckUsername", user.id, RATE_LIMITS.profileCheckUsername)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { searchParams } = new URL(request.url)
@@ -33,10 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
 
   const parsed = querySchema.safeParse({ username })
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Username inválido" },
-      { status: 400 }
-    )
+    return fail("Username inválido")
   }
 
   const supabase = createServiceClient()
@@ -47,15 +42,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al verificar disponibilidad" },
-      { status: 500 }
-    )
+    return fail("Error al verificar disponibilidad", 500)
   }
 
-  return NextResponse.json({
-    success: true,
-    data: { available: data === null },
-    error: null,
-  })
+  return ok({ available: data === null })
 }

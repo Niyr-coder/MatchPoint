@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 export async function GET(
   _request: Request,
@@ -10,16 +11,13 @@ export async function GET(
   const { clubId } = await params
   const auth = await authorize({ clubId, requiredRoles: ["owner", "manager"] })
   if (!auth.ok) {
-    return NextResponse.json({ success: false, data: null, error: "Sin permisos" }, { status: 403 })
+    return fail("Sin permisos", 403)
   }
 
   const { userId } = auth.context
   const rl = await checkRateLimit("shopClubRead", userId, RATE_LIMITS.shopClubRead)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const supabase = createServiceClient()
@@ -31,8 +29,8 @@ export async function GET(
 
   if (error) {
     console.error("Error fetching club products:", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al cargar" }, { status: 500 })
+    return fail("Error al cargar", 500)
   }
 
-  return NextResponse.json({ success: true, data: data ?? [], error: null })
+  return ok(data ?? [])
 }

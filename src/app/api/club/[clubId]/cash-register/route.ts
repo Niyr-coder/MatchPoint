@@ -8,6 +8,7 @@ import {
 } from "@/features/payments/queries"
 import type { ApiResponse } from "@/types"
 import type { CashEntry, CashSummary } from "@/features/payments/queries"
+import { ok, fail } from "@/lib/api/response"
 
 const addEntrySchema = z.object({
   type: z.enum(["income", "expense"] as const, { message: "Tipo inválido" }),
@@ -27,10 +28,7 @@ export async function GET(
 
   const authResult = await authorize({ clubId, requiredPermission: "finance.cashier" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
@@ -38,12 +36,9 @@ export async function GET(
       getCashRegisterToday(clubId),
       getCashSummaryToday(clubId),
     ])
-    return NextResponse.json({ success: true, data: { entries, summary }, error: null })
+    return ok({ entries, summary })
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener la caja" },
-      { status: 500 }
-    )
+    return fail("Error al obtener la caja", 500)
   }
 }
 
@@ -55,28 +50,19 @@ export async function POST(
 
   const authResult = await authorize({ clubId, requiredPermission: "finance.cashier" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = addEntrySchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -85,11 +71,8 @@ export async function POST(
       user_id: authResult.context.userId,
       ...parsed.data,
     })
-    return NextResponse.json({ success: true, data: entry, error: null }, { status: 201 })
+    return ok(entry, 201)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al registrar el movimiento" },
-      { status: 500 }
-    )
+    return fail("Error al registrar el movimiento", 500)
   }
 }

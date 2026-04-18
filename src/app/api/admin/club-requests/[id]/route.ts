@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -65,45 +66,30 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de solicitud requerido" },
-      { status: 400 }
-    )
+    return fail("ID de solicitud requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { action, adminNotes } = parsed.data
@@ -122,23 +108,13 @@ export async function PATCH(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!clubRequest) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Solicitud no encontrada" },
-        { status: 404 }
-      )
+      return fail("Solicitud no encontrada", 404)
     }
 
     const req = clubRequest as ClubRequestRow
 
     if (req.status !== "pending") {
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          error: `Esta solicitud ya fue ${req.status === "approved" ? "aprobada" : "rechazada"}`,
-        },
-        { status: 409 }
-      )
+      return fail(`Esta solicitud ya fue ${req.status === "approved" ? "aprobada" : "rechazada"}`, 409)
     }
 
     if (action === "reject") {
@@ -178,7 +154,7 @@ export async function PATCH(
         details: { requestedClubName: req.name, userId: req.user_id },
       })
 
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     // action === "approve"
@@ -250,13 +226,10 @@ export async function PATCH(
       details: { requestedClubName: req.name, newClubId: newClub.id, userId: req.user_id },
     })
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[PATCH /api/admin/club-requests/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al procesar la solicitud" },
-      { status: 500 }
-    )
+    return fail("Error al procesar la solicitud", 500)
   }
 }

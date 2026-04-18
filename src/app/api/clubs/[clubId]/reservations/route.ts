@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { ok, fail } from "@/lib/api/response"
 
 // ---------------------------------------------------------------------------
 // GET /api/clubs/[clubId]/reservations — week availability endpoint
@@ -14,13 +15,13 @@ export async function GET(
   const { clubId } = await params
 
   if (!clubId) {
-    return NextResponse.json({ success: false, data: null, error: "clubId requerido" }, { status: 400 })
+    return fail("clubId requerido")
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const url = new URL(request.url)
@@ -28,7 +29,7 @@ export async function GET(
   const weekEnd = url.searchParams.get("weekEnd")
 
   if (!weekStart || !weekEnd) {
-    return NextResponse.json({ success: false, data: null, error: "weekStart y weekEnd son requeridos" }, { status: 400 })
+    return fail("weekStart y weekEnd son requeridos")
   }
 
   const service = createServiceClient()
@@ -43,12 +44,12 @@ export async function GET(
 
   if (courtsError) {
     console.error("[GET /api/clubs/[clubId]/reservations] courts error:", courtsError.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener canchas" }, { status: 500 })
+    return fail("Error al obtener canchas", 500)
   }
 
   // If no courts, return empty result
   if (!courts || courts.length === 0) {
-    return NextResponse.json({ success: true, data: { courts: [], reservations: [] }, error: null })
+    return ok({ courts: [], reservations: [] })
   }
 
   const courtIds = courts.map((c) => c.id)
@@ -64,8 +65,8 @@ export async function GET(
 
   if (reservationsError) {
     console.error("[GET /api/clubs/[clubId]/reservations] reservations error:", reservationsError.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener reservas" }, { status: 500 })
+    return fail("Error al obtener reservas", 500)
   }
 
-  return NextResponse.json({ success: true, data: { courts, reservations: reservations ?? [] }, error: null })
+  return ok({ courts, reservations: reservations ?? [] })
 }

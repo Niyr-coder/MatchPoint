@@ -10,6 +10,7 @@ import {
 } from "@/features/clubs/queries/team"
 import type { ApiResponse } from "@/types"
 import type { TeamMember } from "@/features/clubs/queries/team"
+import { ok, fail } from "@/lib/api/response"
 
 const VALID_TEAM_ROLES = ["owner", "manager", "employee", "coach"] as const
 
@@ -38,20 +39,14 @@ export async function GET(
 
   const authResult = await authorize({ clubId, requiredPermission: "team.manage" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
     const members = await getClubTeam(clubId)
-    return NextResponse.json({ success: true, data: members, error: null })
+    return ok(members)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el equipo" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el equipo", 500)
   }
 }
 
@@ -63,40 +58,28 @@ export async function POST(
 
   const authResult = await authorize({ clubId, requiredPermission: "team.manage" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = addMemberSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const result = await addTeamMemberByUserId(clubId, parsed.data.userId, parsed.data.role)
   if (result.error) {
     const status = result.error === "user_not_found" ? 404 : 500
-    return NextResponse.json(
-      { success: false, data: null, error: result.error },
-      { status }
-    )
+    return fail(result.error)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null }, { status: 201 })
+  return ok(null, 201)
 }
 
 export async function PATCH(
@@ -107,28 +90,19 @@ export async function PATCH(
 
   const authResult = await authorize({ clubId, requiredPermission: "team.manage" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchMemberSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   // Verify the member belongs to this club before modifying
@@ -141,10 +115,7 @@ export async function PATCH(
     .maybeSingle()
 
   if (!member) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Miembro no encontrado en este club" },
-      { status: 404 }
-    )
+    return fail("Miembro no encontrado en este club", 404)
   }
 
   try {
@@ -153,11 +124,8 @@ export async function PATCH(
     } else {
       await deactivateMember(parsed.data.memberId)
     }
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar el miembro" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar el miembro", 500)
   }
 }

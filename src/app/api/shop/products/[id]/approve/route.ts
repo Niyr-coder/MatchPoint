@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const approveSchema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -16,28 +17,19 @@ export async function POST(
   const { id } = await params
   const auth = await authorize({ requiredRoles: ["admin"] })
   if (!auth.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Solo administradores" },
-      { status: 403 }
-    )
+    return fail("Solo administradores", 403)
   }
 
   const { userId } = auth.context
   const rl = await checkRateLimit("adminBulk", userId, RATE_LIMITS.adminBulk)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const body = await request.json()
   const parsed = approveSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: "action debe ser approve o reject" },
-      { status: 400 }
-    )
+    return fail("action debe ser approve o reject")
   }
 
   const { action } = parsed.data
@@ -50,10 +42,7 @@ export async function POST(
     .single()
 
   if (fetchError || !product) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Producto no encontrado" },
-      { status: 404 }
-    )
+    return fail("Producto no encontrado", 404)
   }
 
   const newApprovalStatus = action === "approve" ? "approved" : "rejected"
@@ -66,10 +55,7 @@ export async function POST(
 
   if (updateError) {
     console.error("[api/shop/products/approve] Error updating product approval:", updateError)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al procesar" },
-      { status: 500 }
-    )
+    return fail("Error al procesar", 500)
   }
 
   if (product.created_by) {
@@ -84,5 +70,5 @@ export async function POST(
     })
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { ok, fail } from "@/lib/api/response"
 
 const patchBodySchema = z.object({
   winner_id: z.string().uuid(),
@@ -24,7 +25,7 @@ export async function PATCH(
     const message = err instanceof z.ZodError
       ? err.issues.map((e) => e.message).join(", ")
       : "Invalid request body"
-    return NextResponse.json({ success: false, data: null, error: message }, { status: 400 })
+    return fail(message)
   }
 
   // Fetch tournament to get club_id, sport, is_official for auth + RPC
@@ -36,7 +37,7 @@ export async function PATCH(
     .single()
 
   if (tournamentError || !tournament) {
-    return NextResponse.json({ success: false, data: null, error: "Tournament not found" }, { status: 404 })
+    return fail("Tournament not found", 404)
   }
 
   // Authorization: full 6-layer check via authorize()
@@ -54,7 +55,7 @@ export async function PATCH(
     const isCreator = user && tournament.created_by === user.id
 
     if (!isCreator) {
-      return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+      return fail("Forbidden", 403)
     }
   }
 
@@ -76,15 +77,12 @@ export async function PATCH(
 
     // SQLSTATE P0002 (no_data_found) — match not found in tournament
     if (rpcError.code === "P0002" || msg.includes("not found in tournament")) {
-      return NextResponse.json({ success: false, data: null, error: "Partido no encontrado" }, { status: 404 })
+      return fail("Partido no encontrado", 404)
     }
 
     // SQLSTATE 23505 (unique_violation) re-used for already-scored match
     if (rpcError.code === "23505" || msg.includes("ya tiene resultado")) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Este partido ya tiene resultado registrado" },
-        { status: 409 }
-      )
+      return fail("Este partido ya tiene resultado registrado", 409)
     }
 
     console.error("[PATCH /api/tournaments/[id]/brackets/[matchId]] RPC error", {
@@ -92,16 +90,8 @@ export async function PATCH(
       tournamentId,
       error: msg,
     })
-    return NextResponse.json({ success: false, data: null, error: "Internal server error" }, { status: 500 })
+    return fail("Internal server error", 500)
   }
 
-  return NextResponse.json({
-    success: true,
-    data: {
-      nextMatchId: rpcData?.next_match_id ?? null,
-      winnerNewRating: rpcData?.winner_new_rating ?? null,
-      loserNewRating: rpcData?.loser_new_rating ?? null,
-    },
-    error: null,
-  })
+  return ok({ nextMatchId: rpcData?.next_match_id ?? null, winnerNewRating: rpcData?.winner_new_rating ?? null, loserNewRating: rpcData?.loser_new_rating ?? null, })
 }

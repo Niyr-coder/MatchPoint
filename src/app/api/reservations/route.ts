@@ -4,6 +4,7 @@ import { getUserReservations, createReservation, cancelReservation } from "@/fea
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { notifyClubStaff, notifyAdmins } from "@/features/notifications/utils"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const cancelReservationSchema = z.object({
   id: z.string().uuid(),
@@ -28,22 +29,22 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const url = new URL(request.url)
   const userId = url.searchParams.get('user_id')
 
   if (userId && userId !== user.id) {
-    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+    return fail("Acceso denegado", 403)
   }
 
   try {
     const reservations = await getUserReservations(user.id)
-    return NextResponse.json({ success: true, data: reservations })
+    return ok(reservations)
   } catch (error: unknown) {
     console.error("[GET /api/reservations]", error)
-    return NextResponse.json({ success: false, error: "Error al obtener reservas" }, { status: 500 })
+    return fail("Error al obtener reservas", 500)
   }
 }
 
@@ -52,30 +53,24 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const rl = await checkRateLimit("reservations", user.id, RATE_LIMITS.reservations)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 })
+    return fail("Invalid JSON")
   }
 
   const parsed = createReservationSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   // Reject past dates and past time slots for today
@@ -85,17 +80,11 @@ export async function POST(request: NextRequest) {
   const startMinutes = timeToMinutes(parsed.data.start_time)
 
   if (parsed.data.date < todayStr) {
-    return NextResponse.json(
-      { success: false, error: "No puedes reservar en fechas pasadas." },
-      { status: 422 }
-    )
+    return fail("No puedes reservar en fechas pasadas.", 422)
   }
 
   if (parsed.data.date === todayStr && startMinutes <= currentMinutes) {
-    return NextResponse.json(
-      { success: false, error: "No puedes reservar en horarios que ya pasaron." },
-      { status: 422 }
-    )
+    return fail("No puedes reservar en horarios que ya pasaron.", 422)
   }
 
   try {
@@ -107,17 +96,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (courtErr || !court) {
-      return NextResponse.json({ success: false, error: "Cancha no encontrada" }, { status: 404 })
+      return fail("Cancha no encontrada", 404)
     }
 
     const durationHours =
       (timeToMinutes(parsed.data.end_time) - timeToMinutes(parsed.data.start_time)) / 60
 
     if (durationHours <= 0) {
-      return NextResponse.json(
-        { success: false, error: "El horario de fin debe ser posterior al de inicio" },
-        { status: 422 }
-      )
+      return fail("El horario de fin debe ser posterior al de inicio", 422)
     }
 
     const serverPrice = Math.round(court.price_per_hour * durationHours * 100) / 100
@@ -141,19 +127,16 @@ export async function POST(request: NextRequest) {
     void notifyClubStaff(parsed.data.court_id, notificationPayload)
     void notifyAdmins(notificationPayload)
 
-    return NextResponse.json({ success: true, data: reservation }, { status: 201 })
+    return ok(reservation, 201)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear reserva"
 
     if (message === "slot_conflict") {
-      return NextResponse.json(
-        { success: false, error: "Este horario ya fue reservado. Elige otro." },
-        { status: 409 }
-      )
+      return fail("Este horario ya fue reservado. Elige otro.", 409)
     }
 
     console.error("[POST /api/reservations]", error)
-    return NextResponse.json({ success: false, error: "Error al crear reserva" }, { status: 500 })
+    return fail("Error al crear reserva", 500)
   }
 }
 
@@ -162,22 +145,19 @@ export async function PATCH(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 })
+    return fail("Invalid JSON")
   }
 
   const parsed = cancelReservationSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   // Verify ownership before cancelling
@@ -188,22 +168,22 @@ export async function PATCH(request: Request) {
     .single()
 
   if (fetchError || !reservation) {
-    return NextResponse.json({ success: false, error: "Reserva no encontrada" }, { status: 404 })
+    return fail("Reserva no encontrada", 404)
   }
 
   if (reservation.user_id !== user.id) {
-    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+    return fail("Acceso denegado", 403)
   }
 
   if (reservation.status === "cancelled") {
-    return NextResponse.json({ success: false, error: "La reserva ya está cancelada" }, { status: 409 })
+    return fail("La reserva ya está cancelada", 409)
   }
 
   try {
     await cancelReservation(parsed.data.id)
-    return NextResponse.json({ success: true, data: null })
+    return ok(null)
   } catch (error: unknown) {
     console.error("[PATCH /api/reservations]", error)
-    return NextResponse.json({ success: false, error: "Error al cancelar reserva" }, { status: 500 })
+    return fail("Error al cancelar reserva", 500)
   }
 }

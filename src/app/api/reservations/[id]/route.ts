@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { cancelReservation } from "@/features/bookings/queries"
+import { ok, fail } from "@/lib/api/response"
 
 const patchSchema = z.object({
   action: z.string().refine((v) => v === "cancel", { message: "Acción no válida. Usa 'cancel'." }),
@@ -15,7 +16,7 @@ export async function PATCH(
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const { id } = await params
@@ -24,17 +25,17 @@ export async function PATCH(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
   const { action } = parsed.data
 
   if (action !== "cancel") {
-    return NextResponse.json({ success: false, data: null, error: "Acción no válida" }, { status: 422 })
+    return fail("Acción no válida", 422)
   }
 
   // Ownership check: verify the reservation belongs to this user
@@ -45,18 +46,18 @@ export async function PATCH(
     .single()
 
   if (fetchError || !reservation) {
-    return NextResponse.json({ success: false, error: "Reserva no encontrada" }, { status: 404 })
+    return fail("Reserva no encontrada", 404)
   }
 
   if (reservation.user_id !== user.id) {
-    return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   try {
     await cancelReservation(id)
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al cancelar reserva"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }

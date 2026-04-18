@@ -19,6 +19,7 @@ import { authorize } from "@/features/auth/queries"
 import { checkRateLimit } from "@/lib/rate-limit"
 import type { ApiResponse, AppRole } from "@/types"
 import type { InviteEntityType, InviteLink } from "@/features/memberships/actions"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -113,10 +114,7 @@ export async function GET(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   // 2. Validate query params
@@ -127,10 +125,7 @@ export async function GET(
 
   const parsed = listQuerySchema.safeParse(rawParams)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { entity_type, entity_id } = parsed.data
@@ -171,14 +166,11 @@ export async function GET(
 
     if (dbError) throw new Error(dbError.message)
 
-    return NextResponse.json({ success: true, data: (data ?? []) as InviteLink[], error: null })
+    return ok((data ?? []) as InviteLink[])
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/invites]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las invitaciones" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las invitaciones", 500)
   }
 }
 
@@ -194,18 +186,12 @@ export async function POST(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createInviteSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { entity_type, entity_id, max_uses, expires_at, metadata } = parsed.data
@@ -213,10 +199,7 @@ export async function POST(
   // 2. Authorization (also resolves userId)
   const permCheck = await checkCreatePermission(entity_type, entity_id)
   if (!permCheck.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: permCheck.error },
-      { status: permCheck.status }
-    )
+    return fail(permCheck.error)
   }
 
   const { userId } = permCheck
@@ -229,17 +212,7 @@ export async function POST(
   )
 
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Has creado demasiadas invitaciones. Intenta de nuevo en unos minutos." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(rl.resetAt),
-        },
-      }
-    )
+    return fail("Has creado demasiadas invitaciones. Intenta de nuevo en unos minutos.", 429)
   }
 
   // 4. Insert
@@ -261,16 +234,10 @@ export async function POST(
 
     if (dbError) throw new Error(dbError.message)
 
-    return NextResponse.json(
-      { success: true, data: data as InviteLink, error: null },
-      { status: 201 }
-    )
+    return ok(data as InviteLink, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/invites]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear la invitación" },
-      { status: 500 }
-    )
+    return fail("Error al crear la invitación", 500)
   }
 }

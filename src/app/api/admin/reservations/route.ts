@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const PAGE_SIZE = 20
 
@@ -29,10 +30,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<ReservationAdmin[]>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -130,22 +128,10 @@ export async function GET(
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: rows,
-      error: null,
-      meta: {
-        total: count ?? 0,
-        page,
-        limit: PAGE_SIZE,
-      },
-    })
+    return ok(rows)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/admin/reservations]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las reservas" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las reservas", 500)
   }
 }

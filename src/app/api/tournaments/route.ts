@@ -5,6 +5,7 @@ import { authorize } from "@/features/auth/queries"
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const createTournamentSchema = z.object({
   name: z.string().min(3).max(100),
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const createdBy = request.nextUrl.searchParams.get("created_by")
@@ -42,35 +43,29 @@ export async function GET(request: NextRequest) {
     const tournaments = createdBy
       ? await getCreatedTournaments(createdBy)
       : await getOpenTournaments()
-    return NextResponse.json({ success: true, data: tournaments })
+    return ok(tournaments)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al obtener torneos"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }
 
 export async function POST(request: Request) {
   const rl = await checkRateLimit("tournamentCreate", getClientIp(request), RATE_LIMITS.tournamentCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 })
+    return fail("Invalid JSON")
   }
 
   const parsed = createTournamentSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   // Authorization:
@@ -90,7 +85,7 @@ export async function POST(request: Request) {
   if (!authResult.ok) {
     const status = authResult.reason === "not_authenticated" ? 401 : 403
     const message = authResult.reason === "not_authenticated" ? "Unauthorized" : "Forbidden"
-    return NextResponse.json({ success: false, error: message }, { status })
+    return fail(message)
   }
 
   try {
@@ -108,9 +103,9 @@ export async function POST(request: Request) {
       is_official: parsed.data.is_official,
       extras: parsed.data.extras,
     })
-    return NextResponse.json({ success: true, data: tournament }, { status: 201 })
+    return ok(tournament, 201)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al crear torneo"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }

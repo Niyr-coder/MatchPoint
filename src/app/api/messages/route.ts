@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const getMessagesSchema = z.object({
   conversationId: z.string().uuid("conversationId debe ser un UUID válido").optional(),
@@ -16,30 +17,19 @@ export async function GET(request: Request) {
   const ip = getClientIp(request)
   const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Limit": String(RATE_LIMITS.messages.limit),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
-        },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo en un momento.", 429)
   }
 
   const { searchParams } = new URL(request.url)
   const parsed = getMessagesSchema.safeParse({ conversationId: searchParams.get("conversationId") ?? undefined })
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const { conversationId } = parsed.data
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   if (conversationId) {
     // Verify user is a member of this conversation before reading messages
@@ -51,7 +41,7 @@ export async function GET(request: Request) {
       .maybeSingle()
 
     if (!membership) {
-      return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+      return fail("Forbidden", 403)
     }
 
     const { data, error } = await supabase
@@ -61,8 +51,8 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: true })
       .limit(50)
 
-    if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true, data: data ?? [], error: null })
+    if (error) return fail(error.message, 500)
+    return ok(data ?? [])
   }
 
   // Get user's conversations with participants
@@ -79,42 +69,31 @@ export async function GET(request: Request) {
     .eq("user_id", user.id)
     .order("joined_at", { ascending: false })
 
-  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: data?.map((d) => d.conversation) ?? [], error: null })
+  if (error) return fail(error.message, 500)
+  return ok(data?.map((d) => d.conversation) ?? [])
 }
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
   const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Limit": String(RATE_LIMITS.messages.limit),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
-        },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo en un momento.", 429)
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = postMessageSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const { conversationId, content } = parsed.data
 
@@ -127,7 +106,7 @@ export async function POST(request: Request) {
     .maybeSingle()
 
   if (!membership) {
-    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   const { data, error } = await supabase
@@ -136,7 +115,7 @@ export async function POST(request: Request) {
     .select("*, sender:profiles(id, full_name, username, avatar_url)")
     .single()
 
-  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
+  if (error) return fail(error.message, 500)
 
   // Update conversation updated_at
   await supabase
@@ -144,5 +123,5 @@ export async function POST(request: Request) {
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId)
 
-  return NextResponse.json({ success: true, data, error: null })
+  return ok(data)
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 export interface SearchResult {
   id: string
@@ -20,21 +21,18 @@ export async function GET(
 ): Promise<NextResponse<{ data: SearchResponse | null; error: string | null }>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json({ data: null, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminSearch", ctx.userId, RATE_LIMITS.adminSearch)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const q = request.nextUrl.searchParams.get("q")?.trim() ?? ""
   if (q.length < 2) {
-    return NextResponse.json({ data: { results: [] }, error: null })
+    return ok({ results: [] })
   }
 
   const term = `%${q}%`
@@ -82,5 +80,5 @@ export async function GET(
     })),
   ]
 
-  return NextResponse.json({ data: { results }, error: null })
+  return ok({ results })
 }

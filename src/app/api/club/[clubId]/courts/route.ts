@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { getClubCourts, createCourt } from "@/features/clubs/queries/courts"
 import type { ApiResponse } from "@/types"
 import type { Court } from "@/features/clubs/queries/courts"
+import { ok, fail } from "@/lib/api/response"
 
 const createCourtSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "Nombre demasiado largo"),
@@ -25,20 +26,14 @@ export async function GET(
   })
 
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
     const courts = await getClubCourts(clubId)
-    return NextResponse.json({ success: true, data: courts, error: null })
+    return ok(courts)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las canchas" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las canchas", 500)
   }
 }
 
@@ -54,37 +49,25 @@ export async function POST(
   })
 
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createCourtSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
     const court = await createCourt({ ...parsed.data, club_id: clubId })
-    return NextResponse.json({ success: true, data: court, error: null }, { status: 201 })
+    return ok(court, 201)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear la cancha" },
-      { status: 500 }
-    )
+    return fail("Error al crear la cancha", 500)
   }
 }

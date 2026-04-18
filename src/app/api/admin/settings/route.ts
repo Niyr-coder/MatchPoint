@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ── types ──────────────────────────────────────────────────────────────────────
 
@@ -41,10 +42,7 @@ const patchSchema = z
 export async function GET(): Promise<NextResponse<ApiResponse<PlatformSettings>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
@@ -60,18 +58,11 @@ export async function GET(): Promise<NextResponse<ApiResponse<PlatformSettings>>
       return { ...acc, [row.key]: row.value }
     }, {})
 
-    return NextResponse.json({
-      success: true,
-      data: settings as PlatformSettings,
-      error: null,
-    })
+    return ok(settings as PlatformSettings)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[settings] GET failed:", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener la configuración" },
-      { status: 500 }
-    )
+    return fail("Error al obtener la configuración", 500)
   }
 }
 
@@ -82,37 +73,25 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminSettings", ctx.userId, RATE_LIMITS.adminSettings)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -143,13 +122,10 @@ export async function PATCH(
       details: { keys: Object.keys(parsed.data) },
     })
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[settings] PATCH failed:", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al guardar la configuración" },
-      { status: 500 }
-    )
+    return fail("Error al guardar la configuración", 500)
   }
 }

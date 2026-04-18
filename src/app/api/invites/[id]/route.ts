@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
 import type { InviteLink } from "@/features/memberships/actions"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Shared ownership guard
@@ -70,27 +71,19 @@ export async function PATCH(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const { id } = await params
 
   const ownership = await resolveOwnedInvite(id, user.id)
   if (!ownership.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: ownership.error },
-      { status: ownership.status }
-    )
+    return fail(ownership.error)
   }
 
   // Guard: already revoked — return current state instead of a no-op write
   if (!ownership.invite.is_active) {
-    return NextResponse.json(
-      { success: true, data: ownership.invite, error: null }
-    )
+    return ok(ownership.invite)
   }
 
   try {
@@ -106,14 +99,11 @@ export async function PATCH(
 
     if (dbError) throw new Error(dbError.message)
 
-    return NextResponse.json({ success: true, data: data as InviteLink, error: null })
+    return ok(data as InviteLink)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[PATCH /api/invites/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al revocar la invitación" },
-      { status: 500 }
-    )
+    return fail("Error al revocar la invitación", 500)
   }
 }
 
@@ -129,20 +119,14 @@ export async function DELETE(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const { id } = await params
 
   const ownership = await resolveOwnedInvite(id, user.id)
   if (!ownership.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: ownership.error },
-      { status: ownership.status }
-    )
+    return fail(ownership.error)
   }
 
   try {
@@ -156,13 +140,10 @@ export async function DELETE(
 
     if (dbError) throw new Error(dbError.message)
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[DELETE /api/invites/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al eliminar la invitación" },
-      { status: 500 }
-    )
+    return fail("Error al eliminar la invitación", 500)
   }
 }

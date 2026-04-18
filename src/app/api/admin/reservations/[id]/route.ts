@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { notifyUser } from "@/features/notifications/utils"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const patchSchema = z.object({
   status: z.literal("cancelled"),
@@ -20,36 +21,24 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<{ id: string; status: string }>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { id } = await context.params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de reserva requerido" },
-      { status: 400 }
-    )
+    return fail("ID de reserva requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0]?.message ?? "Datos inválidos" },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0]?.message ?? "Datos inválidos", 422)
   }
 
   try {
@@ -63,17 +52,11 @@ export async function PATCH(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Reserva no encontrada" },
-        { status: 404 }
-      )
+      return fail("Reserva no encontrada", 404)
     }
 
     if (existing.status === "cancelled") {
-      return NextResponse.json(
-        { success: false, data: null, error: "La reserva ya está cancelada" },
-        { status: 409 }
-      )
+      return fail("La reserva ya está cancelada", 409)
     }
 
     const { data: updated, error: updateError } = await supabase
@@ -112,13 +95,10 @@ export async function PATCH(
       "notify_user_on_cancelled",
     )
 
-    return NextResponse.json({ success: true, data: updated, error: null })
+    return ok(updated)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[PATCH /api/admin/reservations/[id]]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al cancelar la reserva" },
-      { status: 500 }
-    )
+    return fail("Error al cancelar la reserva", 500)
   }
 }

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const getProductsSchema = z.object({
   category: z.enum(["equipment", "membership", "class", "other"]).optional(),
@@ -17,21 +18,21 @@ export async function GET(request: Request) {
     clubId: searchParams.get("clubId") ?? undefined,
   })
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const { category, clubId } = parsed.data
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   let query = supabase.from("products").select("*").eq("is_active", true)
   if (category) query = query.eq("category", category)
   if (clubId) query = query.eq("club_id", clubId)
 
   const { data, error } = await query.order("created_at", { ascending: false })
-  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: data ?? [], error: null })
+  if (error) return fail(error.message, 500)
+  return ok(data ?? [])
 }
 
 const createProductSchema = z.object({
@@ -47,30 +48,24 @@ const createProductSchema = z.object({
 export async function POST(request: Request) {
   const rl = await checkRateLimit("shopProductCreate", getClientIp(request), RATE_LIMITS.shopProductCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo más tarde.", 429)
   }
 
   const auth = await authorize()
   if (!auth.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 401 })
+    return fail("No autorizado", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "Cuerpo de solicitud inválido" }, { status: 400 })
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createProductSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 400 }
-    )
+    return fail(parsed.error.issues[0].message)
   }
 
   const { club_id, name, description, price, category, stock, image_url } = parsed.data
@@ -112,8 +107,8 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("[POST /api/shop/products] insert error:", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al crear producto" }, { status: 500 })
+    return fail("Error al crear producto", 500)
   }
 
-  return NextResponse.json({ success: true, data: { id: data.id }, error: null }, { status: 201 })
+  return ok({ id: data.id }, 201)
 }

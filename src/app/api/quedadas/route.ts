@@ -5,6 +5,7 @@ import { getOrganizerQuedadas } from "@/features/organizer/queries"
 import { createTournament } from "@/features/tournaments/queries"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const createQuedadaSchema = z.object({
   name: z.string().min(3).max(100),
@@ -21,57 +22,51 @@ const createQuedadaSchema = z.object({
 export async function GET() {
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const ctx = authResult.context
   const allowed = await canOrganize(ctx)
   if (!allowed) {
-    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   try {
     const quedadas = await getOrganizerQuedadas(ctx.userId)
-    return NextResponse.json({ success: true, data: quedadas, error: null })
+    return ok(quedadas)
   } catch (error: unknown) {
     console.error("[api/quedadas GET]", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener quedadas" }, { status: 500 })
+    return fail("Error al obtener quedadas", 500)
   }
 }
 
 export async function POST(request: Request) {
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const ctx = authResult.context
   const allowed = await canOrganize(ctx)
   if (!allowed) {
-    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   const rl = await checkRateLimit("quedadasCreate", ctx.userId, RATE_LIMITS.quedadasCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas quedadas creadas. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas quedadas creadas. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "Invalid JSON" }, { status: 400 })
+    return fail("Invalid JSON")
   }
 
   const parsed = createQuedadaSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const d = parsed.data
@@ -90,9 +85,9 @@ export async function POST(request: Request) {
       game_dynamic: d.game_dynamic,
       court_count: d.court_count,
     })
-    return NextResponse.json({ success: true, data: quedada, error: null }, { status: 201 })
+    return ok(quedada, 201)
   } catch (error: unknown) {
     console.error("[api/quedadas POST]", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al crear quedada" }, { status: 500 })
+    return fail("Error al crear quedada", 500)
   }
 }

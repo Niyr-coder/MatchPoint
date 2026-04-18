@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const proofSchema = z.object({
   proof_url: z.string().url("Debe ser una URL válida")
@@ -17,28 +18,19 @@ export async function PUT(
   const { id } = await params
   const auth = await authorize()
   if (!auth.ok) {
-    return NextResponse.json(
-      { data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { userId } = auth.context
   const rl = await checkRateLimit("proofUpload", userId, RATE_LIMITS.proofUpload)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const body = await request.json()
   const parsed = proofSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { data: null, error: parsed.error.issues[0].message },
-      { status: 400 }
-    )
+    return fail(parsed.error.issues[0].message)
   }
 
   const supabase = await createClient()
@@ -51,17 +43,11 @@ export async function PUT(
     .single()
 
   if (fetchError || !order) {
-    return NextResponse.json(
-      { data: null, error: "Orden no encontrada" },
-      { status: 404 }
-    )
+    return fail("Orden no encontrada", 404)
   }
 
   if (order.status !== "pending") {
-    return NextResponse.json(
-      { data: null, error: "Solo puedes subir comprobante en órdenes pendientes" },
-      { status: 422 }
-    )
+    return fail("Solo puedes subir comprobante en órdenes pendientes", 422)
   }
 
   const { error: updateError } = await supabase
@@ -71,10 +57,7 @@ export async function PUT(
 
   if (updateError) {
     console.error("[orders/[id]/proof] Error updating proof:", updateError)
-    return NextResponse.json(
-      { data: null, error: "Error al guardar comprobante" },
-      { status: 500 }
-    )
+    return fail("Error al guardar comprobante", 500)
   }
 
   if (order.club_id) {
@@ -86,5 +69,5 @@ export async function PUT(
     })
   }
 
-  return NextResponse.json({ data: null, error: null })
+  return ok(null)
 }

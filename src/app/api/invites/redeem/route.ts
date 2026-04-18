@@ -20,6 +20,7 @@ import { checkRateLimit } from "@/lib/rate-limit"
 import { JOIN_HANDLER_REGISTRY } from "@/features/memberships/actions"
 import type { ApiResponse } from "@/types"
 import type { InviteLink, InviteEntityType } from "@/features/memberships/actions"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -99,27 +100,14 @@ export async function POST(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   // 2. Rate limit — keyed by userId to prevent brute force across IPs
   const rl = await checkRateLimit("invites_redeem", user.id, RATE_LIMIT_REDEEM)
 
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(rl.resetAt),
-        },
-      }
-    )
+    return fail("Demasiados intentos. Intenta de nuevo en unos minutos.", 429)
   }
 
   // 3. Parse and validate body
@@ -127,18 +115,12 @@ export async function POST(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = redeemSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { code } = parsed.data
@@ -155,18 +137,12 @@ export async function POST(
 
     if (knownName && knownName in RPC_ERROR_MESSAGES) {
       const mapped = RPC_ERROR_MESSAGES[knownName]
-      return NextResponse.json(
-        { success: false, data: null, error: mapped.message },
-        { status: mapped.status }
-      )
+      return fail(mapped.message)
     }
 
     // Unknown DB error — log but don't expose internals
     console.error("[POST /api/invites/redeem] RPC error:", rpcError.message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al procesar la invitación" },
-      { status: 500 }
-    )
+    return fail("Error al procesar la invitación", 500)
   }
 
   const invite = rpcData as InviteLink
@@ -176,10 +152,7 @@ export async function POST(
 
   if (!handler) {
     console.error("[POST /api/invites/redeem] No handler for entity_type:", invite.entity_type)
-    return NextResponse.json(
-      { success: false, data: null, error: "Tipo de invitación no soportado" },
-      { status: 422 }
-    )
+    return fail("Tipo de invitación no soportado", 422)
   }
 
   try {
@@ -203,10 +176,7 @@ export async function POST(
       )
     }
 
-    return NextResponse.json(
-      { success: false, data: null, error: "No se pudo completar la unión a la entidad" },
-      { status: 500 }
-    )
+    return fail("No se pudo completar la unión a la entidad", 500)
   }
 
   // 6. Return success
@@ -216,5 +186,5 @@ export async function POST(
     message:     SUCCESS_MESSAGES[invite.entity_type],
   }
 
-  return NextResponse.json({ success: true, data: result, error: null })
+  return ok(result)
 }

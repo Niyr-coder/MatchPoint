@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -41,28 +42,19 @@ export async function POST(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = joinTeamSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { inviteCode } = parsed.data
@@ -78,17 +70,11 @@ export async function POST(
     if (teamError) throw new Error(teamError.message)
 
     if (!team) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Código de invitación inválido o expirado" },
-        { status: 404 }
-      )
+      return fail("Código de invitación inválido o expirado", 404)
     }
 
     if (!team.is_active) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Este equipo ya no está activo" },
-        { status: 409 }
-      )
+      return fail("Este equipo ya no está activo", 409)
     }
 
     // Step 2 — check the user is not already a member
@@ -102,10 +88,7 @@ export async function POST(
     if (existingError) throw new Error(existingError.message)
 
     if (existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Ya eres miembro de este equipo" },
-        { status: 409 }
-      )
+      return fail("Ya eres miembro de este equipo", 409)
     }
 
     // Step 3 — insert the membership
@@ -121,16 +104,10 @@ export async function POST(
 
     if (insertError) throw new Error(insertError.message)
 
-    return NextResponse.json(
-      { success: true, data: membership as JoinedMembership, error: null },
-      { status: 201 }
-    )
+    return ok(membership as JoinedMembership, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/teams/join]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al unirse al equipo" },
-      { status: 500 }
-    )
+    return fail("Error al unirse al equipo", 500)
   }
 }

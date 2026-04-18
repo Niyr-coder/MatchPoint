@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -42,10 +43,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<AuditLogEntry[]> & { meta?: AuditMeta }>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -61,10 +59,7 @@ export async function GET(
 
   const parsed = querySchema.safeParse(rawParams)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { actor_id: actorId, action, entity_type: entityType, from_date: fromDate, to_date: toDate, page, limit } = parsed.data
@@ -130,22 +125,10 @@ export async function GET(
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: entries,
-      error: null,
-      meta: {
-        total: countRes.count ?? 0,
-        page,
-        limit,
-      },
-    })
+    return ok(entries)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/admin/audit]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el audit log" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el audit log", 500)
   }
 }

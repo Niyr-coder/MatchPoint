@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const addParticipantSchema = z.discriminatedUnion("type", [
   z.object({
@@ -21,7 +22,7 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const service = createServiceClient()
   const { data, error } = await service
@@ -48,8 +49,8 @@ export async function GET(
     .order("seed", { ascending: true, nullsFirst: false })
     .order("registered_at", { ascending: true })
 
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: data ?? [] })
+  if (error) return fail(error.message, 500)
+  return ok(data ?? [])
 }
 
 export async function POST(
@@ -59,7 +60,7 @@ export async function POST(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data: tournament } = await supabase
     .from("tournaments")
@@ -68,21 +69,18 @@ export async function POST(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   if (["completed", "cancelled"].includes(tournament.status)) {
-    return NextResponse.json(
-      { success: false, error: "No se pueden agregar participantes a un torneo finalizado o cancelado" },
-      { status: 400 }
-    )
+    return fail("No se pueden agregar participantes a un torneo finalizado o cancelado")
   }
 
   let rawBody: unknown
   try { rawBody = await request.json() } catch { rawBody = {} }
   const parsed = addParticipantSchema.safeParse(rawBody)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const body = parsed.data
 
@@ -100,8 +98,8 @@ export async function POST(
       })
       .select()
       .single()
-    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true, data }, { status: 201 })
+    if (error) return fail(error.message, 500)
+    return ok(data, 201)
   }
 
   // Registered user flow
@@ -122,10 +120,10 @@ export async function POST(
         .eq("id", existing.id)
         .select()
         .single()
-      if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-      return NextResponse.json({ success: true, data, reregistered: true })
+      if (error) return fail(error.message, 500)
+      return ok(data)
     }
-    return NextResponse.json({ success: false, error: "El participante ya está inscrito" }, { status: 409 })
+    return fail("El participante ya está inscrito", 409)
   }
 
   const { data, error } = await service
@@ -134,7 +132,7 @@ export async function POST(
     .select()
     .single()
 
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+  if (error) return fail(error.message, 500)
 
   // For in_progress: try to fill the first available bye slot in round 1
   let bracketSlotFilled = false
@@ -160,5 +158,5 @@ export async function POST(
     }
   }
 
-  return NextResponse.json({ success: true, data, bracketSlotFilled }, { status: 201 })
+  return ok(data, 201)
 }

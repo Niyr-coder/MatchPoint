@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
+import { ok, fail } from "@/lib/api/response"
 
 export async function GET() {
   const auth = await authorize({ requiredRoles: ["admin"] })
   if (!auth.ok) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   try {
@@ -17,9 +18,9 @@ export async function GET() {
       .limit(10)
 
     if (error) throw error
-    return NextResponse.json({ success: true, data: data ?? [], error: null })
+    return ok(data ?? [])
   } catch (err) {
     console.error("[GET /api/admin/activity-feed]", err)
-    return NextResponse.json({ success: false, data: null, error: "Error al cargar la actividad" }, { status: 500 })
+    return fail("Error al cargar la actividad", 500)
   }
 }

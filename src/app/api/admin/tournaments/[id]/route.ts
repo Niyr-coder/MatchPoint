@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 interface TournamentWithClub {
   id: string
@@ -52,18 +53,12 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<TournamentWithClub>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de torneo requerido" },
-      { status: 400 }
-    )
+    return fail("ID de torneo requerido")
   }
 
   try {
@@ -77,10 +72,7 @@ export async function GET(
 
     if (error) throw new Error(error.message)
     if (!data) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Torneo no encontrado" },
-        { status: 404 }
-      )
+      return fail("Torneo no encontrado", 404)
     }
 
     const tournament: TournamentWithClub = {
@@ -101,14 +93,11 @@ export async function GET(
       club_name: (data.clubs as { name?: string } | null)?.name ?? null,
     }
 
-    return NextResponse.json({ success: true, data: tournament, error: null })
+    return ok(tournament)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[GET /api/admin/tournaments/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el torneo" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el torneo", 500)
   }
 }
 
@@ -118,52 +107,34 @@ export async function PUT(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("tournamentCreate", ctx.userId, RATE_LIMITS.tournamentCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de torneo requerido" },
-      { status: 400 }
-    )
+    return fail("ID de torneo requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = updateTournamentSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No se enviaron campos para actualizar" },
-      { status: 422 }
-    )
+    return fail("No se enviaron campos para actualizar", 422)
   }
 
   try {
@@ -177,17 +148,11 @@ export async function PUT(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Torneo no encontrado" },
-        { status: 404 }
-      )
+      return fail("Torneo no encontrado", 404)
     }
 
     if ((TERMINAL_STATUSES as readonly string[]).includes(existing.status as string)) {
-      return NextResponse.json(
-        { success: false, data: null, error: "No se puede editar un torneo completado o cancelado" },
-        { status: 400 }
-      )
+      return fail("No se puede editar un torneo completado o cancelado")
     }
 
     // Map camelCase input fields to snake_case DB columns
@@ -218,14 +183,11 @@ export async function PUT(
       details: { fields: Object.keys(d).filter((k) => d[k as keyof typeof d] !== undefined) },
     })
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[PUT /api/admin/tournaments/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar el torneo" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar el torneo", 500)
   }
 }
 
@@ -235,27 +197,18 @@ export async function DELETE(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("tournamentCreate", ctx.userId, RATE_LIMITS.tournamentCreate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de torneo requerido" },
-      { status: 400 }
-    )
+    return fail("ID de torneo requerido")
   }
 
   try {
@@ -269,10 +222,7 @@ export async function DELETE(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Torneo no encontrado" },
-        { status: 404 }
-      )
+      return fail("Torneo no encontrado", 404)
     }
 
     if (existing.status === "draft") {
@@ -302,13 +252,10 @@ export async function DELETE(
       details: { previousStatus: existing.status },
     })
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[DELETE /api/admin/tournaments/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al eliminar el torneo" },
-      { status: 500 }
-    )
+    return fail("Error al eliminar el torneo", 500)
   }
 }

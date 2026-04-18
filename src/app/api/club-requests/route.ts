@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -57,10 +58,7 @@ export async function GET(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   try {
@@ -72,18 +70,11 @@ export async function GET(
 
     if (error) throw new Error(error.message)
 
-    return NextResponse.json({
-      success: true,
-      data: (data ?? []) as ClubRequest[],
-      error: null,
-    })
+    return ok((data ?? []) as ClubRequest[])
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/club-requests]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las solicitudes" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las solicitudes", 500)
   }
 }
 
@@ -102,36 +93,24 @@ export async function POST(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const rl = await checkRateLimit("clubRequests", user.id, RATE_LIMITS.clubRequests)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createClubRequestSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -146,14 +125,7 @@ export async function POST(
     if (checkError) throw new Error(checkError.message)
 
     if (existing) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          error: "Ya tienes una solicitud pendiente. Espera a que sea revisada antes de crear otra.",
-        },
-        { status: 409 }
-      )
+      return fail("Ya tienes una solicitud pendiente. Espera a que sea revisada antes de crear otra.", 409)
     }
 
     const d = parsed.data
@@ -175,16 +147,10 @@ export async function POST(
 
     if (insertError) throw new Error(insertError.message)
 
-    return NextResponse.json(
-      { success: true, data: created as ClubRequest, error: null },
-      { status: 201 }
-    )
+    return ok(created as ClubRequest, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/club-requests]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear la solicitud" },
-      { status: 500 }
-    )
+    return fail("Error al crear la solicitud", 500)
   }
 }

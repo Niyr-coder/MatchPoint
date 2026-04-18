@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -75,10 +76,7 @@ export async function GET(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   try {
@@ -94,7 +92,7 @@ export async function GET(
     if (membershipError) throw new Error(membershipError.message)
 
     if (!membership) {
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     // Fetch the team row
@@ -106,7 +104,7 @@ export async function GET(
 
     if (teamError) throw new Error(teamError.message)
     if (!team) {
-      return NextResponse.json({ success: true, data: null, error: null })
+      return ok(null)
     }
 
     // Fetch all members of this team with their profiles
@@ -142,14 +140,11 @@ export async function GET(
       members,
     }
 
-    return NextResponse.json({ success: true, data: result, error: null })
+    return ok(result)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/teams]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el equipo" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el equipo", 500)
   }
 }
 
@@ -168,28 +163,19 @@ export async function POST(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createTeamSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { name, sport, description } = parsed.data
@@ -220,16 +206,10 @@ export async function POST(
 
     if (memberError) throw new Error(memberError.message)
 
-    return NextResponse.json(
-      { success: true, data: newTeam as CreatedTeam, error: null },
-      { status: 201 }
-    )
+    return ok(newTeam as CreatedTeam, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/teams]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear el equipo" },
-      { status: 500 }
-    )
+    return fail("Error al crear el equipo", 500)
   }
 }

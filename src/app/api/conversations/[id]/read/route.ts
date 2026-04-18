@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 // ---------------------------------------------------------------------------
 // POST /api/conversations/[id]/read — mark a conversation as read for the caller
@@ -13,21 +14,18 @@ export async function POST(
   const { id: conversationId } = await params
 
   if (!conversationId) {
-    return NextResponse.json({ success: false, data: null, error: "conversationId requerido" }, { status: 400 })
+    return fail("conversationId requerido")
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const rl = await checkRateLimit("conversationsMarkRead", user.id, RATE_LIMITS.conversationsMarkRead)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes" },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes", 429)
   }
 
   // Update last_read_at only for the participant row that belongs to this user.
@@ -40,8 +38,8 @@ export async function POST(
 
   if (error) {
     console.error("[api/conversations/[id]/read] update failed:", error.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al marcar como leída" }, { status: 500 })
+    return fail("Error al marcar como leída", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

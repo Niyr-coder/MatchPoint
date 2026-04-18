@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const VALID_PAYMENT_STATUS = ["pending", "paid", "refunded"] as const
 const VALID_STATUS = ["registered", "confirmed", "withdrawn", "cancelled"] as const
@@ -20,7 +21,7 @@ export async function PATCH(
   const { id, userId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data: tournament } = await supabase
     .from("tournaments")
@@ -29,23 +30,23 @@ export async function PATCH(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = patchParticipantSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json({ success: false, error: "No hay campos para actualizar" }, { status: 400 })
+    return fail("No hay campos para actualizar")
   }
 
   const service = createServiceClient()
@@ -57,8 +58,8 @@ export async function PATCH(
     .select()
     .single()
 
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data })
+  if (error) return fail(error.message, 500)
+  return ok(data)
 }
 
 export async function DELETE(
@@ -68,7 +69,7 @@ export async function DELETE(
   const { id, userId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data: tournament } = await supabase
     .from("tournaments")
@@ -77,7 +78,7 @@ export async function DELETE(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   const body = await request.json().catch(() => ({})) as { mode?: string; reason?: string }
@@ -92,7 +93,7 @@ export async function DELETE(
       .eq("tournament_id", id)
       .eq("user_id", userId)
 
-    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    if (error) return fail(error.message, 500)
 
     // Replace pending bracket slots with bye (preserve completed match history)
     const { data: matches } = await service
@@ -109,7 +110,7 @@ export async function DELETE(
       await service.from("tournament_brackets").update(update).eq("id", match.id)
     }
 
-    return NextResponse.json({ success: true, mode: "withdrawn" })
+    return ok({ mode: "withdrawn" })
   }
 
   // Hard remove — pre-tournament only
@@ -119,6 +120,6 @@ export async function DELETE(
     .eq("tournament_id", id)
     .eq("user_id", userId)
 
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, mode: "removed" })
+  if (error) return fail(error.message, 500)
+  return ok({ mode: "removed" })
 }

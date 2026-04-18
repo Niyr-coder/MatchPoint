@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const PAGE_SIZE = 20
 
@@ -27,10 +28,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<InviteLinkAdmin[]>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -99,23 +97,11 @@ export async function GET(
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: rows,
-      error: null,
-      meta: {
-        total: count ?? 0,
-        page,
-        limit: PAGE_SIZE,
-      },
-    })
+    return ok(rows)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/admin/invites]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener los invite links" },
-      { status: 500 }
-    )
+    return fail("Error al obtener los invite links", 500)
   }
 }
 
@@ -143,28 +129,19 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<CreatedInvite>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let rawBody: unknown
   try {
     rawBody = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de la solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de la solicitud inválido")
   }
 
   const parsed = createInviteSchema.safeParse(rawBody)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { entity_type, entity_id, max_uses, expires_at, metadata } = parsed.data
@@ -198,13 +175,10 @@ export async function POST(
       invite_url: `${resolvedBaseUrl}/invite/${data.code as string}`,
     }
 
-    return NextResponse.json({ success: true, data: created, error: null })
+    return ok(created)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/admin/invites]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear el invite link" },
-      { status: 500 }
-    )
+    return fail("Error al crear el invite link", 500)
   }
 }

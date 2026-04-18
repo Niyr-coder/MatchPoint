@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { ok, fail } from "@/lib/api/response"
 
 export async function GET(
   _req: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
     // Auth check — analytics contain participant data, must be authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+      return fail("Unauthorized", 401)
     }
 
     // Verify tournament exists
@@ -23,7 +24,7 @@ export async function GET(
       .single()
 
     if (tErr || !tournament) {
-      return NextResponse.json({ success: false, error: "Torneo no encontrado" }, { status: 404 })
+      return fail("Torneo no encontrado", 404)
     }
 
     // Fetch participants with registration dates
@@ -35,7 +36,7 @@ export async function GET(
       .order("registered_at")
 
     if (pErr) {
-      return NextResponse.json({ success: false, error: pErr.message }, { status: 500 })
+      return fail(pErr.message, 500)
     }
 
     // Fetch feedback for completed tournaments
@@ -45,7 +46,7 @@ export async function GET(
       .eq("tournament_id", id)
 
     if (fErr) {
-      return NextResponse.json({ success: false, error: fErr.message }, { status: 500 })
+      return fail(fErr.message, 500)
     }
 
     // Inscriptions by day
@@ -78,20 +79,9 @@ export async function GET(
       ? (feedbackRows ?? []).reduce((sum, r) => sum + r.rating, 0) / totalFeedback
       : null
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        inscriptions_by_day,
-        rating_distribution,
-        total_participants: (participants ?? []).length,
-        max_participants: tournament.max_participants,
-        avg_rating: avgRating !== null ? Math.round(avgRating * 10) / 10 : null,
-        total_feedback: totalFeedback,
-        status: tournament.status,
-      },
-    })
+    return ok({ inscriptions_by_day, rating_distribution, total_participants: (participants ?? []).length, max_participants: tournament.max_participants, avg_rating: avgRating !== null ? Math.round(avgRating * 10) / 10 : null, total_feedback: totalFeedback, status: tournament.status, })
   } catch (err) {
     console.error("[analytics] unexpected error", err)
-    return NextResponse.json({ success: false, error: "Error interno" }, { status: 500 })
+    return fail("Error interno", 500)
   }
 }

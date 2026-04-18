@@ -11,6 +11,7 @@ import {
 import { SPORT_IDS } from "@/lib/sports/config"
 import type { ApiResponse } from "@/types"
 import type { EventWithClub } from "@/features/activities/queries"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for event updates
@@ -103,10 +104,7 @@ export async function GET(
   try {
     const event = await getEventById(id)
     if (!event) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Evento no encontrado" },
-        { status: 404 }
-      )
+      return fail("Evento no encontrado", 404)
     }
 
     // Attempt to enrich with registration status for authenticated users
@@ -117,18 +115,11 @@ export async function GET(
       isRegistered = reg !== null
     }
 
-    return NextResponse.json({
-      success: true,
-      data: { ...event, is_registered: isRegistered },
-      error: null,
-    })
+    return ok({ ...event, is_registered: isRegistered })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[GET /api/events/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el evento" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el evento", 500)
   }
 }
 
@@ -142,10 +133,7 @@ export async function PUT(
 ): Promise<NextResponse<ApiResponse<EventWithClub>>> {
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { id } = await context.params
@@ -154,34 +142,22 @@ export async function PUT(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = updateEventSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No se enviaron campos para actualizar" },
-      { status: 422 }
-    )
+    return fail("No se enviaron campos para actualizar", 422)
   }
 
   try {
     const existing = await getEventById(id)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Evento no encontrado" },
-        { status: 404 }
-      )
+      return fail("Evento no encontrado", 404)
     }
 
     const { userId, globalRole } = authResult.context
@@ -192,25 +168,15 @@ export async function PUT(
       existing.club_id
     )
     if (!allowed) {
-      return NextResponse.json(
-        { success: false, data: null, error: "No tienes permisos para editar este evento" },
-        { status: 403 }
-      )
+      return fail("No tienes permisos para editar este evento", 403)
     }
 
     const updated = await updateEvent(id, parsed.data)
-    return NextResponse.json({
-      success: true,
-      data: { ...updated, club_name: existing.club_name, registration_count: existing.registration_count, is_registered: false },
-      error: null,
-    })
+    return ok({ ...updated, club_name: existing.club_name, registration_count: existing.registration_count, is_registered: false })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[PUT /api/events/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar el evento" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar el evento", 500)
   }
 }
 
@@ -224,10 +190,7 @@ export async function DELETE(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { id } = await context.params
@@ -235,10 +198,7 @@ export async function DELETE(
   try {
     const existing = await getEventById(id)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Evento no encontrado" },
-        { status: 404 }
-      )
+      return fail("Evento no encontrado", 404)
     }
 
     const { userId, globalRole } = authResult.context
@@ -249,20 +209,14 @@ export async function DELETE(
       existing.club_id
     )
     if (!allowed) {
-      return NextResponse.json(
-        { success: false, data: null, error: "No tienes permisos para eliminar este evento" },
-        { status: 403 }
-      )
+      return fail("No tienes permisos para eliminar este evento", 403)
     }
 
     await deleteEvent(id)
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[DELETE /api/events/${id}]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al eliminar el evento" },
-      { status: 500 }
-    )
+    return fail("Error al eliminar el evento", 500)
   }
 }

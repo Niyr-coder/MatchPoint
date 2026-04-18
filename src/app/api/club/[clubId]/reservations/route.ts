@@ -4,6 +4,7 @@ import { getClubReservations, updateReservationStatus } from "@/features/booking
 import { createServiceClient } from "@/lib/supabase/server"
 import { notifyUser } from "@/features/notifications/utils"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 const updateStatusSchema = z.object({
   id: z.string().uuid(),
@@ -18,7 +19,7 @@ export async function GET(
 
   const authResult = await authorize({ clubId, requiredPermission: "reservations.view" })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+    return fail("Acceso denegado", 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -28,10 +29,10 @@ export async function GET(
 
   try {
     const reservations = await getClubReservations(clubId, { date, status, courtId })
-    return NextResponse.json({ success: true, data: reservations, error: null })
+    return ok(reservations)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al obtener reservas"
-    return NextResponse.json({ success: false, data: null, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }
 
@@ -43,22 +44,19 @@ export async function PATCH(
 
   const authResult = await authorize({ clubId, requiredPermission: "reservations.cancel" })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+    return fail("Acceso denegado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = updateStatusSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   // Verify the reservation belongs to this club and fetch data needed for notification
@@ -71,7 +69,7 @@ export async function PATCH(
     .maybeSingle()
 
   if (!reservation) {
-    return NextResponse.json({ success: false, error: "Reserva no encontrada en este club" }, { status: 404 })
+    return fail("Reserva no encontrada en este club", 404)
   }
 
   try {
@@ -100,9 +98,9 @@ export async function PATCH(
       isConfirmed ? "notify_user_on_confirmed" : "notify_user_on_cancelled",
     )
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al actualizar reserva"
-    return NextResponse.json({ success: false, data: null, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }

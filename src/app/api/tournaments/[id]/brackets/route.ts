@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { ok, fail } from "@/lib/api/response"
 
 export async function GET(
   _request: Request,
@@ -8,7 +9,7 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const service = createServiceClient()
   const { data, error } = await service
@@ -23,8 +24,8 @@ export async function GET(
     .order("round", { ascending: true })
     .order("match_number", { ascending: true })
 
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: data ?? [] })
+  if (error) return fail(error.message, 500)
+  return ok(data ?? [])
 }
 
 export async function POST(
@@ -34,7 +35,7 @@ export async function POST(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data: tournament } = await supabase
     .from("tournaments")
@@ -43,14 +44,11 @@ export async function POST(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   if (tournament.bracket_locked) {
-    return NextResponse.json({
-      success: false,
-      error: "El bracket está bloqueado porque ya hay partidos con resultado registrado.",
-    }, { status: 409 })
+    return fail("El bracket está bloqueado porque ya hay partidos con resultado registrado.", 409)
   }
 
   let body: { type?: string } = {}
@@ -71,9 +69,9 @@ export async function POST(
     .order("seed", { ascending: true, nullsFirst: false })
     .order("registered_at", { ascending: true })
 
-  if (pErr) return NextResponse.json({ success: false, error: pErr.message }, { status: 500 })
+  if (pErr) return fail(pErr.message, 500)
   if (!participants || participants.length < 2) {
-    return NextResponse.json({ success: false, error: "Se necesitan al menos 2 participantes" }, { status: 400 })
+    return fail("Se necesitan al menos 2 participantes")
   }
 
   // Shuffle for fairness if no seeds assigned; keep seeded order if seeds exist
@@ -98,8 +96,8 @@ export async function POST(
     .insert(brackets)
     .select()
 
-  if (iErr) return NextResponse.json({ success: false, error: iErr.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: inserted, type })
+  if (iErr) return fail(iErr.message, 500)
+  return ok(inserted)
 }
 
 interface BracketInsert {

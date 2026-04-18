@@ -8,6 +8,7 @@ import { BADGE_TYPES, BADGE_CONFIG } from "@/features/badges/constants"
 import type { ApiResponse } from "@/types"
 import type { PlayerBadge, RawBadgeRow } from "@/features/badges/types"
 import type { BadgeType } from "@/features/badges/constants"
+import { ok, fail } from "@/lib/api/response"
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -17,7 +18,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<PlayerBadge[]>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   const { id } = await params
@@ -30,7 +31,7 @@ export async function GET(
     .order("granted_at", { ascending: false })
 
   if (error) {
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener insignias" }, { status: 500 })
+    return fail("Error al obtener insignias", 500)
   }
 
   const badges: PlayerBadge[] = (data as unknown as RawBadgeRow[]).map((row) => ({
@@ -42,7 +43,7 @@ export async function GET(
     granted_at: row.granted_at,
   }))
 
-  return NextResponse.json({ success: true, data: badges, error: null })
+  return ok(badges)
 }
 
 const grantSchema = z.object({
@@ -56,16 +57,13 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<PlayerBadge>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
@@ -74,12 +72,12 @@ export async function POST(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "Cuerpo inválido" }, { status: 400 })
+    return fail("Cuerpo inválido")
   }
 
   const parsed = grantSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { badge_type, club_id } = parsed.data
@@ -101,9 +99,9 @@ export async function POST(
 
   if (error) {
     if (error.code === "23505") {
-      return NextResponse.json({ success: false, data: null, error: "El jugador ya tiene esta insignia" }, { status: 409 })
+      return fail("El jugador ya tiene esta insignia", 409)
     }
-    return NextResponse.json({ success: false, data: null, error: "Error al otorgar insignia" }, { status: 500 })
+    return fail("Error al otorgar insignia", 500)
   }
 
   const row = data as unknown as RawBadgeRow
@@ -124,5 +122,5 @@ export async function POST(
     details: { badge_type, club_id: resolvedClubId },
   })
 
-  return NextResponse.json({ success: true, data: badge, error: null })
+  return ok(badge)
 }

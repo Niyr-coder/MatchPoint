@@ -2,6 +2,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import { z } from "zod"
+import { ok, fail } from "@/lib/api/response"
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -24,36 +25,25 @@ export async function POST(request: Request) {
   const ip = getClientIp(request)
   const rl = await checkRateLimit("messages", ip, RATE_LIMITS.messages)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Limit": String(RATE_LIMITS.messages.limit),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
-        },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo en un momento.", 429)
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = broadcastSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, data: null, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const { clubId, title, content } = parsed.data
 
@@ -68,7 +58,7 @@ export async function POST(request: Request) {
 
   if (profileError || !profile) {
     console.error("[api/conversations/broadcast] profile fetch failed:", profileError?.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al verificar permisos" }, { status: 500 })
+    return fail("Error al verificar permisos", 500)
   }
 
   const isGlobalAdmin = profile.global_role === "admin"
@@ -84,12 +74,12 @@ export async function POST(request: Request) {
 
     if (memberError) {
       console.error("[api/conversations/broadcast] membership check failed:", memberError.message)
-      return NextResponse.json({ success: false, data: null, error: "Error al verificar membresía" }, { status: 500 })
+      return fail("Error al verificar membresía", 500)
     }
 
     const hasPermission = clubMember && (BROADCAST_ROLES as readonly string[]).includes(clubMember.role)
     if (!hasPermission) {
-      return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+      return fail("Forbidden", 403)
     }
   }
 
@@ -102,7 +92,7 @@ export async function POST(request: Request) {
 
   if (convError || !conversation) {
     console.error("[api/conversations/broadcast] conversation insert failed:", convError?.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al crear el anuncio" }, { status: 500 })
+    return fail("Error al crear el anuncio", 500)
   }
 
   const conversationId = conversation.id
@@ -118,7 +108,7 @@ export async function POST(request: Request) {
     console.error("[api/conversations/broadcast] members fetch failed:", membersError.message)
     // Rollback conversation to avoid orphan
     await service.from("conversations").delete().eq("id", conversationId)
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener miembros del club" }, { status: 500 })
+    return fail("Error al obtener miembros del club", 500)
   }
 
   // 3. Batch insert all members as participants
@@ -135,7 +125,7 @@ export async function POST(request: Request) {
     if (participantsError) {
       console.error("[api/conversations/broadcast] participants insert failed:", participantsError.message)
       await service.from("conversations").delete().eq("id", conversationId)
-      return NextResponse.json({ success: false, data: null, error: "Error al agregar participantes" }, { status: 500 })
+      return fail("Error al agregar participantes", 500)
     }
   }
 
@@ -148,8 +138,8 @@ export async function POST(request: Request) {
     console.error("[api/conversations/broadcast] message insert failed:", messageError.message)
     // Participants and conversation already created — log but don't roll back;
     // the conversation exists without a message, which is recoverable
-    return NextResponse.json({ success: false, data: null, error: "Error al enviar el mensaje del anuncio" }, { status: 500 })
+    return fail("Error al enviar el mensaje del anuncio", 500)
   }
 
-  return NextResponse.json({ success: true, data: { conversationId }, error: null }, { status: 201 })
+  return ok({ conversationId }, 201)
 }

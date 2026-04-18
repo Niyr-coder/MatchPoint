@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { ok, fail } from "@/lib/api/response"
 
 const putSchema = z.object({
   name:             z.string().min(3, "El nombre debe tener al menos 3 caracteres").max(100).optional(),
@@ -25,7 +26,7 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data, error } = await supabase
     .from("tournaments")
@@ -33,8 +34,8 @@ export async function GET(
     .eq("id", id)
     .single()
 
-  if (error) return NextResponse.json({ success: false, error: "Not found" }, { status: 404 })
-  return NextResponse.json({ success: true, data })
+  if (error) return fail("Not found", 404)
+  return ok(data)
 }
 
 export async function PUT(
@@ -44,15 +45,15 @@ export async function PUT(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   let rawBody: unknown
   try { rawBody = await request.json() } catch {
-    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
   const parsed = putSchema.safeParse(rawBody)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
   const body = parsed.data
 
@@ -63,11 +64,11 @@ export async function PUT(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   if (["completed", "cancelled"].includes(tournament.status as string)) {
-    return NextResponse.json({ success: false, error: "No se puede editar un torneo finalizado" }, { status: 400 })
+    return fail("No se puede editar un torneo finalizado")
   }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -88,8 +89,8 @@ export async function PUT(
     .select()
     .single()
 
-  if (error || !data) return NextResponse.json({ success: false, error: "Error al actualizar" }, { status: 500 })
-  return NextResponse.json({ success: true, data })
+  if (error || !data) return fail("Error al actualizar", 500)
+  return ok(data)
 }
 
 export async function PATCH(
@@ -99,15 +100,15 @@ export async function PATCH(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   let rawBody: unknown
   try { rawBody = await request.json() } catch {
-    return NextResponse.json({ success: false, error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
   const parsedPatch = patchSchema.safeParse(rawBody)
   if (!parsedPatch.success) {
-    return NextResponse.json({ success: false, error: parsedPatch.error.issues[0].message }, { status: 422 })
+    return fail(parsedPatch.error.issues[0].message, 422)
   }
   const { status, force = false } = parsedPatch.data
 
@@ -118,7 +119,7 @@ export async function PATCH(
     .single()
 
   if (!tournament || tournament.created_by !== user.id) {
-    return NextResponse.json({ success: false, error: "No autorizado" }, { status: 403 })
+    return fail("No autorizado", 403)
   }
 
   // State machine: enforce valid transitions
@@ -131,10 +132,7 @@ export async function PATCH(
   }
   const current = tournament.status as string
   if (!(validTransitions[current] ?? []).includes(status)) {
-    return NextResponse.json({
-      success: false,
-      error: `No se puede cambiar de "${current}" a "${status}"`,
-    }, { status: 409 })
+    return fail(`No se puede cambiar de "${current}" a "${status}"`, 409)
   }
 
   const service = createServiceClient()
@@ -148,10 +146,7 @@ export async function PATCH(
       .neq("status", "withdrawn")
 
     if ((participantCount ?? 0) < 4) {
-      return NextResponse.json({
-        success: false,
-        error: `Se necesitan al menos 4 participantes para iniciar. Actualmente hay ${participantCount ?? 0}.`,
-      }, { status: 409 })
+      return fail(`Se necesitan al menos 4 participantes para iniciar. Actualmente hay ${participantCount ?? 0}.`, 409)
     }
 
     const { count: bracketCount } = await service
@@ -160,10 +155,7 @@ export async function PATCH(
       .eq("tournament_id", id)
 
     if ((bracketCount ?? 0) === 0) {
-      return NextResponse.json({
-        success: false,
-        error: "Genera el bracket antes de iniciar el torneo.",
-      }, { status: 409 })
+      return fail("Genera el bracket antes de iniciar el torneo.", 409)
     }
   }
 
@@ -176,12 +168,7 @@ export async function PATCH(
       .in("status", ["pending", "in_progress"])
 
     if ((incompleteCount ?? 0) > 0) {
-      return NextResponse.json({
-        success: false,
-        error: `Hay ${incompleteCount} partido(s) sin resultado. ¿Deseas finalizar igualmente?`,
-        requiresConfirmation: true,
-        incompleteCount,
-      }, { status: 409 })
+      return fail(`Hay ${incompleteCount} partido(s) sin resultado. ¿Deseas finalizar igualmente?`, 409)
     }
   }
 
@@ -194,7 +181,7 @@ export async function PATCH(
     .single()
 
   if (error || !data) {
-    return NextResponse.json({ success: false, error: "No encontrado o sin autorización" }, { status: 404 })
+    return fail("No encontrado o sin autorización", 404)
   }
 
   // On cancellation: auto-refund all paid participants
@@ -206,5 +193,5 @@ export async function PATCH(
       .eq("payment_status", "paid")
   }
 
-  return NextResponse.json({ success: true, data })
+  return ok(data)
 }

@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const updateStatusSchema = z.object({
   status: z.enum(["confirmed", "delivered", "cancelled"]),
@@ -28,28 +29,19 @@ export async function PUT(
   const { id } = await params
   const auth = await authorize()
   if (!auth.ok) {
-    return NextResponse.json(
-      { data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { userId, globalRole } = auth.context
   const rl = await checkRateLimit("shopOrderUpdate", userId, RATE_LIMITS.shopOrderUpdate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const body = await request.json()
   const parsed = updateStatusSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { data: null, error: parsed.error.issues[0].message },
-      { status: 400 }
-    )
+    return fail(parsed.error.issues[0].message)
   }
 
   const { status: newStatus } = parsed.data
@@ -62,10 +54,7 @@ export async function PUT(
     .single()
 
   if (fetchError || !order) {
-    return NextResponse.json(
-      { data: null, error: "Orden no encontrada" },
-      { status: 404 }
-    )
+    return fail("Orden no encontrada", 404)
   }
 
   let effectiveRole = globalRole
@@ -79,19 +68,13 @@ export async function PUT(
       .single()
 
     if (!membership) {
-      return NextResponse.json(
-        { data: null, error: "Sin permisos para esta orden" },
-        { status: 403 }
-      )
+      return fail("Sin permisos para esta orden", 403)
     }
     effectiveRole = membership.role
   }
 
   if (!canTransition(order.status as OrderStatus, newStatus, effectiveRole)) {
-    return NextResponse.json(
-      { data: null, error: `No se puede cambiar de '${order.status}' a '${newStatus}'` },
-      { status: 422 }
-    )
+    return fail(`No se puede cambiar de '${order.status}' a '${newStatus}'`, 422)
   }
 
   const { error: updateError } = await supabase
@@ -101,10 +84,7 @@ export async function PUT(
 
   if (updateError) {
     console.error("[orders/[id]] Error updating order status:", updateError)
-    return NextResponse.json(
-      { data: null, error: "Error al actualizar" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar", 500)
   }
 
   const notificationMap: Record<string, { title: string; body: string; type: string }> = {
@@ -135,5 +115,5 @@ export async function PUT(
     })
   }
 
-  return NextResponse.json({ data: null, error: null })
+  return ok(null)
 }

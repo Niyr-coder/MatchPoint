@@ -3,38 +3,25 @@ import { waitlistSchema } from "@/lib/validations"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   const ip = getClientIp(request)
   const rl = await checkRateLimit("waitlist", ip, RATE_LIMITS.waitlist)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Limit": String(RATE_LIMITS.waitlist.limit),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
-        },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo en un momento.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ success: false, data: null, error: "Cuerpo inválido" }, { status: 400 })
+    return fail("Cuerpo inválido")
   }
 
   const result = waitlistSchema.safeParse(body)
   if (!result.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: result.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(result.error.issues[0].message, 422)
   }
 
   const { email, source } = result.data
@@ -48,17 +35,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
   if (error) {
     // Unique constraint violation → already registered
     if (error.code === "23505") {
-      return NextResponse.json(
-        { success: false, data: null, error: "Este email ya está registrado." },
-        { status: 409 }
-      )
+      return fail("Este email ya está registrado.", 409)
     }
     console.error("[waitlist] Supabase error:", error)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error interno. Intenta de nuevo." },
-      { status: 500 }
-    )
+    return fail("Error interno. Intenta de nuevo.", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null }, { status: 201 })
+  return ok(null, 201)
 }

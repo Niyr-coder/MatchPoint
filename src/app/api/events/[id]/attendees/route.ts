@@ -7,6 +7,7 @@ import {
 } from "@/features/activities/queries"
 import type { ApiResponse } from "@/types"
 import type { EventRegistrationWithProfile } from "@/features/activities/queries"
+import { ok, fail } from "@/lib/api/response"
 
 interface RouteContext {
   params: Promise<{ id: string }>
@@ -49,10 +50,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<EventRegistrationWithProfile[]>>> {
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { id: eventId } = await context.params
@@ -61,10 +59,7 @@ export async function GET(
   try {
     const event = await getEventById(eventId)
     if (!event) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Evento no encontrado" },
-        { status: 404 }
-      )
+      return fail("Evento no encontrado", 404)
     }
 
     const allowed = await canViewAttendees(
@@ -74,29 +69,14 @@ export async function GET(
       event.club_id
     )
     if (!allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          error: "No tienes permisos para ver los asistentes de este evento",
-        },
-        { status: 403 }
-      )
+      return fail("No tienes permisos para ver los asistentes de este evento", 403)
     }
 
     const registrations = await getEventRegistrations(eventId)
-    return NextResponse.json({
-      success: true,
-      data: registrations,
-      error: null,
-      meta: { total: registrations.length },
-    } as ApiResponse<EventRegistrationWithProfile[]> & { meta: unknown })
+    return ok(registrations)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[GET /api/events/${eventId}/attendees]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener los asistentes" },
-      { status: 500 }
-    )
+    return fail("Error al obtener los asistentes", 500)
   }
 }

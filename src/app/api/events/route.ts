@@ -13,6 +13,7 @@ import { SPORT_IDS } from "@/lib/sports/config"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import type { ApiResponse } from "@/types"
 import type { Event, EventFilters } from "@/features/activities/queries"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Validation schema for event creation
@@ -105,17 +106,12 @@ export async function GET(
         !searchParams.has("search") &&
         !legacyAll) {
       const events = await getUpcomingEvents(limit)
-      return NextResponse.json({ success: true, data: events, error: null })
+      return ok(events)
     }
 
     if (legacyAll && !searchParams.has("sport") && !searchParams.has("search")) {
       const result = await getAllEvents(page, limit)
-      return NextResponse.json({
-        success: true,
-        data: result.events,
-        error: null,
-        meta: { total: result.total, page, limit },
-      } as ApiResponse<Event[]> & { meta: unknown })
+      return ok(result.events)
     }
 
     const isFreeParam = searchParams.get("is_free")
@@ -139,17 +135,9 @@ export async function GET(
     }
 
     const result = await getFilteredEvents(filters)
-    return NextResponse.json({
-      success: true,
-      data: result.events,
-      error: null,
-      meta: { total: result.total, page, limit },
-    } as ApiResponse<Event[]> & { meta: unknown })
+    return ok(result.events)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener eventos" },
-      { status: 500 }
-    )
+    return fail("Error al obtener eventos", 500)
   }
 }
 
@@ -167,22 +155,13 @@ export async function POST(
     windowMs: 3_600_000,
   })
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(rl.retryAfterSeconds) },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   // Auth: must be logged in
   const authResult = await authorize()
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { userId, globalRole } = authResult.context
@@ -193,18 +172,12 @@ export async function POST(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = createEventSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { club_id } = parsed.data
@@ -213,27 +186,13 @@ export async function POST(
   if (!isAdmin && club_id) {
     const allowed = await canManageClubEvents(userId, club_id)
     if (!allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          error: "No tienes permisos para crear eventos en este club",
-        },
-        { status: 403 }
-      )
+      return fail("No tienes permisos para crear eventos en este club", 403)
     }
   }
 
   // Non-admins cannot create platform-level events (no club_id)
   if (!isAdmin && !club_id) {
-    return NextResponse.json(
-      {
-        success: false,
-        data: null,
-        error: "Solo los administradores pueden crear eventos de plataforma",
-      },
-      { status: 403 }
-    )
+    return fail("Solo los administradores pueden crear eventos de plataforma", 403)
   }
 
   try {
@@ -249,16 +208,10 @@ export async function POST(
       })
     }
 
-    return NextResponse.json(
-      { success: true, data: event, error: null },
-      { status: 201 }
-    )
+    return ok(event, 201)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[POST /api/events]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al crear el evento" },
-      { status: 500 }
-    )
+    return fail("Error al crear el evento", 500)
   }
 }

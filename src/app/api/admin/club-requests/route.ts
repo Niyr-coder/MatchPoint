@@ -3,6 +3,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -44,19 +45,13 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<ClubRequestWithRequester[]> & { meta?: ListMeta }>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminSearch", ctx.userId, RATE_LIMITS.adminSearch)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { searchParams } = new URL(request.url)
@@ -116,22 +111,10 @@ export async function GET(
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: requests,
-      error: null,
-      meta: {
-        total: count ?? 0,
-        page: pageParam,
-        limit: limitParam,
-      },
-    })
+    return ok(requests)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/admin/club-requests]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las solicitudes" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las solicitudes", 500)
   }
 }

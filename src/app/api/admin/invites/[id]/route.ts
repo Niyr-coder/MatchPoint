@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { logAdminAction } from "@/lib/audit/log"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const patchSchema = z.object({
   is_active: z.literal(false),
@@ -19,36 +20,24 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<{ id: string; is_active: boolean }>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { id } = await context.params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de invite link requerido" },
-      { status: 400 }
-    )
+    return fail("ID de invite link requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0]?.message ?? "Datos inválidos" },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0]?.message ?? "Datos inválidos", 422)
   }
 
   try {
@@ -62,17 +51,11 @@ export async function PATCH(
 
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Invite link no encontrado" },
-        { status: 404 }
-      )
+      return fail("Invite link no encontrado", 404)
     }
 
     if (!existing.is_active) {
-      return NextResponse.json(
-        { success: false, data: null, error: "El invite link ya está revocado" },
-        { status: 409 }
-      )
+      return fail("El invite link ya está revocado", 409)
     }
 
     const { data: updated, error: updateError } = await supabase
@@ -92,13 +75,10 @@ export async function PATCH(
       details: { id },
     })
 
-    return NextResponse.json({ success: true, data: updated, error: null })
+    return ok(updated)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[PATCH /api/admin/invites/[id]]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al revocar el invite link" },
-      { status: 500 }
-    )
+    return fail("Error al revocar el invite link", 500)
   }
 }

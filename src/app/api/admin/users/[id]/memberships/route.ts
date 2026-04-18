@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -27,45 +28,30 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const ctx = authResult.context
   const rl = await checkRateLimit("adminBulk", ctx.userId, RATE_LIMITS.adminBulk)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de usuario requerido" },
-      { status: 400 }
-    )
+    return fail("ID de usuario requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = postSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { clubId, role } = parsed.data as { clubId: string; role: ClubRole }
@@ -82,10 +68,7 @@ export async function POST(
 
     if (profileError) throw new Error(profileError.message)
     if (!profile) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Usuario no encontrado" },
-        { status: 404 }
-      )
+      return fail("Usuario no encontrado", 404)
     }
 
     // Verify the club exists
@@ -97,10 +80,7 @@ export async function POST(
 
     if (clubError) throw new Error(clubError.message)
     if (!club) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Club no encontrado" },
-        { status: 404 }
-      )
+      return fail("Club no encontrado", 404)
     }
 
     // Deactivate any existing membership for this user+club (role may differ)
@@ -123,14 +103,11 @@ export async function POST(
 
     if (insertError) throw new Error(insertError.message)
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[POST /api/admin/users/${id}/memberships]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al agregar la membresía" },
-      { status: 500 }
-    )
+    return fail("Error al agregar la membresía", 500)
   }
 }
 
@@ -140,36 +117,24 @@ export async function DELETE(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const authResult = await authorize({ requiredRoles: ["admin"] })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   const { id } = await params
   if (!id) {
-    return NextResponse.json(
-      { success: false, data: null, error: "ID de usuario requerido" },
-      { status: 400 }
-    )
+    return fail("ID de usuario requerido")
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = deleteSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { clubId } = parsed.data
@@ -185,13 +150,10 @@ export async function DELETE(
 
     if (error) throw new Error(error.message)
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error(`[DELETE /api/admin/users/${id}/memberships]`, message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al eliminar la membresía" },
-      { status: 500 }
-    )
+    return fail("Error al eliminar la membresía", 500)
   }
 }

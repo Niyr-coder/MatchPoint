@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import { broadcastNotificationToAll } from "@/features/notifications/utils"
+import { ok, fail } from "@/lib/api/response"
 
 const orderItemSchema = z.object({
   product_id: z.string().uuid("product_id inválido"),
@@ -17,7 +18,7 @@ const createOrderSchema = z.object({
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   const { data, error } = await supabase
     .from("orders")
@@ -26,42 +27,31 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(20)
 
-  if (error) return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data: data ?? [], error: null })
+  if (error) return fail(error.message, 500)
+  return ok(data ?? [])
 }
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
   const rl = await checkRateLimit("shopOrders", ip, RATE_LIMITS.shopOrders)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(rl.retryAfterSeconds),
-          "X-RateLimit-Limit": String(RATE_LIMITS.shopOrders.limit),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(Math.ceil(rl.resetAt / 1000)),
-        },
-      }
-    )
+    return fail("Demasiadas solicitudes. Intenta de nuevo en un momento.", 429)
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!user) return fail("Unauthorized", 401)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 })
+    return fail("JSON inválido")
   }
 
   const parsed = createOrderSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 422 })
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { items } = parsed.data
@@ -75,11 +65,11 @@ export async function POST(request: Request) {
     .eq("is_active", true)
 
   if (productsError) {
-    return NextResponse.json({ error: "Error al verificar productos" }, { status: 500 })
+    return fail("Error al verificar productos", 500)
   }
 
   if (!products || products.length !== productIds.length) {
-    return NextResponse.json({ error: "Uno o más productos no están disponibles" }, { status: 400 })
+    return fail("Uno o más productos no están disponibles")
   }
 
   const serverPrices = Object.fromEntries(products.map((p) => [p.id, p.price as number]))
@@ -99,9 +89,9 @@ export async function POST(request: Request) {
   if (error) {
     // SQLSTATE 53000 (insufficient_resources) or message from create_order_atomic
     if (error.code === "53000" || error.message.includes("Stock insuficiente")) {
-      return NextResponse.json({ data: null, error: "Stock insuficiente para uno o más productos" }, { status: 409 })
+      return fail("Stock insuficiente para uno o más productos", 409)
     }
-    return NextResponse.json({ data: null, error: "No se pudo crear la orden" }, { status: 500 })
+    return fail("No se pudo crear la orden", 500)
   }
 
   const rpcResult = data as { order_id: string }
@@ -114,5 +104,5 @@ export async function POST(request: Request) {
     metadata: { order_id: rpcResult.order_id },
   }).catch(console.error)
 
-  return NextResponse.json({ data: { orderId: rpcResult.order_id }, error: null })
+  return ok({ orderId: rpcResult.order_id })
 }

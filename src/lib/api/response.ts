@@ -13,13 +13,13 @@ export function ok<T>(data: T, status = 200): NextResponse<ApiResponse<T>> {
   return NextResponse.json({ success: true, data, error: null }, { status })
 }
 
-/** Error response. */
-export function fail(error: string, status = 400): NextResponse<ApiResponse<null>> {
-  return NextResponse.json({ success: false, data: null, error }, { status })
+/** Error response. Generic T lets callers with typed return annotations avoid type errors. */
+export function fail<T = never>(error: string, status = 400): NextResponse<ApiResponse<T>> {
+  return NextResponse.json({ success: false, data: null, error }, { status }) as NextResponse<ApiResponse<T>>
 }
 
 /** Rate limit exceeded — includes standard RL headers. */
-export function rateLimited(retryAfterSeconds: number, resetAt: number, limit: number): NextResponse<ApiResponse<null>> {
+export function rateLimited<T = never>(retryAfterSeconds: number, resetAt: number, limit: number): NextResponse<ApiResponse<T>> {
   return NextResponse.json(
     { success: false, data: null, error: "Demasiadas solicitudes. Intenta de nuevo en un momento." },
     {
@@ -31,5 +31,5 @@ export function rateLimited(retryAfterSeconds: number, resetAt: number, limit: n
         "X-RateLimit-Reset": String(Math.ceil(resetAt / 1000)),
       },
     }
-  )
+  ) as NextResponse<ApiResponse<T>>
 }

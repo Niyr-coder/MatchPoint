@@ -3,6 +3,7 @@ import { z } from "zod"
 import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const updateProductSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -45,31 +46,25 @@ export async function PUT(
   const { id } = await params
   const auth = await authorize()
   if (!auth.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 401 })
+    return fail("No autorizado", 401)
   }
 
   const { userId, globalRole } = auth.context
 
   const rl = await checkRateLimit("shopProductUpdate", userId, RATE_LIMITS.shopProductUpdate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { allowed } = await canManageProduct(userId, globalRole, id)
   if (!allowed) {
-    return NextResponse.json({ success: false, data: null, error: "Sin permisos" }, { status: 403 })
+    return fail("Sin permisos", 403)
   }
 
   const body = await request.json()
   const parsed = updateProductSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 400 }
-    )
+    return fail(parsed.error.issues[0].message)
   }
 
   const updates: Record<string, unknown> = {}
@@ -84,10 +79,10 @@ export async function PUT(
 
   if (error) {
     console.error("Error updating product:", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al actualizar" }, { status: 500 })
+    return fail("Error al actualizar", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }
 
 export async function DELETE(
@@ -97,13 +92,13 @@ export async function DELETE(
   const { id } = await params
   const auth = await authorize()
   if (!auth.ok) {
-    return NextResponse.json({ success: false, data: null, error: "No autorizado" }, { status: 401 })
+    return fail("No autorizado", 401)
   }
 
   const { userId, globalRole } = auth.context
   const { allowed } = await canManageProduct(userId, globalRole, id)
   if (!allowed) {
-    return NextResponse.json({ success: false, data: null, error: "Sin permisos" }, { status: 403 })
+    return fail("Sin permisos", 403)
   }
 
   // Soft delete — archive instead of hard delete
@@ -112,8 +107,8 @@ export async function DELETE(
 
   if (error) {
     console.error("Error archiving product:", error)
-    return NextResponse.json({ success: false, data: null, error: "Error al archivar" }, { status: 500 })
+    return fail("Error al archivar", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

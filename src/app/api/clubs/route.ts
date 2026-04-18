@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getClubs } from "@/features/clubs/queries/clubs"
 import type { ApiResponse } from "@/types"
 import type { ClubWithSports } from "@/features/clubs/queries/clubs"
+import { ok, fail } from "@/lib/api/response"
 
 export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<ClubWithSports[]>>> {
   try {
@@ -10,10 +11,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Unauthorized" },
-        { status: 401 }
-      )
+      return fail("Unauthorized", 401)
     }
 
     const { searchParams } = request.nextUrl
@@ -23,12 +21,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
 
     const clubs = await getClubs({ sport, province, search })
 
-    return NextResponse.json({ success: true, data: clubs, error: null })
+    return ok(clubs)
   } catch (err) {
     console.error("[GET /api/clubs]", err)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener clubes" },
-      { status: 500 }
-    )
+    return fail("Error al obtener clubes", 500)
   }
 }

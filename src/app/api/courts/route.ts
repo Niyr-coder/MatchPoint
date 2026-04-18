@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCourts, getCourtsBySport } from "@/features/clubs/queries/courts"
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
+import { ok, fail } from "@/lib/api/response"
 
 const getCourtsSchema = z.object({
   sport: z.enum(SPORT_IDS).optional(),
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const { searchParams } = new URL(request.url)
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
     city: searchParams.get("city") ?? undefined,
   })
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
+    return fail(parsed.error.issues[0].message)
   }
   const { sport, city } = parsed.data
 
@@ -32,9 +33,9 @@ export async function GET(request: Request) {
       ? await getCourtsBySport(sport)
       : await getCourts(city)
 
-    return NextResponse.json({ success: true, data: courts })
+    return ok(courts)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al obtener canchas"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    return fail(message, 500)
   }
 }

@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { ok, fail } from "@/lib/api/response"
 
 // ---------------------------------------------------------------------------
 // GET /api/clubs/[clubId]/members — list active members of a club
@@ -13,13 +14,13 @@ export async function GET(
   const { clubId } = await params
 
   if (!clubId) {
-    return NextResponse.json({ success: false, data: null, error: "clubId requerido" }, { status: 400 })
+    return fail("clubId requerido")
   }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const service = createServiceClient()
@@ -35,11 +36,11 @@ export async function GET(
 
   if (membershipError) {
     console.error("[api/clubs/[clubId]/members] membership check failed:", membershipError.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al verificar membresía" }, { status: 500 })
+    return fail("Error al verificar membresía", 500)
   }
 
   if (!callerMembership) {
-    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   // Fetch all active members excluding the caller
@@ -53,7 +54,7 @@ export async function GET(
 
   if (membersError) {
     console.error("[api/clubs/[clubId]/members] members fetch failed:", membersError.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al obtener miembros" }, { status: 500 })
+    return fail("Error al obtener miembros", 500)
   }
 
   type ProfileRow = { id: string; full_name: string | null; username: string | null; avatar_url: string | null }
@@ -71,5 +72,5 @@ export async function GET(
     }
   }).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? "", "es"))
 
-  return NextResponse.json({ success: true, data, error: null })
+  return ok(data)
 }

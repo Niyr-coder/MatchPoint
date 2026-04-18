@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { updateCourt, deactivateCourt } from "@/features/clubs/queries/courts"
 import type { ApiResponse } from "@/types"
 import type { Court } from "@/features/clubs/queries/courts"
+import { ok, fail } from "@/lib/api/response"
 
 const updateCourtSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -26,38 +27,26 @@ export async function PATCH(
   })
 
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = updateCourtSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
     const court = await updateCourt(courtId, parsed.data)
-    return NextResponse.json({ success: true, data: court, error: null })
+    return ok(court)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar la cancha" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar la cancha", 500)
   }
 }
 
@@ -73,19 +62,13 @@ export async function DELETE(
   })
 
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
     await deactivateCourt(courtId)
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al desactivar la cancha" },
-      { status: 500 }
-    )
+    return fail("Error al desactivar la cancha", 500)
   }
 }

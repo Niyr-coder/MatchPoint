@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { authorize } from "@/features/auth/queries"
 import type { ApiResponse } from "@/types"
 import type { TournamentFeedback } from "@/features/tournaments/types"
+import { ok, fail } from "@/lib/api/response"
 
 const feedbackSchema = z.object({
   rating:  z.number().int().min(1).max(5),
@@ -16,13 +17,10 @@ interface FeedbackMeta { average_rating: number; count: number }
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-): Promise<NextResponse<ApiResponse<TournamentFeedback[]> & { meta: FeedbackMeta }>> {
+): Promise<NextResponse<ApiResponse<TournamentFeedback[]>>> {
   const authResult = await authorize({})
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado", meta: { average_rating: 0, count: 0 } },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { id } = await params
@@ -35,10 +33,7 @@ export async function GET(
     .order("created_at", { ascending: false })
 
   if (error) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener feedback", meta: { average_rating: 0, count: 0 } },
-      { status: 500 }
-    )
+    return fail("Error al obtener feedback", 500)
   }
 
   const items = (data ?? []) as TournamentFeedback[]
@@ -47,12 +42,7 @@ export async function GET(
     ? Math.round((items.reduce((sum, f) => sum + f.rating, 0) / count) * 10) / 10
     : 0
 
-  return NextResponse.json({
-    success: true,
-    data: items,
-    error: null,
-    meta: { average_rating, count },
-  })
+  return ok(items)
 }
 
 // POST /api/tournaments/[id]/feedback
@@ -62,10 +52,7 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<TournamentFeedback>>> {
   const authResult = await authorize({})
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 401 }
-    )
+    return fail("No autorizado", 401)
   }
 
   const { id } = await params
@@ -79,10 +66,7 @@ export async function POST(
     .single()
 
   if (!tournament || tournament.status !== "completed") {
-    return NextResponse.json(
-      { success: false, data: null, error: "Solo puedes dejar feedback en torneos completados" },
-      { status: 422 }
-    )
+    return fail("Solo puedes dejar feedback en torneos completados", 422)
   }
 
   const { data: participant } = await supabase
@@ -94,26 +78,17 @@ export async function POST(
     .maybeSingle()
 
   if (!participant) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Solo los participantes pueden dejar feedback" },
-      { status: 403 }
-    )
+    return fail("Solo los participantes pueden dejar feedback", 403)
   }
 
   let body: unknown
   try { body = await req.json() } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo inválido")
   }
 
   const parsed = feedbackSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const { data, error } = await supabase
@@ -128,11 +103,8 @@ export async function POST(
     .single()
 
   if (error) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al guardar feedback" },
-      { status: 500 }
-    )
+    return fail("Error al guardar feedback", 500)
   }
 
-  return NextResponse.json({ success: true, data: data as TournamentFeedback, error: null }, { status: 201 })
+  return ok(data as TournamentFeedback, 201)
 }

@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { onboardingSchema } from "@/lib/validations"
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse, Profile } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const profileUpdateSchema = z.object({
   first_name: z.string().min(1, "El nombre es requerido").max(50).optional(),
@@ -34,10 +35,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<Profile>>> {
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const supabase = createServiceClient()
@@ -48,13 +46,10 @@ export async function GET(
     .single()
 
   if (error || !data) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Perfil no encontrado" },
-      { status: 404 }
-    )
+    return fail("Perfil no encontrado", 404)
   }
 
-  return NextResponse.json({ success: true, data: data as Profile, error: null })
+  return ok(data as Profile)
 }
 
 export async function PATCH(
@@ -62,20 +57,14 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const rl = await checkRateLimit("profileUpdate", getClientIp(request), RATE_LIMITS.profileUpdate)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   // Try onboarding schema first (full onboarding flow)
@@ -83,10 +72,7 @@ export async function PATCH(
   if (onboardingParsed.success) {
     const user = await getAuthUser()
     if (!user) {
-      return NextResponse.json(
-        { success: false, data: null, error: "No autenticado" },
-        { status: 401 }
-      )
+      return fail("No autenticado", 401)
     }
 
     const supabase = createServiceClient()
@@ -109,15 +95,9 @@ export async function PATCH(
 
     if (updateError) {
       if (updateError.code === "23505") {
-        return NextResponse.json(
-          { success: false, data: null, error: "Este nombre de usuario ya está en uso." },
-          { status: 409 }
-        )
+        return fail("Este nombre de usuario ya está en uso.", 409)
       }
-      return NextResponse.json(
-        { success: false, data: null, error: "Error al guardar el perfil. Intenta de nuevo." },
-        { status: 500 }
-      )
+      return fail("Error al guardar el perfil. Intenta de nuevo.", 500)
     }
 
     // If the user provided a dominant hand, upsert the pickleball profile
@@ -131,24 +111,18 @@ export async function PATCH(
         )
     }
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   }
 
   // Partial profile update (from profile edit form)
   const profileParsed = profileUpdateSchema.safeParse(body)
   if (!profileParsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: profileParsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(profileParsed.error.issues[0].message, 422)
   }
 
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -184,11 +158,8 @@ export async function PATCH(
     .eq("id", user.id)
 
   if (updateError) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar el perfil." },
-      { status: 500 }
-    )
+    return fail("Error al actualizar el perfil.", 500)
   }
 
-  return NextResponse.json({ success: true, data: null, error: null })
+  return ok(null)
 }

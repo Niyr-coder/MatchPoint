@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ─── Validation schema ─────────────────────────────────────────────────────────
 
@@ -39,10 +40,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<UserSettings>>> {
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const supabase = createServiceClient()
@@ -53,17 +51,14 @@ export async function GET(
     .single()
 
   if (error) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Perfil no encontrado" },
-      { status: 404 }
-    )
+    return fail("Perfil no encontrado", 404)
   }
 
   // Validate the stored JSONB against our schema — unknown keys are stripped
   const parsed = settingsSchema.safeParse(data?.settings ?? {})
   const settings: UserSettings = parsed.success ? parsed.data : {}
 
-  return NextResponse.json({ success: true, data: settings, error: null })
+  return ok(settings)
 }
 
 // ─── PATCH /api/profile/settings ──────────────────────────────────────────────
@@ -73,36 +68,24 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<UserSettings>>> {
   const user = await getAuthUser()
   if (!user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const rl = await checkRateLimit("profileSettings", user.id, RATE_LIMITS.profileSettings)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas actualizaciones. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas actualizaciones. Intenta más tarde.", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = settingsSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   const supabase = createServiceClient()
@@ -115,10 +98,7 @@ export async function PATCH(
     .single()
 
   if (fetchError) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Perfil no encontrado" },
-      { status: 404 }
-    )
+    return fail("Perfil no encontrado", 404)
   }
 
   const merged: UserSettings = {
@@ -132,11 +112,8 @@ export async function PATCH(
     .eq("id", user.id)
 
   if (updateError) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al guardar los ajustes" },
-      { status: 500 }
-    )
+    return fail("Error al guardar los ajustes", 500)
   }
 
-  return NextResponse.json({ success: true, data: merged, error: null })
+  return ok(merged)
 }

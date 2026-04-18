@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { determineWinner, formatScore } from "@/features/organizer/utils/rotation"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
+import { ok, fail } from "@/lib/api/response"
 
 const rotationMatchSchema = z.object({
   player1Id: z.string().uuid(),
@@ -20,15 +21,12 @@ export async function POST(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
+    return fail("Unauthorized", 401)
   }
 
   const rl = await checkRateLimit("quedadasMatch", user.id, RATE_LIMITS.quedadasMatch)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes. Intenta más tarde.", 429)
   }
 
   const { data: quedada } = await supabase
@@ -38,7 +36,7 @@ export async function POST(
     .single()
 
   if (!quedada || quedada.event_type !== "quedada" || quedada.created_by !== user.id) {
-    return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
+    return fail("Forbidden", 403)
   }
 
   let raw: unknown
@@ -46,10 +44,7 @@ export async function POST(
 
   const parsed = rotationMatchSchema.safeParse(raw)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 400 }
-    )
+    return fail(parsed.error.issues[0].message)
   }
 
   const { player1Id, player2Id, scoreA, scoreB } = parsed.data
@@ -87,12 +82,8 @@ export async function POST(
 
   if (error) {
     console.error("[POST /api/quedadas/[id]/rotation/match]", error.message)
-    return NextResponse.json({ success: false, data: null, error: "Error al registrar resultado" }, { status: 500 })
+    return fail("Error al registrar resultado", 500)
   }
 
-  return NextResponse.json({
-    success: true,
-    data: { matchId: data.id, winnerId, loserId },
-    error: null,
-  }, { status: 201 })
+  return ok({ matchId: data.id, winnerId, loserId }, 201)
 }

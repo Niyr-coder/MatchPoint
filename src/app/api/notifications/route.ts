@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 import type { ApiResponse } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 // ──────────────────────────────────────────────────────────
 // Types
@@ -51,18 +52,12 @@ export async function GET(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const rl = await checkRateLimit("notificationsRead", user.id, RATE_LIMITS.notificationsRead)
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes" },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes", 429)
   }
 
   try {
@@ -74,18 +69,11 @@ export async function GET(
 
     if (error) throw new Error(error.message)
 
-    return NextResponse.json({
-      success: true,
-      data: (data ?? []) as Notification[],
-      error: null,
-    })
+    return ok((data ?? []) as Notification[])
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[GET /api/notifications]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener las notificaciones" },
-      { status: 500 }
-    )
+    return fail("Error al obtener las notificaciones", 500)
   }
 }
 
@@ -107,36 +95,24 @@ export async function PATCH(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autenticado" },
-      { status: 401 }
-    )
+    return fail("No autenticado", 401)
   }
 
   const rlPatch = await checkRateLimit("notificationsUpdate", user.id, RATE_LIMITS.notificationsUpdate)
   if (!rlPatch.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes" },
-      { status: 429, headers: { "Retry-After": String(rlPatch.retryAfterSeconds) } }
-    )
+    return fail("Demasiadas solicitudes", 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -161,13 +137,10 @@ export async function PATCH(
       if (error) throw new Error(error.message)
     }
 
-    return NextResponse.json({ success: true, data: null, error: null })
+    return ok(null)
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido"
     console.error("[PATCH /api/notifications]", message)
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar las notificaciones" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar las notificaciones", 500)
   }
 }

@@ -4,6 +4,7 @@ import { authorize } from "@/features/auth/queries"
 import { createServiceClient } from "@/lib/supabase/server"
 import type { ApiResponse } from "@/types"
 import type { Club } from "@/types"
+import { ok, fail } from "@/lib/api/response"
 
 const updateSettingsSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100).optional(),
@@ -23,10 +24,7 @@ export async function GET(
 
   const authResult = await authorize({ clubId, requiredPermission: "club.view" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   try {
@@ -38,18 +36,12 @@ export async function GET(
       .single()
 
     if (error || !data) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Club no encontrado" },
-        { status: 404 }
-      )
+      return fail("Club no encontrado", 404)
     }
 
-    return NextResponse.json({ success: true, data: data as Club, error: null })
+    return ok(data as Club)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al obtener el club" },
-      { status: 500 }
-    )
+    return fail("Error al obtener el club", 500)
   }
 }
 
@@ -61,28 +53,19 @@ export async function PATCH(
 
   const authResult = await authorize({ clubId, requiredPermission: "config.edit" })
   if (!authResult.ok) {
-    return NextResponse.json(
-      { success: false, data: null, error: "No autorizado" },
-      { status: 403 }
-    )
+    return fail("No autorizado", 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Cuerpo de solicitud inválido" },
-      { status: 400 }
-    )
+    return fail("Cuerpo de solicitud inválido")
   }
 
   const parsed = updateSettingsSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, data: null, error: parsed.error.issues[0].message },
-      { status: 422 }
-    )
+    return fail(parsed.error.issues[0].message, 422)
   }
 
   try {
@@ -95,17 +78,11 @@ export async function PATCH(
       .single()
 
     if (error || !data) {
-      return NextResponse.json(
-        { success: false, data: null, error: "Error al actualizar el club" },
-        { status: 500 }
-      )
+      return fail("Error al actualizar el club", 500)
     }
 
-    return NextResponse.json({ success: true, data: data as Club, error: null })
+    return ok(data as Club)
   } catch {
-    return NextResponse.json(
-      { success: false, data: null, error: "Error al actualizar el club" },
-      { status: 500 }
-    )
+    return fail("Error al actualizar el club", 500)
   }
 }
