@@ -33,4 +33,17 @@ describe('makeQueryClient', () => {
     const b = getBrowserClient()
     expect(a).toBe(b)
   })
+
+  it('returns a new instance on every call when window is undefined (server)', async () => {
+    const orig = (globalThis as any).window
+    delete (globalThis as any).window
+    try {
+      const { getBrowserClient } = await import('../client')
+      const a = getBrowserClient()
+      const b = getBrowserClient()
+      expect(a).not.toBe(b)
+    } finally {
+      ;(globalThis as any).window = orig
+    }
+  })
 })

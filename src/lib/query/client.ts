@@ -11,6 +11,7 @@ export function makeQueryClient(): QueryClient {
   })
 }
 
+// intentional module-level singleton — browser only, never reused on server
 let browserClient: QueryClient | undefined
 
 export function getBrowserClient(): QueryClient {
