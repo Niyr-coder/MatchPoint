@@ -41,7 +41,7 @@ const createProductSchema = z.object({
   price: z.number().min(0, "El precio no puede ser negativo"),
   category: z.enum(["equipment", "membership", "class", "other"]),
   stock: z.number().int().min(-1, "Stock mínimo es -1 (ilimitado)"),
-  image_url: z.string().url("URL inválida").optional().or(z.literal("")),
+  image_url: z.string().url("URL inválida").refine(url => url.startsWith("https://"), { message: "Solo se permiten URLs HTTPS" }).optional().or(z.literal("")),
 })
 
 export async function POST(request: Request) {

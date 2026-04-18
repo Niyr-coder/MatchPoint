@@ -23,6 +23,14 @@ export async function POST(
     return NextResponse.json({ success: false, data: null, error: "Unauthorized" }, { status: 401 })
   }
 
+  const rl = await checkRateLimit("quedadasMatch", user.id, RATE_LIMITS.quedadasMatch)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    )
+  }
+
   const { data: quedada } = await supabase
     .from("tournaments")
     .select("created_by, event_type")
@@ -31,14 +39,6 @@ export async function POST(
 
   if (!quedada || quedada.event_type !== "quedada" || quedada.created_by !== user.id) {
     return NextResponse.json({ success: false, data: null, error: "Forbidden" }, { status: 403 })
-  }
-
-  const rl = await checkRateLimit("quedadasMatch", user.id, RATE_LIMITS.quedadasMatch)
-  if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, data: null, error: "Demasiadas solicitudes. Intenta más tarde." },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
-    )
   }
 
   let raw: unknown
@@ -87,7 +87,7 @@ export async function POST(
 
   if (error) {
     console.error("[POST /api/quedadas/[id]/rotation/match]", error.message)
-    return NextResponse.json({ success: false, data: null, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, data: null, error: "Error al registrar resultado" }, { status: 500 })
   }
 
   return NextResponse.json({

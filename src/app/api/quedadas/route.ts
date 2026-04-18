@@ -34,9 +34,8 @@ export async function GET() {
     const quedadas = await getOrganizerQuedadas(ctx.userId)
     return NextResponse.json({ success: true, data: quedadas, error: null })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Error al obtener quedadas"
-    console.error("[api/quedadas GET]", message)
-    return NextResponse.json({ success: false, data: null, error: message }, { status: 500 })
+    console.error("[api/quedadas GET]", error)
+    return NextResponse.json({ success: false, data: null, error: "Error al obtener quedadas" }, { status: 500 })
   }
 }
 
@@ -93,8 +92,7 @@ export async function POST(request: Request) {
     })
     return NextResponse.json({ success: true, data: quedada, error: null }, { status: 201 })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Error al crear quedada"
-    console.error("[api/quedadas POST]", message)
-    return NextResponse.json({ success: false, data: null, error: message }, { status: 500 })
+    console.error("[api/quedadas POST]", error)
+    return NextResponse.json({ success: false, data: null, error: "Error al crear quedada" }, { status: 500 })
   }
 }

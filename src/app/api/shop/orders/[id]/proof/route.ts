@@ -6,7 +6,8 @@ import { broadcastNotificationToAll } from "@/features/notifications/utils"
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit"
 
 const proofSchema = z.object({
-  proof_url: z.string().url("Debe ser una URL válida"),
+  proof_url: z.string().url("Debe ser una URL válida")
+    .refine(url => url.startsWith("https://"), { message: "Solo se permiten URLs HTTPS" }),
 })
 
 export async function PUT(

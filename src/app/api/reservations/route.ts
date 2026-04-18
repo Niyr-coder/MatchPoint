@@ -34,15 +34,16 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url)
   const userId = url.searchParams.get('user_id')
 
-  // Allow filtering by user_id if provided, otherwise use authenticated user
-  const targetUserId = userId ?? user.id
+  if (userId && userId !== user.id) {
+    return NextResponse.json({ success: false, error: "Acceso denegado" }, { status: 403 })
+  }
 
   try {
-    const reservations = await getUserReservations(targetUserId)
+    const reservations = await getUserReservations(user.id)
     return NextResponse.json({ success: true, data: reservations })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Error al obtener reservas"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    console.error("[GET /api/reservations]", error)
+    return NextResponse.json({ success: false, error: "Error al obtener reservas" }, { status: 500 })
   }
 }
 
@@ -151,7 +152,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    console.error("[POST /api/reservations]", error)
+    return NextResponse.json({ success: false, error: "Error al crear reserva" }, { status: 500 })
   }
 }
 
@@ -201,7 +203,7 @@ export async function PATCH(request: Request) {
     await cancelReservation(parsed.data.id)
     return NextResponse.json({ success: true, data: null })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Error al cancelar reserva"
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
+    console.error("[PATCH /api/reservations]", error)
+    return NextResponse.json({ success: false, error: "Error al cancelar reserva" }, { status: 500 })
   }
 }

@@ -10,7 +10,7 @@ const updateProductSchema = z.object({
   price: z.number().min(0).optional(),
   category: z.enum(["equipment", "membership", "class", "other"]).optional(),
   stock: z.number().int().min(-1).optional(),
-  image_url: z.string().url().optional().nullable().or(z.literal("")),
+  image_url: z.string().url().refine(url => url.startsWith("https://"), { message: "Solo se permiten URLs HTTPS" }).optional().nullable().or(z.literal("")),
   is_active: z.boolean().optional(),
 })
 
