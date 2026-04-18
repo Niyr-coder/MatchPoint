@@ -128,9 +128,9 @@ describe("GET /api/admin/clubs", () => {
 // ===========================================================================
 
 describe("GET /api/admin/announcements", () => {
-  async function callRoute(req = makeRequest("/api/admin/announcements")) {
+  async function callRoute() {
     const { GET } = await import("@/app/api/admin/announcements/route")
-    return GET(req)
+    return GET()
   }
 
   it("returns 403 when unauthenticated", async () => {
@@ -229,7 +229,7 @@ describe("API response shape contract", () => {
 describe("Role hierarchy enforcement", () => {
   const adminOnlyRoutes = [
     { label: "admin/clubs", call: () => import("@/app/api/admin/clubs/route").then(m => m.GET(makeRequest("/api/admin/clubs"))) },
-    { label: "admin/announcements", call: () => import("@/app/api/admin/announcements/route").then(m => m.GET(makeRequest("/api/admin/announcements"))) },
+    { label: "admin/announcements", call: () => import("@/app/api/admin/announcements/route").then(m => m.GET()) },
   ]
 
   for (const route of adminOnlyRoutes) {
