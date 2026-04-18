@@ -20,6 +20,10 @@ describe('tournamentKeys', () => {
 })
 
 describe('bookingKeys', () => {
+  it('all returns base key', () => {
+    expect(bookingKeys.all()).toEqual(['bookings'])
+  })
+
   it('user includes userId', () => {
     expect(bookingKeys.user('uid-1')).toEqual(['bookings', 'user', 'uid-1'])
   })
@@ -30,17 +34,29 @@ describe('bookingKeys', () => {
 })
 
 describe('profileKeys', () => {
+  it('all returns base key', () => {
+    expect(profileKeys.all()).toEqual(['profile'])
+  })
+
   it('stats includes userId', () => {
     expect(profileKeys.stats('uid-1')).toEqual(['profile', 'stats', 'uid-1'])
+  })
+
+  it('roles includes userId', () => {
+    expect(profileKeys.roles('uid-1')).toEqual(['profile', 'roles', 'uid-1'])
   })
 })
 
 describe('adminKeys', () => {
-  it('users returns base key', () => {
+  it('all returns base key', () => {
+    expect(adminKeys.all()).toEqual(['admin'])
+  })
+
+  it('users returns scoped key', () => {
     expect(adminKeys.users()).toEqual(['admin', 'users'])
   })
 
-  it('tournaments returns base key', () => {
+  it('tournaments returns scoped key', () => {
     expect(adminKeys.tournaments()).toEqual(['admin', 'tournaments'])
   })
 })
