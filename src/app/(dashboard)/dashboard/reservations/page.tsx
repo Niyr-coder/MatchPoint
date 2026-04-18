@@ -1,17 +1,16 @@
-import Link from "next/link"
-import { authorizeOrRedirect } from "@/features/auth/queries"
-import { getAllUserReservations, getReservationInvites } from "@/features/bookings/queries"
-import { PageHeader } from "@/components/shared/PageHeader"
-import { ReservationsList } from "@/features/bookings/components/ReservationsList"
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import Link from 'next/link'
+import { authorizeOrRedirect } from '@/features/auth/queries'
+import { makeQueryClient } from '@/lib/query/client'
+import { prefetchUserBookings } from '@/features/bookings/prefetch'
+import { PageHeader } from '@/components/shared/PageHeader'
+import { ReservationsPageClient } from '@/features/bookings/components/ReservationsPageClient'
 
 export default async function ReservationsPage() {
   const ctx = await authorizeOrRedirect()
-  const userId = ctx.userId
 
-  const [reservations, invites] = await Promise.all([
-    getAllUserReservations(userId).catch(() => []),
-    getReservationInvites(userId).catch(() => []),
-  ])
+  const queryClient = makeQueryClient()
+  await prefetchUserBookings(queryClient, ctx.userId)
 
   return (
     <div className="flex flex-col gap-8">
@@ -27,7 +26,9 @@ export default async function ReservationsPage() {
           </Link>
         }
       />
-      <ReservationsList reservations={reservations} invites={invites} />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ReservationsPageClient userId={ctx.userId} />
+      </HydrationBoundary>
     </div>
   )
 }
