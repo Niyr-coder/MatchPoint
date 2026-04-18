@@ -3,8 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { bookingKeys } from '@/lib/query/keys'
 
-async function fetchUserReservations() {
-  const res = await fetch('/api/reservations')
+async function fetchUserReservations(userId: string) {
+  const res = await fetch(`/api/reservations?user_id=${userId}`)
   if (!res.ok) throw new Error('Error cargando reservas')
   const json = await res.json()
   return json.data ?? []
@@ -12,7 +12,11 @@ async function fetchUserReservations() {
 
 async function fetchReservationInvites(userId: string) {
   const res = await fetch(`/api/reservations/invites?user_id=${userId}`)
-  if (!res.ok) return []
+  if (res.status === 404) return []  // endpoint doesn't exist yet
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}))
+    throw new Error((json as { error?: string }).error ?? 'Error cargando invitaciones')
+  }
   const json = await res.json()
   return json.data ?? []
 }
@@ -32,7 +36,7 @@ async function cancelReservation(reservationId: string): Promise<void> {
 export function useUserReservations(userId: string | undefined | null) {
   return useQuery({
     queryKey: bookingKeys.user(userId ?? ''),
-    queryFn: fetchUserReservations,
+    queryFn: () => fetchUserReservations(userId!),
     enabled: Boolean(userId),
   })
 }

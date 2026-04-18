@@ -23,7 +23,7 @@ function timeToMinutes(t: string): number {
   return h * 60 + m
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -31,8 +31,14 @@ export async function GET() {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
   }
 
+  const url = new URL(request.url)
+  const userId = url.searchParams.get('user_id')
+
+  // Allow filtering by user_id if provided, otherwise use authenticated user
+  const targetUserId = userId ?? user.id
+
   try {
-    const reservations = await getUserReservations(user.id)
+    const reservations = await getUserReservations(targetUserId)
     return NextResponse.json({ success: true, data: reservations })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al obtener reservas"
