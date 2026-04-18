@@ -33,7 +33,7 @@ interface Props {
 
 export function TournamentsPageClient({ userId }: Props) {
   const { data: openTournaments = [] } = useOpenTournaments()
-  const { data: myTournaments = [] } = useMyTournaments(userId)
+  const { data: myTournaments = [] } = useMyTournaments(userId || undefined)
 
   return (
     <div className="flex flex-col gap-8">
@@ -115,7 +115,7 @@ export function TournamentsPageClient({ userId }: Props) {
                   <div className="flex items-center justify-between pt-2 border-t border-border-subtle">
                     <div className="flex items-center gap-1 text-[11px] text-zinc-500">
                       <Users className="size-3" />
-                      <span>{t.max_participants} cupos</span>
+                      <span>{t.max_participants ? `${t.max_participants} cupos` : 'Sin límite'}</span>
                     </div>
                     <span className="text-[11px] font-black text-foreground">
                       {t.entry_fee > 0 ? `$${t.entry_fee}` : 'Gratis'}
