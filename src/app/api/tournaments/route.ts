@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getOpenTournaments, createTournament } from "@/features/tournaments/queries"
+import { getOpenTournaments, getCreatedTournaments, createTournament } from "@/features/tournaments/queries"
 import { authorize } from "@/features/auth/queries"
 import { z } from "zod"
 import { SPORT_IDS } from "@/lib/sports/config"
@@ -28,7 +28,7 @@ const createTournamentSchema = z.object({
   }).optional(),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -36,8 +36,12 @@ export async function GET() {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
   }
 
+  const createdBy = request.nextUrl.searchParams.get("created_by")
+
   try {
-    const tournaments = await getOpenTournaments()
+    const tournaments = createdBy
+      ? await getCreatedTournaments(createdBy)
+      : await getOpenTournaments()
     return NextResponse.json({ success: true, data: tournaments })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error al obtener torneos"

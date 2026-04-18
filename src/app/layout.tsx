@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants"
+import { QueryProvider } from "@/lib/query/provider"
 
 const inter = Inter({
   variable: "--font-sans",
@@ -56,7 +57,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full bg-card text-foreground antialiased">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   )
