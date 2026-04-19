@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, CheckCircle, XCircle } from "lucide-react"
+import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import {
   onboardingSchema,
   DOMINANT_HANDS,
@@ -423,17 +423,27 @@ export function OnboardingForm() {
 
       {/* Global error */}
       {globalError && (
-        <p className="text-xs text-red-500 text-center">{globalError}</p>
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+          <span>{globalError}</span>
+        </div>
       )}
 
       {/* Submit */}
       <button
         type="submit"
         disabled={status === "loading"}
-        className="btn-pill bg-[#16a34a] text-white w-full py-3.5 text-sm mt-2 disabled:opacity-50"
+        aria-busy={status === "loading"}
+        className="btn-pill-green w-full py-3.5 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {status === "loading" ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Guardando...</span>
+          </>
         ) : (
           "Guardar y continuar"
         )}

@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { Suspense } from "react"
 import { Users, Zap, TrendingUp, Trophy } from "lucide-react"
 import { LoginForm } from "@/components/shared/LoginForm"
 import { SITE_NAME } from "@/lib/constants"
@@ -111,7 +112,9 @@ export default function LoginPage() {
 
         <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-12">
           <div className="w-full max-w-[360px]">
-            <LoginForm />
+            <Suspense>
+              <LoginForm />
+            </Suspense>
           </div>
         </div>
 

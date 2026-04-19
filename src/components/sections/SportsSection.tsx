@@ -37,7 +37,7 @@ function SportCard({ sport, index, single = false }: { sport: SportCategory; ind
         {isPrimary && (
           <div className="absolute top-4 left-4 z-20">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-black text-white uppercase tracking-wider">
-              ⭐ Principal
+              Principal
             </span>
           </div>
         )}

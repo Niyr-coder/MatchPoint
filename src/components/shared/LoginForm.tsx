@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Loader2, AlertCircle } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
 function GoogleIcon() {
@@ -27,10 +28,26 @@ function GoogleIcon() {
   )
 }
 
+const ERROR_MESSAGES: Record<string, string> = {
+  access_denied: "Cancelaste el inicio de sesión con Google.",
+  server_error: "Error del servidor. Intenta de nuevo.",
+  default: "Ocurrió un error al iniciar sesión. Intenta de nuevo.",
+}
+
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const errorCode = searchParams.get("error")
+    if (errorCode) {
+      setError(ERROR_MESSAGES[errorCode] ?? ERROR_MESSAGES.default)
+    }
+  }, [searchParams])
 
   const handleGoogleLogin = async () => {
+    setError(null)
     setIsLoading(true)
     const supabase = createClient()
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
@@ -52,28 +69,45 @@ export function LoginForm() {
         Ingresa con tu cuenta de Google para continuar.
       </p>
 
+      {/* Error banner */}
+      {error && (
+        <div
+          role="alert"
+          className="mt-6 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+          <span>{error}</span>
+        </div>
+      )}
+
       {/* Google button */}
       <div className="mt-10">
         <button
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="flex items-center justify-center gap-3 w-full border border-border bg-white hover:bg-muted rounded-lg px-5 py-3.5 text-sm font-bold text-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          aria-busy={isLoading}
+          className="relative flex items-center justify-center gap-3 w-full border border-border bg-white hover:bg-muted active:scale-[0.98] rounded-xl px-5 py-3.5 text-sm font-bold text-foreground transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           style={{ fontFamily: "inherit" }}
         >
           {isLoading ? (
-            <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-muted-foreground" />
+            <>
+              <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-muted-foreground" />
+              <span>Conectando...</span>
+            </>
           ) : (
-            <GoogleIcon />
+            <>
+              <GoogleIcon />
+              <span>Continuar con Google</span>
+            </>
           )}
-          <span>{isLoading ? "Conectando..." : "Continuar con Google"}</span>
         </button>
 
         {/* Terms */}
         <p className="text-muted-foreground text-xs mt-5 leading-relaxed text-center">
           Al continuar, aceptas nuestros{" "}
-          <a href="#" className="text-primary font-bold hover:underline">Términos de Servicio</a>{" "}
+          <a href="#" className="text-primary font-bold hover:underline focus-visible:outline-none focus-visible:underline">Términos de Servicio</a>{" "}
           y{" "}
-          <a href="#" className="text-primary font-bold hover:underline">Política de Privacidad</a>.
+          <a href="#" className="text-primary font-bold hover:underline focus-visible:outline-none focus-visible:underline">Política de Privacidad</a>.
         </p>
       </div>
     </div>

@@ -1,18 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/85 border-b border-border">
+      <header className={`sticky top-0 z-50 w-full backdrop-blur-xl border-b transition-all duration-300 ${
+        scrolled
+          ? "bg-white/95 border-border shadow-sm"
+          : "bg-transparent border-transparent"
+      }`}>
         <div className="container mx-auto px-6 sm:px-8 h-14 flex items-center justify-between" style={{ maxWidth: 1280 }}>
           {/* Logo */}
-          <a href="/" className="flex items-center gap-1.5 font-black text-[22px] tracking-[-0.03em] text-foreground shrink-0">
+          <a href="/" className={`flex items-center gap-1.5 font-black text-[22px] tracking-[-0.03em] shrink-0 transition-colors duration-300 ${scrolled ? "text-foreground" : "text-white"}`}>
             <span className="text-primary text-[22px]">●</span>
             {SITE_NAME}
           </a>
@@ -23,7 +34,7 @@ export function Navbar() {
               <a
                 key={href}
                 href={href}
-                className="text-sm font-medium text-foreground hover:text-foreground/80 transition-colors"
+                className={`text-sm font-medium transition-colors duration-300 ${scrolled ? "text-foreground hover:text-foreground/70" : "text-white/80 hover:text-white"}`}
               >
                 {label}
               </a>
@@ -34,7 +45,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-2.5 shrink-0">
             <a
               href="/login"
-              className="px-4 py-2.5 text-[13px] font-black text-foreground hover:bg-muted rounded-full transition-colors"
+              className={`px-4 py-2.5 text-[13px] font-black rounded-full transition-colors duration-300 ${scrolled ? "text-foreground hover:bg-muted" : "text-white/80 hover:text-white hover:bg-white/10"}`}
             >
               Iniciar sesión
             </a>
@@ -48,7 +59,7 @@ export function Navbar() {
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 text-foreground rounded-lg hover:bg-muted transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors duration-300 ${scrolled ? "text-foreground hover:bg-muted" : "text-white hover:bg-white/10"}`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >

@@ -22,8 +22,8 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
   const Icon = feature.icon
   return (
     <ScrollReveal delay={index * 0.07}>
-      <div className="bg-white border border-border rounded-2xl p-7 cursor-pointer card-hover h-full">
-        <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] text-primary flex items-center justify-center mb-5">
+      <div className="group bg-white border border-border rounded-2xl p-7 cursor-pointer h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(16,185,129,0.08)]">
+        <div className="w-11 h-11 rounded-xl bg-[#f0fdf4] text-primary flex items-center justify-center mb-5 transition-colors duration-200 group-hover:bg-primary group-hover:text-white">
           <Icon className="w-5 h-5" />
         </div>
         <h3 className="font-black text-foreground uppercase tracking-[-0.03em] text-xl leading-none mb-3">
