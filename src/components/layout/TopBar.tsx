@@ -1,6 +1,6 @@
+import { Search, Plus, Bell } from "lucide-react"
 import { MobileSidebar } from "@/components/layout/MobileSidebar"
 import { NotificationsBell } from "@/features/notifications/components/NotificationsBell"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { NavSection, Profile, AppRole } from "@/types"
 
 interface TopBarProps {
@@ -9,54 +9,43 @@ interface TopBarProps {
   currentRole: AppRole
   pageTitle?: string
   clubName?: string | null
-  darkMode?: boolean
 }
 
-export function TopBar({ sections, profile, currentRole, clubName, darkMode = false }: TopBarProps) {
-  const firstName = profile.first_name ?? profile.full_name?.split(" ")[0] ?? "Bienvenido"
-
-  const initials = [profile.first_name, profile.last_name]
-    .filter(Boolean)
-    .map((n) => n![0].toUpperCase())
-    .join("")
-
-  const today = new Date().toLocaleDateString("es-EC", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  })
-
+export function TopBar({ sections, profile, currentRole, clubName }: TopBarProps) {
   return (
-    <header className={`flex items-center gap-4 h-16 px-4 md:px-6 border-b shrink-0 relative z-10 backdrop-blur-sm ${
-      darkMode
-        ? "border-zinc-800 bg-zinc-950/90"
-        : "border-zinc-200 bg-card/80"
-    }`}>
+    <header className="flex items-center justify-between gap-4 h-[60px] px-4 md:px-7 border-b border-border bg-white sticky top-0 z-10">
       {/* Mobile hamburger */}
-      <MobileSidebar
-        sections={sections}
-        profile={profile}
-        currentRole={currentRole}
-        clubName={clubName}
-      />
-
-      {/* Greeting */}
-      <div className="flex-1 min-w-0">
-        <p className={`text-base font-black leading-tight truncate ${darkMode ? "text-white" : "text-foreground"}`}>
-          Hola, {firstName}.
-        </p>
-        <p className="text-[11px] text-zinc-400 capitalize hidden sm:block">{today}</p>
+      <div className="lg:hidden">
+        <MobileSidebar
+          sections={sections}
+          profile={profile}
+          currentRole={currentRole}
+          clubName={clubName}
+        />
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      {/* Search bar */}
+      <div className="flex items-center gap-2.5 flex-1 max-w-[420px]">
+        <div className="flex-1 relative">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            placeholder="Buscar jugadores, canchas, torneos…"
+            className="w-full py-[9px] pl-8 pr-3 border border-border rounded-lg text-[13px] outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+            style={{ fontFamily: "inherit" }}
+          />
+        </div>
+      </div>
+
+      {/* Right actions */}
+      <div className="flex items-center gap-2 shrink-0">
+        <a
+          href="/dashboard/reservations/new"
+          className="btn-pill-green px-4 py-2 text-[12px] hidden sm:inline-flex items-center gap-1.5"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          Reservar
+        </a>
         <NotificationsBell />
-        <Avatar className="size-8 ml-1">
-          <AvatarImage src={profile.avatar_url ?? undefined} />
-          <AvatarFallback className="bg-foreground text-background text-xs font-black">
-            {initials || "U"}
-          </AvatarFallback>
-        </Avatar>
       </div>
     </header>
   )

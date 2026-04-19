@@ -32,9 +32,9 @@ export default async function HomePage({
         <SocialProofBar />
         <SportsSection />
         <FeaturesSection />
-        <TestimonialsSection />
-        <ClubsSection />
         <StatsSection />
+        <ClubsSection />
+        <TestimonialsSection />
         <CtaSection />
       </main>
       <Footer />

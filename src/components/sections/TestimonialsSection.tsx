@@ -5,21 +5,16 @@ import type { Testimonial } from "@/types"
 function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; index: number }) {
   return (
     <ScrollReveal delay={index * 0.1}>
-      <div className="p-8 rounded-2xl border border-border bg-muted border-l-2 border-l-primary/30 h-full">
-        <p className="text-4xl text-primary/20 font-black leading-none mb-3 select-none">&quot;</p>
-        <div className="flex gap-0.5 mb-4">
-          {[1, 2, 3, 4, 5].map((s) => (
-            <span key={s} className="text-primary text-sm">★</span>
-          ))}
-        </div>
-        <p className="text-foreground font-medium leading-relaxed mb-6">&quot;{testimonial.quote}&quot;</p>
+      <div className="bg-muted border border-border rounded-2xl p-7 h-full">
+        <div className="text-primary text-[32px] leading-[0.5] font-black select-none">&quot;</div>
+        <p className="text-foreground font-medium leading-relaxed mt-3 mb-6" style={{ fontSize: 17 }}>
+          {testimonial.quote}
+        </p>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-lg flex-shrink-0">
-            {testimonial.emoji}
-          </div>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-emerald-700 flex-shrink-0" />
           <div>
-            <p className="text-sm font-black text-foreground uppercase tracking-tight">{testimonial.name}</p>
-            <p className="text-xs text-muted-foreground">{testimonial.sport} · {testimonial.city}</p>
+            <p className="text-[13px] font-bold text-foreground">{testimonial.name}</p>
+            <p className="text-[11px] text-muted-foreground">Nivel 3.5 · {testimonial.city}</p>
           </div>
         </div>
       </div>
@@ -28,22 +23,23 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 }
 
 export function TestimonialsSection() {
-  // Show only player testimonials in main section (first 3)
   const playerTestimonials = TESTIMONIALS.slice(0, 3)
 
   return (
-    <section id="comunidad" className="bg-card py-24 border-t border-border">
-      <div className="container mx-auto px-6 sm:px-8">
+    <section id="testimonials" className="bg-white py-24 px-6 sm:px-8">
+      <div className="container mx-auto" style={{ maxWidth: 1280 }}>
         <ScrollReveal>
-          <p className="label-green">Comunidad</p>
+          <span className="chip mb-4">
+            <span className="chip-dot" /> Lo que dicen
+          </span>
           <h2
-            className="font-black text-foreground uppercase leading-[0.88] tracking-[-0.03em] mb-16 max-w-2xl"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
+            className="font-black text-foreground uppercase leading-[0.95] tracking-[-0.03em]"
+            style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", margin: "16px 0 48px" }}
           >
-            ELLOS YA JUEGAN.<br />TU TURNO.
+            La comunidad habla<span className="text-primary">.</span>
           </h2>
         </ScrollReveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {playerTestimonials.map((t, i) => (
             <TestimonialCard key={i} testimonial={t} index={i} />
           ))}

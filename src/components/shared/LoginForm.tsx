@@ -33,10 +33,6 @@ export function LoginForm() {
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     const supabase = createClient()
-    // Use NEXT_PUBLIC_SITE_URL when set (production canonical domain) so the
-    // callback URL always matches what's configured in Supabase's redirect
-    // allow-list and matches the domain where the code verifier cookie was set.
-    // Falls back to window.location.origin for local dev.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -44,47 +40,42 @@ export function LoginForm() {
         redirectTo: `${siteUrl}/api/auth/callback`,
       },
     })
-    // Browser redirects — no need to reset loading state
   }
 
   return (
-    <div className="space-y-8">
+    <div>
       {/* Header */}
-      <div>
-        <h1 className="font-black text-foreground text-3xl tracking-tight leading-tight mb-2">
-          Empieza a jugar
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          Accede o crea tu cuenta en un solo clic.
-        </p>
-      </div>
+      <h1 className="font-black text-foreground text-[32px] tracking-[-0.03em] leading-none uppercase">
+        Bienvenido<span className="text-primary">.</span>
+      </h1>
+      <p className="text-muted-foreground text-sm mt-2">
+        Ingresa con tu cuenta de Google para continuar.
+      </p>
 
       {/* Google button */}
-      <button
-        onClick={handleGoogleLogin}
-        disabled={isLoading}
-        className="flex items-center gap-3 w-full border border-border bg-card hover:bg-secondary rounded-xl px-4 py-4 text-sm font-semibold text-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
-      >
-        {isLoading ? (
-          <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-muted-foreground" />
-        ) : (
-          <GoogleIcon />
-        )}
-        <span>{isLoading ? "Conectando..." : "Continuar con Google"}</span>
-      </button>
+      <div className="mt-10">
+        <button
+          onClick={handleGoogleLogin}
+          disabled={isLoading}
+          className="flex items-center justify-center gap-3 w-full border border-border bg-white hover:bg-muted rounded-lg px-5 py-3.5 text-sm font-bold text-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          style={{ fontFamily: "inherit" }}
+        >
+          {isLoading ? (
+            <Loader2 className="w-[18px] h-[18px] animate-spin shrink-0 text-muted-foreground" />
+          ) : (
+            <GoogleIcon />
+          )}
+          <span>{isLoading ? "Conectando..." : "Continuar con Google"}</span>
+        </button>
 
-      {/* Terms */}
-      <p className="text-xs text-muted-foreground/70 leading-relaxed">
-        Al continuar aceptas nuestros{" "}
-        <a href="#" className="underline hover:text-muted-foreground transition-colors">
-          Términos de Servicio
-        </a>{" "}
-        y{" "}
-        <a href="#" className="underline hover:text-muted-foreground transition-colors">
-          Política de Privacidad
-        </a>
-        . Si no tienes cuenta, se creará una automáticamente.
-      </p>
+        {/* Terms */}
+        <p className="text-muted-foreground text-xs mt-5 leading-relaxed text-center">
+          Al continuar, aceptas nuestros{" "}
+          <a href="#" className="text-primary font-bold hover:underline">Términos de Servicio</a>{" "}
+          y{" "}
+          <a href="#" className="text-primary font-bold hover:underline">Política de Privacidad</a>.
+        </p>
+      </div>
     </div>
   )
 }

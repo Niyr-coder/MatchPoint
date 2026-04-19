@@ -1,14 +1,13 @@
 "use client"
 
 import Image from "next/image"
-import { ArrowRight, ChevronDown, Building2 } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 export function HeroSection() {
   return (
-    <section className="relative w-full min-h-[92vh] flex items-end overflow-hidden bg-black">
-      {/* Background Image with subtle zoom */}
+    <section className="relative w-full flex items-center overflow-hidden bg-black" style={{ minHeight: 720 }}>
+      {/* Background image with zoom entrance */}
       <div className="absolute inset-0 z-0 animate-zoom-fade-in">
-        <div className="absolute inset-0 bg-black/40 z-10" />
         <Image
           src="/images/landing/hero.png"
           alt="Sports Complex"
@@ -18,78 +17,58 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Overlays */}
-      <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_50%,rgba(22,163,74,0.15),transparent_70%)] z-10 pointer-events-none" />
+      {/* Fallback gradient when image is missing */}
+      <div className="absolute inset-0 z-[1]" style={{
+        backgroundImage: "linear-gradient(135deg, #064e3b 0%, #0a0a0a 40%, #000 100%), radial-gradient(ellipse at 70% 30%, rgba(16,185,129,0.25), transparent 60%)",
+        backgroundBlendMode: "overlay",
+      }} />
 
-      {/* Copy — bottom-left */}
-      <div className="relative z-20 container mx-auto px-6 sm:px-8 pb-16 md:pb-24">
-        {/* Label — white with green dot accent for max visibility on dark photo bg */}
-        <p
-          className="animate-fade-in text-xs font-black uppercase tracking-[0.2em] text-white/80 block mb-4"
-          style={{ animationDelay: "0.1s" }}
-        >
-          <span className="text-primary">●</span>{" "}LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
-        </p>
+      {/* Dark veil */}
+      <div className="absolute inset-0 z-[2] bg-black/55" />
 
-        {/* Headline — two separate phrases, period in emerald signals full stop */}
+      {/* Bottom fade */}
+      <div className="absolute left-0 right-0 bottom-0 h-2/3 z-[3] bg-gradient-to-t from-black via-black/70 to-transparent" />
+
+      {/* Radial green glow */}
+      <div className="absolute inset-0 z-[4] bg-[radial-gradient(ellipse_at_20%_80%,rgba(16,185,129,0.18),transparent_60%)]" />
+
+      {/* Content */}
+      <div className="relative z-10 w-full" style={{ maxWidth: 1280, margin: "0 auto", padding: "120px 32px 140px" }}>
+        {/* Chip badge */}
+        <span className="chip mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <span className="chip-dot" /> La comunidad #1 de pickleball en Ecuador
+        </span>
+
+        {/* Headline */}
         <h1
-          className="animate-fade-in-up-16 font-black text-white uppercase tracking-[-0.03em] mb-8"
-          style={{ fontSize: "clamp(3.5rem, 10vw, 9rem)", animationDelay: "0.15s" }}
+          className="animate-fade-in-up-16 font-black text-white uppercase tracking-[-0.03em]"
+          style={{ fontSize: "clamp(3rem, 8vw, 7.5rem)", lineHeight: 0.9, margin: "24px 0 0", maxWidth: 960, animationDelay: "0.15s" }}
         >
-          <span className="block leading-[0.92] mb-3">
-            JUEGA MÁS<span className="text-primary">.</span>
-          </span>
-          <span className="block leading-[0.92]">
-            JUEGA MEJOR<span className="text-primary">.</span>
-          </span>
+          <span className="block">JUEGA MÁS<span className="text-primary">.</span></span>
+          <span className="block">JUEGA MEJOR<span className="text-primary">.</span></span>
         </h1>
 
         {/* Subheading */}
         <p
-          className="animate-fade-in-up text-white/70 text-lg md:text-xl max-w-md mb-10 font-medium leading-relaxed"
-          style={{ animationDelay: "0.3s" }}
+          className="animate-fade-in-up text-white/70 font-medium max-w-[580px]"
+          style={{ fontSize: 18, lineHeight: 1.55, margin: "32px 0 40px", animationDelay: "0.3s" }}
         >
-          Encuentra rivales de tu nivel, reserva canchas al instante y sube tu ranking en{" "}
-          <span className="text-white">Pickleball.</span>
+          Encuentra rivales de tu nivel, reserva canchas al instante y sube tu ranking.
+          Todo en una sola app.
         </p>
 
-        {/* CTAs — dual audience */}
-        <div
-          className="animate-fade-in-up flex flex-wrap gap-4"
-          style={{ animationDelay: "0.4s" }}
-        >
-          <a
-            href="/login"
-            className="btn-pill bg-card text-foreground px-10 py-3.5 inline-flex items-center gap-2"
-          >
-            Empieza a Jugar <ArrowRight className="w-4 h-4" />
+        {/* CTAs */}
+        <div className="animate-fade-in-up flex flex-wrap gap-3.5" style={{ animationDelay: "0.4s" }}>
+          <a href="#waitlist" className="btn-pill-green px-7 py-3.5 text-sm inline-flex items-center gap-2">
+            Juega ahora <ArrowRight className="w-4 h-4" />
           </a>
           <a
-            href="#clubes"
-            className="btn-pill border border-white/30 text-white hover:bg-card hover:text-foreground px-8 py-3.5 inline-flex items-center gap-2"
+            href="#features"
+            className="btn-pill border border-white/30 text-white hover:bg-white/10 hover:border-white px-7 py-3.5 text-sm inline-flex items-center gap-2 transition-colors"
           >
-            <Building2 className="w-4 h-4" />
-            Registra tu Club
+            Ver cómo funciona
           </a>
         </div>
-
-        {/* Social proof */}
-        <div className="flex items-center gap-3 mt-8 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
-          <div className="flex -space-x-2">
-            {["C", "M", "A", "L"].map((e, i) => (
-              <div key={i} className="w-8 h-8 rounded-full bg-card/10 border border-white/20 flex items-center justify-center text-xs font-black text-white/70">{e}</div>
-            ))}
-          </div>
-          <p className="text-xs text-white/50">
-            <span className="text-white font-semibold">+500</span> deportistas ya en la plataforma
-          </p>
-        </div>
-      </div>
-
-      {/* Scroll hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce z-10">
-        <ChevronDown className="w-6 h-6 text-white/30" />
       </div>
     </section>
   )

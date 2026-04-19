@@ -1,72 +1,55 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { useState } from "react"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 
 export function CtaSection() {
+  const [email, setEmail] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+
   return (
-    <section id="waitlist" className="relative section-dark py-24 overflow-hidden">
+    <section id="waitlist" className="relative bg-[#0a0a0a] text-white py-28 overflow-hidden">
       {/* Radial green glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(22,163,74,0.15),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(16,185,129,0.2),transparent_60%)] pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-6 sm:px-8 text-center max-w-4xl">
+      <div className="relative z-10 text-center" style={{ maxWidth: 900, margin: "0 auto", padding: "0 32px" }}>
         <ScrollReveal>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary block mb-6 text-center">
-            Únete — Acceso Anticipado
-          </p>
-
+          <span className="chip mb-5">
+            <span className="chip-dot" /> Acceso anticipado
+          </span>
           <h2
-            className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-6"
-            style={{ fontSize: "clamp(3rem, 8vw, 8rem)" }}
+            className="font-black text-white uppercase leading-[0.9] tracking-[-0.03em]"
+            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", margin: "20px 0 24px" }}
           >
-            NO TE QUEDES<br />FUERA.
+            Entra antes que<br />todos<span className="text-primary">.</span>
           </h2>
-
-          <p className="text-white/60 text-lg font-medium mb-10 max-w-xl mx-auto">
-            Acceso anticipado gratuito para los primeros 500 registrados.{" "}
-            <br />
-            <span className="text-white font-semibold">Después, será de pago.</span>
+          <p className="text-white/60 mx-auto mb-9" style={{ fontSize: 17, maxWidth: 480 }}>
+            Únete a la lista. Acceso prioritario, tarifas de fundador, y un rival esperándote.
           </p>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.2}>
-          <div className="flex justify-center">
-            <a
-              href="/login"
-              className="btn-pill bg-card text-foreground px-12 py-4 text-base inline-flex items-center gap-2"
-            >
-              Únete Gratis <ArrowRight className="w-5 h-5" />
-            </a>
-          </div>
-        </ScrollReveal>
-
-        {/* Cupos bar */}
-        <ScrollReveal delay={0.3}>
-          <div className="mt-8 flex flex-col items-center gap-2">
-            <div className="w-48 h-1.5 rounded-full bg-white/10 overflow-hidden">
-              <div className="h-full bg-primary rounded-full" style={{ width: "74%" }} />
-            </div>
-            <span className="text-xs text-white/40 font-semibold tracking-wider">370 / 500 CUPOS TOMADOS</span>
-          </div>
-        </ScrollReveal>
-
-        {/* Social proof */}
-        <ScrollReveal delay={0.4} variant="fade-in">
-          <div className="flex items-center justify-center gap-3 mt-10">
-            <div className="flex -space-x-2">
-              {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full bg-white/10 border-2 border-card flex items-center justify-center text-sm"
-                >
-                  {emoji}
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-white/40">
-              <span className="text-white font-semibold">+500</span> deportistas ya registrados
-            </p>
-          </div>
+        <ScrollReveal delay={0.15}>
+          <form
+            onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }}
+            className="flex gap-2 mx-auto rounded-full border border-white/10 bg-white/[0.06] p-1.5"
+            style={{ maxWidth: 460 }}
+          >
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              type="email"
+              required
+              className="flex-1 bg-transparent border-0 text-white px-4 py-2.5 text-sm outline-none placeholder:text-white/30"
+              style={{ fontFamily: "inherit" }}
+            />
+            <button type="submit" className="btn-pill-green px-5 py-2.5 text-[13px] shrink-0">
+              {submitted ? "✓ Listo" : "Únete"}
+            </button>
+          </form>
+          {submitted && (
+            <p className="mt-4 text-[#34d399] text-[13px]">Te avisamos cuando abramos tu zona.</p>
+          )}
         </ScrollReveal>
       </div>
     </section>

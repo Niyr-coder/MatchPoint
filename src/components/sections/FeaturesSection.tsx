@@ -1,83 +1,66 @@
 "use client"
 
-import { Search, Calendar, TrendingUp, ArrowRight, type LucideIcon } from "lucide-react"
+import { Users, Zap, TrendingUp, Trophy, CalendarDays, ShieldCheck, type LucideIcon } from "lucide-react"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 
-interface StepProps {
-  number: string
+interface Feature {
   icon: LucideIcon
   title: string
   desc: string
-  index: number
 }
 
-function Step({ number, icon: Icon, title, desc, index }: StepProps) {
+const FEATURES: Feature[] = [
+  { icon: Users, title: "Rivales de tu nivel", desc: "El algoritmo te conecta con jugadores que te van a exigir — ni muy fácil, ni imposible." },
+  { icon: Zap, title: "Reserva en 30 segundos", desc: "Sin llamadas, sin WhatsApps. Elige cancha, elige horario, listo." },
+  { icon: TrendingUp, title: "Tu ranking sube con cada partido", desc: "Cada punto cuenta. La comunidad ve tu progreso en tiempo real." },
+  { icon: Trophy, title: "Torneos locales", desc: "Compite en tu ciudad. Desde amateurs hasta ligas organizadas." },
+  { icon: CalendarDays, title: "Agenda viva", desc: "Reservas, quedadas, torneos y clases en un solo calendario." },
+  { icon: ShieldCheck, title: "Clubes verificados", desc: "Solo canchas revisadas con disponibilidad confirmada." },
+]
+
+function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+  const Icon = feature.icon
   return (
-    <ScrollReveal delay={index * 0.1}>
-      <div className="text-left">
-        <div className="flex items-center gap-4 mb-6">
-          <span className="text-6xl font-black text-white/10 leading-none select-none">
-            {number}
-          </span>
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Icon className="w-6 h-6 text-primary" />
-          </div>
+    <ScrollReveal delay={index * 0.07}>
+      <div className="bg-white border border-border rounded-2xl p-7 cursor-pointer card-hover h-full">
+        <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] text-primary flex items-center justify-center mb-5">
+          <Icon className="w-5 h-5" />
         </div>
-        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-3">{title}</h3>
-        <p className="text-white/50 font-medium leading-relaxed">{desc}</p>
+        <h3 className="font-black text-foreground uppercase tracking-[-0.03em] text-xl leading-none mb-3">
+          {feature.title}
+        </h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {feature.desc}
+        </p>
       </div>
     </ScrollReveal>
   )
 }
 
-const STEPS = [
-  {
-    number: "01",
-    icon: Search,
-    title: "BUSCA TU CANCHA",
-    desc: "Filtra por deporte, ubicación y horario. Solo canchas verificadas con disponibilidad en tiempo real.",
-  },
-  {
-    number: "02",
-    icon: Calendar,
-    title: "RESERVA AL INSTANTE",
-    desc: "Paga en línea, confirma tu horario y listo. Sin llamadas, sin esperas, sin excusas para no jugar.",
-  },
-  {
-    number: "03",
-    icon: TrendingUp,
-    title: "SUBE TU NIVEL",
-    desc: "Cada partido cuenta. Tu rating sube, desbloqueas torneos y la comunidad conoce tu nombre.",
-  },
-]
-
 export function FeaturesSection() {
   return (
-    <section id="como-funciona" className="section-dark py-24 border-t border-white/5">
-      <div className="container mx-auto px-6 sm:px-8">
+    <section id="features" className="bg-white py-24 px-6 sm:px-8">
+      <div className="container mx-auto" style={{ maxWidth: 1280 }}>
         <ScrollReveal>
-          <p className="label-green">Cómo funciona</p>
+          <span className="chip mb-4">
+            <span className="chip-dot" /> Por qué MatchPoint
+          </span>
           <h2
-            className="font-black text-white uppercase leading-[0.88] tracking-[-0.03em] mb-16"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
+            className="font-black text-foreground uppercase leading-[0.95] tracking-[-0.03em] max-w-3xl"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", margin: "16px 0 0" }}
           >
-            DE CERO A CANCHA<br />EN 60 SEGUNDOS.
+            Todo lo que necesitas para jugar<span className="text-primary">.</span>
           </h2>
+          <p className="text-muted-foreground max-w-[540px] leading-relaxed" style={{ fontSize: 17, margin: "20px 0 64px" }}>
+            Seis herramientas. Un solo lugar. Cero fricción.
+          </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {STEPS.map((step, i) => (
-            <Step key={step.number} {...step} index={i} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURES.map((f, i) => (
+            <FeatureCard key={f.title} feature={f} index={i} />
           ))}
         </div>
-
-        <ScrollReveal delay={0.3}>
-          <div className="mt-16 text-center">
-            <a href="/login" className="btn-pill bg-primary text-white px-10 py-3.5 inline-flex items-center gap-2">
-              Empieza Ahora <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </ScrollReveal>
       </div>
     </section>
   )

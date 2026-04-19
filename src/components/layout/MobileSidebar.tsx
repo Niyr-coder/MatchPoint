@@ -29,29 +29,16 @@ export function MobileSidebar({ sections, profile, currentRole, clubName }: Mobi
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-card border-r border-border">
+        <SheetContent side="left" className="w-64 p-0 bg-[#09090b] text-white border-r border-[#27272a]">
           <SheetHeader className="sr-only">
             <SheetTitle>Menú de navegación</SheetTitle>
           </SheetHeader>
 
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="h-14 px-4 flex items-center border-b border-border shrink-0">
-              <Link href="/" className="flex items-center gap-2.5 min-w-0">
-                <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(22,163,74,0.4)]">
-                  <span className="text-white text-xs font-black tracking-tighter">M</span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-white font-black text-[13px] tracking-[-0.02em] uppercase leading-none">
-                    MATCHPOINT
-                  </p>
-                  {clubName && (
-                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary truncate mt-0.5">
-                      {clubName}
-                    </p>
-                  )}
-                </div>
-              </Link>
+            <div className="px-5 py-[18px] flex items-center gap-1.5 border-b border-[#27272a] shrink-0">
+              <span className="text-primary text-xl">●</span>
+              <span className="font-black text-lg tracking-[-0.02em] text-white">MATCHPOINT</span>
             </div>
 
             {/* Nav */}

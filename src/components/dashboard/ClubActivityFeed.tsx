@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { ActivityItem } from "@/features/clubs/club-activity"
 
 interface ClubActivityFeedProps {
@@ -15,36 +16,44 @@ function relativeTime(timestamp: string): string {
   return `hace ${Math.floor(hours / 24)}d`
 }
 
+function PanelHeader({ title, cta, ctaHref }: { title: string; cta: string; ctaHref: string }) {
+  return (
+    <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <h2 className="text-sm font-black uppercase tracking-[-0.02em]" style={{ fontFamily: "var(--font-heading)" }}>
+        {title}
+      </h2>
+      <Link href={ctaHref} className="text-[11px] font-black uppercase tracking-[0.1em] text-primary hover:underline">
+        {cta} →
+      </Link>
+    </div>
+  )
+}
+
 export function ClubActivityFeed({ items }: ClubActivityFeedProps) {
   if (items.length === 0) return null
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <h2 className="text-xs font-black uppercase tracking-tight text-zinc-400 mb-4">
-        Actividad del Club
-      </h2>
-      <ul className="flex flex-col gap-3">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <PanelHeader title="Actividad del club" cta="Ver todo" ctaHref="/dashboard/activity" />
+      <div>
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3">
-            <span
-              className="mt-1.5 size-1.5 rounded-full shrink-0"
-              style={{ background: item.color }}
-            />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground leading-snug">
-                {item.title}
-              </p>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                {item.subtitle && (
-                  <span>{item.subtitle}</span>
-                )}
-                {item.subtitle && <span> · </span>}
-                <span>{relativeTime(item.timestamp)}</span>
-              </p>
+          <div
+            key={i}
+            className="flex items-center gap-3 px-5 py-3.5"
+            style={{ borderTop: i === 0 ? "none" : "1px solid var(--border)" }}
+          >
+            {/* Avatar placeholder */}
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-emerald-700 flex-shrink-0" />
+            <div className="flex-1 min-w-0 text-[13px]">
+              <b>{item.title}</b>{" "}
+              <span className="text-muted-foreground">{item.subtitle}</span>
             </div>
-          </li>
+            <div className="text-[11px] text-muted-foreground shrink-0">
+              {relativeTime(item.timestamp)}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

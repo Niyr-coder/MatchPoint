@@ -18,10 +18,11 @@ function XIcon() {
   )
 }
 
-function TikTokIcon() {
+function YouTubeIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.28 8.28 0 0 0 4.83 1.54V6.79a4.85 4.85 0 0 1-1.06-.1z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+      <path d="m10 15 5-3-5-3z"/>
     </svg>
   )
 }
@@ -29,30 +30,30 @@ function TikTokIcon() {
 const SOCIAL_LINKS = [
   { label: "Instagram", href: "#", icon: InstagramIcon },
   { label: "X (Twitter)", href: "#", icon: XIcon },
-  { label: "TikTok", href: "#", icon: TikTokIcon },
+  { label: "YouTube", href: "#", icon: YouTubeIcon },
 ]
 
 export function Footer() {
   return (
-    <footer className="section-dark border-t border-white/5">
-      <div className="container mx-auto px-6 sm:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 pb-12 border-b border-white/[0.06]">
-          {/* Brand */}
+    <footer className="bg-[#0a0a0a] text-white" style={{ padding: "80px 32px 32px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-14">
+          {/* Brand column — takes 2 cols */}
           <div className="col-span-2">
-            <a href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-white mb-5">
-              <span className="text-primary">●</span>
+            <a href="/" className="flex items-center gap-1.5 font-black text-2xl tracking-[-0.03em] text-white mb-3.5">
+              <span className="text-primary text-2xl">●</span>
               {SITE_NAME}
             </a>
-            <p className="text-white/30 text-sm leading-relaxed max-w-[200px] mb-7">
-              La plataforma deportiva que conecta jugadores, canchas y torneos en tu ciudad.
+            <p className="text-white/50 text-[13px] leading-relaxed max-w-[280px]">
+              La comunidad #1 de pickleball en Ecuador. Hecho con café en Quito.
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2.5 mt-5">
               {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                  className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-white hover:bg-white/10 transition-colors"
                 >
                   <Icon />
                 </a>
@@ -63,15 +64,15 @@ export function Footer() {
           {/* Link columns */}
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-xs font-black uppercase tracking-widest text-white/25 mb-5">
+              <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#34d399] mb-4">
                 {col.title}
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-xs text-white/40 hover:text-white/70 transition-colors duration-200"
+                      className="text-[13px] text-white/60 hover:text-white/80 transition-colors"
                     >
                       {link.label}
                     </a>
@@ -82,12 +83,13 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <p className="text-xs text-white/25">
-            © {new Date().getFullYear()} {SITE_NAME}. Todos los derechos reservados.
+        {/* Bottom bar */}
+        <div className="border-t border-white/[0.08] pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p className="text-xs text-white/40">
+            © {new Date().getFullYear()} MatchPoint. Todos los derechos reservados.
           </p>
-          <p className="text-xs text-white/20 flex items-center gap-1.5">
-            Hecho con <span className="text-primary">♥</span> para la comunidad deportiva
+          <p className="text-xs text-white/40">
+            Quito · Guayaquil · Cuenca
           </p>
         </div>
       </div>

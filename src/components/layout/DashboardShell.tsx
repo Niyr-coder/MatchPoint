@@ -18,8 +18,8 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className="flex h-screen overflow-hidden bg-muted">
-      {/* Desktop sidebar */}
+    <div className="flex h-screen overflow-hidden bg-[#fafafa]">
+      {/* Desktop sidebar — always dark */}
       <Sidebar
         sections={navSections}
         profile={profile}
@@ -27,20 +27,18 @@ export function DashboardShell({
         clubName={clubName}
       />
 
-      {/* Mobile + main content */}
+      {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0">
-        {/* Mobile top bar — hidden on desktop */}
-        <div className="lg:hidden shrink-0">
-          <TopBar
-            sections={navSections}
-            profile={profile}
-            currentRole={currentRole}
-            clubName={clubName}
-          />
-        </div>
+        {/* Top bar — visible on all screen sizes */}
+        <TopBar
+          sections={navSections}
+          profile={profile}
+          currentRole={currentRole}
+          clubName={clubName}
+        />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="max-w-screen-2xl mx-auto px-4 md:px-7 py-4 md:py-6">
             {children}
           </div>
         </main>

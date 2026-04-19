@@ -33,17 +33,17 @@ export function SidebarNav({ sections, onItemClick }: SidebarNavProps) {
   const activeHref = findActiveHref(sections, pathname)
 
   return (
-    <nav className="flex-1 overflow-y-auto py-3 px-2 scrollbar-thin">
+    <nav className="flex-1 overflow-y-auto py-3 px-3 scrollbar-thin">
       {sections.map((section, i) => (
-        <div key={i} className={i > 0 ? "mt-5" : ""}>
+        <div key={i} className={i > 0 ? "mt-4" : ""}>
           {section.title && (
-            <div className="px-3 pb-1.5">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted-foreground/50">
+            <div className="px-2.5 pb-2 pt-1.5">
+              <p className="text-[9.5px] font-black uppercase tracking-[0.22em] text-[#71717a]">
                 {section.title}
               </p>
             </div>
           )}
-          <div className="space-y-0.5">
+          <div>
             {section.items.map((item) => (
               <SidebarItem
                 key={item.href}

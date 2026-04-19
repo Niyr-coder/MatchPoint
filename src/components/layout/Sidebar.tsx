@@ -2,18 +2,7 @@ import Link from "next/link"
 import { SidebarNav } from "@/components/layout/SidebarNav"
 import { SidebarUserCard } from "@/components/layout/SidebarUserCard"
 import { MobileSidebar } from "@/components/layout/MobileSidebar"
-import { NotificationsBell } from "@/features/notifications/components/NotificationsBell"
 import type { NavSection, Profile, AppRole } from "@/types"
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Administrador",
-  owner: "Owner",
-  manager: "Manager",
-  partner: "Socio",
-  coach: "Entrenador",
-  employee: "Empleado",
-  user: "Jugador",
-}
 
 interface SidebarProps {
   sections: NavSection[]
@@ -24,29 +13,11 @@ interface SidebarProps {
 
 export function Sidebar({ sections, profile, currentRole, clubName }: SidebarProps) {
   return (
-    <aside className="hidden lg:flex flex-col w-60 shrink-0 bg-card border-r border-border">
+    <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-[#09090b] text-white border-r border-[#27272a] sticky top-0 h-screen">
       {/* Logo header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-border shrink-0">
-        <Link href="/" className="flex items-center gap-2.5 min-w-0">
-          <div className="size-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-black tracking-tighter">M</span>
-          </div>
-          <div className="min-w-0">
-            <p className="text-foreground font-black text-[13px] tracking-[-0.02em] uppercase leading-none">
-              MATCHPOINT
-            </p>
-            {clubName ? (
-              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary truncate mt-0.5">
-                {clubName}
-              </p>
-            ) : (
-              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
-                {ROLE_LABELS[currentRole] ?? currentRole}
-              </p>
-            )}
-          </div>
-        </Link>
-        <NotificationsBell />
+      <div className="px-5 py-[18px] flex items-center gap-1.5 border-b border-[#27272a] shrink-0">
+        <span className="text-primary text-xl">●</span>
+        <span className="font-black text-lg tracking-[-0.02em] text-white">MATCHPOINT</span>
       </div>
 
       {/* Navigation */}

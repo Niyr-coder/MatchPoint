@@ -10,10 +10,10 @@ interface ReservasPanelProps {
 
 type DisplayStatus = "confirmada" | "pendiente" | "cancelada"
 
-const STATUS_STYLES: Record<DisplayStatus, { label: string; classes: string }> = {
-  confirmada: { label: "Confirmada", classes: "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]" },
-  pendiente: { label: "Pendiente", classes: "bg-amber-50 text-amber-700 border-amber-200" },
-  cancelada: { label: "Cancelada", classes: "bg-red-50 text-red-600 border-red-200" },
+const STATUS_STYLES: Record<DisplayStatus, { label: string; bg: string; text: string; border?: string }> = {
+  confirmada: { label: "Confirmada", bg: "rgba(16,185,129,0.12)", text: "var(--primary)" },
+  pendiente: { label: "Pendiente pago", bg: "#fffbeb", text: "#b45309", border: "#fde68a" },
+  cancelada: { label: "Cancelada", bg: "#fef2f2", text: "#dc2626", border: "#fecaca" },
 }
 
 const STATUS_MAP: Record<string, DisplayStatus> = {
@@ -34,74 +34,68 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString("es-EC", { weekday: "short", day: "numeric", month: "short" })
 }
 
+function PanelHeader({ title, cta, ctaHref }: { title: string; cta: string; ctaHref: string }) {
+  return (
+    <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <h2 className="text-sm font-black uppercase tracking-[-0.02em]" style={{ fontFamily: "var(--font-heading)" }}>
+        {title}
+      </h2>
+      <Link href={ctaHref} className="text-[11px] font-black uppercase tracking-[0.1em] text-primary hover:underline">
+        {cta} →
+      </Link>
+    </div>
+  )
+}
+
 export function ReservasPanel({ reservations }: ReservasPanelProps) {
   return (
-    <div
-      className="animate-fade-in-up rounded-2xl overflow-hidden flex flex-col bg-card border border-border"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
-        <div className="flex items-center gap-2">
-          <div
-            className="size-8 rounded-xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #fff7ed, #fed7aa)" }}
-          >
-            <Calendar className="size-4 text-orange-500" />
-          </div>
-          <h2 className="text-sm font-black uppercase tracking-tight text-foreground">
-            Mis Reservas
-          </h2>
-        </div>
-        <Link
-          href="/dashboard/reservations/new"
-          className="text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 bg-foreground text-white rounded-full hover:bg-[#222] transition-colors"
-        >
-          Nueva
-        </Link>
-      </div>
+    <div className="animate-fade-in-up rounded-2xl overflow-hidden bg-card border border-border">
+      <PanelHeader title="Próximas reservas" cta="Ver todas" ctaHref="/dashboard/reservations" />
 
-      {/* Reservation list */}
-      <div className="flex-1 divide-y divide-zinc-50">
-        {reservations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2">
-            <Clock className="size-7 text-zinc-300" />
-            <p className="text-xs font-bold text-zinc-400">Sin reservas próximas</p>
-            <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-foreground hover:underline">
-              Reservar una cancha →
-            </Link>
-          </div>
-        ) : (
-          reservations.map((r) => {
+      {reservations.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 gap-2">
+          <Clock className="size-7 text-zinc-300" />
+          <p className="text-xs font-bold text-zinc-400">Sin reservas próximas</p>
+          <Link href="/dashboard/reservations/new" className="text-[11px] font-bold text-foreground hover:underline">
+            Reservar una cancha →
+          </Link>
+        </div>
+      ) : (
+        <div className="flex flex-col">
+          {reservations.map((r, i) => {
             const displayStatus = STATUS_MAP[r.status] ?? "pendiente"
             const st = STATUS_STYLES[displayStatus]
-            const courtName = [r.courts?.name, r.courts?.clubs?.name].filter(Boolean).join(" — ")
+            const courtName = [r.courts?.name, r.courts?.clubs?.name].filter(Boolean).join(" · ")
 
             return (
-              <div key={r.id} className="flex items-center gap-3 px-6 py-3.5">
-                <div className="size-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-                  <Clock className="size-3.5 text-orange-400" />
+              <div key={r.id} className="flex items-center gap-3.5 px-5 py-3.5" style={{ borderTop: i === 0 ? "none" : "1px solid var(--border)" }}>
+                <div className="w-11 h-11 rounded-[10px] bg-[#f0fdf4] text-primary flex items-center justify-center shrink-0">
+                  <Calendar className="w-[18px] h-[18px]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-foreground truncate">{courtName || "Cancha"}</p>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">
-                    {r.courts?.sport ?? ""} · {formatDate(r.date)} · {r.start_time.slice(0, 5)}
+                  <p className="text-[10px] font-black uppercase tracking-[0.15em] text-primary">
+                    {formatDate(r.date)} · {r.start_time.slice(0, 5)}
+                  </p>
+                  <p className="text-sm font-bold mt-0.5 truncate">{courtName || "Cancha"}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {r.courts?.sport ?? "Pickleball"}
                   </p>
                 </div>
-                <span className={`text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full border ${st.classes}`}>
+                <span
+                  className="text-[10px] font-black uppercase tracking-[0.1em] px-2.5 py-1 rounded-full"
+                  style={{
+                    background: st.bg,
+                    color: st.text,
+                    border: st.border ? `1px solid ${st.border}` : "none",
+                  }}
+                >
                   {st.label}
                 </span>
               </div>
             )
-          })
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="px-6 py-3 border-t border-zinc-50">
-        <Link href="/dashboard/reservations" className="text-[11px] font-bold text-zinc-400 hover:text-zinc-600 hover:underline">
-          Ver historial de reservas →
-        </Link>
-      </div>
+          })}
+        </div>
+      )}
     </div>
   )
 }

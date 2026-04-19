@@ -1,13 +1,16 @@
 import { PARTNER_CLUBS } from "@/lib/constants"
 
 export function SocialProofBar() {
-  const doubled = [...PARTNER_CLUBS, ...PARTNER_CLUBS]
+  const tripled = [...PARTNER_CLUBS, ...PARTNER_CLUBS, ...PARTNER_CLUBS]
   return (
-    <section className="bg-card py-5 border-y border-border overflow-hidden">
-      <div className="flex items-center gap-16 animate-marquee whitespace-nowrap">
-        {doubled.map((club, i) => (
-          <span key={i} className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/40 flex-shrink-0">
-            {club}
+    <section className="bg-[#0a0a0a] py-5 overflow-hidden border-b border-white/5">
+      <div className="flex items-center gap-14 animate-marquee whitespace-nowrap">
+        {tripled.map((club, i) => (
+          <span
+            key={i}
+            className="text-[13px] font-bold tracking-[0.12em] uppercase text-white/50 flex-shrink-0"
+          >
+            <span className="text-primary mr-2.5">●</span>{club}
           </span>
         ))}
       </div>

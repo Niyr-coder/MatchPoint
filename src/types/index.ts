@@ -62,6 +62,7 @@ export interface NavItem {
   label: string
   href: string
   icon: string
+  badge?: string
   permission?: import("@/features/auth/types").AppPermission
 }
 

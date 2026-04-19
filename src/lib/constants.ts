@@ -6,10 +6,10 @@ export const SITE_DESCRIPTION =
   "La plataforma #1 de Pickleball en Ecuador. Encuentra canchas, rivales y torneos cerca de ti."
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "Pickleball", href: "#deportes" },
-  { label: "Cómo funciona", href: "#como-funciona" },
-  { label: "Comunidad", href: "#comunidad" },
-  { label: "Para Clubes", href: "#clubes" },
+  { label: "Beneficios", href: "#features" },
+  { label: "Deportes", href: "#deportes" },
+  { label: "Clubes", href: "#clubs" },
+  { label: "Testimonios", href: "#testimonials" },
 ]
 
 // Landing-page display metadata that extends SportConfig with visual fields.
@@ -41,15 +41,15 @@ export const SPORTS: SportCategory[] = VISIBLE_SPORT_IDS.map((id) => {
 
 
 export const TESTIMONIALS: Testimonial[] = [
-  { quote: "Pasé de jugar una vez al mes a tres veces por semana. La app te facilita todo.", name: "Carlos M.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
-  { quote: "Encontré rivales de mi nivel en días. Antes tardaba semanas buscando en grupos de WhatsApp.", name: "María L.", sport: "Pickleball", city: "Guayaquil", emoji: "🏓" },
-  { quote: "El sistema de ranking me motiva a mejorar cada semana. Es adictivo.", name: "Andrés R.", sport: "Pickleball", city: "Cuenca", emoji: "🏓" },
+  { quote: "En dos semanas ya tenía tres matches nuevos. Los rivales eran del nivel justo.", name: "Camila R.", sport: "Pickleball", city: "Cumbayá", emoji: "🏓" },
+  { quote: "Dejé de perder el tiempo en WhatsApps. Reservo, juego, listo.", name: "Juan P.", sport: "Pickleball", city: "Quito", emoji: "🏓" },
+  { quote: "El ranking me mantiene enganchado. Cada partido cuenta.", name: "Sofía M.", sport: "Pickleball", city: "Guayaquil", emoji: "🏓" },
 ]
 
 export const PARTNER_CLUBS: string[] = [
-  "Club Arrayanes", "Liga Pickleball EC", "Pickleball Quito Norte",
-  "Pickleball GYE", "Complejo Los Chillos", "Arena Sports UIO",
-  "Pickleball Cuenca", "Quito Pickleball Club",
+  "Cumbayá Pickleball Club", "Club Rancho San Francisco", "Academia Guayaquil",
+  "Tumbaco Paddle", "Club Quito Tenis", "Pickleball Cuenca",
+  "Arena Sports UIO", "Liga Pickleball EC",
 ]
 
 export const ECUADOR_CITIES_BY_PROVINCE: Record<string, string[]> = {
@@ -83,26 +83,38 @@ export const ECUADOR_PROVINCES = Object.keys(ECUADOR_CITIES_BY_PROVINCE)
 
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
-    title: "Plataforma",
+    title: "Producto",
     links: [
-      { label: "Pickleball", href: "#deportes" },
-      { label: "Cómo funciona", href: "#como-funciona" },
-      { label: "Para Clubes", href: "#clubes" },
-      { label: "Únete Gratis", href: "/login" },
+      { label: "Cómo funciona", href: "#features" },
+      { label: "Deportes", href: "#deportes" },
+      { label: "Clubes", href: "#clubs" },
+      { label: "Precios", href: "#" },
     ],
   },
   {
     title: "Comunidad",
     links: [
-      { label: "Comunidad", href: "#comunidad" },
-      { label: "Torneos", href: "#deportes" },
+      { label: "Torneos", href: "#" },
+      { label: "Ranking", href: "#" },
+      { label: "Blog", href: "#" },
+      { label: "Embajadores", href: "#" },
+    ],
+  },
+  {
+    title: "Empresa",
+    links: [
+      { label: "Nosotros", href: "#" },
+      { label: "Prensa", href: "#" },
+      { label: "Contacto", href: "#" },
+      { label: "Trabaja con nosotros", href: "#" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { label: "Privacidad", href: "#" },
       { label: "Términos", href: "#" },
+      { label: "Privacidad", href: "#" },
+      { label: "Cookies", href: "#" },
     ],
   },
 ]

@@ -90,8 +90,23 @@
   --success: #f0fdf4;
   --success-foreground: #16a34a;
   --success-border: #bbf7d0;
+  --warning: #fffbeb;
+  --warning-foreground: #b45309;
+  --warning-border: #fde68a;
   --foreground-hover: #222222;
   --border-subtle: #f0f0f0;
+
+  /* Shadows */
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-bento-hover: 0 6px 16px rgba(0, 0, 0, 0.06);
+  --shadow-stat-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-dark-hover: 0 6px 20px rgba(0, 0, 0, 0.2);
+
+  /* Motion */
+  --ease-mp: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-slow: 500ms;
 }
 
 /* Dark theme — activated by .dark wrapper in (dashboard) layout */
@@ -277,6 +292,27 @@
   }
   .btn-pill:active {
     opacity: 0.75;
+  }
+
+  /* Chip badge — green pill with dot */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
   }
 }
 

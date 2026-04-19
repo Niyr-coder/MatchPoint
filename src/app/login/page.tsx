@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { Users, Zap, TrendingUp, Trophy } from "lucide-react"
 import { LoginForm } from "@/components/shared/LoginForm"
 import { SITE_NAME } from "@/lib/constants"
 
@@ -9,12 +10,19 @@ export const metadata: Metadata = {
   description: "Accede a tu cuenta de MATCHPOINT y encuentra tu próximo partido.",
 }
 
+const BENEFITS = [
+  { icon: Users, title: "Rivales de tu nivel", desc: "El sistema te conecta con jugadores que te van a exigir." },
+  { icon: Zap, title: "Reserva en 30 segundos", desc: "Sin llamadas, sin WhatsApps. Cancha, horario, listo." },
+  { icon: TrendingUp, title: "Tu ranking sube", desc: "Cada partido cuenta. La comunidad ve tu progreso." },
+  { icon: Trophy, title: "Torneos locales", desc: "Compite en tu ciudad desde amateurs hasta ligas." },
+]
+
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
-      {/* Left — Hero panel (same visual identity as landing hero) */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-black flex-col justify-between">
-        {/* Background image — same as landing hero */}
+      {/* Left — Hero panel */}
+      <div className="hidden lg:flex lg:flex-1 relative overflow-hidden bg-black flex-col justify-between">
+        {/* Background image */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black/55 z-10" />
           <Image
@@ -26,26 +34,29 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Gradient overlay — bottom fade like hero */}
-        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black via-black/70 to-transparent z-10 pointer-events-none" />
-        {/* Green glow — same radial as landing */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(16,185,129,0.18),transparent_60%)] z-10 pointer-events-none" />
+        {/* Fallback gradient */}
+        <div className="absolute inset-0 z-[1]" style={{
+          background: "linear-gradient(135deg, #064e3b 0%, #0a0a0a 40%, #000 100%)",
+        }} />
+        <div className="absolute inset-0 bg-black/55 z-[2]" />
+        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black via-black/70 to-transparent z-[3]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(16,185,129,0.18),transparent_60%)] z-[4]" />
 
         {/* Top — logo */}
-        <div className="relative z-20 p-12 xl:p-16">
-          <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-white">
-            <span className="text-primary">●</span>
+        <div className="relative z-20 p-12">
+          <Link href="/" className="flex items-center gap-1.5 font-black text-[22px] tracking-[-0.03em] text-white">
+            <span className="text-primary text-[22px]">●</span>
             {SITE_NAME}
           </Link>
         </div>
 
         {/* Bottom — headline + benefits + social proof */}
-        <div className="relative z-20 p-12 xl:p-16">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-4">
+        <div className="relative z-20 p-12">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">
             LA COMUNIDAD #1 DE PICKLEBALL EN ECUADOR
           </p>
           <h2
-            className="font-black text-white uppercase tracking-[-0.03em] mb-8"
+            className="font-black text-white uppercase tracking-[-0.03em]"
             style={{ fontSize: "clamp(2rem, 3.5vw, 3.2rem)", lineHeight: 0.92 }}
           >
             <span className="block mb-2">JUEGA MÁS<span className="text-primary">.</span></span>
@@ -53,44 +64,43 @@ export default function LoginPage() {
           </h2>
 
           {/* Benefits list */}
-          <ul className="space-y-4 mb-10">
-            {[
-              { icon: "🏓", title: "Rivals de tu nivel", desc: "El sistema te conecta con jugadores que te van a exigir — ni muy fácil, ni imposible." },
-              { icon: "⚡", title: "Reserva en 30 segundos", desc: "Sin llamadas, sin WhatsApps, sin esperas. Elige cancha, elige horario, listo." },
-              { icon: "📈", title: "Tu ranking sube con cada partido", desc: "Cada punto que juegas cuenta. La comunidad ve tu progreso." },
-              { icon: "🏆", title: "Acceso a torneos locales", desc: "Compite en tu ciudad. Desde amateurs hasta ligas organizadas." },
-            ].map((b) => (
-              <li key={b.title} className="flex gap-3 items-start">
-                <span className="text-lg leading-none mt-0.5 flex-shrink-0">{b.icon}</span>
-                <div>
-                  <p className="text-white text-sm font-bold leading-snug">{b.title}</p>
-                  <p className="text-white/45 text-xs leading-relaxed mt-0.5">{b.desc}</p>
-                </div>
-              </li>
-            ))}
+          <ul className="space-y-4 mt-8 mb-10">
+            {BENEFITS.map((b) => {
+              const Icon = b.icon
+              return (
+                <li key={b.title} className="flex gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-primary/15 text-primary flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-bold text-white">{b.title}</p>
+                    <p className="text-xs text-white/45 mt-0.5 leading-relaxed">{b.desc}</p>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
 
           {/* Social proof */}
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              {["🏓", "🎾", "🏸", "⚽"].map((emoji, i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-8 h-8 rounded-full bg-white/10 border-2 border-black flex items-center justify-center text-sm"
-                >
-                  {emoji}
-                </div>
+                  className="w-8 h-8 rounded-full border-2 border-black"
+                  style={{ background: `hsl(${160 + i * 10}, 55%, ${35 + i * 5}%)` }}
+                />
               ))}
             </div>
             <p className="text-xs text-white/50">
-              <span className="text-white font-semibold">+500</span> deportistas ya dentro
+              <b className="text-white">+500</b> deportistas ya dentro
             </p>
           </div>
         </div>
       </div>
 
       {/* Right — Login form */}
-      <div className="w-full lg:w-1/2 flex flex-col bg-card">
+      <div className="flex-1 flex flex-col bg-white">
         {/* Mobile logo */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-border lg:hidden">
           <Link href="/" className="flex items-center gap-1.5 font-black text-xl tracking-tight text-foreground">
@@ -100,28 +110,19 @@ export default function LoginPage() {
         </div>
 
         <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-12">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-[360px]">
             <LoginForm />
           </div>
         </div>
 
-        <div className="px-6 py-5 text-center lg:hidden border-t border-border">
+        <div className="px-6 lg:px-12 py-6 border-t border-border flex justify-between items-center">
           <p className="text-xs text-muted-foreground">
             ¿No tienes cuenta?{" "}
-            <a href="/#waitlist" className="text-primary font-semibold hover:underline">
+            <a href="/#waitlist" className="text-primary font-bold hover:underline">
               Únete gratis
             </a>
           </p>
-        </div>
-
-        <div className="hidden lg:flex px-12 py-6 border-t border-border justify-between items-center">
-          <p className="text-xs text-muted-foreground">
-            ¿No tienes cuenta?{" "}
-            <a href="/#waitlist" className="text-primary font-semibold hover:underline">
-              Únete gratis
-            </a>
-          </p>
-          <p className="text-xs text-muted-foreground/50">© {new Date().getFullYear()} {SITE_NAME}</p>
+          <p className="text-xs text-muted-foreground/60 hidden sm:block">© {new Date().getFullYear()} MATCHPOINT</p>
         </div>
       </div>
     </div>
